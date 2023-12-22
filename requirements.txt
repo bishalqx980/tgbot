@@ -1,0 +1,7 @@
+python-telegram-bot==20.7
+python-dotenv
+deep-translator
+pymongo
+pytz
+flask
+requests
