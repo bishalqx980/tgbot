@@ -1,0 +1,8 @@
+mongodb stats
+broadcast
+welcome
+group-manage
+- ban unban
+- kick
+- mute unmute
+- delete service msg

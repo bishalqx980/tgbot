@@ -80,6 +80,17 @@ class MongoDB:
             print(e)
 
 
+    def info_db():
+        collection_names = db.list_collection_names()
+
+        for collection_name in collection_names:
+            collection_stats = db.command("collstats", collection_name)
+            coll_name = collection_name
+            coll_stats = collection_stats['count']
+            coll_logical_size = f"{collection_stats['storageSize'] / (1024 * 1024):.2f} MB"
+            coll_actual_size = f"Actual Size: {collection_stats['size'] / (1024 * 1024):.2f} MB"
+            return coll_name, coll_stats, coll_logical_size, coll_actual_size
+
     def delete_all_doc(collection_name):
         collection = db[collection_name]
         try:

@@ -1,16 +1,15 @@
 import requests
-from telegram import Update
-from telegram.constants import ParseMode
 
-async def ping_url(update: Update, ping_url):
-  text = await update.message.reply_text(f"Pinging...")
+def ping_url(ping_url):
   try:
     response = requests.get(ping_url)
-    if response.status_code == 200:
+    status_code = response.status_code
+    if status_code == 200:
       ping_time = response.elapsed.total_seconds() * 1000
-      ping_time = round(ping_time, 2)
-      await text.edit_text(f"↻ <a href='{ping_url}'>Server</a> respond in {ping_time}ms", parse_mode=ParseMode.HTML, disable_web_page_preview=True)
+      ping_time = f"{int(ping_time)}ms"
+      return ping_url, ping_time, status_code
     else:
-      await text.edit_text(f"⚠ <a href='{ping_url}'>Server</a> request timeout! Response: {response.status_code}", parse_mode=ParseMode.HTML, disable_web_page_preview=True)
-  except requests.RequestException as e:
-    await text.edit_text(f"Error: {e}")
+      ping_time = "~"
+      return ping_url, ping_time, status_code
+  except Exception as e:
+    print(e)
