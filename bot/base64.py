@@ -8,7 +8,7 @@ def decode_b64(text):
             print(f"Decoded: {decoded_text}")
             return decoded_text
     except Exception as e:
-        print(e)
+        print(f"Error (Decoding): {e}")
 
 
 def encode_b64(text): 
@@ -19,4 +19,4 @@ def encode_b64(text):
             print(f"Encoded: {encoded_text}")
             return encoded_text
     except Exception as e:
-        print(e)
+        print(f"Error (Encoding): {e}")

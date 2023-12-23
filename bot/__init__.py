@@ -2,15 +2,21 @@ import os
 import logging
 from telegram import Bot
 from dotenv import load_dotenv
-from helper.alive import alive
+from bot.alive import alive
 
 load_dotenv("config.env")
 
 bot_token = os.getenv("bot_token")
-server_url = os.getenv("server_url")
-shortener_api_key = os.getenv("shortener_api_key")
+owner_id = os.getenv("owner_id")
+# database
 mongodb_uri = os.getenv("mongodb_uri")
 db_name = os.getenv("db_name")
+# alive
+server_url = os.getenv("server_url")
+# api's
+shortener_api_key = os.getenv("shortener_api_key")
+omdb_api = os.getenv("omdb_api")
+
 
 bot = Bot(bot_token)
 

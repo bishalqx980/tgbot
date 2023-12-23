@@ -12,4 +12,4 @@ def ping_url(ping_url):
       ping_time = "~"
       return ping_url, ping_time, status_code
   except Exception as e:
-    print(e)
+    print(f"Error (pinging url): {e}")

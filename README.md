@@ -5,9 +5,11 @@ This Telegram bot is built using the `python-telegram-bot` library and performs 
 
 ## Features
 - **Group Management:** Powerfull Group Manager bot
+- **Movie Info:** Can provide any movie/series/episode
 - **Language Translator:** Can translate any lang using Google Translator
 - **URL Shortener:** Can convert any url to shorturl (using shrinke.me api)
 - **Encode/Decode base64:** Can encode/decode base64 code
+- **Calculator:** it has built-in calculator
 - **To be continued...**
 
 ## Setup
@@ -16,7 +18,11 @@ This Telegram bot is built using the `python-telegram-bot` library and performs 
 - Finally `python main.py`
 
 ### Prerequisites
-- Python 3
+- Python 3.11
+- `bot_token` Get from https://t.me/BotFather
+- `mongodb_uri` Get from https://www.mongodb.com/
+- `shortener_api_key` Get from https://shrinkme.io/
+- `omdb_api` Get from https://www.omdbapi.com/
 
 ## License
 ```

@@ -1,4 +1,3 @@
-mongodb stats
 broadcast
 welcome
 group-manage
@@ -6,3 +5,10 @@ group-manage
 - kick
 - mute unmute
 - delete service msg
+
+
+pytube
+https://steamcommunity.com/dev/
+/lockdown
+pip install praytimes
+force sub

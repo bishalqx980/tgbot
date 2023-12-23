@@ -1,9 +1,9 @@
 from telegram import Update, Bot, BotCommand, InlineKeyboardMarkup
 from telegram.constants import ParseMode
-from helper import bot
+from bot import bot
 
 class Message:
-    async def send_msg(chat_id, msg, btn, disable_web_preview=False):
+    async def send_msg(chat_id, msg, btn=None, disable_web_preview=False):
         if btn:
             reply_markup = InlineKeyboardMarkup(btn)
             await bot.send_message(
@@ -22,7 +22,7 @@ class Message:
             )
 
     
-    async def send_img(chat_id, img, caption, btn):
+    async def send_img(chat_id, img, caption, btn=None):
         if btn:
             reply_markup = InlineKeyboardMarkup(btn)
             await bot.send_photo(
