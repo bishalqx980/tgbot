@@ -4,11 +4,19 @@ from telegram import BotCommand
 
 async def set_bot_command():
     commands = [
-        BotCommand("start", "..."),
-        BotCommand("echo", "..."),
-        BotCommand("ping", "..."),
-        BotCommand("calc", "..."),
-        BotCommand("help", "..."),
+        BotCommand("start", "Start the bot"),
+        BotCommand("movie", "Get any movie info"),
+        BotCommand("tr", "Translate text"),
+        BotCommand("setlang", "Set chat language"),
+        BotCommand("decode", "Decode base64 code"),
+        BotCommand("encode", "Encode text code"),
+        BotCommand("shortener", "Short any url"),
+        BotCommand("ping", "Ping any url"),
+        BotCommand("calc", "Calculate any math"),
+        BotCommand("echo", "Make chat fun"),
+        BotCommand("broadcast", "Broadcast message to bot user"),
+        BotCommand("help", "Show help message"),
+        BotCommand("database", "owner only")
     ]
 
     print("Bot commands updated!")

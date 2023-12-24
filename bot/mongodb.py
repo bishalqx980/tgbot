@@ -98,27 +98,29 @@ class MongoDB:
 
 
     def info_db(collection_name=None):
-        collection_names = db.list_collection_names()
+        docs_name = db.list_collection_names()
         if collection_name:
-            if collection_name in collection_names:
-                collection_stats = db.command("collstats", collection_name)
-                coll_name = collection_name
-                coll_stats = collection_stats['count']
-                coll_logical_size = f"{collection_stats['storageSize'] / (1024 * 1024):.2f} MB"
-                coll_actual_size = f"Actual Size: {collection_stats['size'] / (1024 * 1024):.2f} MB"
-                return coll_name, coll_stats, coll_logical_size, coll_actual_size
+            if collection_name in docs_name:
+                doc_stats = db.command("collstats", collection_name)
+                # stats
+                doc_name = collection_name
+                doc_count = doc_stats['count']
+                doc_size = f"{doc_stats['storageSize'] / (1024 * 1024):.2f} MB"
+                doc_acsize = f"Actual Size: {doc_stats['size'] / (1024 * 1024):.2f} MB"
+                return doc_name, doc_count, doc_size, doc_acsize
             else:
                 print(f"{collection_name} Not found!!")
         else:
-            all_collections_info = []
-            for collection_name in collection_names:
-                collection_stats = db.command("collstats", collection_name)
-                coll_name = collection_name
-                coll_stats = collection_stats['count']
-                coll_logical_size = f"{collection_stats['storageSize'] / (1024 * 1024):.2f} MB"
-                coll_actual_size = f"Actual Size: {collection_stats['size'] / (1024 * 1024):.2f} MB"
-                all_collections_info.append((coll_name, coll_stats, coll_logical_size, coll_actual_size))
-            return all_collections_info
+            storage = []
+            for collection_name in docs_name:
+                doc_stats = db.command("collstats", collection_name)
+                # stats
+                doc_name = collection_name
+                doc_count = doc_stats['count']
+                doc_size = f"{doc_stats['storageSize'] / (1024 * 1024):.2f} MB"
+                doc_acsize = f"Actual Size: {doc_stats['size'] / (1024 * 1024):.2f} MB"
+                storage.append((doc_name, doc_count, doc_size, doc_acsize))
+            return storage
 
 
     def delete_all_doc(collection_name):

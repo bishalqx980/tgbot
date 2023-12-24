@@ -7,10 +7,15 @@ This Telegram bot is built using the `python-telegram-bot` library and performs 
 - **Group Management:** Powerfull Group Manager bot
 - **Movie Info:** Can provide any movie/series/episode
 - **Language Translator:** Can translate any lang using Google Translator
-- **URL Shortener:** Can convert any url to shorturl (using shrinke.me api)
 - **Encode/Decode base64:** Can encode/decode base64 code
+- **URL Shortener:** Can convert any url to shorturl (using shrinke.me api)
+- **Ping Website** Can detect website response
 - **Calculator:** it has built-in calculator
-- **To be continued...**
+- **Echo:** I can echo your message (for fun) 😁
+- **broadcast** Can broadcast message to bot users
+
+- **🆘 More Feature coming soon...**
+- **∞ Successor of [Melina](https://t.me/YmlzaGFsbot) ☺**
 
 ## Setup
 - Edit Config.env

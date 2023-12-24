@@ -9,7 +9,7 @@ def ping_url(ping_url):
       ping_time = f"{int(ping_time)}ms"
       return ping_url, ping_time, status_code
     else:
-      ping_time = "~"
-      return ping_url, ping_time, status_code
+      return ping_url, "~", status_code
   except Exception as e:
     print(f"Error (pinging url): {e}")
+    return ping_url, "~", "None"

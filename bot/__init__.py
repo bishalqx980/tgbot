@@ -8,6 +8,7 @@ load_dotenv("config.env")
 
 bot_token = os.getenv("bot_token")
 owner_id = os.getenv("owner_id")
+owner_username = os.getenv("owner_username")
 # database
 mongodb_uri = os.getenv("mongodb_uri")
 db_name = os.getenv("db_name")

@@ -3,7 +3,7 @@ from telegram.constants import ParseMode
 from bot import bot
 
 class Message:
-    async def send_msg(chat_id, msg, btn=None, disable_web_preview=False):
+    async def send_msg(chat_id, msg, btn=None, disable_web_preview=True):
         if btn:
             reply_markup = InlineKeyboardMarkup(btn)
             sent_msg = await bot.send_message(
@@ -43,7 +43,7 @@ class Message:
         return sent_msg
 
     
-    async def reply_msg(update: Update, msg, disable_web_preview=False):
+    async def reply_msg(update: Update, msg, disable_web_preview=True):
         message = update.message
         if message.reply_to_message:
             message_id = message.reply_to_message.message_id
