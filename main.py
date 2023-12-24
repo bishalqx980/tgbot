@@ -1,4 +1,5 @@
-from telegram import Update, InlineKeyboardButton, BotCommand
+import asyncio
+from telegram import Update, InlineKeyboardButton, InputMedia
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
 from bot import bot_token, owner_id, server_url
 from bot.mongodb import MongoDB
@@ -26,16 +27,23 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
     ]
 
-    # await Message.send_msg(chat_id, "Hi, this is send msg", btn=None)
-    # await Message.send_msg(chat_id, "Hi this is a btn message", btn)
-    # await Message.send_img(chat_id, img, "<b>python-telegram-bot==20.7</b>", btn=None)
-    # await Message.send_img(chat_id, img, "<b>python-telegram-bot==20.7</b>", btn)
+    await Message.send_msg(chat_id, "Hi, this is send msg")
+    await Message.send_msg(chat_id, "Hi this is a btn message", btn)
+    await Message.send_img(chat_id, img, "<b>python-telegram-bot==20.7</b>", btn=None)
+    await Message.send_img(chat_id, img, "<b>python-telegram-bot==20.7</b>", btn)
     
     ping = ping_url(server_url)
-    await Message.reply_msg(update, f"URL: {ping[0]}\nTime(ms): {ping[1]}\nResponse: {ping[2]}")
+    x = await Message.reply_msg(update, f"URL: {ping[0]}\nTime(ms): {ping[1]}\nResponse: {ping[2]}")
+    y = await Message.send_img(update.effective_chat.id, img, "python telegram bot library")
+    z = await Message.send_msg(update.effective_chat.id, "Hi from send_mg...") 
+    await asyncio.sleep(2)
+    
+    await Message.send_msg(update.effective_chat.id, "Hi", btn)
+    for msg in [x, y, z]:
+        await Message.edit_msg(update, "Message Edited...", msg)
 
-    info = MongoDB.find("users", "user_id")
-    await Message.reply_msg(update, info)
+    """ info = MongoDB.find("users", "user_id")
+    await Message.reply_msg(update, info) """
 
     """ 
     user = update.effective_user
