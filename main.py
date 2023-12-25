@@ -244,7 +244,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await Message.reply_msg(update, "help")
+    await Message.reply_msg(update, MessageStorage.help_msg())
 
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):

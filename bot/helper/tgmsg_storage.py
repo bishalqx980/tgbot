@@ -1,3 +1,5 @@
+from bot.helper import commands
+
 class MessageStorage:
     def welcome_msg():
         message = (
@@ -10,8 +12,7 @@ class MessageStorage:
             "⪧ I can short any URL\n"
             "⪧ I can ping (Detect web response) any URL\n"
             "⪧ You can use me as a calculator too 😎\n"
-            "⪧ I can echo your message (for fun) 😁\n"
-            "⪧ I can broadcast message to bot users\n\n" # break
+            "⪧ I can echo your message (for fun) 😁\n\n" # break
             "🆘 More Feature coming soon...\n"
             "⪧ /help for bot help\n"
             "∞ Successor of <a href='https://t.me/YmlzaGFsbot'>Melina</a> ☺"
@@ -42,3 +43,11 @@ class MessageStorage:
             f"<pre>{movie_info[9]}</pre>\n"
         )
         return message
+
+
+    def help_msg():
+        message = "<b>Available Bot Commands ⚜</b>\n\n"
+        for cmd in commands:
+            message += (f"/{cmd.command} <code>: {cmd.description}</code>\n")
+        return message
+    

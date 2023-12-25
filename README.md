@@ -12,7 +12,6 @@ This Telegram bot is built using the `python-telegram-bot` library and performs 
 - **Ping Website** Can detect website response
 - **Calculator:** it has built-in calculator
 - **Echo:** I can echo your message (for fun) 😁
-- **broadcast** Can broadcast message to bot users
 
 - **🆘 More Feature coming soon...**
 - **∞ Successor of [Melina](https://t.me/YmlzaGFsbot) ☺**
