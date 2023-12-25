@@ -100,26 +100,30 @@ class MongoDB:
     def info_db(collection_name=None):
         docs_name = db.list_collection_names()
         if collection_name:
+            print(f"Getting Info about {collection_name} MongoDB...")
             if collection_name in docs_name:
                 doc_stats = db.command("collstats", collection_name)
                 # stats
                 doc_name = collection_name
                 doc_count = doc_stats['count']
                 doc_size = f"{doc_stats['storageSize'] / (1024 * 1024):.2f} MB"
-                doc_acsize = f"Actual Size: {doc_stats['size'] / (1024 * 1024):.2f} MB"
+                doc_acsize = f"{doc_stats['size'] / (1024 * 1024):.2f} MB"
+                print("Got Info: [INFO HIDDEN BECASUE OF PRIVACY]!!")
                 return doc_name, doc_count, doc_size, doc_acsize
             else:
                 print(f"{collection_name} Not found!!")
         else:
             storage = []
             for collection_name in docs_name:
+                print(f"Getting Info about {collection_name} MongoDB...")
                 doc_stats = db.command("collstats", collection_name)
                 # stats
                 doc_name = collection_name
                 doc_count = doc_stats['count']
                 doc_size = f"{doc_stats['storageSize'] / (1024 * 1024):.2f} MB"
-                doc_acsize = f"Actual Size: {doc_stats['size'] / (1024 * 1024):.2f} MB"
+                doc_acsize = f"{doc_stats['size'] / (1024 * 1024):.2f} MB"
                 storage.append((doc_name, doc_count, doc_size, doc_acsize))
+            print("Got Info: [INFO HIDDEN BECASUE OF PRIVACY]!!")
             return storage
 
 

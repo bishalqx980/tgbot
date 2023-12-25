@@ -1,5 +1,5 @@
 import asyncio
-from telegram import Update, InlineKeyboardButton, InputMedia
+from telegram import Update, InlineKeyboardButton
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
 from bot import bot_token, bot, owner_id, owner_username, server_url
 from bot.mongodb import MongoDB
@@ -249,9 +249,33 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    msg = " ".join(context.args)
     if user.id == int(owner_id):
-        db = MongoDB.info_db()
-        await Message.reply_msg(update, db)
+        if msg != "":
+            db = MongoDB.info_db(msg)
+            if db:
+                msg = (
+                    f"▬▬▬▬▬▬▬▬▬▬\n"
+                    f"Doc Name:<code> {db[0]}</code>\n"
+                    f"Doc Count:<code> {db[1]}</code>\n"
+                    f"Doc Size:<code> {db[2]}</code>\n"
+                    f"Actual Size:<code> {db[3]}</code>\n"
+                    f"▬▬▬▬▬▬▬▬▬▬\n"
+                )
+        else:
+            db = MongoDB.info_db()
+            msg = "▬▬▬▬▬▬▬▬▬▬\n"
+            for info in db:
+                msg += (
+                    f"Doc Name:<code> {info[0]}</code>\n"
+                    f"Doc Count:<code> {info[1]}</code>\n"
+                    f"Doc Size:<code> {info[2]}</code>\n"
+                    f"Actual Size:<code> {info[3]}</code>\n"
+                    f"▬▬▬▬▬▬▬▬▬▬\n"
+                )
+
+        await Message.reply_msg(update, f"<b>{msg}</b>")
+
     else:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 

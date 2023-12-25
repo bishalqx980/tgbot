@@ -1,4 +1,4 @@
-from telegram import Update, Bot, BotCommand, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardMarkup
 from telegram.constants import ParseMode
 from bot import bot
 
@@ -57,6 +57,7 @@ class Message:
             parse_mode=ParseMode.HTML
         )
         return sent_msg
+
 
     async def edit_msg(update: Update, edit_msg_text, sent_msg_pointer):
         caption_msg = sent_msg_pointer.caption

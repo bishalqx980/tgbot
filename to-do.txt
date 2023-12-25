@@ -11,3 +11,5 @@ https://steamcommunity.com/dev/
 /lockdown
 pip install praytimes
 force sub
+
+v1.0.1 ∞
