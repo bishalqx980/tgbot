@@ -81,6 +81,13 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     if chat.type == "private":
         msg = " ".join(context.args)
+        tr_reply = update.message.reply_to_message
+        if tr_reply:
+            if tr_reply.text:
+                msg = tr_reply.text
+            elif tr_reply.caption:
+                msg = tr_reply.caption
+
         if msg != "":
             find_user = MongoDB.find_one("users", "user_id", user.id)
             lang_code = find_user.get("lang")
@@ -101,7 +108,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 await Message.reply_msg(update, "Something Went Wrong!")
         else:
-            await Message.reply_msg(update, "Use <code>/tr text</code>\nE.g. <code>/tr the text you want to translate</code>")
+            await Message.reply_msg(update, "Use <code>/tr text</code> or reply the text with <code>/tr</code>\nE.g. <code>/tr the text you want to translate</code>")
 
     else:
         await Message.reply_msg(update, "Coming Soon...")
