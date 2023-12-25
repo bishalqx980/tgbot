@@ -2,7 +2,7 @@ class MessageStorage:
     def welcome_msg():
         message = (
             "Hi, {user_mention} !! It's <a href='https://t.me/{bot_username}'>{bot_firstname}</a>!\n"
-            "I'm not only a Powerfull Group Management bot but also\n"
+            "I'm not only a Powerful Group Management bot but also\n"
             "I can do many other task 😜\n\n" # break
             "⪧ I can get any Movie information\n"
             "⪧ I can Translate any language to your desired lang\n"
@@ -13,6 +13,7 @@ class MessageStorage:
             "⪧ I can echo your message (for fun) 😁\n"
             "⪧ I can broadcast message to bot users\n\n" # break
             "🆘 More Feature coming soon...\n"
+            "⪧ /help for bot help\n"
             "∞ Successor of <a href='https://t.me/YmlzaGFsbot'>Melina</a> ☺"
         )
         return message

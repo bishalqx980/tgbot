@@ -1,4 +1,3 @@
-broadcast
 welcome
 group-manage
 - ban unban

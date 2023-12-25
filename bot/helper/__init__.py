@@ -14,8 +14,8 @@ async def set_bot_command():
         BotCommand("ping", "Ping any url"),
         BotCommand("calc", "Calculate any math"),
         BotCommand("echo", "Make chat fun"),
-        BotCommand("broadcast", "Broadcast message to bot user"),
         BotCommand("help", "Show help message"),
+        BotCommand("broadcast", "owner only"),
         BotCommand("database", "owner only")
     ]
 

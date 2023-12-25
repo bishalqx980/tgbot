@@ -49,13 +49,31 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
-    movie_info = get_movie_info(msg)
-    if movie_info:
-        msg = MessageStorage.msg_movie_info(movie_info)
-        btn = [
-            [InlineKeyboardButton(f"✨ IMDB - {movie_info[2]}", f"https://www.imdb.com/title/{movie_info[16]}")]
-        ]
-        await Message.send_img(update.effective_chat.id, movie_info[0], msg, btn)
+
+    if msg != "":
+        imdb_id = None
+        year = None
+        
+        if "-i" in msg:
+            index_i = msg.index("-i")
+            imdb_id = msg[index_i + len("-i"):].strip()
+            msg = None
+        elif "-y" in msg:
+            index_y = msg.index("-y")
+            year = msg[index_y + len("-y"):].strip()
+            msg = msg[0:index_y].strip()
+        elif "-i" and "-y" in msg:
+            await Message.reply_msg(update, "⚠ You can't use both statement in same message!\n/movie for details.")
+
+        movie_info = get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
+        if movie_info:
+            msg = MessageStorage.msg_movie_info(movie_info)
+            btn = [
+                [InlineKeyboardButton(f"✨ IMDB - {movie_info[2]}", f"https://www.imdb.com/title/{movie_info[16]}")]
+            ]
+            await Message.send_img(update.effective_chat.id, movie_info[0], msg, btn)
+    else:
+        await Message.reply_msg(update, "Use <code>/movie movie_name</code>\nE.g. <code>/movie animal</code>\nor\n<code>/movie -i tt13751694</code> [IMDB ID]\nor\n<code>/movie bodyguard -y 2011</code>")
 
 
 async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -81,7 +99,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if tr_msg != msg:
                 await Message.reply_msg(update, tr_msg)
             else:
-                await Message.reply_msg(update, "Something Went Worng!")
+                await Message.reply_msg(update, "Something Went Wrong!")
         else:
             await Message.reply_msg(update, "Use <code>/tr text</code>\nE.g. <code>/tr the text you want to translate</code>")
 
@@ -180,7 +198,7 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if verify == "on":
                 await Message.reply_msg(update, "Echo enabled in this chat!")
             else:
-                await Message.reply_msg(update, "Something went wrong!")
+                await Message.reply_msg(update, "Something Went Wrong!")
         elif msg == "off":
             MongoDB.update_db("users", "user_id", user.id, "echo", "off")
             find_one = MongoDB.find_one("users", "user_id", user.id)
@@ -188,7 +206,7 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if verify == "off":
                 await Message.reply_msg(update, "Echo disabled in this chat!")
             else:
-                await Message.reply_msg(update, "Something went wrong!")
+                await Message.reply_msg(update, "Something Went Wrong!")
         elif msg == "":
             await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
 
@@ -222,7 +240,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Job Done !!")
 
     else:
-        await Message.reply_msg(update, "❗ This command is only for bot moderators!")
+        await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -230,9 +248,12 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    get = MongoDB.info_db("users")
-    print(get)
-    await Message.reply_msg(update, get)
+    user = update.effective_user
+    if user.id == int(owner_id):
+        db = MongoDB.info_db()
+        await Message.reply_msg(update, db)
+    else:
+        await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
 
 async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -260,9 +281,9 @@ def main():
     application.add_handler(CommandHandler("ping", func_ping))
     application.add_handler(CommandHandler("calc", func_calc))
     application.add_handler(CommandHandler("echo", func_echo))
-    application.add_handler(CommandHandler("broadcast", func_broadcast))
     application.add_handler(CommandHandler("help", func_help))
     # owner
+    application.add_handler(CommandHandler("broadcast", func_broadcast))
     application.add_handler(CommandHandler("database", func_database))
     # filters
     application.add_handler(MessageHandler(filters.ALL, func_filter_all))
