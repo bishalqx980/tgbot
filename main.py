@@ -19,22 +19,23 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_info = await bot.get_me()
     avatar = MongoDB.get_data("ciri_docs", "avatar")
 
-    welcome_msg = MessageStorage.welcome_msg()
-    welcome_msg = welcome_msg.format(
-        user_mention = user.mention_html(),
-        bot_username = bot_info.username,
-        bot_firstname = bot_info.first_name
-    )
-
-    btn = [
-        [
-            InlineKeyboardButton("⚡ Developer ⚡", f"https://t.me/{owner_username}")
-        ]
-    ]
-
-    await Message.send_img(chat.id, avatar, welcome_msg, btn)
-
     if chat.type == "private":
+        welcome_msg = MessageStorage.welcome_msg()
+        welcome_msg = welcome_msg[0].format(
+            user_mention = user.mention_html(),
+            bot_username = bot_info.username,
+            bot_firstname = bot_info.first_name
+        )
+
+        btn = [
+            [
+                InlineKeyboardButton("Add in Group", f"http://t.me/{bot_info.username}?startgroup=start"),
+                InlineKeyboardButton("⚡ Developer ⚡", f"https://t.me/{owner_username}")
+            ]
+        ]
+
+        await Message.send_img(chat.id, avatar, welcome_msg, btn)
+
         data = {
             "user_id": user.id,
             "Name": user.full_name,
@@ -45,6 +46,20 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_db = MongoDB.find_one("users", "user_id", user.id)
         if not find_db:
             MongoDB.insert_single_data("users", data)
+
+    else:
+        welcome_msg = MessageStorage.welcome_msg()
+        welcome_msg = welcome_msg[1].format(
+            user_mention = user.mention_html()
+        )
+
+        btn = [
+            [
+                InlineKeyboardButton("Start me in private", f"http://t.me/{bot_info.username}?start=start")
+            ]
+        ]
+
+        await Message.send_msg(chat.id, welcome_msg, btn)
 
 
 async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
