@@ -301,7 +301,7 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]
         ]
 
-        await Message.reply_msg(update, "Add me to your Group to manage your Group!", btn)
+        await Message.send_msg(chat.id, "Add me to your Group to manage your Group!", btn)
 
 
 async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -340,7 +340,7 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]
         ]
 
-        await Message.reply_msg(update, "Add me to your Group to manage your Group!", btn)
+        await Message.send_msg(chat.id, "Add me to your Group to manage your Group!", btn)
 
 
 
@@ -381,7 +381,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]
         ]
 
-        await Message.reply_msg(update, "Add me to your Group to manage your Group!", btn)
+        await Message.send_msg(chat.id, "Add me to your Group to manage your Group!", btn)
 
 
 async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -437,7 +437,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]
         ]
 
-        await Message.reply_msg(update, "Add me to your Group to manage your Group!", btn)
+        await Message.send_msg(chat.id, "Add me to your Group to manage your Group!", btn)
 
 
 async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -493,7 +493,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]
         ]
 
-        await Message.reply_msg(update, "Add me to your Group to manage your Group!", btn)
+        await Message.send_msg(chat.id, "Add me to your Group to manage your Group!", btn)
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
