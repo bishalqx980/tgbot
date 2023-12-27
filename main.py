@@ -236,35 +236,6 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Coming Soon...")
 
 
-async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    replied_msg = update.message.reply_to_message
-
-    if user.id == int(owner_id):
-        if replied_msg:
-            msg = replied_msg.text
-        else:
-            await Message.reply_msg(update, "Reply a message to broadcast!")
-            return
-        
-        users = MongoDB.find("users", "user_id")
-        x = MongoDB.info_db("users")
-
-        sent_count = 0
-        notify = await Message.send_msg(owner_id, f"Sent: {sent_count}\nTotal User: {x[1]}")
-        for user_id in users:
-            try:
-                await Message.send_msg(user_id, msg)
-                sent_count += 1
-                await Message.edit_msg(update, f"Sent: {sent_count}\nTotal User: {x[1]}", notify)
-            except Exception as e:
-                print(f"Error Broadcast: {e}")
-        await Message.reply_msg(update, "Job Done !!")
-
-    else:
-        await Message.reply_msg(update, "❗ This command is only for bot owner!")
-
-
 async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -498,6 +469,35 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await Message.reply_msg(update, MessageStorage.help_msg())
+
+
+async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    replied_msg = update.message.reply_to_message
+
+    if user.id == int(owner_id):
+        if replied_msg:
+            msg = replied_msg.text
+        else:
+            await Message.reply_msg(update, "Reply a message to broadcast!")
+            return
+        
+        users = MongoDB.find("users", "user_id")
+        x = MongoDB.info_db("users")
+
+        sent_count = 0
+        notify = await Message.send_msg(owner_id, f"Sent: {sent_count}\nTotal User: {x[1]}")
+        for user_id in users:
+            try:
+                await Message.send_msg(user_id, msg)
+                sent_count += 1
+                await Message.edit_msg(update, f"Sent: {sent_count}\nTotal User: {x[1]}", notify)
+            except Exception as e:
+                print(f"Error Broadcast: {e}")
+        await Message.reply_msg(update, "Job Done !!")
+
+    else:
+        await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
