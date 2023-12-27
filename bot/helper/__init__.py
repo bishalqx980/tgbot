@@ -4,15 +4,20 @@ from telegram import BotCommand
 
 commands = [
     BotCommand("start", "Start the bot"),
-    BotCommand("movie", "Get any movie info"),
-    BotCommand("tr", "Translate text"),
-    BotCommand("setlang", "Set chat language"),
+    BotCommand("movie", "Get any movie info by name/imdb id"),
+    BotCommand("tr", "Translate any lang to your lang"),
+    BotCommand("setlang", "Set chat default language"),
     BotCommand("decode", "Decode base64 code"),
     BotCommand("encode", "Encode text code"),
     BotCommand("shortener", "Short any url"),
     BotCommand("ping", "Ping any url"),
     BotCommand("calc", "Calculate any math"),
     BotCommand("echo", "Make chat fun"),
+    BotCommand("ban", "Ban an user from group"),
+    BotCommand("unban", "Unban an user from group"),
+    BotCommand("kick", "Kick an user from group"),
+    BotCommand("mute", "Mute an user (Restrict from group)"),
+    BotCommand("unmute", "Unmute an user (Unrestrict from group)"),
     BotCommand("help", "Show help message"),
     BotCommand("broadcast", "owner only"),
     BotCommand("database", "owner only")

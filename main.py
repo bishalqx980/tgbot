@@ -1,5 +1,5 @@
 import asyncio
-from telegram import Update, InlineKeyboardButton
+from telegram import Update, InlineKeyboardButton, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
 from bot import bot_token, bot, owner_id, owner_username, server_url
 from bot.mongodb import MongoDB
@@ -265,6 +265,192 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
 
+async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    reply = update.message.reply_to_message
+    get_bot = await bot.get_me()
+    get_bot_permission = await chat.get_member(get_bot.id)
+    get_user_permission = await chat.get_member(user.id)
+
+    if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        if get_bot_permission.status == ChatMember.ADMINISTRATOR:
+            try:
+                if reply:
+                    get_user_permission = await chat.get_member(reply.from_user.id)
+                    if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                        await bot.ban_chat_member(chat.id, reply.from_user.id)
+                        await Message.reply_msg(update, f"{user.mention_html()} has been banned!")
+                    elif get_bot.id == reply.from_user.id:
+                        await Message.reply_msg(update, "Really? Should I leave? 😐")
+                    else:
+                        await Message.reply_msg(update, "I'm not going to ban an admin!")
+                else:
+                    await Message.reply_msg(update, "Reply the user message with command to ban him/her!")
+            except Exception as e:
+                print(f"Error user ban: {e}")
+        else:
+            await Message.reply_msg(update, "I'm not an admin in this chat!")
+    else:
+        await Message.reply_msg(update, "You aren't an admin of this chat!")
+
+
+async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    reply = update.message.reply_to_message
+    get_bot = await bot.get_me()
+    get_bot_permission = await chat.get_member(get_bot.id)
+    get_user_permission = await chat.get_member(user.id)
+
+    if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        if get_bot_permission.status == ChatMember.ADMINISTRATOR:
+            try:
+                if reply:
+                    get_user_permission = await chat.get_member(reply.from_user.id)
+                    if get_user_permission.status == ChatMember.BANNED:
+                        await bot.unban_chat_member(chat.id, reply.from_user.id)
+                        await Message.reply_msg(update, f"{user.mention_html()} has been unbanned! He/She can join again!")
+                    elif get_bot.id == reply.from_user.id:
+                        await Message.reply_msg(update, "What is happening here? Why should I ban or unban myslef? Should I leave? 😐")
+                    else:
+                        await Message.reply_msg(update, "Wrong command for this task!")
+                else:
+                    await Message.reply_msg(update, "Reply the user message with command to unban him/her!")
+            except Exception as e:
+                print(f"Error user unban: {e}")
+        else:
+            await Message.reply_msg(update, "I'm not an admin in this chat!")
+    else:
+        await Message.reply_msg(update, "You aren't an admin of this chat!")
+
+
+
+async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    reply = update.message.reply_to_message
+    get_bot = await bot.get_me()
+    get_bot_permission = await chat.get_member(get_bot.id)
+    get_user_permission = await chat.get_member(user.id)
+
+    if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        if get_bot_permission.status == ChatMember.ADMINISTRATOR:
+            try:
+                if reply:
+                    get_user_permission = await chat.get_member(reply.from_user.id)
+                    if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                        await bot.ban_chat_member(chat.id, reply.from_user.id)
+                        await bot.unban_chat_member(chat.id, reply.from_user.id)
+                        await Message.reply_msg(update, f"{user.mention_html()} has been kicked!")
+                    elif get_bot.id == reply.from_user.id:
+                        await Message.reply_msg(update, "What is happening here? Why should I kick myslef? Should I leave? 😐")
+                    else:
+                        await Message.reply_msg(update, "I'm not going to kick an admin!")
+                else:
+                    await Message.reply_msg(update, "Reply the user message with command to kick him/her!")         
+            except Exception as e:
+                print(f"Error user kick: {e}")
+        else:
+            await Message.reply_msg(update, "I'm not an admin in this chat!")
+    else:
+        await Message.reply_msg(update, "You aren't an admin of this chat!") 
+
+
+async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    reply = update.message.reply_to_message
+    get_bot = await bot.get_me()
+    get_bot_permission = await chat.get_member(get_bot.id)
+    get_user_permission = await chat.get_member(user.id)
+
+    permissions = {
+        "can_send_other_messages": False,
+        "can_invite_users": False,
+        "can_send_polls": False,
+        "can_send_messages": False,
+        "can_change_info": False,
+        "can_pin_messages": False,
+        "can_add_web_page_previews": False,
+        "can_manage_topics": False,
+        "can_send_audios": False,
+        "can_send_documents": False,
+        "can_send_photos": False,
+        "can_send_videos": False,
+        "can_send_video_notes": False,
+        "can_send_voice_notes": False
+    }
+
+    if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        if get_bot_permission.status == ChatMember.ADMINISTRATOR:
+            try:
+                if reply:
+                    get_user_permission = await chat.get_member(reply.from_user.id)
+                    if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                        await bot.restrict_chat_member(chat.id, reply.from_user.id, permissions)
+                        await Message.reply_msg(update, f"{user.mention_html()} has been muted 🤫!")
+                    elif get_bot.id == reply.from_user.id:
+                        await Message.reply_msg(update, "What is happening here? Why you want to mute me? 😐")
+                    else:
+                        await Message.reply_msg(update, "I'm not going to mute an admin!")
+                else:
+                    await Message.reply_msg(update, "Reply the user message with command to mute him/her!")         
+            except Exception as e:
+                print(f"Error user mute: {e}")
+        else:
+            await Message.reply_msg(update, "I'm not an admin in this chat!")
+    else:
+        await Message.reply_msg(update, "You aren't an admin of this chat!") 
+
+
+async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    reply = update.message.reply_to_message
+    get_bot = await bot.get_me()
+    get_bot_permission = await chat.get_member(get_bot.id)
+    get_user_permission = await chat.get_member(user.id)
+
+    permissions = {
+        "can_send_other_messages": True,
+        "can_invite_users": True,
+        "can_send_polls": True,
+        "can_send_messages": True,
+        "can_change_info": True,
+        "can_pin_messages": True,
+        "can_add_web_page_previews": True,
+        "can_manage_topics": True,
+        "can_send_audios": True,
+        "can_send_documents": True,
+        "can_send_photos": True,
+        "can_send_videos": True,
+        "can_send_video_notes": True,
+        "can_send_voice_notes": True
+    }
+
+    if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        if get_bot_permission.status == ChatMember.ADMINISTRATOR:
+            try:
+                if reply:
+                    get_user_permission = await chat.get_member(reply.from_user.id)
+                    if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                        await bot.restrict_chat_member(chat.id, reply.from_user.id, permissions)
+                        await Message.reply_msg(update, f"{user.mention_html()} has been unmuted 😉! You can speak again {user.mention_html()}!")
+                    elif get_bot.id == reply.from_user.id:
+                        await Message.reply_msg(update, "Wrong command for this task!")
+                    else:
+                        await Message.reply_msg(update, "Wrong command for this task!")
+                else:
+                    await Message.reply_msg(update, "Reply the user message with command to unmute him/her!")         
+            except Exception as e:
+                print(f"Error user mute: {e}")
+        else:
+            await Message.reply_msg(update, "I'm not an admin in this chat!")
+    else:
+        await Message.reply_msg(update, "You aren't an admin of this chat!") 
+
+
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await Message.reply_msg(update, MessageStorage.help_msg())
 
@@ -327,6 +513,11 @@ def main():
     application.add_handler(CommandHandler("ping", func_ping))
     application.add_handler(CommandHandler("calc", func_calc))
     application.add_handler(CommandHandler("echo", func_echo))
+    application.add_handler(CommandHandler("ban", func_ban))
+    application.add_handler(CommandHandler("unban", func_unban))
+    application.add_handler(CommandHandler("kick", func_kick))
+    application.add_handler(CommandHandler("mute", func_mute))
+    application.add_handler(CommandHandler("unmute", func_unmute))
     application.add_handler(CommandHandler("help", func_help))
     # owner
     application.add_handler(CommandHandler("broadcast", func_broadcast))
