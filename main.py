@@ -467,6 +467,25 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_msg(chat.id, "Add me to your Group to manage your Group!", btn)
 
 
+async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    admins = await bot.get_chat_administrators(chat.id)
+
+    owner_storage = ""
+    admins_storage = ""
+    bots_storage = ""
+
+    for admin in admins:
+        if admin.status == "creator":
+            owner_storage += f"<b>👑 Owner:</b>\n<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n\n"
+        elif admin.user.is_bot == True:
+            bots_storage += f"<b>🤖 Bot's:</b>\n<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n\n"
+        else:
+            admins_storage += f"<b>⚔ Admin's:</b>\n<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n\n"
+
+    await Message.reply_msg(update, f"<b>{chat.title} admin's ↴</b>\n\n{owner_storage}{admins_storage}{bots_storage}")
+
+
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await Message.reply_msg(update, MessageStorage.help_msg())
 
@@ -563,6 +582,7 @@ def main():
     application.add_handler(CommandHandler("kick", func_kick))
     application.add_handler(CommandHandler("mute", func_mute))
     application.add_handler(CommandHandler("unmute", func_unmute))
+    application.add_handler(CommandHandler("adminlist", func_adminlist))
     application.add_handler(CommandHandler("help", func_help))
     # owner
     application.add_handler(CommandHandler("broadcast", func_broadcast))

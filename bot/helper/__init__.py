@@ -18,6 +18,7 @@ commands = [
     BotCommand("kick", "Kick an user from group"),
     BotCommand("mute", "Mute an user (Restrict from group)"),
     BotCommand("unmute", "Unmute an user (Unrestrict from group)"),
+    BotCommand("adminlist", "See group admins list"),
     BotCommand("help", "Show help message"),
     BotCommand("broadcast", "owner only"),
     BotCommand("database", "owner only")
