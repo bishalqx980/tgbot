@@ -273,26 +273,35 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     get_bot_permission = await chat.get_member(get_bot.id)
     get_user_permission = await chat.get_member(user.id)
 
-    if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        if get_bot_permission.status == ChatMember.ADMINISTRATOR:
-            try:
-                if reply:
-                    get_user_permission = await chat.get_member(reply.from_user.id)
-                    if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                        await bot.ban_chat_member(chat.id, reply.from_user.id)
-                        await Message.reply_msg(update, f"{user.mention_html()} has been banned!")
-                    elif get_bot.id == reply.from_user.id:
-                        await Message.reply_msg(update, "Really? Should I leave? 😐")
+    if chat.type in ["group", "supergroup"]:
+        if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+            if get_bot_permission.status == ChatMember.ADMINISTRATOR:
+                try:
+                    if reply:
+                        get_user_permission = await chat.get_member(reply.from_user.id)
+                        if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                            await bot.ban_chat_member(chat.id, reply.from_user.id)
+                            await Message.reply_msg(update, f"{user.mention_html()} has been banned!")
+                        elif get_bot.id == reply.from_user.id:
+                            await Message.reply_msg(update, "Really? Should I leave? 😐")
+                        else:
+                            await Message.reply_msg(update, "I'm not going to ban an admin!")
                     else:
-                        await Message.reply_msg(update, "I'm not going to ban an admin!")
-                else:
-                    await Message.reply_msg(update, "Reply the user message with command to ban him/her!")
-            except Exception as e:
-                print(f"Error user ban: {e}")
+                        await Message.reply_msg(update, "Reply the user message with command to ban him/her!")
+                except Exception as e:
+                    print(f"Error user ban: {e}")
+            else:
+                await Message.reply_msg(update, "I'm not an admin in this chat!")
         else:
-            await Message.reply_msg(update, "I'm not an admin in this chat!")
+            await Message.reply_msg(update, "You aren't an admin of this chat!")
     else:
-        await Message.reply_msg(update, "You aren't an admin of this chat!")
+        btn = [
+            [
+                InlineKeyboardButton("Add me to Group", f"http://t.me/{get_bot.username}?startgroup=start")
+            ]
+        ]
+
+        await Message.reply_msg(update, "Add me to your Group to manage your Group!", btn)
 
 
 async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -303,26 +312,35 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     get_bot_permission = await chat.get_member(get_bot.id)
     get_user_permission = await chat.get_member(user.id)
 
-    if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        if get_bot_permission.status == ChatMember.ADMINISTRATOR:
-            try:
-                if reply:
-                    get_user_permission = await chat.get_member(reply.from_user.id)
-                    if get_user_permission.status == ChatMember.BANNED:
-                        await bot.unban_chat_member(chat.id, reply.from_user.id)
-                        await Message.reply_msg(update, f"{user.mention_html()} has been unbanned! He/She can join again!")
-                    elif get_bot.id == reply.from_user.id:
-                        await Message.reply_msg(update, "What is happening here? Why should I ban or unban myslef? Should I leave? 😐")
+    if chat.type in ["group", "supergroup"]:
+        if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+            if get_bot_permission.status == ChatMember.ADMINISTRATOR:
+                try:
+                    if reply:
+                        get_user_permission = await chat.get_member(reply.from_user.id)
+                        if get_user_permission.status == ChatMember.BANNED:
+                            await bot.unban_chat_member(chat.id, reply.from_user.id)
+                            await Message.reply_msg(update, f"{user.mention_html()} has been unbanned! He/She can join again!")
+                        elif get_bot.id == reply.from_user.id:
+                            await Message.reply_msg(update, "What is happening here? Why should I ban or unban myslef? Should I leave? 😐")
+                        else:
+                            await Message.reply_msg(update, "Wrong command for this task!")
                     else:
-                        await Message.reply_msg(update, "Wrong command for this task!")
-                else:
-                    await Message.reply_msg(update, "Reply the user message with command to unban him/her!")
-            except Exception as e:
-                print(f"Error user unban: {e}")
+                        await Message.reply_msg(update, "Reply the user message with command to unban him/her!")
+                except Exception as e:
+                    print(f"Error user unban: {e}")
+            else:
+                await Message.reply_msg(update, "I'm not an admin in this chat!")
         else:
-            await Message.reply_msg(update, "I'm not an admin in this chat!")
+            await Message.reply_msg(update, "You aren't an admin of this chat!")
     else:
-        await Message.reply_msg(update, "You aren't an admin of this chat!")
+        btn = [
+            [
+                InlineKeyboardButton("Add me to Group", f"http://t.me/{get_bot.username}?startgroup=start")
+            ]
+        ]
+
+        await Message.reply_msg(update, "Add me to your Group to manage your Group!", btn)
 
 
 
@@ -334,27 +352,36 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     get_bot_permission = await chat.get_member(get_bot.id)
     get_user_permission = await chat.get_member(user.id)
 
-    if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        if get_bot_permission.status == ChatMember.ADMINISTRATOR:
-            try:
-                if reply:
-                    get_user_permission = await chat.get_member(reply.from_user.id)
-                    if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                        await bot.ban_chat_member(chat.id, reply.from_user.id)
-                        await bot.unban_chat_member(chat.id, reply.from_user.id)
-                        await Message.reply_msg(update, f"{user.mention_html()} has been kicked!")
-                    elif get_bot.id == reply.from_user.id:
-                        await Message.reply_msg(update, "What is happening here? Why should I kick myslef? Should I leave? 😐")
+    if chat.type in ["group", "supergroup"]:
+        if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+            if get_bot_permission.status == ChatMember.ADMINISTRATOR:
+                try:
+                    if reply:
+                        get_user_permission = await chat.get_member(reply.from_user.id)
+                        if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                            await bot.ban_chat_member(chat.id, reply.from_user.id)
+                            await bot.unban_chat_member(chat.id, reply.from_user.id)
+                            await Message.reply_msg(update, f"{user.mention_html()} has been kicked!")
+                        elif get_bot.id == reply.from_user.id:
+                            await Message.reply_msg(update, "What is happening here? Why should I kick myslef? Should I leave? 😐")
+                        else:
+                            await Message.reply_msg(update, "I'm not going to kick an admin!")
                     else:
-                        await Message.reply_msg(update, "I'm not going to kick an admin!")
-                else:
-                    await Message.reply_msg(update, "Reply the user message with command to kick him/her!")         
-            except Exception as e:
-                print(f"Error user kick: {e}")
+                        await Message.reply_msg(update, "Reply the user message with command to kick him/her!")         
+                except Exception as e:
+                    print(f"Error user kick: {e}")
+            else:
+                await Message.reply_msg(update, "I'm not an admin in this chat!")
         else:
-            await Message.reply_msg(update, "I'm not an admin in this chat!")
+            await Message.reply_msg(update, "You aren't an admin of this chat!")
     else:
-        await Message.reply_msg(update, "You aren't an admin of this chat!") 
+        btn = [
+            [
+                InlineKeyboardButton("Add me to Group", f"http://t.me/{get_bot.username}?startgroup=start")
+            ]
+        ]
+
+        await Message.reply_msg(update, "Add me to your Group to manage your Group!", btn)
 
 
 async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -382,26 +409,35 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "can_send_voice_notes": False
     }
 
-    if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        if get_bot_permission.status == ChatMember.ADMINISTRATOR:
-            try:
-                if reply:
-                    get_user_permission = await chat.get_member(reply.from_user.id)
-                    if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                        await bot.restrict_chat_member(chat.id, reply.from_user.id, permissions)
-                        await Message.reply_msg(update, f"{user.mention_html()} has been muted 🤫!")
-                    elif get_bot.id == reply.from_user.id:
-                        await Message.reply_msg(update, "What is happening here? Why you want to mute me? 😐")
+    if chat.type in ["group", "supergroup"]:
+        if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+            if get_bot_permission.status == ChatMember.ADMINISTRATOR:
+                try:
+                    if reply:
+                        get_user_permission = await chat.get_member(reply.from_user.id)
+                        if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                            await bot.restrict_chat_member(chat.id, reply.from_user.id, permissions)
+                            await Message.reply_msg(update, f"{user.mention_html()} has been muted 🤫!")
+                        elif get_bot.id == reply.from_user.id:
+                            await Message.reply_msg(update, "What is happening here? Why you want to mute me? 😐")
+                        else:
+                            await Message.reply_msg(update, "I'm not going to mute an admin!")
                     else:
-                        await Message.reply_msg(update, "I'm not going to mute an admin!")
-                else:
-                    await Message.reply_msg(update, "Reply the user message with command to mute him/her!")         
-            except Exception as e:
-                print(f"Error user mute: {e}")
+                        await Message.reply_msg(update, "Reply the user message with command to mute him/her!")         
+                except Exception as e:
+                    print(f"Error user mute: {e}")
+            else:
+                await Message.reply_msg(update, "I'm not an admin in this chat!")
         else:
-            await Message.reply_msg(update, "I'm not an admin in this chat!")
+            await Message.reply_msg(update, "You aren't an admin of this chat!")
     else:
-        await Message.reply_msg(update, "You aren't an admin of this chat!") 
+        btn = [
+            [
+                InlineKeyboardButton("Add me to Group", f"http://t.me/{get_bot.username}?startgroup=start")
+            ]
+        ]
+
+        await Message.reply_msg(update, "Add me to your Group to manage your Group!", btn)
 
 
 async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -429,26 +465,35 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "can_send_voice_notes": True
     }
 
-    if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        if get_bot_permission.status == ChatMember.ADMINISTRATOR:
-            try:
-                if reply:
-                    get_user_permission = await chat.get_member(reply.from_user.id)
-                    if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                        await bot.restrict_chat_member(chat.id, reply.from_user.id, permissions)
-                        await Message.reply_msg(update, f"{user.mention_html()} has been unmuted 😉! You can speak again {user.mention_html()}!")
-                    elif get_bot.id == reply.from_user.id:
-                        await Message.reply_msg(update, "Wrong command for this task!")
+    if chat.type in ["group", "supergroup"]:
+        if get_user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+            if get_bot_permission.status == ChatMember.ADMINISTRATOR:
+                try:
+                    if reply:
+                        get_user_permission = await chat.get_member(reply.from_user.id)
+                        if get_user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                            await bot.restrict_chat_member(chat.id, reply.from_user.id, permissions)
+                            await Message.reply_msg(update, f"{user.mention_html()} has been unmuted 😉! You can speak again {user.mention_html()}!")
+                        elif get_bot.id == reply.from_user.id:
+                            await Message.reply_msg(update, "Wrong command for this task!")
+                        else:
+                            await Message.reply_msg(update, "Wrong command for this task!")
                     else:
-                        await Message.reply_msg(update, "Wrong command for this task!")
-                else:
-                    await Message.reply_msg(update, "Reply the user message with command to unmute him/her!")         
-            except Exception as e:
-                print(f"Error user mute: {e}")
+                        await Message.reply_msg(update, "Reply the user message with command to unmute him/her!")         
+                except Exception as e:
+                    print(f"Error user mute: {e}")
+            else:
+                await Message.reply_msg(update, "I'm not an admin in this chat!")
         else:
-            await Message.reply_msg(update, "I'm not an admin in this chat!")
+            await Message.reply_msg(update, "You aren't an admin of this chat!")
     else:
-        await Message.reply_msg(update, "You aren't an admin of this chat!") 
+        btn = [
+            [
+                InlineKeyboardButton("Add me to Group", f"http://t.me/{get_bot.username}?startgroup=start")
+            ]
+        ]
+
+        await Message.reply_msg(update, "Add me to your Group to manage your Group!", btn)
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
