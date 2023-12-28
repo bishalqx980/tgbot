@@ -479,7 +479,6 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    admins = await bot.get_chat_administrators(chat.id)
     get_bot = await bot.get_me()
 
     owner_storage = "<b>👑 Owner:</b>\n"
@@ -487,6 +486,7 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admins_storage = "<b>⚔ Admin's:</b>\n"
 
     if chat.type in ["group", "supergroup"]:
+        admins = await bot.get_chat_administrators(chat.id)
         for admin in admins:
             if admin.status == "creator":
                 owner_storage += f"<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n\n"
