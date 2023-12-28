@@ -632,20 +632,30 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if chatgpt_req_count == None:
                 chatgpt_req_count = 0
 
-            if chatgpt_req_count < int(chatgpt_usage_limit):
+            if user.id == int(owner_id):
+                await Message.reply_msg(update, "<b>Welcome Boss...!</b>")
                 sent_msg = await Message.reply_msg(update, "<b>Generating Response...</b>")
                 chatgpt_res = await safone_api.chatgpt(msg)
                 chatgpt_res = chatgpt_res.message
                 if chatgpt_res:
                     await Message.edit_msg(update, chatgpt_res, sent_msg, parse_mode=ParseMode.MARKDOWN)
-                    chatgpt_req_count += 1
-                    MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", chatgpt_req_count)
                 else:
                     await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
             else:
-                await Message.reply_msg(update, f"Usage: {chatgpt_req_count}/{chatgpt_usage_limit}\n\nYou have reached your usage limit for today!\nContact: @{owner_username} for unlimited usage!")
-                cool_downtime = datetime.datetime.now()
-                MongoDB.update_db("users", "user_id", user.id, "chatgpt_last_used", cool_downtime)
+                if chatgpt_req_count < int(chatgpt_usage_limit):
+                    sent_msg = await Message.reply_msg(update, "<b>Generating Response...</b>")
+                    chatgpt_res = await safone_api.chatgpt(msg)
+                    chatgpt_res = chatgpt_res.message
+                    if chatgpt_res:
+                        await Message.edit_msg(update, chatgpt_res, sent_msg, parse_mode=ParseMode.MARKDOWN)
+                        chatgpt_req_count += 1
+                        MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", chatgpt_req_count)
+                    else:
+                        await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
+                else:
+                    await Message.reply_msg(update, f"Usage: {chatgpt_req_count}/{chatgpt_usage_limit}\n\nYou have reached your usage limit for today!\nContact: @{owner_username} for unlimited usage!")
+                    cool_downtime = datetime.datetime.now()
+                    MongoDB.update_db("users", "user_id", user.id, "chatgpt_last_used", cool_downtime)
 
 
 def main():
