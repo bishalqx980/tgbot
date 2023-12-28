@@ -4,6 +4,7 @@ This Telegram bot is built using the `python-telegram-bot` library and performs 
 - This bot can be found as [Ciri](https://t.me/MissCiri_bot) on Telegram.
 
 ## Features
+- **ChatGPT AI:** I can get response from ChatGPT AI
 - **Group Management:** Powerfull Group Manager bot
 - **Movie Info:** Can provide any movie/series/episode
 - **Language Translator:** Can translate any lang using Google Translator
