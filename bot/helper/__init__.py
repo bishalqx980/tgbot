@@ -13,6 +13,7 @@ commands = [
     BotCommand("ping", "Ping any url"),
     BotCommand("calc", "Calculate any math"),
     BotCommand("echo", "Make chat fun"),
+    BotCommand("chatgpt", "ChatGPT AI for your chat"),
     BotCommand("ban", "Ban an user from group"),
     BotCommand("unban", "Unban an user from group"),
     BotCommand("kick", "Kick an user from group"),

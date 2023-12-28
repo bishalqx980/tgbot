@@ -1,7 +1,9 @@
 import asyncio
+import datetime
+from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
-from bot import bot_token, bot, owner_id, owner_username, server_url
+from bot import bot_token, bot, owner_id, owner_username, server_url, safone_api, chatgpt_usage_limit, chatgpt_usage_reset_time
 from bot.mongodb import MongoDB
 from bot.helper.telegram_helper import Message
 from bot.ping import ping_url
@@ -241,6 +243,35 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "Something Went Wrong!")
         elif msg == "":
             await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
+
+    else:
+        await Message.reply_msg(update, "Coming Soon...")
+
+
+async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    msg = " ".join(context.args)
+
+    if chat.type == "private":
+        if msg == "on":
+            MongoDB.update_db("users", "user_id", user.id, "chatgpt", "on")
+            find_one = MongoDB.find_one("users", "user_id", user.id)
+            verify = find_one.get("chatgpt")
+            if verify == "on":
+                await Message.reply_msg(update, "ChatGPT AI enabled in this chat!")
+            else:
+                await Message.reply_msg(update, "Something Went Wrong!")
+        elif msg == "off":
+            MongoDB.update_db("users", "user_id", user.id, "chatgpt", "off")
+            find_one = MongoDB.find_one("users", "user_id", user.id)
+            verify = find_one.get("chatgpt")
+            if verify == "off":
+                await Message.reply_msg(update, "ChatGPT AI disabled in this chat!")
+            else:
+                await Message.reply_msg(update, "Something Went Wrong!")
+        elif msg == "":
+            await Message.reply_msg(update, "Use <code>/chatgpt on</code> to turn on.\nUse <code>/chatgpt off</code> to turn off.")
 
     else:
         await Message.reply_msg(update, "Coming Soon...")
@@ -579,9 +610,42 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == "private":
         find_user = MongoDB.find_one("users", "user_id", user.id)
+        # status
         echo_status = find_user.get("echo")
+        chatgpt_status = find_user.get("chatgpt")
+        chatgpt_req_count = find_user.get("chatgpt_req_count")
+        chatgpt_last_used = find_user.get("chatgpt_last_used")
+
+        # Trigger
         if echo_status == "on":
             await Message.reply_msg(update, msg)
+
+        if chatgpt_status == "on":
+            current_time = datetime.datetime.now()
+
+            if chatgpt_last_used != None:
+                time = (current_time - chatgpt_last_used).total_seconds() > int(chatgpt_usage_reset_time) * 3600
+                if time:
+                    MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", 0)
+                    chatgpt_req_count = 0
+
+            if chatgpt_req_count == None:
+                chatgpt_req_count = 0
+
+            if chatgpt_req_count < int(chatgpt_usage_limit):
+                sent_msg = await Message.reply_msg(update, "<b>Generating Response...</b>")
+                chatgpt_res = await safone_api.chatgpt(msg)
+                chatgpt_res = chatgpt_res.message
+                if chatgpt_res:
+                    await Message.edit_msg(update, chatgpt_res, sent_msg, parse_mode=ParseMode.MARKDOWN)
+                    chatgpt_req_count += 1
+                    MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", chatgpt_req_count)
+                else:
+                    await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
+            else:
+                await Message.reply_msg(update, f"Usage: {chatgpt_req_count}/{chatgpt_usage_limit}\n\nYou have reached your usage limit for today!\nContact: @{owner_username} for unlimited usage!")
+                cool_downtime = datetime.datetime.now()
+                MongoDB.update_db("users", "user_id", user.id, "chatgpt_last_used", cool_downtime)
 
 
 def main():
@@ -597,6 +661,7 @@ def main():
     application.add_handler(CommandHandler("ping", func_ping))
     application.add_handler(CommandHandler("calc", func_calc))
     application.add_handler(CommandHandler("echo", func_echo))
+    application.add_handler(CommandHandler("chatgpt", func_chatgpt))
     application.add_handler(CommandHandler("ban", func_ban))
     application.add_handler(CommandHandler("unban", func_unban))
     application.add_handler(CommandHandler("kick", func_kick))

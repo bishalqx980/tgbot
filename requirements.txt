@@ -5,3 +5,5 @@ pymongo
 pytz
 flask
 requests
+safoneapi
+TgCrypto
