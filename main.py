@@ -184,16 +184,26 @@ async def func_shortener(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
     if msg != "":
+        if msg[0:4] != "http":
+            msg = f"http://{msg}"
+
         sent_msg = await Message.reply_msg(update, f"Pinging {msg}\nPlease wait...")
         ping = ping_url(msg)
+
         if ping:
             res = ping[2]
             if res == 200:
                 site_status = "<b>∞ Site is online 🟢</b>"
             else:
                 site_status = "<b>∞ Site is offline/something went wrong 🔴</b>"
+              
+            btn = [
+                [
+                    InlineKeyboardButton("Visit Site", f"{ping[0]}")
+                ]
+            ]
 
-            await Message.edit_msg(update, f"<b>∞ URL:</b> {ping[0]}\n<b>∞ Time(ms):</b> <code>{ping[1]}</code>\n<b>∞ Response Code:</b> <code>{ping[2]}</code>\n{site_status}", sent_msg)
+            await Message.edit_msg(update, f"<b>∞ URL:</b> {ping[0]}\n<b>∞ Time(ms):</b> <code>{ping[1]}</code>\n<b>∞ Response Code:</b> <code>{ping[2]}</code>\n{site_status}", sent_msg, btn)
     else:
         await Message.reply_msg(update, "Use <code>/ping url</code>\nE.g. <code>/ping https://google.com</code>")
 
@@ -470,20 +480,30 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     admins = await bot.get_chat_administrators(chat.id)
+    get_bot = await bot.get_me()
 
-    owner_storage = ""
-    admins_storage = ""
-    bots_storage = ""
+    owner_storage = "<b>👑 Owner:</b>\n"
+    bots_storage = "<b>🤖 Bot's:</b>\n"
+    admins_storage = "<b>⚔ Admin's:</b>\n"
 
-    for admin in admins:
-        if admin.status == "creator":
-            owner_storage += f"<b>👑 Owner:</b>\n<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n\n"
-        elif admin.user.is_bot == True:
-            bots_storage += f"<b>🤖 Bot's:</b>\n<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n\n"
-        else:
-            admins_storage += f"<b>⚔ Admin's:</b>\n<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n\n"
+    if chat.type in ["group", "supergroup"]:
+        for admin in admins:
+            if admin.status == "creator":
+                owner_storage += f"<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n\n"
+            elif admin.user.is_bot == True:
+                bots_storage += f"<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n\n"
+            else:
+                admins_storage += f"<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n\n"
 
-    await Message.reply_msg(update, f"<b>{chat.title} admin's ↴</b>\n\n{owner_storage}{admins_storage}{bots_storage}")
+        await Message.reply_msg(update, f"<b>{chat.title} admin's ↴</b>\n\n{owner_storage}{admins_storage}{bots_storage}")
+    else:
+        btn = [
+            [
+                InlineKeyboardButton("Add me to Group", f"http://t.me/{get_bot.username}?startgroup=start")
+            ]
+        ]
+
+        await Message.send_msg(chat.id, "Add me to your Group to manage your Group!", btn)
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
