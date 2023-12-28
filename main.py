@@ -513,20 +513,20 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     get_bot = await bot.get_me()
 
     owner_storage = "<b>👑 Owner:</b>\n\n"
-    bots_storage = "<b>🤖 Bot's:</b>\n\n"
-    admins_storage = "<b>⚔ Admin's:</b>\n\n"
+    admins_storage = "\n<b>⚔ Admin's:</b>\n\n"
+    bots_storage = "\n<b>🤖 Bot's:</b>\n\n"
 
     if chat.type in ["group", "supergroup"]:
         admins = await bot.get_chat_administrators(chat.id)
         for admin in admins:
             if admin.status == "creator":
-                owner_storage += f"<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
+                owner_storage += f"▪ <a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
             elif admin.user.is_bot == True:
-                bots_storage += f"<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
+                bots_storage += f"▪ <a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
             else:
-                admins_storage += f"<a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
+                admins_storage += f"▪ <a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
 
-        await Message.reply_msg(update, f"<b>{chat.title} admin's ↴</b>\n\n{owner_storage}{admins_storage}{bots_storage}")
+        await Message.reply_msg(update, f"<b>{chat.title} admin's ✨</b>\n\n{owner_storage}{admins_storage}{bots_storage}")
     else:
         btn = [
             [
