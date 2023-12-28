@@ -14,6 +14,8 @@ commands = [
     BotCommand("calc", "Calculate any math"),
     BotCommand("echo", "Make chat fun"),
     BotCommand("chatgpt", "ChatGPT AI for your chat"),
+    BotCommand("stats", "Show your config data"),
+    BotCommand("id", "Show chat/user id"),
     BotCommand("ban", "Ban an user from group"),
     BotCommand("unban", "Unban an user from group"),
     BotCommand("kick", "Kick an user from group"),

@@ -277,6 +277,41 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Coming Soon...")
 
 
+async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+
+    if chat.type == "private":
+        find_mongodb = MongoDB.find_one("users", "user_id", user.id)
+        user_mention = find_mongodb.get("mention")
+        lang = find_mongodb.get("lang")
+        echo = find_mongodb.get("echo")
+        chatgpt = find_mongodb.get("chatgpt")
+
+        text = f"<b>⚜ Data of</b>\n\n◉ User: {user_mention}\n◉ Lang: <code>{lang}</code>\n◉ Echo: <code>{echo}</code>\n◉ ChatGPT: <code>{chatgpt}</code>"
+        await Message.reply_msg(update, text)
+
+
+async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    reply = update.message.reply_to_message
+
+    if chat.type == "private":
+        user_id = user.id
+        if reply:
+            from_user_id = reply.from_user.id
+            await Message.reply_msg(update, f"◉ Your UserID: <code>{user_id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>")
+        else:
+            await Message.reply_msg(update, f"◉ UserID: <code>{user_id}</code>")
+    else:
+        if reply:
+            from_user_id = reply.from_user.id
+            await Message.reply_msg(update, f"◉ Your UserID: <code>{user_id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>\n◉ ChatID: <code>{chat.id}</code>")
+        else:
+            await Message.reply_msg(update, f"◉ UserID: <code>{user_id}</code>\n◉ ChatID: <code>{chat.id}</code>")
+
+
 async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -520,11 +555,11 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         admins = await bot.get_chat_administrators(chat.id)
         for admin in admins:
             if admin.status == "creator":
-                owner_storage += f"▪ <a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
+                owner_storage += f"◈ <a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
             elif admin.user.is_bot == True:
-                bots_storage += f"▪ <a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
+                bots_storage += f"◈ <a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
             else:
-                admins_storage += f"▪ <a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
+                admins_storage += f"◈ <a href='tg://user?id={admin.user.id}'>{admin.user.first_name}</a>\n"
 
         await Message.reply_msg(update, f"<b>{chat.title} admin's ✨</b>\n\n{owner_storage}{admins_storage}{bots_storage}")
     else:
@@ -608,7 +643,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     msg = update.message.text
 
-    if chat.type == "private":
+    if chat.type == "private" and msg:
         find_user = MongoDB.find_one("users", "user_id", user.id)
         # status
         echo_status = find_user.get("echo")
@@ -672,6 +707,8 @@ def main():
     application.add_handler(CommandHandler("calc", func_calc))
     application.add_handler(CommandHandler("echo", func_echo))
     application.add_handler(CommandHandler("chatgpt", func_chatgpt))
+    application.add_handler(CommandHandler("stats", func_stats))
+    application.add_handler(CommandHandler("id", func_id))
     application.add_handler(CommandHandler("ban", func_ban))
     application.add_handler(CommandHandler("unban", func_unban))
     application.add_handler(CommandHandler("kick", func_kick))
