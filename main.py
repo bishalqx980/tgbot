@@ -280,15 +280,21 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+    msg = " ".join(context.args)
 
     if chat.type == "private":
-        find_mongodb = MongoDB.find_one("users", "user_id", user.id)
+        if msg:
+            find_mongodb = MongoDB.find_one("users", "user_id", int(msg))
+        else:
+            find_mongodb = MongoDB.find_one("users", "user_id", user.id)
+
         user_mention = find_mongodb.get("mention")
         lang = find_mongodb.get("lang")
         echo = find_mongodb.get("echo")
         chatgpt = find_mongodb.get("chatgpt")
+        chatgpt_req_count = find_mongodb.get("chatgpt_req_count")
 
-        text = f"<b>⚜ Data of</b>\n\n◉ User: {user_mention}\n◉ Lang: <code>{lang}</code>\n◉ Echo: <code>{echo}</code>\n◉ ChatGPT: <code>{chatgpt}</code>"
+        text = f"<b>⚜ Data of</b>\n\n◉ User: {user_mention}\n◉ Lang: <code>{lang}</code>\n◉ Echo: <code>{echo}</code>\n◉ ChatGPT: <code>{chatgpt}</code>\n◉ ChatGPT Req: <code>{chatgpt_req_count}</code>"
         await Message.reply_msg(update, text)
 
 
