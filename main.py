@@ -1,4 +1,5 @@
 import asyncio
+import time
 import datetime
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, ChatMember
@@ -121,7 +122,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
             
             if tr_msg != msg:
-                await Message.reply_msg(update, tr_msg)
+                await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
             else:
                 await Message.reply_msg(update, "Something Went Wrong!")
         else:
@@ -284,18 +285,23 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == "private":
         if msg:
-            find_mongodb = MongoDB.find_one("users", "user_id", int(msg))
+            user_id = int(msg)
         else:
-            find_mongodb = MongoDB.find_one("users", "user_id", user.id)
+            user_id = user.id
 
-        user_mention = find_mongodb.get("mention")
-        lang = find_mongodb.get("lang")
-        echo = find_mongodb.get("echo")
-        chatgpt = find_mongodb.get("chatgpt")
-        chatgpt_req_count = find_mongodb.get("chatgpt_req_count")
+        find_mongodb = MongoDB.find_one("users", "user_id", user_id)
 
-        text = f"<b>⚜ Data of</b>\n\n◉ User: {user_mention}\n◉ Lang: <code>{lang}</code>\n◉ Echo: <code>{echo}</code>\n◉ ChatGPT: <code>{chatgpt}</code>\n◉ ChatGPT Req: <code>{chatgpt_req_count}</code>"
-        await Message.reply_msg(update, text)
+        if find_mongodb:
+            user_mention = find_mongodb.get("mention")
+            lang = find_mongodb.get("lang")
+            echo = find_mongodb.get("echo")
+            chatgpt = find_mongodb.get("chatgpt")
+            chatgpt_req_count = find_mongodb.get("chatgpt_req_count")
+
+            text = f"<b>⚜ Data of ⨯⨯⨯</b>\n\n◉ User: {user_mention}\n◉ Lang: <code>{lang}</code>\n◉ Echo: <code>{echo}</code>\n◉ ChatGPT: <code>{chatgpt}</code>\n◉ ChatGPT Req: <code>{chatgpt_req_count}</code>"
+            await Message.reply_msg(update, text)
+        else:
+            await Message.reply_msg(update, "User not found!")
 
 
 async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -304,18 +310,25 @@ async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
 
     if chat.type == "private":
-        user_id = user.id
         if reply:
-            from_user_id = reply.from_user.id
-            await Message.reply_msg(update, f"◉ Your UserID: <code>{user_id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>")
+            if reply.forward_from:
+                from_user_id = reply.forward_from.id
+            elif reply.from_user:
+                from_user_id = reply.from_user.id
+
+            await Message.reply_msg(update, f"◉ Your UserID: <code>{user.id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>")
         else:
-            await Message.reply_msg(update, f"◉ UserID: <code>{user_id}</code>")
+            await Message.reply_msg(update, f"◉ UserID: <code>{user.id}</code>")
     else:
         if reply:
-            from_user_id = reply.from_user.id
-            await Message.reply_msg(update, f"◉ Your UserID: <code>{user_id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>\n◉ ChatID: <code>{chat.id}</code>")
+            if reply.forward_from:
+                from_user_id = reply.forward_from.id
+            elif reply.from_user:
+                from_user_id = reply.from_user.id
+
+            await Message.reply_msg(update, f"◉ Your UserID: <code>{user.id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>\n◉ ChatID: <code>{chat.id}</code>")
         else:
-            await Message.reply_msg(update, f"◉ UserID: <code>{user_id}</code>\n◉ ChatID: <code>{chat.id}</code>")
+            await Message.reply_msg(update, f"◉ UserID: <code>{user.id}</code>\n◉ ChatID: <code>{chat.id}</code>")
 
 
 async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -600,7 +613,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         notify = await Message.send_msg(owner_id, f"Sent: {sent_count}\nTotal User: {x[1]}")
         for user_id in users:
             try:
-                await Message.send_msg(user_id, msg)
+                await Message.send_msg(user_id, msg, parse_mode=ParseMode.MARKDOWN)
                 sent_count += 1
                 await Message.edit_msg(update, f"Sent: {sent_count}\nTotal User: {x[1]}", notify)
             except Exception as e:
@@ -665,8 +678,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             current_time = datetime.datetime.now()
 
             if chatgpt_last_used != None:
-                time = (current_time - chatgpt_last_used).total_seconds() > int(chatgpt_usage_reset_time) * 3600
-                if time:
+                usage = (current_time - chatgpt_last_used).total_seconds() > int(chatgpt_usage_reset_time) * 3600
+                if usage:
                     MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", 0)
                     chatgpt_req_count = 0
 
@@ -674,8 +687,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chatgpt_req_count = 0
 
             if user.id == int(owner_id):
-                await Message.reply_msg(update, "<b>Welcome Boss...!</b>")
-                sent_msg = await Message.reply_msg(update, "<b>Generating Response...</b>")
+                sent_msg = await Message.reply_msg(update, "<b>✨ Boss, Generating Response...</b>")
                 chatgpt_res = await safone_api.chatgpt(msg)
                 chatgpt_res = chatgpt_res.message
                 if chatgpt_res:
@@ -684,19 +696,19 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
             else:
                 if chatgpt_req_count < int(chatgpt_usage_limit):
-                    sent_msg = await Message.reply_msg(update, "<b>Generating Response...</b>")
+                    sent_msg = await Message.reply_msg(update, "<b>✨ Generating Response...</b>")
                     chatgpt_res = await safone_api.chatgpt(msg)
                     chatgpt_res = chatgpt_res.message
                     if chatgpt_res:
                         await Message.edit_msg(update, chatgpt_res, sent_msg, parse_mode=ParseMode.MARKDOWN)
                         chatgpt_req_count += 1
                         MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", chatgpt_req_count)
+                        cool_downtime = datetime.datetime.now()
+                        MongoDB.update_db("users", "user_id", user.id, "chatgpt_last_used", cool_downtime)
                     else:
                         await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
                 else:
                     await Message.reply_msg(update, f"Usage: {chatgpt_req_count}/{chatgpt_usage_limit}\n\nYou have reached your usage limit for today!\nContact: @{owner_username} for unlimited usage!")
-                    cool_downtime = datetime.datetime.now()
-                    MongoDB.update_db("users", "user_id", user.id, "chatgpt_last_used", cool_downtime)
 
 
 def main():
