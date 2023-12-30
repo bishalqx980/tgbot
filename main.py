@@ -38,7 +38,6 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 InlineKeyboardButton("⚡ Developer ⚡", f"https://t.me/{owner_username}")
             ]
         ]
-
         await Message.send_img(chat.id, avatar, welcome_msg, btn)
 
         data = {
@@ -52,7 +51,17 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not find_db:
             MongoDB.insert_single_data("users", data)
 
-    else:
+    elif chat.type in ["group", "supergroup"]:
+        chat = update.effective_chat
+        find_db = MongoDB.find_one("groups", "chat_id", chat.id)
+
+        if not find_db:
+            data = {
+                "chat_id": chat.id,
+                "Title": chat.title
+            }
+            MongoDB.insert_single_data("groups", data)
+
         welcome_msg = MessageStorage.welcome_msg()
         welcome_msg = welcome_msg[1].format(
             user_mention = user.mention_html()
@@ -63,7 +72,6 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 InlineKeyboardButton("Start me in private", f"http://t.me/{bot_info.username}?start=start")
             ]
         ]
-
         await Message.send_msg(chat.id, welcome_msg, btn)
 
 
@@ -99,61 +107,79 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+
     if chat.type == "private":
-        msg = " ".join(context.args)
-        tr_reply = update.message.reply_to_message
-        if tr_reply:
-            if tr_reply.text:
-                msg = tr_reply.text
-            elif tr_reply.caption:
-                msg = tr_reply.caption
-
-        if msg != "":
-            find_user = MongoDB.find_one("users", "user_id", user.id)
-            lang_code = find_user.get("lang")
-            try:
-                tr_msg = translate(msg, lang_code)
-            except Exception as e:
-                print(f"Error Translator: {e}")
-
-                lang_code_list = MongoDB.get_data("ciri_docs", "lang_code_list")
-                btn = [
-                    [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
-                ]
-                await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
-                return
-            
-            if tr_msg != msg:
-                await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
-            else:
-                await Message.reply_msg(update, "Something Went Wrong!")
+        find_user = MongoDB.find_one("users", "user_id", user.id)
+        lang_code = find_user.get("lang")
+    elif chat.type in ["group", "supergroup"]:
+        find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+        if find_group:
+            lang_code = find_group.get("lang")
         else:
-            await Message.reply_msg(update, "Use <code>/tr text</code> or reply the text with <code>/tr</code>\nE.g. <code>/tr the text you want to translate</code>")
+            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...")
+            return
 
+    msg = " ".join(context.args)
+    tr_reply = update.message.reply_to_message
+    if tr_reply:
+        if tr_reply.text:
+            msg = tr_reply.text
+        elif tr_reply.caption:
+            msg = tr_reply.caption
+
+    if msg != "":
+        try:
+            tr_msg = translate(msg, lang_code)
+        except Exception as e:
+            print(f"Error Translator: {e}")
+
+            lang_code_list = MongoDB.get_data("ciri_docs", "lang_code_list")
+            btn = [
+                [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
+            ]
+            await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+            return
+        
+        if tr_msg != msg:
+            await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
+        else:
+            await Message.reply_msg(update, "Something Went Wrong!")
     else:
-        await Message.reply_msg(update, "Coming Soon...")
+        await Message.reply_msg(update, "Use <code>/tr text</code> or reply the text with <code>/tr</code>\nE.g. <code>/tr the text you want to translate</code>")    
 
 
 async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     msg = " ".join(context.args)
+
     if chat.type == "private":
-        if msg != "":
-            try:
-                MongoDB.update_db("users", "user_id", user.id, "lang", msg)
+        collection_name = "users"
+        search = "user_id"
+        match = user.id
+    elif chat.type in ["group", "supergroup"]:
+        collection_name = "groups"
+        search = "chat_id"
+        match = chat.id
+
+    if msg != "":
+        try:
+            get_chat = MongoDB.find_one(collection_name, search, chat.id)
+            if get_chat:
+                MongoDB.update_db(collection_name, search, match, "lang", msg)
                 await Message.reply_msg(update, f"Language Updated to <code>{msg}</code>. Now you can use /tr command.")
-            except Exception as e:
-                print(f"Error setting lang code: {e}")
-                await Message.reply_msg(update, f"Error: {e}")
-        else:
-            lang_code_list = MongoDB.get_data("ciri_docs", "lang_code_list")
-            btn = [
-                [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
-            ]
-            await Message.send_msg(chat.id, "<code>lang_code</code> can't be leave empty! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+            else:
+                await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...")
+                return
+        except Exception as e:
+            print(f"Error setting lang code: {e}")
+            await Message.reply_msg(update, f"Error: {e}")
     else:
-        await Message.reply_msg(update, "Coming Soon...")
+        lang_code_list = MongoDB.get_data("ciri_docs", "lang_code_list")
+        btn = [
+            [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
+        ]
+        await Message.send_msg(chat.id, "<code>lang_code</code> can't be leave empty! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
 
 
 async def func_b64decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -304,6 +330,8 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, text)
         else:
             await Message.reply_msg(update, "User not found!")
+    else:
+        await Message.reply_msg(update, "Coming Soon...")
 
 
 async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
