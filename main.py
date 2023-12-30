@@ -355,7 +355,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         notify = await Message.send_msg(owner_id, f"Sent: {sent_count}\nTotal User: {x[1]}")
         for user_id in users:
             try:
-                await Message.send_msg(user_id, msg, parse_mode=ParseMode.MARKDOWN)
+                await Message.send_msg(user_id, msg)
                 sent_count += 1
                 await Message.edit_msg(update, f"Sent: {sent_count}\nTotal User: {x[1]}", notify)
             except Exception as e:
