@@ -300,7 +300,7 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chatgpt = find_mongodb.get("chatgpt")
             chatgpt_req_count = find_mongodb.get("chatgpt_req_count")
 
-            text = f"<b>⚜ Data of ⨯⨯⨯</b>\n\n◉ User: {user_mention}\n◉ Lang: <code>{lang}</code>\n◉ Echo: <code>{echo}</code>\n◉ ChatGPT: <code>{chatgpt}</code>\n◉ ChatGPT Req: <code>{chatgpt_req_count}</code>"
+            text = f"<b>⚜ Data of <code>{user_id}</code></b>\n\n◉ User: {user_mention}\n◉ Lang: <code>{lang}</code>\n◉ Echo: <code>{echo}</code>\n◉ ChatGPT: <code>{chatgpt}</code>\n◉ ChatGPT Req: <code>{chatgpt_req_count}</code>"
             await Message.reply_msg(update, text)
         else:
             await Message.reply_msg(update, "User not found!")
@@ -340,12 +340,22 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     replied_msg = update.message.reply_to_message
+    user_id = " ".join(context.args)
 
     if user.id == int(owner_id):
         if replied_msg:
             msg = replied_msg.text
         else:
             await Message.reply_msg(update, "Reply a message to broadcast!")
+            return
+        
+        if user_id:
+            try:
+                await Message.send_msg(user_id, msg)
+                await Message.reply_msg(update, "Job Done !!")
+            except Exception as e:
+                print(f"Error Broadcast: {e}")
+                await Message.reply_msg(update, f"Error Broadcast: {e}")
             return
         
         users = MongoDB.find("users", "user_id")
