@@ -4,7 +4,7 @@ import datetime
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
-from bot import bot_token, bot, owner_id, owner_username, server_url, safone_api, chatgpt_usage_limit, chatgpt_usage_reset_time
+from bot import bot_token, bot, owner_id, owner_username, server_url, chatgpt_usage_limit, chatgpt_usage_reset_time
 from bot.mongodb import MongoDB
 from bot.helper.telegram_helper import Message
 from bot.ping import ping_url
@@ -14,6 +14,7 @@ from bot.base64 import decode_b64, encode_b64
 from bot.omdb_movie_info import get_movie_info
 from bot.utils import calc
 from bot.helper.tgmsg_storage import MessageStorage
+from bot.safone import Safone
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -668,7 +669,6 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         echo_status = find_user.get("echo")
         chatgpt_status = find_user.get("chatgpt")
         chatgpt_req_count = find_user.get("chatgpt_req_count")
-        chatgpt_last_used = find_user.get("chatgpt_last_used")
 
         # Trigger
         if echo_status == "on":
@@ -681,15 +681,20 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if user.id == int(owner_id):
                 sent_msg = await Message.reply_msg(update, "<b>✨ Boss, Generating Response...</b>")
 
-                try:
-                    chatgpt_res = await safone_api.chatgpt(msg)
-                except Exception as e:
-                    print(f"Error ChatGPT: {e}")
-                    return
-                
-                chatgpt_res = chatgpt_res.message
-                if chatgpt_res:
-                    await Message.edit_msg(update, chatgpt_res, sent_msg, parse_mode=ParseMode.MARKDOWN)
+                safone_ai_res = await Safone.safone_ai(msg)
+                if safone_ai_res:
+                    chatgpt = safone_ai_res[0]
+                    bard = safone_ai_res[1]
+                    chatbot = safone_ai_res[2]
+
+                    if chatgpt:
+                        text = chatgpt.message
+                    elif bard:
+                        text = bard.message
+                    else:
+                        text = chatbot.response
+
+                    await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
                 else:
                     await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
             else:
@@ -700,19 +705,13 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if chatgpt_req_count < int(chatgpt_usage_limit):
                     sent_msg = await Message.reply_msg(update, "<b>✨ Generating Response...</b>")
                     
-                    try:
-                        chatgpt_res = await safone_api.chatgpt(msg)
-                    except Exception as e:
-                        print(f"Error ChatGPT: {e}")
-                        return
-                    
+                    chatgpt_res = await Safone.chatgpt(msg)
                     chatgpt_res = chatgpt_res.message
+                    
                     if chatgpt_res:
                         await Message.edit_msg(update, chatgpt_res, sent_msg, parse_mode=ParseMode.MARKDOWN)
                         chatgpt_req_count += 1
                         MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", chatgpt_req_count)
-                        cool_downtime = datetime.datetime.now()
-                        MongoDB.update_db("users", "user_id", user.id, "chatgpt_last_used", cool_downtime)
                     else:
                         await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
                 else:
