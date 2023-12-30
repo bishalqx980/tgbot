@@ -675,14 +675,6 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, msg)
 
         if chatgpt_status == "on":
-            current_time = datetime.datetime.now()
-
-            if chatgpt_last_used != None:
-                usage = (current_time - chatgpt_last_used).total_seconds() > int(chatgpt_usage_reset_time) * 3600
-                if usage:
-                    MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", 0)
-                    chatgpt_req_count = 0
-
             if chatgpt_req_count == None:
                 chatgpt_req_count = 0
 
@@ -695,6 +687,10 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 else:
                     await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
             else:
+                chatgpt_premium = MongoDB.get_data("chatgpt", "chatgpt_premium")
+                if user.id in chatgpt_premium:
+                    chatgpt_req_count = 0
+
                 if chatgpt_req_count < int(chatgpt_usage_limit):
                     sent_msg = await Message.reply_msg(update, "<b>✨ Generating Response...</b>")
                     chatgpt_res = await safone_api.chatgpt(msg)
@@ -708,7 +704,17 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     else:
                         await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
                 else:
-                    await Message.reply_msg(update, f"Usage: {chatgpt_req_count}/{chatgpt_usage_limit}\n\nYou have reached your usage limit for today!\nContact: @{owner_username} for unlimited usage!")
+                    chatgpt_seller = MongoDB.get_data("chatgpt", "chatgpt_seller")
+                    if chatgpt_seller == None:
+                        chatgpt_seller = owner_username
+
+                    btn = [
+                        [
+                            InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{chatgpt_seller}")
+                        ]
+                    ]
+
+                    await Message.reply_msg(update, f"Usage: {chatgpt_req_count}/{chatgpt_usage_limit}\n\nYou have reached your usage limit for free trail!\nContact: @{chatgpt_seller} for unlimited usage!", btn)
 
 
 def main():
