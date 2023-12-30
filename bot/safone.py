@@ -19,3 +19,4 @@ class Safone:
                 except Exception as e:
                     print(f"Error Chatbot: {e}")
         return chatgpt_res, bard_res, chatbot_res
+    
