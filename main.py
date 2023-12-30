@@ -154,32 +154,48 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
 
     if chat.type == "private":
-        collection_name = "users"
-        search = "user_id"
-        match = user.id
-    elif chat.type in ["group", "supergroup"]:
-        collection_name = "groups"
-        search = "chat_id"
-        match = chat.id
-
-    if msg != "":
-        try:
-            get_chat = MongoDB.find_one(collection_name, search, chat.id)
-            if get_chat:
-                MongoDB.update_db(collection_name, search, match, "lang", msg)
+        if msg != "":
+            try:
+                MongoDB.update_db("users", "user_id", user.id, "lang", msg)
                 await Message.reply_msg(update, f"Language Updated to <code>{msg}</code>. Now you can use /tr command.")
+            except Exception as e:
+                print(f"Error setting lang code: {e}")
+                await Message.reply_msg(update, f"Error: {e}")
+        else:
+            lang_code_list = MongoDB.get_data("ciri_docs", "lang_code_list")
+            btn = [
+                [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
+            ]
+            await Message.send_msg(chat.id, "<code>lang_code</code> can't be leave empty! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+    elif chat.type in ["group", "supergroup"]:
+        get_bot = await bot.get_me()
+        getper_bot = await chat.get_member(get_bot.id)
+        getper_user = await chat.get_member(user.id)
+
+        if getper_bot.status == ChatMember.ADMINISTRATOR:
+            if getper_user.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                if msg != "":
+                    try:
+                        get_chat = MongoDB.find_one("groups", "chat_id", chat.id)
+                        if get_chat:
+                            MongoDB.update_db("groups", "chat_id", chat.id, "lang", msg)
+                            await Message.reply_msg(update, f"Language Updated to <code>{msg}</code>. Now you can use /tr command.")
+                        else:
+                            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
+                            return
+                    except Exception as e:
+                        print(f"Error setting lang code: {e}")
+                        await Message.reply_msg(update, f"Error: {e}")
+                else:
+                    lang_code_list = MongoDB.get_data("ciri_docs", "lang_code_list")
+                    btn = [
+                        [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
+                    ]
+                    await Message.send_msg(chat.id, "<code>lang_code</code> can't be leave empty! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
             else:
-                await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...")
-                return
-        except Exception as e:
-            print(f"Error setting lang code: {e}")
-            await Message.reply_msg(update, f"Error: {e}")
-    else:
-        lang_code_list = MongoDB.get_data("ciri_docs", "lang_code_list")
-        btn = [
-            [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
-        ]
-        await Message.send_msg(chat.id, "<code>lang_code</code> can't be leave empty! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+                await Message.reply_msg(update, "😪 You aren't an admin of this chat!")
+        else:
+            await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
 
 
 async def func_b64decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -275,6 +291,16 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     else:
         await Message.reply_msg(update, "Coming Soon...")
+
+
+async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    url = " ".join(context.args)
+    if url:
+        webshot = await Safone.webshot(url)
+        await Message.send_img(chat.id, webshot, f"✨ {url}")
+    else:
+        await Message.reply_msg(update, "Use <code>/webshot url</code>\nE.g. <code>/webshot https://google.com</code>")
 
 
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -515,6 +541,7 @@ def main():
     application.add_handler(CommandHandler("ping", func_ping))
     application.add_handler(CommandHandler("calc", func_calc))
     application.add_handler(CommandHandler("echo", func_echo))
+    application.add_handler(CommandHandler("webshot", func_webshot))
     application.add_handler(CommandHandler("chatgpt", func_chatgpt))
     application.add_handler(CommandHandler("stats", func_stats))
     application.add_handler(CommandHandler("id", func_id))

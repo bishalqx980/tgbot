@@ -19,4 +19,11 @@ class Safone:
                 except Exception as e:
                     print(f"Error Chatbot: {e}")
         return chatgpt_res, bard_res, chatbot_res
-    
+
+   
+    async def webshot(url):
+        try:
+            res = await safone_api.webshot(url)
+        except Exception as e:
+            print(f"Error Webshot: {e}")
+        return res

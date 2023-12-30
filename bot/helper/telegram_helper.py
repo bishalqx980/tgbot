@@ -24,7 +24,7 @@ class Message:
         return sent_msg
 
     
-    async def send_img(chat_id, img, caption, btn=None, parse_mode=ParseMode.HTML):
+    async def send_img(chat_id, img, caption=None, btn=None, parse_mode=ParseMode.HTML):
         if btn:
             reply_markup = InlineKeyboardMarkup(btn)
             sent_msg = await bot.send_photo(
