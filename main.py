@@ -510,12 +510,21 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                 if chatgpt_req_count < int(chatgpt_usage_limit):
                     sent_msg = await Message.reply_msg(update, "<b>✨ Generating Response...</b>")
-                    
-                    chatgpt_res = await Safone.chatgpt(msg)
-                    chatgpt_res = chatgpt_res.message
-                    
-                    if chatgpt_res:
-                        await Message.edit_msg(update, chatgpt_res, sent_msg, parse_mode=ParseMode.MARKDOWN)
+
+                    safone_ai_res = await Safone.safone_ai(msg)
+                    if safone_ai_res:
+                        chatgpt = safone_ai_res[0]
+                        bard = safone_ai_res[1]
+                        chatbot = safone_ai_res[2]
+
+                        if chatgpt:
+                            text = chatgpt.message
+                        elif bard:
+                            text = bard.message
+                        else:
+                            text = chatbot.response
+
+                        await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
                         chatgpt_req_count += 1
                         MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", chatgpt_req_count)
                     else:
