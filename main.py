@@ -288,7 +288,6 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "Something Went Wrong!")
         elif msg == "":
             await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
-
     else:
         await Message.reply_msg(update, "Coming Soon...")
 
@@ -482,22 +481,29 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if chatgpt_status == "on":
             chatgpt_premium = MongoDB.get_data("chatgpt", "chatgpt_premium")
+            find_user = MongoDB.find_one("users", "user_id", user.id)
+            chatgpt_req_count = find_user.get("chatgpt_req_count")
+            if chatgpt_req_count == None:
+                chatgpt_req_count = 0
 
             if user.id == int(owner_id):
                 g_msg = "✨ Hi Boss, Please wait!! Generating Response..."
             elif user.id in chatgpt_premium:
                 g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
             else:
-                chatgpt_seller = MongoDB.get_data("chatgpt", "chatgpt_seller")
-                if chatgpt_seller == None:
-                    chatgpt_seller = owner_username
-                btn = [
-                    [
-                        InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{chatgpt_seller}")
+                if chatgpt_req_count == int(chatgpt_usage_limit):
+                    chatgpt_seller = MongoDB.get_data("chatgpt", "chatgpt_seller")
+                    if chatgpt_seller == None:
+                        chatgpt_seller = owner_username
+                    btn = [
+                        [
+                            InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{chatgpt_seller}")
+                        ]
                     ]
-                ]
-                await Message.reply_msg(update, f"Contact @{chatgpt_seller} to buy ChatGPT Premium!", btn)
-                return
+                    await Message.reply_msg(update, f"Your ChatGPT usage limit Exceeded!\nContact @{chatgpt_seller} to buy ChatGPT Premium!\n\n⩙ Usage: {chatgpt_req_count} out of {chatgpt_usage_limit}", btn)
+                    return
+                else:
+                    g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
                 
             sent_msg = await Message.reply_msg(update, g_msg)
 
@@ -515,6 +521,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     text = chatbot.response
 
                 await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
+                chatgpt_req_count += 1
+                MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", chatgpt_req_count)
             else:
                 await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
 

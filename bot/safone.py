@@ -26,3 +26,11 @@ class Safone:
         except Exception as e:
             print(f"Error Webshot: {e}")
         return res
+
+
+    async def youtube():
+        try:
+            res = await safone_api.youtube()
+        except Exception as e:
+            print(f"Error youtube: {e}")
+            

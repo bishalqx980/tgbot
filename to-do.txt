@@ -13,3 +13,6 @@ pip install praytimes
 force sub
 
 v1.0.1 ∞
+
+
+python-telegram-bot[callback-data]
