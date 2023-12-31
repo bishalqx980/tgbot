@@ -5,7 +5,6 @@ class Safone:
         chatgpt_res = None
         bard_res = None
         chatbot_res = None
-
         try:
             chatgpt_res = await safone_api.chatgpt(msg)
         except Exception as e:
@@ -20,7 +19,7 @@ class Safone:
                     print(f"Error Chatbot: {e}")
         return chatgpt_res, bard_res, chatbot_res
 
-   
+
     async def webshot(url):
         try:
             res = await safone_api.webshot(url)

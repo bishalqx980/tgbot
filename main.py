@@ -333,7 +333,6 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "Something Went Wrong!")
         elif msg == "":
             await Message.reply_msg(update, "Use <code>/chatgpt on</code> to turn on.\nUse <code>/chatgpt off</code> to turn off.")
-
     else:
         await Message.reply_msg(update, "Coming Soon...")
 
@@ -474,73 +473,48 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # status
         echo_status = find_user.get("echo")
         chatgpt_status = find_user.get("chatgpt")
-        chatgpt_req_count = find_user.get("chatgpt_req_count")
 
         # Trigger
         if echo_status == "on":
             await Message.reply_msg(update, msg)
 
         if chatgpt_status == "on":
-            if chatgpt_req_count == None:
-                chatgpt_req_count = 0
+            chatgpt_premium = MongoDB.get_data("chatgpt", "chatgpt_premium")
 
             if user.id == int(owner_id):
-                sent_msg = await Message.reply_msg(update, "<b>✨ Boss, Generating Response...</b>")
-
-                safone_ai_res = await Safone.safone_ai(msg)
-                if safone_ai_res:
-                    chatgpt = safone_ai_res[0]
-                    bard = safone_ai_res[1]
-                    chatbot = safone_ai_res[2]
-
-                    if chatgpt:
-                        text = chatgpt.message
-                    elif bard:
-                        text = bard.message
-                    else:
-                        text = chatbot.response
-
-                    await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
-                else:
-                    await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
+                g_msg = "✨ Hi Boss, Please wait!! Generating Response..."
+            elif user.id in chatgpt_premium:
+                g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
             else:
-                chatgpt_premium = MongoDB.get_data("chatgpt", "chatgpt_premium")
-                if user.id in chatgpt_premium:
-                    chatgpt_req_count = 0
-
-                if chatgpt_req_count < int(chatgpt_usage_limit):
-                    sent_msg = await Message.reply_msg(update, "<b>✨ Generating Response...</b>")
-
-                    safone_ai_res = await Safone.safone_ai(msg)
-                    if safone_ai_res:
-                        chatgpt = safone_ai_res[0]
-                        bard = safone_ai_res[1]
-                        chatbot = safone_ai_res[2]
-
-                        if chatgpt:
-                            text = chatgpt.message
-                        elif bard:
-                            text = bard.message
-                        else:
-                            text = chatbot.response
-
-                        await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
-                        chatgpt_req_count += 1
-                        MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", chatgpt_req_count)
-                    else:
-                        await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
-                else:
-                    chatgpt_seller = MongoDB.get_data("chatgpt", "chatgpt_seller")
-                    if chatgpt_seller == None:
-                        chatgpt_seller = owner_username
-
-                    btn = [
-                        [
-                            InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{chatgpt_seller}")
-                        ]
+                chatgpt_seller = MongoDB.get_data("chatgpt", "chatgpt_seller")
+                if chatgpt_seller == None:
+                    chatgpt_seller = owner_username
+                btn = [
+                    [
+                        InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{chatgpt_seller}")
                     ]
+                ]
+                await Message.reply_msg(update, f"Contact @{chatgpt_seller} to buy ChatGPT Premium!", btn)
+                return
+                
+            sent_msg = await Message.reply_msg(update, g_msg)
 
-                    await Message.reply_msg(update, f"Usage: {chatgpt_req_count}/{chatgpt_usage_limit}\n\nYou have reached your usage limit for free trail!\nContact: @{chatgpt_seller} for unlimited usage!", btn)
+            safone_ai_res = await Safone.safone_ai(msg)
+            if safone_ai_res:
+                chatgpt = safone_ai_res[0]
+                bard = safone_ai_res[1]
+                chatbot = safone_ai_res[2]
+
+                if chatgpt:
+                    text = chatgpt.message
+                elif bard:
+                    text = bard.message
+                else:
+                    text = chatbot.response
+
+                await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
+            else:
+                await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
 
 
 def main():
