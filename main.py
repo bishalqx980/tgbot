@@ -1,6 +1,7 @@
 import asyncio
 import time
 import datetime
+from threading import Thread
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
@@ -562,4 +563,5 @@ def main():
 
 if __name__ == "__main__":
     print("🤖 Bot Started !!")
-    main()
+    thread = Thread(target=asyncio.run, args=(main(),))
+    thread.start()
