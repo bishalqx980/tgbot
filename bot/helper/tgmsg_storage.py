@@ -13,7 +13,8 @@ class MessageStorage:
             "⪧ I can short any URL\n"
             "⪧ I can ping (Detect web response) any URL\n"
             "⪧ You can use me as a calculator too 😎\n"
-            "⪧ I can echo your message (for fun) 😁\n\n" # break
+            "⪧ I can echo your message (for fun) 😁\n"
+            "⪧ I can take screenshot of any website by url 📸\n\n" # break
             "🆘 More Feature coming soon...\n"
             "⪧ /help for bot help\n"
             "∞ Successor of <a href='https://t.me/YmlzaGFsbot'>Melina</a> ☺"

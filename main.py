@@ -298,7 +298,13 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = " ".join(context.args)
     if url:
         webshot = await Safone.webshot(url)
-        await Message.send_img(chat.id, webshot, f"✨ {url}")
+        if webshot:
+            try:
+                await Message.send_img(chat.id, webshot, f"✨ {url}")
+            except Exception as e:
+                await Message.reply_msg(update, f"Error: {e}")
+        else:
+            await Message.reply_msg(update, "Something Went Wrong!")
     else:
         await Message.reply_msg(update, "Use <code>/webshot url</code>\nE.g. <code>/webshot https://google.com</code>")
 
@@ -356,7 +362,7 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, text)
         else:
             await Message.reply_msg(update, "User not found!")
-    else:
+    elif chat.type in ["group", "supergroup"]:
         await Message.reply_msg(update, "Coming Soon...")
 
 

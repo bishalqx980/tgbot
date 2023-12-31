@@ -5,7 +5,7 @@ This Telegram bot is built using the `python-telegram-bot` library and performs 
 
 ## Features
 - **ChatGPT AI:** I can get response from ChatGPT AI
-- **Group Management:** Powerfull Group Manager bot
+- **Group Management:** Powerful Group Manager bot
 - **Movie Info:** Can provide any movie/series/episode
 - **Language Translator:** Can translate any lang using Google Translator
 - **Encode/Decode base64:** Can encode/decode base64 code
@@ -13,6 +13,8 @@ This Telegram bot is built using the `python-telegram-bot` library and performs 
 - **Ping Website** Can detect website response
 - **Calculator:** it has built-in calculator
 - **Echo:** I can echo your message (for fun) 😁
+- **Webshot** I can take screenshot of any website by url 📸
+- **Much more...**
 
 - **🆘 More Feature coming soon...**
 - **∞ Successor of [Melina](https://t.me/YmlzaGFsbot) ☺**
