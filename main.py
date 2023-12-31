@@ -297,9 +297,11 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     url = " ".join(context.args)
     if url:
+        sent_msg = await Message.reply_msg(update, "Generating please wait...")
         webshot = await Safone.webshot(url)
         if webshot:
             try:
+                await Message.del_msg(chat.id, sent_msg)
                 await Message.send_img(chat.id, webshot, f"✨ {url}")
             except Exception as e:
                 await Message.reply_msg(update, f"Error: {e}")

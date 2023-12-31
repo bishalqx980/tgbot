@@ -114,3 +114,8 @@ class Message:
                     disable_web_page_preview=bool(disable_web_preview),
                     parse_mode=parse_mode
                 )
+    
+
+    async def del_msg(chat_id, del_msg_pointer):
+        msg_id = del_msg_pointer.message_id
+        await bot.delete_message(chat_id=chat_id, message_id=msg_id)
