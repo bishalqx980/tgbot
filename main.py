@@ -491,7 +491,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             elif user.id in chatgpt_premium:
                 g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
             else:
-                if chatgpt_req_count == int(chatgpt_usage_limit):
+                if chatgpt_req_count >= int(chatgpt_usage_limit):
                     chatgpt_seller = MongoDB.get_data("chatgpt", "chatgpt_seller")
                     if chatgpt_seller == None:
                         chatgpt_seller = owner_username
