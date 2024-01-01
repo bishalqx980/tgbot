@@ -1,7 +1,4 @@
 import asyncio
-import time
-import datetime
-from threading import Thread
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
@@ -557,11 +554,10 @@ def main():
     application.add_handler(CommandHandler("database", func_database))
     # filters
     application.add_handler(MessageHandler(filters.ALL, func_filter_all))
-
+    # Check Updates
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
     print("🤖 Bot Started !!")
-    thread = Thread(target=asyncio.run, args=(main(),))
-    thread.start()
+    main()
