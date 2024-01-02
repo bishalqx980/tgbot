@@ -6,7 +6,8 @@ class MessageStorage:
             "Hi, {user_mention} !! It's <a href='https://t.me/{bot_username}'>{bot_firstname}</a>!\n"
             "I'm not only a Powerful <b>Group Management bot</b> but also\n"
             "I can do many other task 😜\n\n" # break
-            "🔥 I can get response from <b>ChatGPT AI</b>\n\n" # break
+            "🔥 I can get response from <b>ChatGPT AI</b>\n\n"
+            "🔥 I can Imagine Image by AI from your promt\n\n" # break
             "⪧ I can get any Movie information\n"
             "⪧ I can Translate any language to your desired lang\n"
             "⪧ I can decode/encode base64 code\n"
