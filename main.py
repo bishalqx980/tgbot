@@ -360,8 +360,8 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if imagine:
             try:
                 ai_imagine_req += 1
-                await Message.del_msg(chat.id, sent_msg)
                 await Message.send_img(chat.id, imagine, f"✨ {promt}")
+                await Message.del_msg(chat.id, sent_msg)
                 await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
                 await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
             except Exception as e:
