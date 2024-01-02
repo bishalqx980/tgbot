@@ -14,6 +14,7 @@ commands = [
     BotCommand("calc", "Calculate any math"),
     BotCommand("echo", "Make chat fun"),
     BotCommand("webshot", "Take Screenshot of any website"),
+    BotCommand("imagine", "AI Image generator based on your promt"),
     BotCommand("chatgpt", "ChatGPT AI for your chat"),
     BotCommand("stats", "Show your config data"),
     BotCommand("id", "Show chat/user id"),
@@ -29,7 +30,7 @@ commands = [
 ]
 
 class BotCommandHelper:
-    def __init__(self, cmd, des):
+    async def __init__(self, cmd, des):
         self.commad = cmd
         self.description = des
 

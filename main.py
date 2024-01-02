@@ -1,8 +1,9 @@
 import asyncio
+from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
-from bot import bot_token, bot, owner_id, owner_username, server_url, chatgpt_usage_limit, chatgpt_usage_reset_time
+from bot import bot_token, bot, owner_id, owner_username, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
 from bot.mongodb import MongoDB
 from bot.helper.telegram_helper import Message
 from bot.ping import ping_url
@@ -20,10 +21,10 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     bot_info = await bot.get_me()
-    avatar = MongoDB.get_data("ciri_docs", "avatar")
+    avatar = await MongoDB.get_data("ciri_docs", "avatar")
 
     if chat.type == "private":
-        welcome_msg = MessageStorage.welcome_msg()
+        welcome_msg = await MessageStorage.welcome_msg()
         welcome_msg = welcome_msg[0].format(
             user_mention = user.mention_html(),
             bot_username = bot_info.username,
@@ -45,22 +46,22 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "mention": user.mention_html(),
             "lang": user.language_code
         }
-        find_db = MongoDB.find_one("users", "user_id", user.id)
+        find_db = await MongoDB.find_one("users", "user_id", user.id)
         if not find_db:
-            MongoDB.insert_single_data("users", data)
+            await MongoDB.insert_single_data("users", data)
 
     elif chat.type in ["group", "supergroup"]:
         chat = update.effective_chat
-        find_db = MongoDB.find_one("groups", "chat_id", chat.id)
+        find_db = await MongoDB.find_one("groups", "chat_id", chat.id)
 
         if not find_db:
             data = {
                 "chat_id": chat.id,
                 "Title": chat.title
             }
-            MongoDB.insert_single_data("groups", data)
+            await MongoDB.insert_single_data("groups", data)
 
-        welcome_msg = MessageStorage.welcome_msg()
+        welcome_msg = await MessageStorage.welcome_msg()
         welcome_msg = welcome_msg[1].format(
             user_mention = user.mention_html()
         )
@@ -93,7 +94,7 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         movie_info = get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
         if movie_info:
-            msg = MessageStorage.msg_movie_info(movie_info)
+            msg = await MessageStorage.msg_movie_info(movie_info)
             btn = [
                 [InlineKeyboardButton(f"✨ IMDB - {movie_info[2]}", f"https://www.imdb.com/title/{movie_info[16]}")]
             ]
@@ -107,10 +108,10 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
 
     if chat.type == "private":
-        find_user = MongoDB.find_one("users", "user_id", user.id)
+        find_user = await MongoDB.find_one("users", "user_id", user.id)
         lang_code = find_user.get("lang")
     elif chat.type in ["group", "supergroup"]:
-        find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             lang_code = find_group.get("lang")
         else:
@@ -131,7 +132,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             print(f"Error Translator: {e}")
 
-            lang_code_list = MongoDB.get_data("ciri_docs", "lang_code_list")
+            lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
             btn = [
                 [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
             ]
@@ -154,13 +155,13 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type == "private":
         if msg != "":
             try:
-                MongoDB.update_db("users", "user_id", user.id, "lang", msg)
+                await MongoDB.update_db("users", "user_id", user.id, "lang", msg)
                 await Message.reply_msg(update, f"Language Updated to <code>{msg}</code>. Now you can use /tr command.")
             except Exception as e:
                 print(f"Error setting lang code: {e}")
                 await Message.reply_msg(update, f"Error: {e}")
         else:
-            lang_code_list = MongoDB.get_data("ciri_docs", "lang_code_list")
+            lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
             btn = [
                 [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
             ]
@@ -174,9 +175,9 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if getper_user.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
                 if msg != "":
                     try:
-                        get_chat = MongoDB.find_one("groups", "chat_id", chat.id)
+                        get_chat = await MongoDB.find_one("groups", "chat_id", chat.id)
                         if get_chat:
-                            MongoDB.update_db("groups", "chat_id", chat.id, "lang", msg)
+                            await MongoDB.update_db("groups", "chat_id", chat.id, "lang", msg)
                             await Message.reply_msg(update, f"Language Updated to <code>{msg}</code>. Now you can use /tr command.")
                         else:
                             await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
@@ -185,7 +186,7 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         print(f"Error setting lang code: {e}")
                         await Message.reply_msg(update, f"Error: {e}")
                 else:
-                    lang_code_list = MongoDB.get_data("ciri_docs", "lang_code_list")
+                    lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
                     btn = [
                         [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
                     ]
@@ -269,16 +270,16 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == "private":
         if msg == "on":
-            MongoDB.update_db("users", "user_id", user.id, "echo", "on")
-            find_one = MongoDB.find_one("users", "user_id", user.id)
+            await MongoDB.update_db("users", "user_id", user.id, "echo", "on")
+            find_one = await MongoDB.find_one("users", "user_id", user.id)
             verify = find_one.get("echo")
             if verify == "on":
                 await Message.reply_msg(update, "Echo enabled in this chat!")
             else:
                 await Message.reply_msg(update, "Something Went Wrong!")
         elif msg == "off":
-            MongoDB.update_db("users", "user_id", user.id, "echo", "off")
-            find_one = MongoDB.find_one("users", "user_id", user.id)
+            await MongoDB.update_db("users", "user_id", user.id, "echo", "off")
+            find_one = await MongoDB.find_one("users", "user_id", user.id)
             verify = find_one.get("echo")
             if verify == "off":
                 await Message.reply_msg(update, "Echo disabled in this chat!")
@@ -308,6 +309,70 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/webshot url</code>\nE.g. <code>/webshot https://google.com</code>")
 
 
+async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    promt = " ".join(context.args)
+
+    if promt:
+        premium_user = await MongoDB.get_data("premium", "user_list")
+        find_user = await MongoDB.find_one("users", "user_id", user.id)
+        ai_imagine_req = find_user.get("ai_imagine_req")
+        last_used = find_user.get("last_used")
+        current_time = datetime.now()
+
+        if last_used != None:
+            calc = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
+            if calc:
+                ai_imagine_req = 0
+                await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
+
+        if ai_imagine_req == None:
+            ai_imagine_req = 0
+
+        if user.id == int(owner_id):
+            g_msg = "✨ Hi Boss, Generating AI Image please wait..."
+        elif user.id in premium_user:
+            g_msg = f"✨ Hi {user.first_name}, Generating AI Image please wait..."
+        else:
+            if ai_imagine_req >= int(ai_imagine_limit):
+                premium_seller = await MongoDB.get_data("premium", "premium_seller")
+                if premium_seller == None:
+                    premium_seller = owner_username
+                btn = [
+                    [
+                        InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{premium_seller}")
+                    ]
+                ]
+                text = (
+                    f"❗ Your AI Imagine usage limit Exceeded!\n"
+                    f"⩙ Usage: {ai_imagine_req} out of {ai_imagine_limit}\n"
+                    f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
+                    f"OR Contact @{premium_seller} to buy Premium Account!"
+                )
+                await Message.reply_msg(update, text, btn)
+                return
+            else:
+                g_msg = f"✨ Hi {user.first_name}, Generating AI Image please wait..."
+
+        sent_msg = await Message.reply_msg(update, g_msg)
+        imagine = await Safone.imagine(promt)
+        if imagine:
+            try:
+                ai_imagine_req += 1
+                await Message.del_msg(chat.id, sent_msg)
+                await Message.send_img(chat.id, imagine, f"✨ {promt}")
+                await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
+                await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
+            except Exception as e:
+                print(f"Error Imagine: {e}")
+                await Message.reply_msg(update, f"Error Imagine: {e}")
+        else:
+            await Message.reply_msg(update, "Something Went Wrong!")
+    else:
+        await Message.reply_msg(update, "Use <code>/imagine promt</code>\nE.g. <code>/imagine a cute cat</code>")
+
+
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -315,16 +380,16 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == "private":
         if msg == "on":
-            MongoDB.update_db("users", "user_id", user.id, "chatgpt", "on")
-            find_one = MongoDB.find_one("users", "user_id", user.id)
+            await MongoDB.update_db("users", "user_id", user.id, "chatgpt", "on")
+            find_one = await MongoDB.find_one("users", "user_id", user.id)
             verify = find_one.get("chatgpt")
             if verify == "on":
                 await Message.reply_msg(update, "ChatGPT AI enabled in this chat!")
             else:
                 await Message.reply_msg(update, "Something Went Wrong!")
         elif msg == "off":
-            MongoDB.update_db("users", "user_id", user.id, "chatgpt", "off")
-            find_one = MongoDB.find_one("users", "user_id", user.id)
+            await MongoDB.update_db("users", "user_id", user.id, "chatgpt", "off")
+            find_one = await MongoDB.find_one("users", "user_id", user.id)
             verify = find_one.get("chatgpt")
             if verify == "off":
                 await Message.reply_msg(update, "ChatGPT AI disabled in this chat!")
@@ -347,16 +412,27 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             user_id = user.id
 
-        find_mongodb = MongoDB.find_one("users", "user_id", user_id)
+        find_user = await MongoDB.find_one("users", "user_id", user_id)
 
-        if find_mongodb:
-            user_mention = find_mongodb.get("mention")
-            lang = find_mongodb.get("lang")
-            echo = find_mongodb.get("echo")
-            chatgpt = find_mongodb.get("chatgpt")
-            chatgpt_req_count = find_mongodb.get("chatgpt_req_count")
+        if find_user:
+            user_mention = find_user.get("mention")
+            lang = find_user.get("lang")
+            echo = find_user.get("echo")
+            chatgpt = find_user.get("chatgpt")
+            chatgpt_req = find_user.get("chatgpt_req")
+            ai_imagine_req = find_user.get("ai_imagine_req")
+            last_used = find_user.get("last_used")
 
-            text = f"<b>⚜ Data of <code>{user_id}</code></b>\n\n◉ User: {user_mention}\n◉ Lang: <code>{lang}</code>\n◉ Echo: <code>{echo}</code>\n◉ ChatGPT: <code>{chatgpt}</code>\n◉ ChatGPT Req: <code>{chatgpt_req_count}</code>"
+            text = (
+                f"<b>⚜ Data of <code>{user_id}</code></b>\n\n"
+                f"◉ User: {user_mention}\n"
+                f"◉ Lang: <code>{lang}</code>\n"
+                f"◉ Echo: <code>{echo}</code>\n"
+                f"◉ ChatGPT: <code>{chatgpt}</code>\n"
+                f"◉ ChatGPT Req: <code>{chatgpt_req}/{chatgpt_limit}</code>\n"
+                f"◉ AI Imagine Req: <code>{ai_imagine_req}/{ai_imagine_limit}</code>\n"
+                f"◉ Last Used: <code>{last_used}</code>\n"
+            )
             await Message.reply_msg(update, text)
         else:
             await Message.reply_msg(update, "User not found!")
@@ -392,7 +468,7 @@ async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await Message.reply_msg(update, MessageStorage.help_msg())
+    await Message.reply_msg(update, await MessageStorage.help_msg())
 
 
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -416,8 +492,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, f"Error Broadcast: {e}")
             return
         
-        users = MongoDB.find("users", "user_id")
-        x = MongoDB.info_db("users")
+        users = await MongoDB.find("users", "user_id")
+        x = await MongoDB.info_db("users")
 
         sent_count = 0
         notify = await Message.send_msg(owner_id, f"Sent: {sent_count}\nTotal User: {x[1]}")
@@ -439,13 +515,13 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
     if user.id == int(owner_id):
         if msg != "":
-            db = MongoDB.find_one("users", "user_id", int(msg))
+            db = await MongoDB.find_one("users", "user_id", int(msg))
             if db:
                 msg = db
             else:
                 msg = f"Data not found!"
         else:
-            db = MongoDB.info_db()
+            db = await MongoDB.info_db()
             msg = "▬▬▬▬▬▬▬▬▬▬\n"
             for info in db:
                 msg += (
@@ -468,7 +544,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message.text
 
     if chat.type == "private" and msg:
-        find_user = MongoDB.find_one("users", "user_id", user.id)
+        find_user = await MongoDB.find_one("users", "user_id", user.id)
         # status
         echo_status = find_user.get("echo")
         chatgpt_status = find_user.get("chatgpt")
@@ -478,27 +554,42 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, msg)
 
         if chatgpt_status == "on":
-            chatgpt_premium = MongoDB.get_data("chatgpt", "chatgpt_premium")
-            find_user = MongoDB.find_one("users", "user_id", user.id)
-            chatgpt_req_count = find_user.get("chatgpt_req_count")
-            if chatgpt_req_count == None:
-                chatgpt_req_count = 0
+            premium_user = await MongoDB.get_data("premium", "user_list")
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
+            chatgpt_req = find_user.get("chatgpt_req")
+            last_used = find_user.get("last_used")
+            current_time = datetime.now()
+
+            if last_used != None:
+                calc = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
+                if calc:
+                    chatgpt_req = 0
+                    await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
+
+            if chatgpt_req == None:
+                chatgpt_req = 0
 
             if user.id == int(owner_id):
                 g_msg = "✨ Hi Boss, Please wait!! Generating Response..."
-            elif user.id in chatgpt_premium:
+            elif user.id in premium_user:
                 g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
             else:
-                if chatgpt_req_count >= int(chatgpt_usage_limit):
-                    chatgpt_seller = MongoDB.get_data("chatgpt", "chatgpt_seller")
-                    if chatgpt_seller == None:
-                        chatgpt_seller = owner_username
+                if chatgpt_req >= int(chatgpt_limit):
+                    premium_seller = await MongoDB.get_data("premium", "premium_seller")
+                    if premium_seller == None:
+                        premium_seller = owner_username
                     btn = [
                         [
-                            InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{chatgpt_seller}")
+                            InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{premium_seller}")
                         ]
                     ]
-                    await Message.reply_msg(update, f"Your ChatGPT usage limit Exceeded!\nContact @{chatgpt_seller} to buy ChatGPT Premium!\n\n⩙ Usage: {chatgpt_req_count} out of {chatgpt_usage_limit}", btn)
+                    text = (
+                        f"❗ Your ChatGPT usage limit Exceeded!\n"
+                        f"⩙ Usage: {chatgpt_req} out of {chatgpt_limit}\n"
+                        f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
+                        f"OR Contact @{premium_seller} to buy Premium Account!"
+                    )
+                    await Message.reply_msg(update, text, btn)
                     return
                 else:
                     g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
@@ -518,9 +609,14 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 else:
                     text = chatbot.response
 
-                await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
-                chatgpt_req_count += 1
-                MongoDB.update_db("users", "user_id", user.id, "chatgpt_req_count", chatgpt_req_count)
+                try:
+                    chatgpt_req += 1
+                    await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
+                    await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
+                    await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
+                except Exception as e:
+                    print(f"Error ChatGPT: {e}")
+                    await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
             else:
                 await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
 
@@ -528,32 +624,33 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     application = ApplicationBuilder().token(bot_token).build()
 
-    application.add_handler(CommandHandler("start", func_start))
-    application.add_handler(CommandHandler("movie", func_movieinfo))
-    application.add_handler(CommandHandler("tr", func_translator))
-    application.add_handler(CommandHandler("setlang", func_setlang))
-    application.add_handler(CommandHandler("decode", func_b64decode))
-    application.add_handler(CommandHandler("encode", func_b64encode))
-    application.add_handler(CommandHandler("shortener", func_shortener))
-    application.add_handler(CommandHandler("ping", func_ping))
-    application.add_handler(CommandHandler("calc", func_calc))
-    application.add_handler(CommandHandler("echo", func_echo))
-    application.add_handler(CommandHandler("webshot", func_webshot))
-    application.add_handler(CommandHandler("chatgpt", func_chatgpt))
-    application.add_handler(CommandHandler("stats", func_stats))
-    application.add_handler(CommandHandler("id", func_id))
-    application.add_handler(CommandHandler("ban", func_ban))
-    application.add_handler(CommandHandler("unban", func_unban))
-    application.add_handler(CommandHandler("kick", func_kick))
-    application.add_handler(CommandHandler("mute", func_mute))
-    application.add_handler(CommandHandler("unmute", func_unmute))
-    application.add_handler(CommandHandler("adminlist", func_adminlist))
-    application.add_handler(CommandHandler("help", func_help))
+    application.add_handler(CommandHandler("start", func_start, block=False))
+    application.add_handler(CommandHandler("movie", func_movieinfo, block=False))
+    application.add_handler(CommandHandler("tr", func_translator, block=False))
+    application.add_handler(CommandHandler("setlang", func_setlang, block=False))
+    application.add_handler(CommandHandler("decode", func_b64decode, block=False))
+    application.add_handler(CommandHandler("encode", func_b64encode, block=False))
+    application.add_handler(CommandHandler("shortener", func_shortener, block=False))
+    application.add_handler(CommandHandler("ping", func_ping, block=False))
+    application.add_handler(CommandHandler("calc", func_calc, block=False))
+    application.add_handler(CommandHandler("echo", func_echo, block=False))
+    application.add_handler(CommandHandler("webshot", func_webshot, block=False))
+    application.add_handler(CommandHandler("imagine", func_imagine, block=False))
+    application.add_handler(CommandHandler("chatgpt", func_chatgpt, block=False))
+    application.add_handler(CommandHandler("stats", func_stats, block=False))
+    application.add_handler(CommandHandler("id", func_id, block=False))
+    application.add_handler(CommandHandler("ban", func_ban, block=False))
+    application.add_handler(CommandHandler("unban", func_unban, block=False))
+    application.add_handler(CommandHandler("kick", func_kick, block=False))
+    application.add_handler(CommandHandler("mute", func_mute, block=False))
+    application.add_handler(CommandHandler("unmute", func_unmute, block=False))
+    application.add_handler(CommandHandler("adminlist", func_adminlist, block=False))
+    application.add_handler(CommandHandler("help", func_help, block=False))
     # owner
-    application.add_handler(CommandHandler("broadcast", func_broadcast))
-    application.add_handler(CommandHandler("database", func_database))
+    application.add_handler(CommandHandler("broadcast", func_broadcast, block=False))
+    application.add_handler(CommandHandler("database", func_database, block=False))
     # filters
-    application.add_handler(MessageHandler(filters.ALL, func_filter_all))
+    application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
     # Check Updates
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 

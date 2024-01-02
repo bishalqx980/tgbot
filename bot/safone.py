@@ -28,9 +28,11 @@ class Safone:
         return res
 
 
-    async def youtube():
+    async def imagine(promt):
         try:
-            res = await safone_api.youtube()
+            res = await safone_api.imagine(promt)
+            res = res[0]
         except Exception as e:
             print(f"Error youtube: {e}")
+        return res
             

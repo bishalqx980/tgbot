@@ -6,7 +6,7 @@ client = pymongo.MongoClient(mongodb_uri)
 db = client[db_name]
 
 class MongoDB:
-    def insert_single_data(collection_name, data):
+    async def insert_single_data(collection_name, data):
         collection = db[collection_name]
         #ex. data = {"name": "John", "age": 30, "city": "New York"}
 
@@ -20,7 +20,7 @@ class MongoDB:
             print(f"Error (inserting db_data): {e}")
 
 
-    def insert_multiple_data(collection_name, data_list):
+    async def insert_multiple_data(collection_name, data_list):
         collection = db[collection_name]
 
         # ex. data = [
@@ -38,7 +38,7 @@ class MongoDB:
             print(f"Error (inserting db_data): {e}")
 
 
-    def find_one(collection_name, search, match):
+    async def find_one(collection_name, search, match):
         collection = db[collection_name]
         try:
             print(f"Finding Data in {collection_name} MongoDB...")
@@ -52,7 +52,7 @@ class MongoDB:
             print(f"Error (finding db_data): {e}")
     
 
-    def find(collection_name, search):
+    async def find(collection_name, search):
         collection = db[collection_name]
         try:
             print(f"Finding Data in {collection_name} MongoDB...")
@@ -69,7 +69,7 @@ class MongoDB:
 
 
 
-    def get_data(collection_name, get_data):
+    async def get_data(collection_name, get_data):
         collection = db[collection_name]
         try:
             print(f"Getting Data from {collection_name} MongoDB...")
@@ -84,7 +84,7 @@ class MongoDB:
             print(f"Error (Getting db_data): {e}")
 
 
-    def update_db(collection_name, search, match, update_data_name, update_data_value):
+    async def update_db(collection_name, search, match, update_data_name, update_data_value):
         collection = db[collection_name]
         try:
             print(f"Updating {collection_name} MongoDB Data...")
@@ -97,7 +97,7 @@ class MongoDB:
             print(f"Error (Updating db_data): {e}")
 
 
-    def info_db(collection_name=None):
+    async def info_db(collection_name=None):
         docs_name = db.list_collection_names()
         if collection_name:
             print(f"Getting Info about {collection_name} MongoDB...")
@@ -127,7 +127,7 @@ class MongoDB:
             return storage
 
 
-    def delete_all_doc(collection_name):
+    async def delete_all_doc(collection_name):
         collection = db[collection_name]
         try:
             print(f"{collection_name} Data deleting process started...")

@@ -20,8 +20,9 @@ shortener_api_key = os.getenv("shortener_api_key")
 omdb_api = os.getenv("omdb_api")
 # safone api
 safone_api = SafoneAPI()
-chatgpt_usage_limit = os.getenv("chatgpt_usage_limit")
-chatgpt_usage_reset_time = os.getenv("chatgpt_usage_reset_time")
+chatgpt_limit = os.getenv("chatgpt_limit")
+ai_imagine_limit = os.getenv("ai_imagine_limit")
+usage_reset = os.getenv("usage_reset")
 
 bot = Bot(bot_token)
 

@@ -1,7 +1,7 @@
 from bot.helper import commands
 
 class MessageStorage:
-    def welcome_msg():
+    async def welcome_msg():
         pvt_message = (
             "Hi, {user_mention} !! It's <a href='https://t.me/{bot_username}'>{bot_firstname}</a>!\n"
             "I'm not only a Powerful <b>Group Management bot</b> but also\n"
@@ -25,7 +25,7 @@ class MessageStorage:
         return pvt_message, group_message
 
 
-    def msg_movie_info(movie_info):
+    async def msg_movie_info(movie_info):
         # get_movie_info()
         message = (
             f"<b>🎥 Content Type:</b> {movie_info[1]}\n"
@@ -50,7 +50,7 @@ class MessageStorage:
         return message
 
 
-    def help_msg():
+    async def help_msg():
         message = "<b>Available Bot Commands ⚜</b>\n\n"
         for cmd in commands:
             message += (f"/{cmd.command} <code>: {cmd.description}</code>\n")
