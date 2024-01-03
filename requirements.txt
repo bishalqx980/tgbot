@@ -8,3 +8,4 @@ requests
 safoneapi
 TgCrypto
 pytube
+psutil

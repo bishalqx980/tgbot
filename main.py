@@ -1,4 +1,5 @@
 import os
+import psutil
 import asyncio
 from datetime import datetime
 from telegram.constants import ParseMode
@@ -407,7 +408,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     url = " ".join(context.args)
     if url != "":
-        await Message.reply_msg(update, "Please Wait...")
+        tmp_msg = await Message.reply_msg(update, "Please Wait...")
         try:
             res = YouTubeDownload.ytdl(url)
             audio_file = open(res[1], "rb")
@@ -415,6 +416,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.send_audio(chat.id, audio_file, res[0])
                 try:
                     os.remove(res[1])
+                    await Message.del_msg(chat.id, tmp_msg)
                     print("File Removed...")
                 except Exception as e:
                     print(f"Error: {e}")
@@ -569,6 +571,35 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
 
+async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    if user.id == int(owner_id):
+        sys_info = (
+            f"▣ System info\n"
+            f"CPU: <code>{psutil.cpu_count()}</code>\n"
+            f"CPU (Logical): <code>{psutil.cpu_count(False)}</code>\n"
+            f"CPU freq Current: <code>{psutil.cpu_freq()[0]/1024:.2f} Ghz</code>\n"
+            f"CPU freq Max: <code>{psutil.cpu_freq()[2]/1024:.2f} Ghz</code>\n\n"
+            f"RAM Total: <code>{psutil.virtual_memory()[0]/(1024**3):.2f} GB</code>\n"
+            f"RAM Avail: <code>{psutil.virtual_memory()[1]/(1024**3):.2f} GB</code>\n"
+            f"RAM Used: <code>{psutil.virtual_memory()[3]/(1024**3):.2f} GB</code>\n"
+            f"RAM Free: <code>{psutil.virtual_memory()[4]/(1024**3):.2f} GB</code>\n"
+            f"RAM Percent: <code>{psutil.virtual_memory()[2]} %</code>\n\n"
+            f"RAM Total (Swap): <code>{psutil.swap_memory()[0]/(1024**3):.2f} GB</code>\n"
+            f"RAM Used (Swap): <code>{psutil.swap_memory()[1]/(1024**3):.2f} GB</code>\n"
+            f"RAM Free (Swap): <code>{psutil.swap_memory()[2]/(1024**3):.2f} GB</code>\n"
+            f"RAM Percent (Swap): <code>{psutil.swap_memory()[3]} %</code>\n\n"
+            f"Total Partitions: <code>{len(psutil.disk_partitions())}</code>\n"
+            f"Disk Usage Total: <code>{psutil.disk_usage('/')[0]/(1024**3):.2f} GB</code>\n"
+            f"Disk Usage Used: <code>{psutil.disk_usage('/')[1]/(1024**3):.2f} GB</code>\n"
+            f"Disk Usage Free: <code>{psutil.disk_usage('/')[2]/(1024**3):.2f} GB</code>\n"
+            f"Disk Usage Percent: <code>{psutil.disk_usage('/')[3]} %\n\n"
+        )
+        await Message.reply_msg(update, sys_info)
+    else:
+        await Message.reply_msg(update, "❗ This command is only for bot owner!")
+
+
 async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -681,6 +712,7 @@ def main():
     # owner
     application.add_handler(CommandHandler("broadcast", func_broadcast, block=False))
     application.add_handler(CommandHandler("database", func_database, block=False))
+    application.add_handler(CommandHandler("sys", func_sys, block=False))
     # filters
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
     # Check Updates
