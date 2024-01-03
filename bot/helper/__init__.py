@@ -27,7 +27,8 @@ commands = [
     BotCommand("adminlist", "See group admins list"),
     BotCommand("help", "Show help message"),
     BotCommand("broadcast", "owner only"),
-    BotCommand("database", "owner only")
+    BotCommand("database", "owner only"),
+    BotCommand("sys", "owner only")
 ]
 
 class BotCommandHelper:

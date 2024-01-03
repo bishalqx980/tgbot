@@ -7,6 +7,7 @@ This Telegram bot is built using the `python-telegram-bot` library and performs 
 - **ChatGPT AI:** I can get response from ChatGPT AI
 - **AI Imazine:** 🔥 I can Imagine Image by AI from your promt
 - **Group Management:** Powerful Group Manager bot
+- **YouTube Download** Can download video from YouTube
 - **Movie Info:** Can provide any movie/series/episode
 - **Language Translator:** Can translate any lang using Google Translator
 - **Encode/Decode base64:** Can encode/decode base64 code
