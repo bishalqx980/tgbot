@@ -1,5 +1,6 @@
 from bot.helper import commands
 
+
 class MessageStorage:
     async def welcome_msg():
         pvt_message = (
@@ -56,4 +57,3 @@ class MessageStorage:
         for cmd in commands:
             message += (f"/{cmd.command} <code>: {cmd.description}</code>\n")
         return message
-    

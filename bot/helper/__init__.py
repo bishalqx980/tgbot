@@ -1,5 +1,5 @@
 import asyncio
-from bot import bot
+from bot import bot, logger
 from telegram import BotCommand
 
 commands = [
@@ -16,6 +16,7 @@ commands = [
     BotCommand("webshot", "Take Screenshot of any website"),
     BotCommand("imagine", "AI Image generator based on your promt"),
     BotCommand("chatgpt", "ChatGPT AI for your chat"),
+    BotCommand("ytdl", "Download youtube video"),
     BotCommand("stats", "Show your config data"),
     BotCommand("id", "Show chat/user id"),
     BotCommand("ban", "Ban an user from group"),
@@ -37,7 +38,7 @@ class BotCommandHelper:
 
     async def set_bot_command():
         await bot.set_my_commands(commands)
-        print("🤖 Bot commands updated!")
+        logger.info("🤖 Bot commands updated!")
 
 
 asyncio.get_event_loop().run_until_complete(BotCommandHelper.set_bot_command())

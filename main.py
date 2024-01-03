@@ -1,20 +1,22 @@
+import os
 import asyncio
 from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
-from bot import bot_token, bot, owner_id, owner_username, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
+from bot import logger, bot_token, bot, owner_id, owner_username, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
 from bot.mongodb import MongoDB
-from bot.helper.telegram_helper import Message
+from bot.helper.telegram_helper import Message, Button
 from bot.ping import ping_url
 from bot.shortener import shortener_url
 from bot.translator import translate
 from bot.base64 import decode_b64, encode_b64
 from bot.omdb_movie_info import get_movie_info
 from bot.utils import calc
-from bot.helper.tgmsg_storage import MessageStorage
+from bot.helper.data_storage import MessageStorage
 from bot.safone import Safone
 from bot.group_management import func_ban, func_unban, func_kick, func_mute, func_unmute, func_adminlist
+from bot.ytdl import YouTubeDownload
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -401,6 +403,29 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Coming Soon...")
 
 
+async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    url = " ".join(context.args)
+    if url != "":
+        await Message.reply_msg(update, "Please Wait...")
+        try:
+            res = YouTubeDownload.ytdl(url)
+            audio_file = open(res[1], "rb")
+            if audio_file:
+                await Message.send_audio(chat.id, audio_file, res[0])
+                try:
+                    os.remove(res[1])
+                    print("File Removed...")
+                except Exception as e:
+                    print(f"Error: {e}")
+            else:
+                await Message.reply_msg(update, "Something Went Wrong!")
+        except Exception as e:
+            print(f"Error: {e}")
+    else:
+        await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")       
+
+
 async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -478,14 +503,20 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if user.id == int(owner_id):
         if replied_msg:
-            msg = replied_msg.text
+            if replied_msg.text:
+                msg = replied_msg.text
+            else:
+                msg = replied_msg.caption
         else:
             await Message.reply_msg(update, "Reply a message to broadcast!")
             return
         
         if user_id:
             try:
-                await Message.send_msg(user_id, msg)
+                if replied_msg.text:
+                    await Message.send_msg(user_id, msg)
+                elif replied_msg.caption:
+                    await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
                 await Message.reply_msg(update, "Job Done !!")
             except Exception as e:
                 print(f"Error Broadcast: {e}")
@@ -499,13 +530,15 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         notify = await Message.send_msg(owner_id, f"Sent: {sent_count}\nTotal User: {x[1]}")
         for user_id in users:
             try:
-                await Message.send_msg(user_id, msg)
                 sent_count += 1
+                if replied_msg.text:
+                    await Message.send_msg(user_id, msg)
+                elif replied_msg.caption:
+                    await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
                 await Message.edit_msg(update, f"Sent: {sent_count}\nTotal User: {x[1]}", notify)
             except Exception as e:
                 print(f"Error Broadcast: {e}")
         await Message.reply_msg(update, "Job Done !!")
-
     else:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
@@ -531,9 +564,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     f"Actual Size:<code> {info[3]}</code>\n"
                     f"▬▬▬▬▬▬▬▬▬▬\n"
                 )
-
         await Message.reply_msg(update, f"<b>{msg}</b>")
-
     else:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
@@ -637,6 +668,7 @@ def main():
     application.add_handler(CommandHandler("webshot", func_webshot, block=False))
     application.add_handler(CommandHandler("imagine", func_imagine, block=False))
     application.add_handler(CommandHandler("chatgpt", func_chatgpt, block=False))
+    application.add_handler(CommandHandler("ytdl", func_ytdl, block=False))
     application.add_handler(CommandHandler("stats", func_stats, block=False))
     application.add_handler(CommandHandler("id", func_id, block=False))
     application.add_handler(CommandHandler("ban", func_ban, block=False))
@@ -656,5 +688,5 @@ def main():
 
 
 if __name__ == "__main__":
-    print("🤖 Bot Started !!")
+    logger.info("🤖 Bot Started !!")
     main()
