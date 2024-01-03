@@ -593,7 +593,7 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Disk Usage Total: <code>{psutil.disk_usage('/')[0]/(1024**3):.2f} GB</code>\n"
             f"Disk Usage Used: <code>{psutil.disk_usage('/')[1]/(1024**3):.2f} GB</code>\n"
             f"Disk Usage Free: <code>{psutil.disk_usage('/')[2]/(1024**3):.2f} GB</code>\n"
-            f"Disk Usage Percent: <code>{psutil.disk_usage('/')[3]} %\n\n"
+            f"Disk Usage Percent: <code>{psutil.disk_usage('/')[3]} %</code>\n\n"
         )
         await Message.reply_msg(update, sys_info)
     else:
