@@ -4,6 +4,7 @@ from pytube import YouTube
 class YouTubeDownload:
     async def ytdl(url):
         try:
+            print("Downloading...")
             yt = YouTube(url)
             title = yt.title
             file_type = "audio"
@@ -21,6 +22,8 @@ class YouTubeDownload:
             if stream:
                 filename = f"file.{extention}"
                 file_path = stream.download(output_path=file_path, filename=filename)
+                if file_path:
+                    print("Video Downloaded!!")
                 return title, file_path
             else:
                 print("No stream found for this video")
