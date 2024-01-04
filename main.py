@@ -414,7 +414,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 res = await YouTubeDownload.ytdl(url)
                 audio_file = open(res[1], "rb")
                 if audio_file:
-                    await Message.send_audio(chat.id, audio_file, res[0])
+                    await Message.send_audio(chat.id, audio_file, res[0], res[0])
                     try:
                         os.remove(res[1])
                         await Message.del_msg(chat.id, tmp_msg)

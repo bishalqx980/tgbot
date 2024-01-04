@@ -19,7 +19,7 @@ class YouTubeDownload:
                 .first()
             )
             if stream:
-                filename = f"{title}.{extention}"
+                filename = f"file.{extention}"
                 file_path = stream.download(output_path=file_path, filename=filename)
                 return title, file_path
             else:
