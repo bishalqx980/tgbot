@@ -315,9 +315,9 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    promt = " ".join(context.args)
+    prompt = " ".join(context.args)
 
-    if promt:
+    if prompt:
         premium_user = await MongoDB.get_data("premium", "user_list")
         find_user = await MongoDB.find_one("users", "user_id", user.id)
         ai_imagine_req = find_user.get("ai_imagine_req")
@@ -359,11 +359,11 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 g_msg = f"✨ Hi {user.first_name}, Generating AI Image please wait..."
 
         sent_msg = await Message.reply_msg(update, g_msg)
-        imagine = await Safone.imagine(promt)
+        imagine = await Safone.imagine(prompt)
         if imagine:
             try:
                 ai_imagine_req += 1
-                await Message.send_img(chat.id, imagine, f"✨ {promt}")
+                await Message.send_img(chat.id, imagine, f"✨ {prompt}")
                 await Message.del_msg(chat.id, sent_msg)
                 await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
                 await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
@@ -373,7 +373,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await Message.reply_msg(update, "Something Went Wrong!")
     else:
-        await Message.reply_msg(update, "Use <code>/imagine promt</code>\nE.g. <code>/imagine a cute cat</code>")
+        await Message.reply_msg(update, "Use <code>/imagine prompt</code>\nE.g. <code>/imagine a cute cat</code>")
 
 
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):

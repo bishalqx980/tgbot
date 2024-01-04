@@ -8,7 +8,7 @@ class MessageStorage:
             "I'm not only a Powerful <b>Group Management bot</b> but also\n"
             "I can do many other task 😜\n\n" # break
             "🔥 I can get response from <b>ChatGPT AI</b>\n\n"
-            "🔥 I can Imagine Image by AI from your promt\n\n" # break
+            "🔥 I can Imagine Image by AI from your prompt\n\n" # break
             "⪧ I can download video from YouTube\n"
             "⪧ I can get any Movie information\n"
             "⪧ I can Translate any language to your desired lang\n"
