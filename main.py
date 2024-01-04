@@ -421,9 +421,10 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 except Exception as e:
                     print(f"Error: {e}")
             else:
-                await Message.reply_msg(update, "Something Went Wrong!")
+                await Message.edit_msg(update, "Something Went Wrong!", tmp_msg)
         except Exception as e:
             print(f"Error: {e}")
+            await Message.edit_msg(update, f"Error: {e}", tmp_msg)
     else:
         await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")       
 
