@@ -410,7 +410,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if url != "":
         tmp_msg = await Message.reply_msg(update, "Please Wait...")
         try:
-            res = YouTubeDownload.ytdl(url)
+            res = await YouTubeDownload.ytdl(url)
             audio_file = open(res[1], "rb")
             if audio_file:
                 await Message.send_audio(chat.id, audio_file, res[0])

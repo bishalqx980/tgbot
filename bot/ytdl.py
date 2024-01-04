@@ -2,7 +2,7 @@ from pytube import YouTube
 
 
 class YouTubeDownload:
-    def ytdl(url):
+    async def ytdl(url):
         try:
             yt = YouTube(url)
             title = yt.title
