@@ -291,7 +291,7 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif msg == "":
             await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
     else:
-        await Message.reply_msg(update, "Coming Soon...")
+        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!\nClick /start")
 
 
 async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -401,32 +401,35 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif msg == "":
             await Message.reply_msg(update, "Use <code>/chatgpt on</code> to turn on.\nUse <code>/chatgpt off</code> to turn off.")
     else:
-        await Message.reply_msg(update, "Coming Soon...")
+        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!\nClick /start")
 
 
 async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     url = " ".join(context.args)
-    if url != "":
-        tmp_msg = await Message.reply_msg(update, "Please Wait...")
-        try:
-            res = await YouTubeDownload.ytdl(url)
-            audio_file = open(res[1], "rb")
-            if audio_file:
-                await Message.send_audio(chat.id, audio_file, res[0])
-                try:
-                    os.remove(res[1])
-                    await Message.del_msg(chat.id, tmp_msg)
-                    print("File Removed...")
-                except Exception as e:
-                    print(f"Error: {e}")
-            else:
-                await Message.edit_msg(update, "Something Went Wrong!", tmp_msg)
-        except Exception as e:
-            print(f"Error: {e}")
-            await Message.edit_msg(update, f"Error: {e}", tmp_msg)
+    if chat.type == "private":
+        if url != "":
+            tmp_msg = await Message.reply_msg(update, "Please Wait...")
+            try:
+                res = await YouTubeDownload.ytdl(url)
+                audio_file = open(res[1], "rb")
+                if audio_file:
+                    await Message.send_audio(chat.id, audio_file, res[0])
+                    try:
+                        os.remove(res[1])
+                        await Message.del_msg(chat.id, tmp_msg)
+                        print("File Removed...")
+                    except Exception as e:
+                        print(f"Error: {e}")
+                else:
+                    await Message.edit_msg(update, "Something Went Wrong!", tmp_msg)
+            except Exception as e:
+                print(f"Error: {e}")
+                await Message.edit_msg(update, f"Error: {e}", tmp_msg)
+        else:
+            await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")
     else:
-        await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")       
+        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!\nClick /start")
 
 
 async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -465,7 +468,7 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await Message.reply_msg(update, "User not found!")
     elif chat.type in ["group", "supergroup"]:
-        await Message.reply_msg(update, "Coming Soon...")
+        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!\nClick /start")
 
 
 async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
