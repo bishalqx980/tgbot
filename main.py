@@ -412,11 +412,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if url != "":
             tmp_msg = await Message.reply_msg(update, "Please Wait...")
             await Message.edit_msg(update, "📥 Downloading...", tmp_msg)
-            try:
-                res = await YouTubeDownload.ytdl(url)
-            except Exception as e:
-                print(f"Error ytdl: {e}")
-                await Message.reply_msg(update, f"Error: {e}")
+            res = await YouTubeDownload.ytdl(url)
             if res:
                 await Message.edit_msg(update, "📤 Uploading...", tmp_msg)
                 try_attempt = 0
@@ -440,6 +436,8 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await Message.del_msg(chat.id, tmp_msg)
                 except Exception as e:
                     print(f"Error os.remove: {e}")
+            else:
+                await Message.edit_msg(update, "Something Went Wrong...", tmp_msg)
         else:
             await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")
     else:
