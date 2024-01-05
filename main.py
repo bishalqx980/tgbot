@@ -5,7 +5,7 @@ import subprocess
 from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, ChatMember
-from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters
+from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from bot import logger, bot_token, bot, owner_id, owner_username, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
 from bot.mongodb import MongoDB
 from bot.helper.telegram_helper import Message, Button
@@ -19,6 +19,7 @@ from bot.helper.data_storage import MessageStorage
 from bot.safone import Safone
 from bot.group_management import func_ban, func_unban, func_kick, func_mute, func_unmute, func_adminlist
 from bot.ytdl import YouTubeDownload
+from bot.helper.callbackbtn_helper import func_callbackbtn
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -409,40 +410,60 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     e_msg = update.effective_message
     url = " ".join(context.args)
+    context.user_data["url"] = url
+    context.user_data["msg_id"] = e_msg.id
     if chat.type == "private":
         if url != "":
-            tmp_msg = await Message.reply_msg(update, "Please Wait...")
-            await Message.edit_msg(update, "📥 Downloading...", tmp_msg)
-            res = await YouTubeDownload.ytdl(url)
-            if res:
-                await Message.edit_msg(update, "📤 Uploading...", tmp_msg)
-                try_attempt = 0
-                max_attempt = 3
-                while try_attempt <= max_attempt:
-                    try:
-                        await Message.send_audio(chat.id, res[1], res[0], res[0], e_msg.id)
-                        break
-                    except Exception as e:
-                        print(f"Error Uploading: {e}")
-                        try_attempt += 1
-                        if try_attempt == max_attempt:
-                            print(f"Error Uploading: {e}")
-                            await Message.reply_msg(update, f"Error Uploading: {e}")
-                            break
-                        print(f"Waiting {2**try_attempt}sec before retry...")
-                        await asyncio.sleep(2**try_attempt)
-                try:
-                    os.remove(res[1])
-                    print("File Removed...")
-                    await Message.del_msg(chat.id, tmp_msg)
-                except Exception as e:
-                    print(f"Error os.remove: {e}")
-            else:
-                await Message.edit_msg(update, "Something Went Wrong...", tmp_msg)
+            btn_name = ["mp4", "mp3"]
+            btn_close = ["close"]
+            btn = await Button.cbutton(btn_name, btn_name, True)
+            btn2 = await Button.cbutton(btn_close, btn_close)
+            await Message.reply_msg(update, f"Select Content Quality/Format\n{url}", btn + btn2)
         else:
             await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")
     else:
         await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!\nClick /start")
+
+
+async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url, extention):
+    chat = update.effective_chat
+    tmp_msg = await Message.send_msg(chat.id, "Please Wait...")
+    await Message.edit_msg(update, "📥 Downloading...", tmp_msg)
+    res = await YouTubeDownload.ytdl(url, extention)
+    if res:
+        await Message.edit_msg(update, "📤 Uploading...", tmp_msg)
+        try_attempt = 0
+        max_attempt = 3
+        msg_id = context.user_data.get("msg_id")
+        while try_attempt <= max_attempt:
+            try:
+                if extention == "mp4":
+                    title = res[0]
+                    file_path = res[1]
+                    thumbnail = res[2]
+                    await Message.send_vid(chat.id, file_path, thumbnail, title, msg_id)
+                elif extention == "mp3":
+                    title = res[0]
+                    file_path = res[1]
+                    await Message.send_audio(chat.id, file_path, title, title, msg_id)
+                break
+            except Exception as e:
+                print(f"Error Uploading: {e}")
+                try_attempt += 1
+                if try_attempt == max_attempt:
+                    print(f"Error Uploading: {e}")
+                    await Message.send_msg(chat.id, f"Error Uploading: {e}")
+                    break
+                print(f"Waiting {2**try_attempt}sec before retry...")
+                await asyncio.sleep(2**try_attempt)
+        try:
+            os.remove(res[1])
+            print("File Removed...")
+            await Message.del_msg(chat.id, tmp_msg)
+        except Exception as e:
+            print(f"Error os.remove: {e}")
+    else:
+        await Message.edit_msg(update, "Something Went Wrong...", tmp_msg)
 
 
 async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -764,6 +785,8 @@ def main():
     application.add_handler(CommandHandler("sys", func_sys, block=False))
     # filters
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
+    # Callback button
+    application.add_handler(CallbackQueryHandler(func_callbackbtn, block=False))
     # Check Updates
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 

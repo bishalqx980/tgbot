@@ -20,7 +20,6 @@ class MessageStorage:
             "⪧ I can take screenshot of any website by url 📸\n\n" # break
             "🆘 More Feature coming soon...\n"
             "⪧ /help for bot help\n"
-            "∞ Successor of <a href='https://t.me/YmlzaGFsbot'>Melina</a> ☺"
         )
         group_message = (
             "Hi, {user_mention}! Start me in private to chat with me 😊!"

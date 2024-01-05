@@ -19,7 +19,6 @@ This Telegram bot is built using the `python-telegram-bot` library and performs 
 - **Much more...**
 
 - **🆘 More Feature coming soon...**
-- **∞ Successor of [Melina](https://t.me/YmlzaGFsbot) ☺**
 
 ## Setup
 - Edit Config.env
