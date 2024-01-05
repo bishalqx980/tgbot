@@ -1,6 +1,7 @@
 import os
 import psutil
 import asyncio
+import subprocess
 from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, ChatMember
@@ -362,9 +363,9 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         imagine = await Safone.imagine(prompt)
         if imagine:
             try:
-                ai_imagine_req += 1
                 await Message.send_img(chat.id, imagine, f"✨ {prompt}")
                 await Message.del_msg(chat.id, sent_msg)
+                ai_imagine_req += 1
                 await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
                 await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
             except Exception as e:
@@ -548,11 +549,11 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         notify = await Message.send_msg(owner_id, f"Sent: {sent_count}\nTotal User: {x[1]}")
         for user_id in users:
             try:
-                sent_count += 1
                 if replied_msg.text:
                     await Message.send_msg(user_id, msg)
                 elif replied_msg.caption:
-                    await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
+                    await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
+                sent_count += 1
                 await Message.edit_msg(update, f"Sent: {sent_count}\nTotal User: {x[1]}", notify)
             except Exception as e:
                 print(f"Error Broadcast: {e}")
@@ -583,6 +584,33 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     f"▬▬▬▬▬▬▬▬▬▬\n"
                 )
         await Message.reply_msg(update, f"<b>{msg}</b>")
+    else:
+        await Message.reply_msg(update, "❗ This command is only for bot owner!")
+
+
+async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    e_msg = update.effective_message
+    command = " ".join(context.args)
+    command = command.replace("'", "")
+
+    if user.id == int(owner_id):
+        if chat.type == "private":
+            if command != "":
+                result = subprocess.run(command, shell=True, capture_output=True, text=True)
+                if result.returncode == 0:
+                    with open('log.txt', 'w') as log_file:
+                        log_file.write(result.stdout)
+                    with open("log.txt", "rb") as log_file:
+                        x = log_file.read()
+                        await Message.send_doc(chat.id, x, "log.txt", "log.txt", e_msg.id)
+                else:
+                    await Message.reply_msg(update, result.stderr)
+            else:
+                await Message.reply_msg(update, "E.g. <code>/shell dir</code> [linux/windows]")
+        else:
+            await Message.reply_msg(update, "⚠ Boss you are in public!")
     else:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
@@ -692,8 +720,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     text = chatbot.response
 
                 try:
-                    chatgpt_req += 1
                     await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
+                    chatgpt_req += 1
                     await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
                     await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
                 except Exception as e:
@@ -732,6 +760,7 @@ def main():
     # owner
     application.add_handler(CommandHandler("broadcast", func_broadcast, block=False))
     application.add_handler(CommandHandler("database", func_database, block=False))
+    application.add_handler(CommandHandler("shell", func_shell, block=False))
     application.add_handler(CommandHandler("sys", func_sys, block=False))
     # filters
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))

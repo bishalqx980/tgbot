@@ -28,6 +28,7 @@ commands = [
     BotCommand("help", "Show help message"),
     BotCommand("broadcast", "owner only"),
     BotCommand("database", "owner only"),
+    BotCommand("shell", "owner only"),
     BotCommand("sys", "owner only")
 ]
 
