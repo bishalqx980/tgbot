@@ -406,26 +406,39 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
+    e_msg = update.effective_message
     url = " ".join(context.args)
     if chat.type == "private":
         if url != "":
             tmp_msg = await Message.reply_msg(update, "Please Wait...")
-            try:
-                res = await YouTubeDownload.ytdl(url)
-                audio_file = open(res[1], "rb")
-                if audio_file:
-                    await Message.send_audio(chat.id, audio_file, res[0], res[0])
+            await Message.edit_msg(update, "📥 Downloading...", tmp_msg)
+            res = await YouTubeDownload.ytdl(url)
+            if res:
+                await Message.edit_msg(update, "📥 Uploading...", tmp_msg)
+                try_attempt = 0
+                max_attempt = 3
+                while try_attempt <= max_attempt:
                     try:
-                        os.remove(res[1])
-                        await Message.del_msg(chat.id, tmp_msg)
-                        print("File Removed...")
+                        await Message.send_audio(chat.id, res[1], res[0], res[0], e_msg.id)
+                        break
                     except Exception as e:
-                        print(f"Error: {e}")
-                else:
-                    await Message.edit_msg(update, "Something Went Wrong!", tmp_msg)
-            except Exception as e:
-                print(f"Error: {e}")
-                await Message.edit_msg(update, f"Error: {e}", tmp_msg)
+                        print(f"Error Uploading: {e}")
+                        try_attempt += 1
+                        if try_attempt == max_attempt:
+                            print(f"Error Uploading: {e}")
+                            await Message.edit_msg(update, f"Error Uploading: {e}", tmp_msg)
+                            break
+                        print(f"Waiting {2**try_attempt}sec before retry...")
+                        await asyncio.sleep(2**try_attempt)
+                try:
+                    os.remove(res[1])
+                    print("File Removed...")
+                    await asyncio.sleep(2)
+                    await Message.del_msg(chat.id, tmp_msg)
+                except Exception as e:
+                    print(f"Error os.remove: {e}")
+            else:
+                await Message.edit_msg(update, f"Something Went Wrong! Try again after sometime...", tmp_msg)
         else:
             await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")
     else:

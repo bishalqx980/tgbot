@@ -71,12 +71,13 @@ class Message:
         return sent_vid
 
 
-    async def send_audio(chat_id, audio, title, caption=None):
+    async def send_audio(chat_id, audio, title, caption=None, reply_msg_id=None):
         await bot.send_audio(
             chat_id=chat_id,
             audio=audio,
             title=title,
-            caption=caption
+            caption=caption,
+            reply_to_message_id=reply_msg_id
         )
 
     
