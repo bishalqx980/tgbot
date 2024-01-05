@@ -426,14 +426,13 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         try_attempt += 1
                         if try_attempt == max_attempt:
                             print(f"Error Uploading: {e}")
-                            await Message.edit_msg(update, f"Error Uploading: {e}", tmp_msg)
+                            await Message.reply_msg(update, f"Error Uploading: {e}")
                             break
                         print(f"Waiting {2**try_attempt}sec before retry...")
                         await asyncio.sleep(2**try_attempt)
                 try:
                     os.remove(res[1])
                     print("File Removed...")
-                    await asyncio.sleep(2)
                     await Message.del_msg(chat.id, tmp_msg)
                 except Exception as e:
                     print(f"Error os.remove: {e}")
