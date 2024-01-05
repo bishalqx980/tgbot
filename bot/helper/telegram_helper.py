@@ -45,13 +45,14 @@ class Message:
         return sent_msg
 
 
-    async def send_vid(chat_id, video, thumbnail=None, caption=None, btn=None, parse_mode=ParseMode.HTML):
+    async def send_vid(chat_id, video, thumbnail=None, caption=None, reply_msg_id=None, btn=None, parse_mode=ParseMode.HTML):
         if btn:
             reply_markup = InlineKeyboardMarkup(btn)
             sent_vid = await bot.send_video(
                 chat_id=chat_id,
                 video=video,
                 caption=caption,
+                reply_to_message_id=reply_msg_id,
                 reply_markup=reply_markup,
                 thumbnail=thumbnail,
                 height=1080,
@@ -63,6 +64,7 @@ class Message:
                 chat_id=chat_id,
                 video=video,
                 caption=caption,
+                reply_to_message_id=reply_msg_id,
                 thumbnail=thumbnail,
                 height=1080,
                 width=1920,
