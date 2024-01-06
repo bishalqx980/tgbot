@@ -414,7 +414,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     e_msg = update.effective_message
     re_msg = update.message.reply_to_message
-    if re_msg.text:
+    if re_msg:
         url = re_msg.text
     else:
         url = " ".join(context.args)
