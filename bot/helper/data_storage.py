@@ -55,5 +55,5 @@ class MessageStorage:
     async def help_msg():
         message = "<b>Available Bot Commands ⚜</b>\n\n"
         for cmd in commands:
-            message += (f"/{cmd.command} <code>: {cmd.description}</code>\n")
+            message += (f"/{cmd.command} ⇒ {cmd.description}\n")
         return message

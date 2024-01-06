@@ -6,7 +6,7 @@ from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, InlineKeyboardButton, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
-from bot import logger, bot_token, bot, owner_id, owner_username, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
+from bot import logger, bot_token, bot, owner_id, owner_username, support_chat, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
 from bot.mongodb import MongoDB
 from bot.helper.telegram_helper import Message, Button
 from bot.ping import ping_url
@@ -36,12 +36,16 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             bot_firstname = bot_info.first_name
         )
 
-        btn = [
-            [
-                InlineKeyboardButton("Add in Group", f"http://t.me/{bot_info.username}?startgroup=start"),
-                InlineKeyboardButton("⚡ Developer ⚡", f"https://t.me/{owner_username}")
-            ]
-        ]
+        btn1 = ["Add in Group", "⚡ Developer ⚡"]
+        url_btn1 = [f"http://t.me/{bot_info.username}?startgroup=start", f"https://t.me/{owner_username}"]
+        btn2 = ["👨‍💻 Support Chat"]
+        url_btn2 = [support_chat]
+        btn1 = await Button.ubutton(btn1, url_btn1, True)
+        if len(support_chat) != 0:
+            btn2 = await Button.ubutton(btn2, url_btn2)
+            btn = btn1 + btn2
+        else:
+            btn = btn1
         await Message.send_img(chat.id, avatar, welcome_msg, btn)
 
         data = {
@@ -442,11 +446,12 @@ async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url,
                     file_path = res[1]
                     thumbnail = res[2]
                     await Message.send_vid(chat.id, file_path, thumbnail, title, msg_id)
+                    break
                 elif extention == "mp3":
                     title = res[0]
                     file_path = res[1]
                     await Message.send_audio(chat.id, file_path, title, title, msg_id)
-                break
+                    break
             except Exception as e:
                 print(f"Error Uploading: {e}")
                 try_attempt += 1
