@@ -413,7 +413,11 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     e_msg = update.effective_message
-    url = " ".join(context.args)
+    re_msg = update.message.reply_to_message
+    if re_msg.text:
+        url = re_msg.text
+    else:
+        url = " ".join(context.args)
     context.user_data["url"] = url
     context.user_data["msg_id"] = e_msg.id
     if chat.type == "private":
