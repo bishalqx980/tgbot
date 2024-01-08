@@ -39,6 +39,10 @@ class MongoDB:
 
 
     async def find_one(collection_name, search, match):
+        '''
+        Example: x = find_one(collection_name)\n
+        x.get(item)
+        '''
         collection = db[collection_name]
         try:
             print(f"Finding Data in {collection_name} MongoDB...")

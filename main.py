@@ -46,7 +46,12 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn = btn1 + btn2
         else:
             btn = btn1
-        await Message.send_img(chat.id, avatar, welcome_msg, btn)
+
+        welcome_img = await MongoDB.get_data("ciri_docs", "welcome_img")
+        if welcome_img:
+            await Message.send_img(chat.id, avatar, welcome_msg, btn)
+        else:
+            await Message.send_msg(chat.id, welcome_msg, btn)
 
         data = {
             "user_id": user.id,
@@ -618,6 +623,49 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
 
+async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    key = " ".join(context.args)
+    c_name = "ciri_docs"
+    if user.id == int(owner_id):
+        if key != "":
+            if "-n" in key:
+                index_n = key.index("-n")
+                n_value = key[index_n + len("-n"):].strip()
+                if n_value.lower() == "true":
+                    n_value = bool(True)
+                elif n_value.lower() == "false":
+                    n_value = bool(False)
+                key = key[0:index_n].strip()
+            else:
+                await Message.reply_msg(update, "-n not provided")
+            try:
+                o_value = await MongoDB.get_data(c_name, key)
+                await MongoDB.update_db(c_name, key, o_value, key, n_value)
+                await Message.reply_msg(update, "Database Updated!")
+            except Exception as e:
+                print(f"Error bsetting: {e}")
+                await Message.reply_msg(update, f"Error bsetting: {e}")
+        else:
+            find = await MongoDB.find(c_name, "_id")
+            data = await MongoDB.find_one(c_name, "_id", find[0])
+            avatar = data.get("avatar")
+            telegraph = data.get("telegraph")
+            lang_code_list = data.get("lang_code_list")
+            welcome_img = data.get("welcome_img")
+            msg = (
+                f"// Bot Setting's //\n\n"
+                f"<code>avatar</code>: <code>{avatar}</code>\n"
+                f"<code>telegraph</code>: <code>{telegraph}</code>\n"
+                f"<code>lang_code_list</code>: <code>{lang_code_list}</code>\n"
+                f"<code>welcome_img</code>: <code>{welcome_img}</code>\n\n"
+                f"/bsetting collection_name -n new_value"
+            )
+            await Message.reply_msg(update, f"<b>{msg}</b>")
+    else:
+        await Message.reply_msg(update, "❗ This command is only for bot owner!")
+
+
 async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -790,6 +838,7 @@ def main():
     # owner
     application.add_handler(CommandHandler("broadcast", func_broadcast, block=False))
     application.add_handler(CommandHandler("database", func_database, block=False))
+    application.add_handler(CommandHandler("bsetting", func_bsetting, block=False))
     application.add_handler(CommandHandler("shell", func_shell, block=False))
     application.add_handler(CommandHandler("sys", func_sys, block=False))
     # filters

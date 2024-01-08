@@ -57,6 +57,7 @@ class Message:
                 thumbnail=thumbnail,
                 height=1080,
                 width=1920,
+                supports_streaming=True,
                 parse_mode=parse_mode
             )
         else:
@@ -68,6 +69,7 @@ class Message:
                 thumbnail=thumbnail,
                 height=1080,
                 width=1920,
+                supports_streaming=True,
                 parse_mode=parse_mode
             )
         return sent_vid
