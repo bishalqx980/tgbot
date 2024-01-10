@@ -140,6 +140,36 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_msg(chat.id, "Add me to your Group to manage your Group!", btn)
 
 
+async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    hostage = user
+    getper_hostage = await chat.get_member(hostage.id)
+    get_bot = await bot.get_me()
+    getper_bot = await chat.get_member(get_bot.id)
+
+    if chat.type in ["group", "supergroup"]:
+        if getper_bot.status == ChatMember.ADMINISTRATOR:
+            if getper_hostage.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                await bot.ban_chat_member(chat.id, hostage.id)
+                unban = await bot.unban_chat_member(chat.id, hostage.id)
+                if unban:
+                    await Message.reply_msg(update, f"Good Choice! Get out of here!\n{hostage.mention_html()} has choosed the easy way to out!")
+                else:
+                    await Message.reply_msg(update, "Something Went Wrong! 🤔")
+            else:
+                await Message.reply_msg(update, f"I'm not going to kick an admin! You must be joking! 😝")
+        else:
+            await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
+    else:
+        btn = [
+            [
+                InlineKeyboardButton("Add me to Group", f"http://t.me/{get_bot.username}?startgroup=start")
+            ]
+        ]
+        await Message.send_msg(chat.id, "Add me to your Group to manage your Group!", btn)
+
+
 async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user

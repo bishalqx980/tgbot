@@ -17,7 +17,7 @@ from bot.omdb_movie_info import get_movie_info
 from bot.utils import calc
 from bot.helper.data_storage import MessageStorage
 from bot.safone import Safone
-from bot.group_management import func_ban, func_unban, func_kick, func_mute, func_unmute, func_adminlist
+from bot.group_management import func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_adminlist
 from bot.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
 
@@ -831,6 +831,7 @@ def main():
     application.add_handler(CommandHandler("ban", func_ban, block=False))
     application.add_handler(CommandHandler("unban", func_unban, block=False))
     application.add_handler(CommandHandler("kick", func_kick, block=False))
+    application.add_handler(CommandHandler("kickme", func_kickme, block=False))
     application.add_handler(CommandHandler("mute", func_mute, block=False))
     application.add_handler(CommandHandler("unmute", func_unmute, block=False))
     application.add_handler(CommandHandler("adminlist", func_adminlist, block=False))

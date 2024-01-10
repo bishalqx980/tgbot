@@ -22,6 +22,7 @@ commands = [
     BotCommand("ban", "Ban an user from group"),
     BotCommand("unban", "Unban an user from group"),
     BotCommand("kick", "Kick an user from group"),
+    BotCommand("kickme", "The easy way to out"),
     BotCommand("mute", "Mute an user (Restrict from group)"),
     BotCommand("unmute", "Unmute an user (Unrestrict from group)"),
     BotCommand("adminlist", "See group admins list"),
