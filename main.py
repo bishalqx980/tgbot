@@ -1,6 +1,8 @@
 import os
 import psutil
 import asyncio
+import requests
+import threading
 import subprocess
 from datetime import datetime
 from telegram.constants import ParseMode
@@ -809,6 +811,26 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
 
 
+def server_alive():
+    asyncio.run(ex_server_alive())
+
+
+async def ex_server_alive():
+    if len(server_url) != 0:
+        while True:
+            try:
+                response = requests.get(server_url)
+                if response.status_code == 200:
+                    print(f"{server_url} is up and running. ✅")
+                else:
+                    print(f"{server_url} is down or unreachable. ❌")
+            except Exception as e:
+                print(f"Error webiste ping: {server_url} > {e}")
+            await asyncio.sleep(180) # 3 min
+    else:
+        logger.warning("Server URL not provided !!")
+
+
 def main():
     application = ApplicationBuilder().token(bot_token).build()
 
@@ -852,4 +874,6 @@ def main():
 
 if __name__ == "__main__":
     logger.info("🤖 Bot Started !!")
+    t = threading.Thread(target=server_alive)
+    t.start()
     main()
