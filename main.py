@@ -38,16 +38,19 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             bot_firstname = bot_info.first_name
         )
 
-        btn1 = ["Add in Group", "⚡ Developer ⚡"]
-        url_btn1 = [f"http://t.me/{bot_info.username}?startgroup=start", f"https://t.me/{owner_username}"]
-        btn2 = ["👨‍💻 Support Chat"]
-        url_btn2 = [support_chat]
-        btn1 = await Button.ubutton(btn1, url_btn1, True)
+        btn1 = ["Add in Group"]
+        url_btn1 = [f"http://t.me/{bot_info.username}?startgroup=start"]
+        btn2 = ["⚡ Developer ⚡", "📘 Source Code"]
+        url_btn2 = [f"https://t.me/{owner_username}", "https://github.com/bishalqx980/tgbot"]
+        btn3 = ["👨‍💻 Support Chat"]
+        url_btn3 = [support_chat]
+        btn1 = await Button.ubutton(btn1, url_btn1)
+        btn2 = await Button.ubutton(btn2, url_btn2, True)
         if len(support_chat) != 0:
-            btn2 = await Button.ubutton(btn2, url_btn2)
-            btn = btn1 + btn2
+            btn3 = await Button.ubutton(btn3, url_btn3)
+            btn = btn1 + btn2 + btn3
         else:
-            btn = btn1
+            btn = btn1 + btn2
 
         welcome_img = await MongoDB.get_data("ciri_docs", "welcome_img")
         if welcome_img:
