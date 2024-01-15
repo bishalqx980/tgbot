@@ -77,8 +77,6 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
     </details>
 </details>
 
-<hr>
-
 ## License
 
 ```
