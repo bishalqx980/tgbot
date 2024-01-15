@@ -1,9 +1,10 @@
 # tgbot
-This Telegram bot is built using the `python-telegram-bot` library and performs various tasks within Telegram.
+This Telegram bot is built using the `python-telegram-bot` library **_version 20.7_** and performs various tasks within **Telegram**.
 
-- This bot can be found as [Ciri](https://t.me/MissCiri_bot) on Telegram.
+- **This bot can be found as [Ciri](https://t.me/MissCiri_bot) on Telegram.**
 
-### Features:
+<details>
+<summary><b>Features</b></summary>
 
 - **ChatGPT AI:** I can get response from ChatGPT AI
 - **AI Imazine:** 🔥 I can Imagine Image by AI from your prompt
@@ -18,63 +19,65 @@ This Telegram bot is built using the `python-telegram-bot` library and performs 
 - **Echo:** I can echo your message (for fun) 😁
 - **Webshot** I can take screenshot of any website by url 📸
 - **Much more...**
-
 - **🆘 More Feature coming soon...**
 
-### Setup
+</details>
+
+<hr>
+
+<details>
+<summary><b>Setup ⚙</b></summary>
 
 - Fillup `sample_config.env` file value's
+- `bot_token` Get from https://t.me/BotFather E.g. 123456:abcdefGHIJK...
+- `owner_id` Get from bot by /id command E.g. 2134776547
+- `owner_username` Your Username E.g. paste like bishalqx980 not @bishalqx980
+- ❗ OPTIONAL | `support_chat` Your bot support chat invite link 
+- `mongodb_uri` Get from https://www.mongodb.com/
+- `db_name` anything E.g. MissCiri_db
+- `server_url` E.g. for render it will be https://your_app_name.onrender.com/
+- ❗ OPTIONAL | `shortener_api_key` Get from https://shrinkme.io/
+- ❗ OPTIONAL | `omdb_api` Get from https://www.omdbapi.com/
+- `chatgpt_limit` E.g. 10
+- `ai_imagine_limit` E.g. 10
+- `usage_reset` E.g. 24 (in hour)
+    <hr>
+    <details>
+    <summary><b>Local Deploy 🚀</b></summary>
 
-`bot_token` Get from https://t.me/BotFather E.g. 123456:abcdefGHIJK...
+    - Required `python 3.11` or later
+    - Open `tgbot` directory on cmd
+    - Run on cmd `pip install -r requirements.txt`
+    - Finally `python main.py`
 
-`owner_id` Get from bot by /id command E.g. 2134776547
+    </details>
 
-`owner_username` Your Username E.g. paste like bishalqx980 not @bishalqx980
+    <details>
+    <summary><b>Render Deploy 🚀</b></summary>
 
-❗ OPTIONAL | `support_chat` Your bot support chat invite link 
+    - Signin/Signup on https://render.com/
+    - Goto dashboard & create a New `Web Service`
+    - Select `Build and deploy from a Git repository` > `Public Git repository` https://github.com/bishalqx980/tgbot
 
-`mongodb_uri` Get from https://www.mongodb.com/
+    ```
+    `Branch` main
 
-`db_name` anything E.g. MissCiri_db
+    `Runtime` Python 3
 
-`server_url` E.g. for render it will be https://your_app_name.onrender.com/
+    `Build Command` pip install -r requirements.txt
 
-❗ OPTIONAL | `shortener_api_key` Get from https://shrinkme.io/
+    `Start Command` python main.py
 
-❗ OPTIONAL | `omdb_api` Get from https://www.omdbapi.com/
+    `Instance Type` Free (maybe paid)
 
-`chatgpt_limit` E.g. 10
+    ⚠ Advanced option > `Add secret file` filename: `config.env` - file content: paste all content from `sample_config.env` (make sure you filled up everything)
 
-`ai_imagine_limit` E.g. 10
+    **Finally click on Create Web Service & wait few sec for deployment & Done | Enjoy 🎉**
+    ```
+    </details>
+</details>
 
-`usage_reset` E.g. 24 (in hour)
-
-#### Local Deploy
-
-- Required `python 3.11` or later
-- Open `tgbot` directory on cmd
-- Run on cmd `pip install -r requirements.txt`
-- Finally `python main.py`
-
-#### Render Deploy
-
-- Signin/Signup on https://render.com/
-- Goto dashboard & create a New `Web Service`
-- Select `Build and deploy from a Git repository` > `Public Git repository` https://github.com/bishalqx980/tgbot
-
-> `Branch` main
-
-> `Runtime` Python 3
-
-> `Build Command` pip install -r requirements.txt
-
-> `Start Command` python main.py
-
-> `Instance Type` Free (maybe paid)
-
-> ⚠ Advanced option > `Add secret file` filename: `config.env` - file content: paste all content from `sample_config.env` (make sure you filled up everything)
-
-#### 💠 Finally click on Create Web Service & wait few sec for deployment & Done | Enjoy 🎉
+<hr>
 
 ## License
 
