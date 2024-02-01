@@ -23,7 +23,7 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 
 </details>
 
----
+<hr>
 
 <details>
 <summary><b>Setup ⚙</b></summary>

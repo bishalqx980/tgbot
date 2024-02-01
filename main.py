@@ -586,7 +586,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         x = await MongoDB.info_db("users")
 
         sent_count = 0
-        notify = await Message.send_msg(owner_id, f"Sent: {sent_count}\nTotal User: {x[1]}")
+        except_count = 0
+        notify = await Message.send_msg(owner_id, f"Total User: {x[1]}")
         for user_id in users:
             try:
                 if replied_msg.text:
@@ -594,8 +595,9 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 elif replied_msg.caption:
                     await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
                 sent_count += 1
-                await Message.edit_msg(update, f"Sent: {sent_count}\nTotal User: {x[1]}", notify)
+                await Message.edit_msg(update, f"Total User: {x[1]}\nSent: {sent_count}\nBlocked/Deleted: {except_count}", notify)
             except Exception as e:
+                except_count += 1
                 print(f"Error Broadcast: {e}")
         await Message.reply_msg(update, "Job Done !!")
     else:
