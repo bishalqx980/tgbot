@@ -138,13 +138,64 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
     msg = " ".join(context.args)
+    if msg == "auto_on":
+        if chat.type == "private":
+            try:
+                await MongoDB.update_db("users", "user_id", user.id, "auto_tr", "on")
+                await Message.reply_msg(update, f"Auto Translator Enabled for this chat!")
+            except Exception as e:
+                print(f"Error enabling auto tr: {e}")
+                await Message.reply_msg(update, f"Error: {e}")
+        elif chat.type in ["group", "supergroup"]:
+            get_bot = await bot.get_me()
+            getper_bot = await chat.get_member(get_bot.id)
+            getper_user = await chat.get_member(user.id)
+
+            if getper_bot.status == ChatMember.ADMINISTRATOR:
+                if getper_user.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                    try:
+                        await MongoDB.update_db("groups", "chat_id", chat.id, "auto_tr", "on")
+                        await Message.reply_msg(update, f"Auto Translator Enabled for this chat!")
+                    except Exception as e:
+                        print(f"Error enabling auto tr: {e}")
+                        await Message.reply_msg(update, f"Error: {e}")
+                else:
+                    await Message.reply_msg(update, "😪 You aren't an admin of this chat!")
+            else:
+                await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
+    elif msg == "auto_off":
+        if chat.type == "private":
+            try:
+                await MongoDB.update_db("users", "user_id", user.id, "auto_tr", "off")
+                await Message.reply_msg(update, f"Auto Translator Disabled for this chat!")
+            except Exception as e:
+                print(f"Error disabling auto tr: {e}")
+                await Message.reply_msg(update, f"Error: {e}")
+        elif chat.type in ["group", "supergroup"]:
+            get_bot = await bot.get_me()
+            getper_bot = await chat.get_member(get_bot.id)
+            getper_user = await chat.get_member(user.id)
+
+            if getper_bot.status == ChatMember.ADMINISTRATOR:
+                if getper_user.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                    try:
+                        await MongoDB.update_db("groups", "chat_id", chat.id, "auto_tr", "off")
+                        await Message.reply_msg(update, f"Auto Translator Disabled for this chat!")
+                    except Exception as e:
+                        print(f"Error disabling auto tr: {e}")
+                        await Message.reply_msg(update, f"Error: {e}")
+                else:
+                    await Message.reply_msg(update, "😪 You aren't an admin of this chat!")
+            else:
+                await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
+    # checking msg is replied or not
     tr_reply = update.message.reply_to_message
     if tr_reply:
         if tr_reply.text:
             msg = tr_reply.text
         elif tr_reply.caption:
             msg = tr_reply.caption
-
+    # checking msg is not empty
     if msg != "":
         try:
             tr_msg = translate(msg, lang_code)
@@ -157,13 +208,13 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]
             await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
             return
-        
+        # tanslate proccess
         if tr_msg != msg:
             await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
         else:
             await Message.reply_msg(update, "Something Went Wrong!")
     else:
-        await Message.reply_msg(update, "Use <code>/tr text</code> or reply the text with <code>/tr</code>\nE.g. <code>/tr the text you want to translate</code>")    
+        await Message.reply_msg(update, "Use <code>/tr text</code> or reply the text with <code>/tr</code>\nE.g. <code>/tr the text you want to translate</code>\n\nAuto translator mode:\nEnable using <code>/tr auto_on</code>\nDisable using <code>/tr auto_off</code>")    
 
 
 async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -502,6 +553,7 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             user_mention = find_user.get("mention")
             lang = find_user.get("lang")
             echo = find_user.get("echo")
+            auto_tr = find_user.get("auto_tr")
             chatgpt = find_user.get("chatgpt")
             chatgpt_req = find_user.get("chatgpt_req")
             ai_imagine_req = find_user.get("ai_imagine_req")
@@ -512,6 +564,7 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"◉ User: {user_mention}\n"
                 f"◉ Lang: <code>{lang}</code>\n"
                 f"◉ Echo: <code>{echo}</code>\n"
+                f"◉ Auto tr: <code>{auto_tr}</code>\n"
                 f"◉ ChatGPT: <code>{chatgpt}</code>\n"
                 f"◉ ChatGPT Req: <code>{chatgpt_req}/{chatgpt_limit}</code>\n"
                 f"◉ AI Imagine Req: <code>{ai_imagine_req}/{ai_imagine_limit}</code>\n"
@@ -742,11 +795,29 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_user = await MongoDB.find_one("users", "user_id", user.id)
         # status
         echo_status = find_user.get("echo")
+        auto_tr_status = find_user.get("auto_tr")
         chatgpt_status = find_user.get("chatgpt")
 
         # Trigger
         if echo_status == "on":
             await Message.reply_msg(update, msg)
+
+        if auto_tr_status == "on":
+            lang_code = find_user.get("lang")
+            try:
+                tr_msg = translate(msg, lang_code)
+            except Exception as e:
+                print(f"Error Translator: {e}")
+
+                lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
+                btn = [
+                    [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
+                ]
+                await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+                return
+            # tanslate proccess
+            if tr_msg != msg:
+                await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
 
         if chatgpt_status == "on":
             premium_user = await MongoDB.get_data("premium", "user_list")
@@ -814,6 +885,29 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
             else:
                 await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
+
+    elif chat.type in ["group", "supergroup"]:
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+        # status
+        auto_tr_status = find_group.get("auto_tr")
+
+        # Trigger
+        if auto_tr_status == "on":
+            lang_code = find_group.get("lang")
+            try:
+                tr_msg = translate(msg, lang_code)
+            except Exception as e:
+                print(f"Error Translator: {e}")
+
+                lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
+                btn = [
+                    [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
+                ]
+                await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+                return
+            # tanslate proccess
+            if tr_msg != msg:
+                await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
 
 
 def server_alive():
