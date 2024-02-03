@@ -138,7 +138,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if find_group:
             lang_code = find_group.get("lang")
         else:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...")
+            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
             return
 
     msg = " ".join(context.args)
@@ -390,7 +390,7 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
         else:
-            await Message.reply_msg(update, "Group isn't registered! click /start to register the group...!")
+            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
 
 
 async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -621,7 +621,7 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             await Message.reply_msg(update, text)
         else:
-            await Message.reply_msg(update, "Group isn't registered! click /start to register the group...!")
+            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
 
 
 async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -834,125 +834,131 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == "private" and msg:
         find_user = await MongoDB.find_one("users", "user_id", user.id)
-        # status
-        echo_status = find_user.get("echo")
-        auto_tr_status = find_user.get("auto_tr")
-        chatgpt_status = find_user.get("chatgpt")
+        if find_user:
+            # status
+            echo_status = find_user.get("echo")
+            auto_tr_status = find_user.get("auto_tr")
+            chatgpt_status = find_user.get("chatgpt")
 
-        # Trigger
-        if echo_status == "on":
-            await Message.reply_msg(update, msg)
+            # Trigger
+            if echo_status == "on":
+                await Message.reply_msg(update, msg)
 
-        if auto_tr_status == "on":
-            lang_code = find_user.get("lang")
-            try:
-                tr_msg = translate(msg, lang_code)
-            except Exception as e:
-                print(f"Error Translator: {e}")
-
-                lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
-                btn = [
-                    [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
-                ]
-                await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
-                return
-            # tanslate proccess
-            if tr_msg != msg:
-                await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
-
-        if chatgpt_status == "on":
-            premium_user = await MongoDB.get_data("premium", "user_list")
-            find_user = await MongoDB.find_one("users", "user_id", user.id)
-            chatgpt_req = find_user.get("chatgpt_req")
-            last_used = find_user.get("last_used")
-            current_time = datetime.now()
-
-            if last_used != None:
-                calc = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
-                if calc:
-                    chatgpt_req = 0
-                    await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
-
-            if chatgpt_req == None:
-                chatgpt_req = 0
-
-            if user.id == int(owner_id):
-                g_msg = "✨ Hi Boss, Please wait!! Generating Response..."
-            elif user.id in premium_user:
-                g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
-            else:
-                if chatgpt_req >= int(chatgpt_limit):
-                    premium_seller = await MongoDB.get_data("premium", "premium_seller")
-                    if premium_seller == None:
-                        premium_seller = owner_username
-                    btn = [
-                        [
-                            InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{premium_seller}")
-                        ]
-                    ]
-                    text = (
-                        f"❗ Your ChatGPT usage limit Exceeded!\n"
-                        f"⩙ Usage: {chatgpt_req} out of {chatgpt_limit}\n"
-                        f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
-                        f"OR Contact @{premium_seller} to buy Premium Account!"
-                    )
-                    await Message.reply_msg(update, text, btn)
-                    return
-                else:
-                    g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
-                
-            sent_msg = await Message.reply_msg(update, g_msg)
-
-            safone_ai_res = await Safone.safone_ai(msg)
-            if safone_ai_res:
-                chatgpt = safone_ai_res[0]
-                bard = safone_ai_res[1]
-                chatbot = safone_ai_res[2]
-
-                if chatgpt:
-                    text = chatgpt.message
-                elif bard:
-                    text = bard.message
-                else:
-                    text = chatbot.response
-
+            if auto_tr_status == "on":
+                lang_code = find_user.get("lang")
                 try:
-                    await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
-                    chatgpt_req += 1
-                    await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
-                    await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
+                    tr_msg = translate(msg, lang_code)
                 except Exception as e:
-                    print(f"Error ChatGPT: {e}")
-                    await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
-            else:
-                await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
+                    print(f"Error Translator: {e}")
 
+                    lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
+                    btn = [
+                        [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
+                    ]
+                    await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+                    return
+                # tanslate proccess
+                if tr_msg != msg:
+                    await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
+
+            if chatgpt_status == "on":
+                premium_user = await MongoDB.get_data("premium", "user_list")
+                find_user = await MongoDB.find_one("users", "user_id", user.id)
+                chatgpt_req = find_user.get("chatgpt_req")
+                last_used = find_user.get("last_used")
+                current_time = datetime.now()
+
+                if last_used != None:
+                    calc = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
+                    if calc:
+                        chatgpt_req = 0
+                        await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
+
+                if chatgpt_req == None:
+                    chatgpt_req = 0
+
+                if user.id == int(owner_id):
+                    g_msg = "✨ Hi Boss, Please wait!! Generating Response..."
+                elif user.id in premium_user:
+                    g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
+                else:
+                    if chatgpt_req >= int(chatgpt_limit):
+                        premium_seller = await MongoDB.get_data("premium", "premium_seller")
+                        if premium_seller == None:
+                            premium_seller = owner_username
+                        btn = [
+                            [
+                                InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{premium_seller}")
+                            ]
+                        ]
+                        text = (
+                            f"❗ Your ChatGPT usage limit Exceeded!\n"
+                            f"⩙ Usage: {chatgpt_req} out of {chatgpt_limit}\n"
+                            f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
+                            f"OR Contact @{premium_seller} to buy Premium Account!"
+                        )
+                        await Message.reply_msg(update, text, btn)
+                        return
+                    else:
+                        g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
+                    
+                sent_msg = await Message.reply_msg(update, g_msg)
+
+                safone_ai_res = await Safone.safone_ai(msg)
+                if safone_ai_res:
+                    chatgpt = safone_ai_res[0]
+                    bard = safone_ai_res[1]
+                    chatbot = safone_ai_res[2]
+
+                    if chatgpt:
+                        text = chatgpt.message
+                    elif bard:
+                        text = bard.message
+                    else:
+                        text = chatbot.response
+
+                    try:
+                        await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
+                        chatgpt_req += 1
+                        await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
+                        await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
+                    except Exception as e:
+                        print(f"Error ChatGPT: {e}")
+                        await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
+                else:
+                    await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
+        else:
+            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
+    # group's
     elif chat.type in ["group", "supergroup"]:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-        # status
-        echo_status = find_group.get("echo")
-        auto_tr_status = find_group.get("auto_tr")
+        if find_group:
+            # status
+            echo_status = find_group.get("echo")
+            auto_tr_status = find_group.get("auto_tr")
 
-        # Trigger
-        if echo_status == "on":
-            await Message.reply_msg(update, msg)
-            
-        if auto_tr_status == "on":
-            lang_code = find_group.get("lang")
-            try:
-                tr_msg = translate(msg, lang_code)
-            except Exception as e:
-                print(f"Error Translator: {e}")
+            # Trigger
+            if echo_status == "on":
+                await Message.reply_msg(update, msg)
+                
+            if auto_tr_status == "on":
+                lang_code = find_group.get("lang")
+                try:
+                    tr_msg = translate(msg, lang_code)
+                except Exception as e:
+                    print(f"Error Translator: {e}")
 
-                lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
-                btn = [
-                    [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
-                ]
-                await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
-                return
-            # tanslate proccess
-            if tr_msg != msg:
-                await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
+                    lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
+                    btn = [
+                        [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
+                    ]
+                    await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+                    return
+                # tanslate proccess
+                if tr_msg != msg:
+                    await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
+        else:
+            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
 
 
 def server_alive():
