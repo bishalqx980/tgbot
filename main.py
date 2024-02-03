@@ -360,32 +360,37 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif msg == "":
             await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
     elif chat.type in ["group", "supergroup"]:
-        get_bot = await bot.get_me()
-        getper_bot = await chat.get_member(get_bot.id)
-        getper_user = await chat.get_member(user.id)
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
 
-        if getper_bot.status == ChatMember.ADMINISTRATOR:
-            if getper_user.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                if msg == "on":
-                    try:
-                        await MongoDB.update_db("groups", "chat_id", chat.id, "echo", "on")
-                        await Message.reply_msg(update, "Echo enabled in this chat!")
-                    except Exception as e:
-                        print(f"Error enabling echo: {e}")
-                        await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
-                elif msg == "off":
-                    try:
-                        await MongoDB.update_db("groups", "chat_id", chat.id, "echo", "off")
-                        await Message.reply_msg(update, "Echo disabled in this chat!")
-                    except Exception as e:
-                        print(f"Error disabling echo: {e}")
-                        await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
-                elif msg == "":
-                    await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
+        if find_group:
+            get_bot = await bot.get_me()
+            getper_bot = await chat.get_member(get_bot.id)
+            getper_user = await chat.get_member(user.id)
+
+            if getper_bot.status == ChatMember.ADMINISTRATOR:
+                if getper_user.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                    if msg == "on":
+                        try:
+                            await MongoDB.update_db("groups", "chat_id", chat.id, "echo", "on")
+                            await Message.reply_msg(update, "Echo enabled in this chat!")
+                        except Exception as e:
+                            print(f"Error enabling echo: {e}")
+                            await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
+                    elif msg == "off":
+                        try:
+                            await MongoDB.update_db("groups", "chat_id", chat.id, "echo", "off")
+                            await Message.reply_msg(update, "Echo disabled in this chat!")
+                        except Exception as e:
+                            print(f"Error disabling echo: {e}")
+                            await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
+                    elif msg == "":
+                        await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
+                else:
+                    await Message.reply_msg(update, "😪 You aren't an admin of this chat!")
             else:
-                await Message.reply_msg(update, "😪 You aren't an admin of this chat!")
+                await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
         else:
-            await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
+            await Message.reply_msg(update, "Group isn't registered! click /start to register the group...!")
 
 
 async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
