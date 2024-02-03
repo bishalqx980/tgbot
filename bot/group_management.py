@@ -118,7 +118,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             await bot.ban_chat_member(chat.id, hostage.id)
                             unban = await bot.unban_chat_member(chat.id, hostage.id)
                             if unban:
-                                await Message.reply_msg(update, f"Damn!\n{title} {user.mention_html()} has kicked user {hostage.mention_html()}!")
+                                await Message.reply_msg(update, f"Get out of my sight!\n{title} {user.mention_html()} has kicked user {hostage.mention_html()}!")
                             else:
                                 await Message.reply_msg(update, "Something Went Wrong! 🤔")
                         else:
@@ -154,7 +154,7 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await bot.ban_chat_member(chat.id, hostage.id)
                 unban = await bot.unban_chat_member(chat.id, hostage.id)
                 if unban:
-                    await Message.reply_msg(update, f"Good Choice! Get out of here!\n{hostage.mention_html()} has choosed the easy way to out!")
+                    await Message.reply_msg(update, f"Nice Choice! Get out of my sight!\n{hostage.mention_html()} has choosed the easy way to out!")
                 else:
                     await Message.reply_msg(update, "Something Went Wrong! 🤔")
             else:
@@ -272,7 +272,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         if getper_hostage.status == ChatMember.RESTRICTED:
                             mute = await bot.restrict_chat_member(chat.id, hostage.id, permissions)
                             if mute:
-                                await Message.reply_msg(update, f"Good!\n{title} {user.mention_html()} has unmuted user {hostage.mention_html()}!\n{hostage.first_name} can speak again!")
+                                await Message.reply_msg(update, f"Nice!\n{title} {user.mention_html()} has unmuted user {hostage.mention_html()}!\n{hostage.first_name} can speak again!")
                             else:
                                 await Message.reply_msg(update, "Something Went Wrong! 🤔")
                         else:
