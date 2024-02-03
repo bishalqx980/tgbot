@@ -930,7 +930,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
     # group's
-    elif chat.type in ["group", "supergroup"]:
+    elif chat.type in ["group", "supergroup"] and msg:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             # status
