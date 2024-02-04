@@ -6,7 +6,7 @@ import threading
 import subprocess
 from datetime import datetime
 from telegram.constants import ParseMode
-from telegram import Update, InlineKeyboardButton, ChatMember
+from telegram import Update, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from bot import logger, bot_token, bot, owner_id, owner_username, support_chat, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
 from bot.mongodb import MongoDB
@@ -38,19 +38,19 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             bot_firstname = bot_info.first_name
         )
 
-        btn1 = ["Add in Group"]
-        url_btn1 = [f"http://t.me/{bot_info.username}?startgroup=start"]
-        btn2 = ["⚡ Developer ⚡", "📘 Source Code"]
-        url_btn2 = [f"https://t.me/{owner_username}", "https://github.com/bishalqx980/tgbot"]
-        btn3 = ["👨‍💻 Support Chat"]
-        url_btn3 = [support_chat]
-        btn1 = await Button.ubutton(btn1, url_btn1)
-        btn2 = await Button.ubutton(btn2, url_btn2, True)
+        btn_name_1 = ["Add in Group"]
+        btn_url_1 = [f"http://t.me/{bot_info.username}?startgroup=start"]
+        btn_name_2 = ["⚡ Developer ⚡", "📘 Source Code"]
+        btn_url_2 = [f"https://t.me/{owner_username}", "https://github.com/bishalqx980/tgbot"]
+        btn_name_3 = ["👨‍💻 Support Chat"]
+        btn_url_3 = [support_chat]
+        btn_1 = await Button.ubutton(btn_name_1, btn_url_1)
+        btn_2 = await Button.ubutton(btn_name_2, btn_url_2, True)
         if len(support_chat) != 0:
-            btn3 = await Button.ubutton(btn3, url_btn3)
-            btn = btn1 + btn2 + btn3
+            btn_3 = await Button.ubutton(btn_name_3, btn_url_3)
+            btn = btn_1 + btn_2 + btn_3
         else:
-            btn = btn1 + btn2
+            btn = btn_1 + btn_2
 
         welcome_img = await MongoDB.get_data("ciri_docs", "welcome_img")
         if welcome_img:
@@ -89,11 +89,9 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         welcome_msg = welcome_msg[1].format(
             user_mention = user.mention_html()
         )
-
         btn_name = ["Start me in private"]
         btn_url = [f"http://t.me/{bot_info.username}?start=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-
         await Message.send_msg(chat.id, welcome_msg, btn)
 
 
@@ -118,9 +116,9 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         movie_info = get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
         if movie_info:
             msg = await MessageStorage.msg_movie_info(movie_info)
-            btn = [
-                [InlineKeyboardButton(f"✨ IMDB - {movie_info[2]}", f"https://www.imdb.com/title/{movie_info[16]}")]
-            ]
+            btn_name = [f"✨ IMDB - {movie_info[2]}"]
+            btn_url = [f"https://www.imdb.com/title/{movie_info[16]}"]
+            btn = await Button.ubutton(btn_name, btn_url)
             await Message.send_img(update.effective_chat.id, movie_info[0], msg, btn)
     else:
         await Message.reply_msg(update, "Use <code>/movie movie_name</code>\nE.g. <code>/movie animal</code>\nor\n<code>/movie -i tt13751694</code> [IMDB ID]\nor\n<code>/movie bodyguard -y 2011</code>")
@@ -205,11 +203,10 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             tr_msg = translate(msg, lang_code)
         except Exception as e:
             print(f"Error Translator: {e}")
-
             lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
-            btn = [
-                [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
-            ]
+            btn_name = ["Language Code List 📃"]
+            btn_url = [lang_code_list]
+            btn = await Button.ubutton(btn_name, btn_url)
             await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
             return
         # tanslate proccess
@@ -236,9 +233,9 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, f"Error: {e}")
         else:
             lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
-            btn = [
-                [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
-            ]
+            btn_name = ["Language Code List 📃"]
+            btn_url = [lang_code_list]
+            btn = await Button.ubutton(btn_name, btn_url)
             await Message.send_msg(chat.id, "<code>lang_code</code> can't be leave empty! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
     elif chat.type in ["group", "supergroup"]:
         get_bot = await bot.get_me()
@@ -261,9 +258,9 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await Message.reply_msg(update, f"Error: {e}")
                 else:
                     lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
-                    btn = [
-                        [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
-                    ]
+                    btn_name = ["Language Code List 📃"]
+                    btn_url = [lang_code_list]
+                    btn = await Button.ubutton(btn_name, btn_url)
                     await Message.send_msg(chat.id, "<code>lang_code</code> can't be leave empty! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
             else:
                 await Message.reply_msg(update, "😪 You aren't an admin of this chat!")
@@ -316,13 +313,9 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 site_status = "<b>∞ Site is online 🟢</b>"
             else:
                 site_status = "<b>∞ Site is offline/something went wrong 🔴</b>"
-              
-            btn = [
-                [
-                    InlineKeyboardButton("Visit Site", f"{ping[0]}")
-                ]
-            ]
-
+            btn_name = ["Visit Site"]
+            btn_url = [f"{ping[0]}"]
+            btn = await Button.ubutton(btn_name, btn_url)
             await Message.edit_msg(update, f"<b>∞ URL:</b> {ping[0]}\n<b>∞ Time(ms):</b> <code>{ping[1]}</code>\n<b>∞ Response Code:</b> <code>{ping[2]}</code>\n{site_status}", sent_msg, btn)
     else:
         await Message.reply_msg(update, "Use <code>/ping url</code>\nE.g. <code>/ping https://google.com</code>")
@@ -441,17 +434,15 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 premium_seller = await MongoDB.get_data("premium", "premium_seller")
                 if premium_seller == None:
                     premium_seller = owner_username
-                btn = [
-                    [
-                        InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{premium_seller}")
-                    ]
-                ]
                 text = (
                     f"❗ Your AI Imagine usage limit Exceeded!\n"
                     f"⩙ Usage: {ai_imagine_req} out of {ai_imagine_limit}\n"
                     f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
                     f"OR Contact @{premium_seller} to buy Premium Account!"
                 )
+                btn_name = ["Buy Premium ✨"]
+                btn_url = [f"https://t.me/{premium_seller}"]
+                btn = await Button.ubutton(btn_name, btn_url)
                 await Message.reply_msg(update, text, btn)
                 return
             else:
@@ -478,6 +469,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+    bot_info = await bot.get_me()
     msg = " ".join(context.args)
 
     if chat.type == "private":
@@ -498,11 +490,15 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif msg == "":
             await Message.reply_msg(update, "Use <code>/chatgpt on</code> to turn on.\nUse <code>/chatgpt off</code> to turn off.")
     else:
-        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!\nClick /start")
+        btn_name = ["Start me in private"]
+        btn_url = [f"http://t.me/{bot_info.username}?start=start"]
+        btn = await Button.ubutton(btn_name, btn_url)
+        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!", btn)
 
 
 async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
+    bot_info = await bot.get_me()
     e_msg = update.effective_message
     re_msg = update.message.reply_to_message
     if re_msg:
@@ -521,7 +517,10 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")
     else:
-        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!\nClick /start")
+        btn_name = ["Start me in private"]
+        btn_url = [f"http://t.me/{bot_info.username}?start=start"]
+        btn = await Button.ubutton(btn_name, btn_url)
+        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!", btn)
 
 
 async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url, extention):
@@ -852,11 +851,10 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     tr_msg = translate(msg, lang_code)
                 except Exception as e:
                     print(f"Error Translator: {e}")
-
                     lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
-                    btn = [
-                        [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
-                    ]
+                    btn_name = ["Language Code List 📃"]
+                    btn_url = [lang_code_list]
+                    btn = await Button.ubutton(btn_name, btn_url)
                     await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
                     return
                 # tanslate proccess
@@ -888,22 +886,20 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         premium_seller = await MongoDB.get_data("premium", "premium_seller")
                         if premium_seller == None:
                             premium_seller = owner_username
-                        btn = [
-                            [
-                                InlineKeyboardButton("Buy Premium ✨", f"https://t.me/{premium_seller}")
-                            ]
-                        ]
                         text = (
                             f"❗ Your ChatGPT usage limit Exceeded!\n"
                             f"⩙ Usage: {chatgpt_req} out of {chatgpt_limit}\n"
                             f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
                             f"OR Contact @{premium_seller} to buy Premium Account!"
                         )
+                        btn_name = ["Buy Premium ✨"]
+                        btn_url = [f"https://t.me/{premium_seller}"]
+                        btn = await Button.ubutton(btn_name, btn_url)
                         await Message.reply_msg(update, text, btn)
                         return
                     else:
                         g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
-                    
+
                 sent_msg = await Message.reply_msg(update, g_msg)
 
                 safone_ai_res = await Safone.safone_ai(msg)
@@ -949,11 +945,10 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     tr_msg = translate(msg, lang_code)
                 except Exception as e:
                     print(f"Error Translator: {e}")
-
                     lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
-                    btn = [
-                        [InlineKeyboardButton("Language Code List 📃", lang_code_list)]
-                    ]
+                    btn_name = ["Language Code List 📃"]
+                    btn_url = [lang_code_list]
+                    btn = await Button.ubutton(btn_name, btn_url)
                     await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
                     return
                 # tanslate proccess
