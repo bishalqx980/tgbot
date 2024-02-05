@@ -127,6 +127,8 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+    bot_info = await bot.get_me()
+    msg = " ".join(context.args)
 
     if chat.type == "private":
         find_user = await MongoDB.find_one("users", "user_id", user.id)
@@ -139,7 +141,6 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
             return
 
-    msg = " ".join(context.args)
     if msg == "auto_on":
         if chat.type == "private":
             try:
@@ -149,8 +150,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 print(f"Error enabling auto tr: {e}")
                 await Message.reply_msg(update, f"Error: {e}")
         elif chat.type in ["group", "supergroup"]:
-            get_bot = await bot.get_me()
-            getper_bot = await chat.get_member(get_bot.id)
+            getper_bot = await chat.get_member(bot_info.id)
             getper_user = await chat.get_member(user.id)
 
             if getper_bot.status == ChatMember.ADMINISTRATOR:
@@ -174,8 +174,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 print(f"Error disabling auto tr: {e}")
                 await Message.reply_msg(update, f"Error: {e}")
         elif chat.type in ["group", "supergroup"]:
-            get_bot = await bot.get_me()
-            getper_bot = await chat.get_member(get_bot.id)
+            getper_bot = await chat.get_member(bot_info.id)
             getper_user = await chat.get_member(user.id)
 
             if getper_bot.status == ChatMember.ADMINISTRATOR:
@@ -191,12 +190,12 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
     # checking msg is replied or not
-    tr_reply = update.message.reply_to_message
-    if tr_reply:
-        if tr_reply.text:
-            msg = tr_reply.text
-        elif tr_reply.caption:
-            msg = tr_reply.caption
+    re_msg = update.message.reply_to_message
+    if re_msg:
+        if re_msg.text:
+            msg = re_msg.text
+        elif re_msg.caption:
+            msg = re_msg.caption
     # checking msg is not empty
     if msg != "":
         try:
@@ -269,43 +268,73 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def func_b64decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = " ".join(context.args)
+    re_msg = update.message.reply_to_message
+    if re_msg:
+        if re_msg.text:
+            msg = re_msg.text
+        elif re_msg.caption:
+            msg = re_msg.caption
+    else:
+        msg = " ".join(context.args)
+
     if msg != "":
         decode = decode_b64(msg)
-        await Message.reply_msg(update, f"Decode: <code>{decode}</code>")
+        if decode != None:
+            await Message.reply_msg(update, f"Decoded text:\n<code>{decode}</code>")
+        else:
+            await Message.reply_msg(update, f"Invalid text!")
     else:
-        await Message.reply_msg(update, "Use <code>/decode text</code>\nE.g. <code>/decode the text you want to decode</code>")
+        await Message.reply_msg(update, "Use <code>/decode the `Encoded` text</code>\nor reply the `Encoded` text with <code>/decode</code>\nE.g. <code>/decode the `Encoded` text you want to decode</code>")
 
 
 async def func_b64encode(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = " ".join(context.args)
-    if msg != "":
-        encode = encode_b64(msg)
-        await Message.reply_msg(update, f"Encode: <code>{encode}</code>")
+    re_msg = update.message.reply_to_message
+    if re_msg:
+        if re_msg.text:
+            msg = re_msg.text
+        elif re_msg.caption:
+            msg = re_msg.caption
     else:
-        await Message.reply_msg(update, "Use <code>/encode text</code>\nE.g. <code>/encode the text you want to encode</code>")
+        msg = " ".join(context.args)
+
+    if msg != "":
+            encode = encode_b64(msg)
+            if encode != None:
+                await Message.reply_msg(update, f"Encoded text:\n<code>{encode}</code>")
+            else:
+                await Message.reply_msg(update, f"Invalid text!")
+    else:
+        await Message.reply_msg(update, "Use <code>/encode the `Decoded` or `normal` text</code>\nor reply the `Decoded` or `normal` text with <code>/encode</code>\nE.g. <code>/encode the `Decoded` or `normal` text you want to encode</code>")
 
 
 async def func_shortener(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = " ".join(context.args)
+    re_msg = update.message.reply_to_message
+    if re_msg:
+        if re_msg.text:
+            msg = re_msg.text
+        elif re_msg.caption:
+            msg = re_msg.caption
+    else:
+        msg = " ".join(context.args)
+
     if msg != "":
         shorted_url = shortener_url(msg)
         if shorted_url:
             await Message.reply_msg(update, shorted_url)
         else:
-            await Message.reply_msg(update, "Something Went Wrong!")
+            await Message.reply_msg(update, f"Something went wrong!\nInvalid URL!")
     else:
-        await Message.reply_msg(update, "Use <code>/shortener url</code>\nE.g. <code>/shortener https://google.com</code>")
+        await Message.reply_msg(update, "Use <code>/shortener url</code>\nor reply the url with <code>/shortener</code>\nE.g. <code>/shortener https://google.com</code>")
 
 
 async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = " ".join(context.args)
-    if msg != "":
-        if msg[0:4] != "http":
-            msg = f"http://{msg}"
+    url = " ".join(context.args)
+    if url:
+        if url[0:4] != "http":
+            url = f"http://{url}"
 
-        sent_msg = await Message.reply_msg(update, f"Pinging {msg}\nPlease wait...")
-        ping = ping_url(msg)
+        sent_msg = await Message.reply_msg(update, f"Pinging {url}\nPlease wait...")
+        ping = ping_url(url)
 
         if ping:
             res = ping[2]
@@ -322,12 +351,20 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    msg = " ".join(context.args)
+    re_msg = update.message.reply_to_message
+    if re_msg:
+        if re_msg.text:
+            msg = re_msg.text
+        elif re_msg.caption:
+            msg = re_msg.caption
+    else:
+        msg = " ".join(context.args)
+
     if msg != "":
         if msg:
-            await Message.reply_msg(update, f"<b>{msg} = <code>{calc(msg):.2f}</code></b>")
+            await Message.reply_msg(update, f"Calculation result: <code>{calc(msg):.2f}</code>")
     else:
-        await Message.reply_msg(update, "Use <code>/calc math</code>\nE.g. <code>/calc (980 - 80) + 100 / 4 * 4 - 20</code>")
+        await Message.reply_msg(update, "Use <code>/calc math</code>\nor reply the math with <code>/calc</code>\nE.g. <code>/calc (980 - 80) + 100 / 4 * 4 - 20</code>")
 
 
 async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -390,16 +427,17 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     url = " ".join(context.args)
     if url:
-        sent_msg = await Message.reply_msg(update, "Generating please wait...")
-        webshot = await Safone.webshot(url)
-        if webshot:
-            try:
-                await Message.del_msg(chat.id, sent_msg)
-                await Message.send_img(chat.id, webshot, f"✨ {url}")
-            except Exception as e:
-                await Message.reply_msg(update, f"Error: {e}")
-        else:
-            await Message.reply_msg(update, "Something Went Wrong!")
+        if url[0:4] != "http":
+            url = f"http://{url}"
+
+        sent_msg = await Message.reply_msg(update, "Taking webshot please wait...")
+        try:
+            webshot = await Safone.webshot(url)
+            await Message.del_msg(chat.id, sent_msg)
+            await Message.send_img(chat.id, webshot, f"✨ {url}")
+        except Exception as e:
+            print(f"Error taking webshot: {e}")
+            await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
     else:
         await Message.reply_msg(update, "Use <code>/webshot url</code>\nE.g. <code>/webshot https://google.com</code>")
 
@@ -407,63 +445,70 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+    bot_info = await bot.get_me()
     prompt = " ".join(context.args)
 
-    if prompt:
-        premium_user = await MongoDB.get_data("premium", "user_list")
-        find_user = await MongoDB.find_one("users", "user_id", user.id)
-        ai_imagine_req = find_user.get("ai_imagine_req")
-        last_used = find_user.get("last_used")
-        current_time = datetime.now()
+    if chat.type == "private":
+        if prompt:
+            premium_user = await MongoDB.get_data("premium", "user_list")
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
+            ai_imagine_req = find_user.get("ai_imagine_req")
+            last_used = find_user.get("last_used")
+            current_time = datetime.now()
 
-        if last_used != None:
-            calc = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
-            if calc:
+            if last_used != None:
+                calc = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
+                if calc:
+                    ai_imagine_req = 0
+                    await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
+
+            if ai_imagine_req == None:
                 ai_imagine_req = 0
-                await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
 
-        if ai_imagine_req == None:
-            ai_imagine_req = 0
-
-        if user.id == int(owner_id):
-            g_msg = "✨ Hi Boss, Generating AI Image please wait..."
-        elif user.id in premium_user:
-            g_msg = f"✨ Hi {user.first_name}, Generating AI Image please wait..."
-        else:
-            if ai_imagine_req >= int(ai_imagine_limit):
-                premium_seller = await MongoDB.get_data("premium", "premium_seller")
-                if premium_seller == None:
-                    premium_seller = owner_username
-                text = (
-                    f"❗ Your AI Imagine usage limit Exceeded!\n"
-                    f"⩙ Usage: {ai_imagine_req} out of {ai_imagine_limit}\n"
-                    f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
-                    f"OR Contact @{premium_seller} to buy Premium Account!"
-                )
-                btn_name = ["Buy Premium ✨"]
-                btn_url = [f"https://t.me/{premium_seller}"]
-                btn = await Button.ubutton(btn_name, btn_url)
-                await Message.reply_msg(update, text, btn)
-                return
-            else:
+            if user.id == int(owner_id):
+                g_msg = "✨ Hi Boss, Generating AI Image please wait..."
+            elif user.id in premium_user:
                 g_msg = f"✨ Hi {user.first_name}, Generating AI Image please wait..."
+            else:
+                if ai_imagine_req >= int(ai_imagine_limit):
+                    premium_seller = await MongoDB.get_data("premium", "premium_seller")
+                    if premium_seller == None:
+                        premium_seller = owner_username
+                    text = (
+                        f"❗ Your AI Imagine usage limit Exceeded!\n"
+                        f"⩙ Usage: {ai_imagine_req} out of {ai_imagine_limit}\n"
+                        f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
+                        f"OR Contact @{premium_seller} to buy Premium Account!"
+                    )
+                    btn_name = ["Buy Premium ✨"]
+                    btn_url = [f"https://t.me/{premium_seller}"]
+                    btn = await Button.ubutton(btn_name, btn_url)
+                    await Message.reply_msg(update, text, btn)
+                    return
+                else:
+                    g_msg = f"✨ Hi {user.first_name}, Generating AI Image please wait..."
 
-        sent_msg = await Message.reply_msg(update, g_msg)
-        imagine = await Safone.imagine(prompt)
-        if imagine:
-            try:
-                await Message.send_img(chat.id, imagine, f"✨ {prompt}")
-                await Message.del_msg(chat.id, sent_msg)
-                ai_imagine_req += 1
-                await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
-                await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
-            except Exception as e:
-                print(f"Error Imagine: {e}")
-                await Message.reply_msg(update, f"Error Imagine: {e}")
+            sent_msg = await Message.reply_msg(update, g_msg)
+            imagine = await Safone.imagine(prompt)
+            if imagine:
+                try:
+                    await Message.del_msg(chat.id, sent_msg)
+                    await Message.send_img(chat.id, imagine, f"✨ {prompt}")
+                    ai_imagine_req += 1
+                    await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
+                    await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
+                except Exception as e:
+                    print(f"Error Imagine: {e}")
+                    await Message.reply_msg(update, f"Error Imagine: {e}")
+            else:
+                await Message.reply_msg(update, "Something Went Wrong!")
         else:
-            await Message.reply_msg(update, "Something Went Wrong!")
+            await Message.reply_msg(update, "Use <code>/imagine prompt</code>\nE.g. <code>/imagine a cute cat</code>")
     else:
-        await Message.reply_msg(update, "Use <code>/imagine prompt</code>\nE.g. <code>/imagine a cute cat</code>")
+        btn_name = ["Start me in private"]
+        btn_url = [f"http://t.me/{bot_info.username}?start=start"]
+        btn = await Button.ubutton(btn_name, btn_url)
+        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!", btn)
 
 
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -501,6 +546,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_info = await bot.get_me()
     e_msg = update.effective_message
     re_msg = update.message.reply_to_message
+
     if re_msg:
         url = re_msg.text
     else:
@@ -626,28 +672,21 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    reply = update.message.reply_to_message
+    re_msg = update.message.reply_to_message
+    if re_msg:
+        if re_msg.forward_from:
+            from_user_id = re_msg.forward_from.id
+        elif re_msg.from_user:
+            from_user_id = re_msg.from_user.id
 
-    if chat.type == "private":
-        if reply:
-            if reply.forward_from:
-                from_user_id = reply.forward_from.id
-            elif reply.from_user:
-                from_user_id = reply.from_user.id
-
-            await Message.reply_msg(update, f"◉ Your UserID: <code>{user.id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>")
-        else:
-            await Message.reply_msg(update, f"◉ UserID: <code>{user.id}</code>")
-    else:
-        if reply:
-            if reply.forward_from:
-                from_user_id = reply.forward_from.id
-            elif reply.from_user:
-                from_user_id = reply.from_user.id
-
-            await Message.reply_msg(update, f"◉ Your UserID: <code>{user.id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>\n◉ ChatID: <code>{chat.id}</code>")
-        else:
-            await Message.reply_msg(update, f"◉ UserID: <code>{user.id}</code>\n◉ ChatID: <code>{chat.id}</code>")
+    if chat.type == "private" and re_msg:
+        await Message.reply_msg(update, f"◉ Your UserID: <code>{user.id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>")
+    elif chat.type == "private":
+        await Message.reply_msg(update, f"◉ UserID: <code>{user.id}</code>")
+    elif chat.type in ["group", "supergroup"] and re_msg:
+        await Message.reply_msg(update, f"◉ Your UserID: <code>{user.id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>\n◉ ChatID: <code>{chat.id}</code>")
+    elif chat.type in ["group", "supergroup"]:
+        await Message.reply_msg(update, f"◉ UserID: <code>{user.id}</code>\n◉ ChatID: <code>{chat.id}</code>")
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -878,9 +917,9 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     chatgpt_req = 0
 
                 if user.id == int(owner_id):
-                    g_msg = "✨ Hi Boss, Please wait!! Generating Response..."
+                    g_msg = "✨ Hi Boss, Please wait!! Generating AI Response..."
                 elif user.id in premium_user:
-                    g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
+                    g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating AI Response..."
                 else:
                     if chatgpt_req >= int(chatgpt_limit):
                         premium_seller = await MongoDB.get_data("premium", "premium_seller")
@@ -898,7 +937,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await Message.reply_msg(update, text, btn)
                         return
                     else:
-                        g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating Response..."
+                        g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating AI Response..."
 
                 sent_msg = await Message.reply_msg(update, g_msg)
 
