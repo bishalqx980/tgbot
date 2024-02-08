@@ -479,6 +479,8 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"UV Ray: <code>{uv}</code>\n\n<pre>⚠ 8 or higher is harmful for skin!</pre>"
             )
             await Message.reply_msg(update, msg)
+        else:
+            await Message.reply_msg(update, "Something went wrong!")
     else:
         await Message.reply_msg(update, "Use <code>/weather location_name</code>\nE.g. <code>/weather london</code>")
 

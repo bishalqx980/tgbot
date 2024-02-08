@@ -18,6 +18,7 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 - **Calculator:** it has built-in calculator
 - **Echo:** I can echo your message (for fun) 😁
 - **Webshot** I can take screenshot of any website by url 📸
+- **☁ Weather** I can get weather info of specified location ☁
 - **Much more...**
 - **🆘 More Feature coming soon...**
 
@@ -38,6 +39,7 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 - `server_url` E.g. for render it will be https://your_app_name.onrender.com/
 - ❗ OPTIONAL | `shortener_api_key` Get from https://shrinkme.io/
 - ❗ OPTIONAL | `omdb_api` Get from https://www.omdbapi.com/
+- ❗ OPTIONAL | `weather_api_key` Get from https://www.weatherapi.com/
 - `chatgpt_limit` E.g. 10
 - `ai_imagine_limit` E.g. 10
 - `usage_reset` E.g. 24 (in hour)
