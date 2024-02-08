@@ -19,6 +19,7 @@ server_url = os.getenv("server_url")
 # api's
 shortener_api_key = os.getenv("shortener_api_key")
 omdb_api = os.getenv("omdb_api")
+weather_api_key = os.getenv("weather_api_key")
 # safone api
 safone_api = SafoneAPI()
 chatgpt_limit = os.getenv("chatgpt_limit")

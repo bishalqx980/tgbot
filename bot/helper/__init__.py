@@ -14,6 +14,7 @@ commands = [
     BotCommand("calc", "Calculate any math"),
     BotCommand("echo", "Make chat fun"),
     BotCommand("webshot", "Take Screenshot of any website"),
+    BotCommand("weather", "Get weather info"),
     BotCommand("imagine", "AI Image generator based on your prompt"),
     BotCommand("chatgpt", "ChatGPT AI for your chat"),
     BotCommand("ytdl", "Download youtube video"),

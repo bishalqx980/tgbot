@@ -22,6 +22,7 @@ from bot.safone import Safone
 from bot.group_management import func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_adminlist
 from bot.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
+from bot.weather import weather_info
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -440,6 +441,46 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
     else:
         await Message.reply_msg(update, "Use <code>/webshot url</code>\nE.g. <code>/webshot https://google.com</code>")
+
+
+async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    location = " ".join(context.args)
+    if location:
+        info = weather_info(location)
+        if info:
+            loc_name = info[0]
+            country = info[1]
+            zone = info[2]
+            localtime = info[3]
+            lastupdate = info[4] # last weather update time
+            temp_c = info[5]
+            f_temp_c = info[6]
+            temp_f = info[7]
+            f_temp_f = info[8]
+            wind_mph = info[9]
+            wind_kph = info[10]
+            wind_deg = info[11]
+            uv = info[12]
+            condition = info[13]
+            condition_icon = info[14]
+            msg = (
+                f"<b>|ººº LOCATION INFO ººº|</b>\n\n"
+                f"City: <code>{loc_name}</code>\n"
+                f"Country: <code>{country}</code>\n"
+                f"Zone: <code>{zone}</code>\n"
+                f"Local Time: <code>{localtime}</code>\n\n"
+                f"<b>|ººº WEATHER INFO ººº|</b>\n"
+                f"✨ {condition} ✨\n\n"
+                f"Temperature ⁛\n"
+                f"temp (C) » <code>{temp_c}</code>\nFeels » <code>{f_temp_c}</code>\n"
+                f"temp (F) » <code>{temp_f}</code>\nFeels » <code>{f_temp_f}</code>\n\n"
+                f"Wind: <code>{wind_mph}</code> | <code>{wind_kph}</code>\n"
+                f"Wind `Angle`: <code>{wind_deg}</code>\n"
+                f"UV Ray: <code>{uv}</code>\n\n<pre>⚠ 8 or higher is harmful for skin!</pre>"
+            )
+            await Message.reply_msg(update, msg)
+    else:
+        await Message.reply_msg(update, "Use <code>/weather location_name</code>\nE.g. <code>/weather london</code>")
 
 
 async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1031,6 +1072,7 @@ def main():
     application.add_handler(CommandHandler("calc", func_calc, block=False))
     application.add_handler(CommandHandler("echo", func_echo, block=False))
     application.add_handler(CommandHandler("webshot", func_webshot, block=False))
+    application.add_handler(CommandHandler("weather", func_weather, block=False))
     application.add_handler(CommandHandler("imagine", func_imagine, block=False))
     application.add_handler(CommandHandler("chatgpt", func_chatgpt, block=False))
     application.add_handler(CommandHandler("ytdl", func_ytdl, block=False))
