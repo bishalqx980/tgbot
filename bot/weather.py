@@ -26,6 +26,7 @@ def weather_info(location):
             cur_wind_mph = f"{current_data.get('wind_mph')} mph"
             cur_wind_kph = f"{current_data.get('wind_kph')} kph"
             cur_wind_deg = f"{current_data.get('wind_degree')}°"
+            cur_humidity = f"{current_data.get('humidity')}%"
             cur_uv = current_data.get("uv") # 11 is dangerous
 
 
@@ -34,6 +35,6 @@ def weather_info(location):
             cur_con_text = cur_condition_data.get("text") # rainy
             cur_con_icon = cur_condition_data.get("icon") # img link
 
-            return loc_name, loc_country, loc_tz_id, loc_localtime, cur_last_updated, cur_temp_c, cur_f_temp_c, cur_temp_f, cur_f_temp_f, cur_wind_mph, cur_wind_kph, cur_wind_deg, cur_uv, cur_con_text, cur_con_icon
+            return loc_name, loc_country, loc_tz_id, loc_localtime, cur_last_updated, cur_temp_c, cur_f_temp_c, cur_temp_f, cur_f_temp_f, cur_wind_mph, cur_wind_kph, cur_wind_deg, cur_humidity, cur_uv, cur_con_text, cur_con_icon
     except Exception as e:
         print(f"Error (getting weather): {e}")
