@@ -33,6 +33,6 @@ class Safone:
             res = await safone_api.imagine(prompt)
             res = res[0]
         except Exception as e:
-            print(f"Error youtube: {e}")
+            print(f"Error imagine: {e}")
         return res
             
