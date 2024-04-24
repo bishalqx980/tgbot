@@ -1,33 +1,33 @@
 # tgbot
 This Telegram bot is built using the `python-telegram-bot` library **_version 20.7_** and performs various tasks within **Telegram**.
 
-- **This bot can be found as [Ciri](https://t.me/MissCiri_bot) on Telegram.**
+- **This bot can be found as [𝕮𝖎𝖗𝖎 "希里"](https://t.me/MissCiri_bot) on Telegram.**
 
-<details>
-<summary><b>Features</b></summary>
+## Features ✨:
 
-- **ChatGPT AI:** I can get response from ChatGPT AI
-- **AI Imazine:** 🔥 I can Imagine Image by AI from your prompt
-- **Group Management:** Powerful Group Manager bot
-- **YouTube Download** Can download video from YouTube
-- **Movie Info:** Can provide any movie/series/episode
-- **Language Translator:** Can translate any lang using Google Translator
-- **Encode/Decode base64:** Can encode/decode base64 code
-- **URL Shortener:** Can convert any url to shorturl (using shrinke.me api)
-- **Ping Website** Can detect website response
-- **Calculator:** it has built-in calculator
-- **Echo:** I can echo your message (for fun) 😁
-- **Webshot** I can take screenshot of any website by url 📸
-- **☁ Weather** I can get weather info of specified location ☁
+- **ChatGPT AI:** Get response from ChatGPT AI
+- **AI Imazine:** Generate image from your prompt
+- **Group Management:** Manage Group as an active admin
+- **YouTube Download** Download videos from YouTube
+- **Movie Info:** Provide movie information
+- **Language Translator:** Translate languages
+- **Encode/Decode base64:** Encode/decode base64
+- **URL Shortener:** Shorten URLs using shrinke.me api
+- **Ping Website** Ping any URL
+- **Calculator:** Works as everyday calculator
+- **Echo:** Echo your message for fun
+- **Webshot** Take website screenshot
+- **Weather** Provide weather information
 - **Much more...**
-- **🆘 More Feature coming soon...**
 
-</details>
+**<i>More Feature coming soon...</i>**
 
-<hr>
+• • • • • • • • • • • • • • • • • • • •
+
+## How to Deploy 🚀:
 
 <details>
-<summary><b>Setup ⚙</b></summary>
+<summary><b>Setup 📦</b></summary>
 
 - Fillup `sample_config.env` file value's
 - `bot_token` Get from https://t.me/BotFather E.g. 123456:abcdefGHIJK...
