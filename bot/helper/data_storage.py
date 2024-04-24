@@ -17,6 +17,8 @@ class MessageStorage:
             "• Be your calculator\n"
             "• Echo your message for fun\n"
             "• Take website screenshot\n"
+            "• Provide weather information\n"
+            "• Group management & Much more...\n"
             "• /help for bot help\n\n" # break
             "<i>More Feature coming soon...</i>\n"
         )
