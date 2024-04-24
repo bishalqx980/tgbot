@@ -4,22 +4,21 @@ from bot.helper import commands
 class MessageStorage:
     async def welcome_msg():
         pvt_message = (
-            "Hi, {user_mention} !! It's <a href='https://t.me/{bot_username}'>{bot_firstname}</a>!\n"
-            "I'm not only a Powerful <b>Group Management bot</b> but also\n"
-            "I can do many other task 😜\n\n" # break
-            "🔥 I can get response from <b>ChatGPT AI</b>\n\n"
-            "🔥 I can Imagine Image by AI from your prompt\n\n" # break
-            "⪧ I can download video from YouTube\n"
-            "⪧ I can get any Movie information\n"
-            "⪧ I can Translate any language to your desired lang\n"
-            "⪧ I can decode/encode base64 code\n"
-            "⪧ I can short any URL\n"
-            "⪧ I can ping (Detect web response) any URL\n"
-            "⪧ You can use me as a calculator too 😎\n"
-            "⪧ I can echo your message (for fun) 😁\n"
-            "⪧ I can take screenshot of any website by url 📸\n\n" # break
-            "🆘 More Feature coming soon...\n"
-            "⪧ /help for bot help\n"
+            "Hi {user_mention}! I'm <a href='https://t.me/{bot_username}'>{bot_firstname}</a>, your all-in-one bot!\n"
+            "Here's what I can do:\n\n" # break
+            "• Get response from <b><i>ChatGPT AI</i></b>\n"
+            "• Generate image from your prompt\n"
+            "• Download videos from YouTube\n"
+            "• Provide movie information\n"
+            "• Translate languages\n"
+            "• Encode/decode base64\n"
+            "• Shorten URLs\n"
+            "• Ping any URL\n"
+            "• Be your calculator\n"
+            "• Echo your message for fun\n"
+            "• Take website screenshot\n"
+            "• /help for bot help\n\n" # break
+            "<i>More Feature coming soon...</i>\n"
         )
         group_message = (
             "Hi, {user_mention}! Start me in private to chat with me 😊!"
