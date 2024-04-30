@@ -72,7 +72,6 @@ class MongoDB:
             print(f"Error (finding db_data): {e}")
 
 
-
     async def get_data(collection_name, get_data):
         collection = db[collection_name]
         try:

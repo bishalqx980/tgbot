@@ -23,16 +23,17 @@ class Safone:
     async def webshot(url):
         try:
             res = await safone_api.webshot(url)
+            return res
         except Exception as e:
             print(f"Error Webshot: {e}")
-        return res
 
 
     async def imagine(prompt):
         try:
             res = await safone_api.imagine(prompt)
             res = res[0]
+            return res
         except Exception as e:
             print(f"Error imagine: {e}")
-        return res
+
             

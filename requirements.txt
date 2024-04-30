@@ -6,6 +6,6 @@ pytz
 Flask
 requests
 SafoneAPI
-TgCrypto
 pytube
 psutil
+TgCrypto

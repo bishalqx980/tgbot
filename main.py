@@ -8,7 +8,7 @@ from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
-from bot import logger, bot_token, bot, owner_id, owner_username, support_chat, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
+from bot import logger, bot_token, bot, owner_id, owner_username, bot_pic, lang_code_list, welcome_img, support_chat, telegraph, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
 from bot.mongodb import MongoDB
 from bot.helper.telegram_helper import Message, Button
 from bot.ping import ping_url
@@ -29,71 +29,75 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     bot_info = await bot.get_me()
-    avatar = await MongoDB.get_data("ciri_docs", "avatar")
+    bot_pic = await MongoDB.get_data("bot_docs", "bot_pic")
 
-    if chat.type == "private":
-        welcome_msg = await MessageStorage.welcome_msg()
-        welcome_msg = welcome_msg[0].format(
-            user_mention = user.mention_html(),
-            bot_username = bot_info.username,
-            bot_firstname = bot_info.first_name
-        )
+    if owner_id != "":
+        if chat.type == "private":
+            welcome_msg = await MessageStorage.welcome_msg()
+            welcome_msg = welcome_msg[0].format(
+                user_mention = user.mention_html(),
+                bot_username = bot_info.username,
+                bot_firstname = bot_info.first_name
+            )
 
-        btn_name_1 = ["Add in Group"]
-        btn_url_1 = [f"http://t.me/{bot_info.username}?startgroup=start"]
-        btn_name_2 = ["⚡ Developer ⚡", "📘 Source Code"]
-        btn_url_2 = [f"https://t.me/{owner_username}", "https://github.com/bishalqx980/tgbot"]
-        btn_name_3 = ["👨‍💻 Support Chat"]
-        btn_url_3 = [support_chat]
-        btn_1 = await Button.ubutton(btn_name_1, btn_url_1)
-        btn_2 = await Button.ubutton(btn_name_2, btn_url_2, True)
-        if len(support_chat) != 0:
-            btn_3 = await Button.ubutton(btn_name_3, btn_url_3)
-            btn = btn_1 + btn_2 + btn_3
-        else:
-            btn = btn_1 + btn_2
+            btn_name_1 = ["Add in Group"]
+            btn_url_1 = [f"http://t.me/{bot_info.username}?startgroup=start"]
+            btn_name_2 = ["⚡ Developer ⚡", "📘 Source Code"]
+            btn_url_2 = [f"https://t.me/bishalqx980", "https://github.com/bishalqx980/tgbot"]
+            btn_name_3 = ["👨🏼‍💻 Support Chat"]
+            btn_url_3 = [support_chat]
+            btn_1 = await Button.ubutton(btn_name_1, btn_url_1)
+            btn_2 = await Button.ubutton(btn_name_2, btn_url_2, True)
+            if len(support_chat) != 0:
+                btn_3 = await Button.ubutton(btn_name_3, btn_url_3)
+                btn = btn_1 + btn_2 + btn_3
+            else:
+                btn = btn_1 + btn_2
 
-        welcome_img = await MongoDB.get_data("ciri_docs", "welcome_img")
-        if welcome_img:
-            await Message.send_img(chat.id, avatar, welcome_msg, btn)
-        else:
+            welcome_img = await MongoDB.get_data("bot_docs", "welcome_img")
+            if welcome_img:
+                await Message.send_img(chat.id, bot_pic, welcome_msg, btn)
+            else:
+                await Message.send_msg(chat.id, welcome_msg, btn)
+
+            data = {
+                "user_id": user.id,
+                "Name": user.full_name,
+                "username": user.username,
+                "mention": user.mention_html(),
+                "lang": user.language_code
+            }
+            find_db = await MongoDB.find_one("users", "user_id", user.id)
+            if not find_db:
+                await MongoDB.insert_single_data("users", data)
+        elif chat.type in ["group", "supergroup"]:
+            chat = update.effective_chat
+            find_db = await MongoDB.find_one("groups", "chat_id", chat.id)
+
+            if not find_db:
+                try:
+                    data = {
+                        "chat_id": chat.id,
+                        "title": chat.title
+                    }
+                    await MongoDB.insert_single_data("groups", data)
+                    await Message.reply_msg(update, "Group has been registered successfully...")
+                except Exception as e:
+                    print(f"Error registering group: {e}")
+                    await Message.reply_msg(update, "⚠ Group has not registered, something went wrong...")
+
+            welcome_msg = await MessageStorage.welcome_msg()
+            welcome_msg = welcome_msg[1].format(
+                user_mention = user.mention_html()
+            )
+            btn_name = ["Start me in private"]
+            btn_url = [f"http://t.me/{bot_info.username}?start=start"]
+            btn = await Button.ubutton(btn_name, btn_url)
             await Message.send_msg(chat.id, welcome_msg, btn)
-
-        data = {
-            "user_id": user.id,
-            "Name": user.full_name,
-            "username": user.username,
-            "mention": user.mention_html(),
-            "lang": user.language_code
-        }
-        find_db = await MongoDB.find_one("users", "user_id", user.id)
-        if not find_db:
-            await MongoDB.insert_single_data("users", data)
-
-    elif chat.type in ["group", "supergroup"]:
-        chat = update.effective_chat
-        find_db = await MongoDB.find_one("groups", "chat_id", chat.id)
-
-        if not find_db:
-            try:
-                data = {
-                    "chat_id": chat.id,
-                    "title": chat.title
-                }
-                await MongoDB.insert_single_data("groups", data)
-                await Message.reply_msg(update, "Group has been registered successfully...")
-            except Exception as e:
-                print(f"Error registering group: {e}")
-                await Message.reply_msg(update, "⚠ Group has not registered, something went wrong...")
-
-        welcome_msg = await MessageStorage.welcome_msg()
-        welcome_msg = welcome_msg[1].format(
-            user_mention = user.mention_html()
-        )
-        btn_name = ["Start me in private"]
-        btn_url = [f"http://t.me/{bot_info.username}?start=start"]
-        btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, welcome_msg, btn)
+    elif chat.type == "private":
+        await Message.send_msg(chat.id, f"owner_id: <code>{chat.id}</code>\nPlease add owner_id in config.env file then retry. Otherwise bot won't work properly.")
+    else:
+        await Message.reply_msg(update, "Error <i>owner_id</i> not provided!")
 
 
 async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -203,7 +207,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             tr_msg = translate(msg, lang_code)
         except Exception as e:
             print(f"Error Translator: {e}")
-            lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
+            lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
             btn_name = ["Language Code List 📃"]
             btn_url = [lang_code_list]
             btn = await Button.ubutton(btn_name, btn_url)
@@ -232,7 +236,7 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 print(f"Error setting lang code: {e}")
                 await Message.reply_msg(update, f"Error: {e}")
         else:
-            lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
+            lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
             btn_name = ["Language Code List 📃"]
             btn_url = [lang_code_list]
             btn = await Button.ubutton(btn_name, btn_url)
@@ -257,7 +261,7 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         print(f"Error setting lang code: {e}")
                         await Message.reply_msg(update, f"Error: {e}")
                 else:
-                    lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
+                    lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
                     btn_name = ["Language Code List 📃"]
                     btn_url = [lang_code_list]
                     btn = await Button.ubutton(btn_name, btn_url)
@@ -511,9 +515,9 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ai_imagine_req = 0
 
             if user.id == int(owner_id):
-                g_msg = "✨ Hi Boss, Generating AI Image please wait..."
+                g_msg = "Hi Boss, Generating AI Image please wait..."
             elif user.id in premium_user:
-                g_msg = f"✨ Hi {user.first_name}, Generating AI Image please wait..."
+                g_msg = f"Hi {user.first_name}, Generating AI Image please wait..."
             else:
                 if ai_imagine_req >= int(ai_imagine_limit):
                     premium_seller = await MongoDB.get_data("premium", "premium_seller")
@@ -531,7 +535,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await Message.reply_msg(update, text, btn)
                     return
                 else:
-                    g_msg = f"✨ Hi {user.first_name}, Generating AI Image please wait..."
+                    g_msg = f"Hi {user.first_name}, Generating AI Image please wait..."
 
             sent_msg = await Message.reply_msg(update, g_msg)
             imagine = await Safone.imagine(prompt)
@@ -546,7 +550,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     print(f"Error Imagine: {e}")
                     await Message.reply_msg(update, f"Error Imagine: {e}")
             else:
-                await Message.reply_msg(update, "Something Went Wrong!")
+                await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
         else:
             await Message.reply_msg(update, "Use <code>/imagine prompt</code>\nE.g. <code>/imagine a cute cat</code>")
     else:
@@ -809,7 +813,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     key = " ".join(context.args)
-    c_name = "ciri_docs"
+    c_name = "bot_docs"
     if user.id == int(owner_id):
         if key != "":
             if "-n" in key:
@@ -831,18 +835,34 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, f"Error bsetting: {e}")
         else:
             find = await MongoDB.find(c_name, "_id")
-            data = await MongoDB.find_one(c_name, "_id", find[0])
-            avatar = data.get("avatar")
-            telegraph = data.get("telegraph")
-            lang_code_list = data.get("lang_code_list")
-            welcome_img = data.get("welcome_img")
+            if find:
+                data = await MongoDB.find_one(c_name, "_id", find[0])
+            else:
+                data = {
+                        "bot_pic": bot_pic,
+                        "telegraph": telegraph,
+                        "lang_code_list": lang_code_list,
+                        "welcome_img": bool(welcome_img)
+                    }
+                await MongoDB.insert_single_data(c_name, data)
+
+                find = await MongoDB.find(c_name, "_id")
+                if find:
+                    data = await MongoDB.find_one(c_name, "_id", find[0])
+                else:
+                    await Message.reply_msg(update, f"Error bsetting: {e}")
+
+            b_pic = data.get("bot_pic")
+            tele_graph = data.get("telegraph")
+            lcl = data.get("lang_code_list")
+            wel_img = data.get("welcome_img")
             msg = (
-                f"// Bot Setting's //\n\n"
-                f"// collection_name : value\n"
-                f"<code>avatar</code>: <code>{avatar}</code>\n"
-                f"<code>telegraph</code>: <code>{telegraph}</code>\n"
-                f"<code>lang_code_list</code>: <code>{lang_code_list}</code>\n"
-                f"<code>welcome_img</code>: <code>{welcome_img}</code>\n\n"
+                f"<b>Bot Setting</b>\n\n"
+                f"[collection_name: value]\n"
+                f"<i><code>bot_pic</code></i>: <code>{b_pic}</code>\n"
+                f"<i><code>telegraph</code></i>: <code>{tele_graph}</code>\n"
+                f"<i><code>lang_code_list</code></i>: <code>{lcl}</code>\n"
+                f"<i><code>welcome_img</code></i>: <code>{wel_img}</code>\n\n"
                 f"/bsetting collection_name -n new_value"
             )
             await Message.reply_msg(update, f"<b>{msg}</b>")
@@ -935,7 +955,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     tr_msg = translate(msg, lang_code)
                 except Exception as e:
                     print(f"Error Translator: {e}")
-                    lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
+                    lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
                     btn_name = ["Language Code List 📃"]
                     btn_url = [lang_code_list]
                     btn = await Button.ubutton(btn_name, btn_url)
@@ -962,9 +982,9 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     chatgpt_req = 0
 
                 if user.id == int(owner_id):
-                    g_msg = "✨ Hi Boss, Please wait!! Generating AI Response..."
+                    g_msg = "Hi Boss, Please wait!! Generating AI Response..."
                 elif user.id in premium_user:
-                    g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating AI Response..."
+                    g_msg = f"Hi {user.first_name}, Please wait!! Generating AI Response..."
                 else:
                     if chatgpt_req >= int(chatgpt_limit):
                         premium_seller = await MongoDB.get_data("premium", "premium_seller")
@@ -982,7 +1002,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await Message.reply_msg(update, text, btn)
                         return
                     else:
-                        g_msg = f"✨ Hi {user.first_name}, Please wait!! Generating AI Response..."
+                        g_msg = f"Hi {user.first_name}, Please wait!! Generating AI Response..."
 
                 sent_msg = await Message.reply_msg(update, g_msg)
 
@@ -1029,7 +1049,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     tr_msg = translate(msg, lang_code)
                 except Exception as e:
                     print(f"Error Translator: {e}")
-                    lang_code_list = await MongoDB.get_data("ciri_docs", "lang_code_list")
+                    lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
                     btn_name = ["Language Code List 📃"]
                     btn_url = [lang_code_list]
                     btn = await Button.ubutton(btn_name, btn_url)
