@@ -30,6 +30,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     bot_info = await bot.get_me()
     bot_pic = await MongoDB.get_data("bot_docs", "bot_pic")
+    support_chat = await MongoDB.get_data("bot_docs", "support_chat")
 
     if owner_id != "":
         if chat.type == "private":
@@ -48,7 +49,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn_url_3 = [support_chat]
             btn_1 = await Button.ubutton(btn_name_1, btn_url_1)
             btn_2 = await Button.ubutton(btn_name_2, btn_url_2, True)
-            if len(support_chat) != 0:
+            if support_chat: #len(support_chat) != 0
                 btn_3 = await Button.ubutton(btn_name_3, btn_url_3)
                 btn = btn_1 + btn_2 + btn_3
             else:
@@ -95,7 +96,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn = await Button.ubutton(btn_name, btn_url)
             await Message.send_msg(chat.id, welcome_msg, btn)
     elif chat.type == "private":
-        await Message.send_msg(chat.id, f"owner_id: <code>{chat.id}</code>\nPlease add owner_id in /bsetting or <code>config.env</code> file then retry. Otherwise bot won't work properly.")
+        await Message.send_msg(chat.id, f"owner_id: <code>{chat.id}</code>\nPlease add owner_id in <code>config.env</code> file then retry. Otherwise bot won't work properly.")
     else:
         await Message.reply_msg(update, "Error <i>owner_id</i> not provided!")
 
@@ -684,15 +685,15 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             last_used = find_user.get("last_used")
 
             text = (
-                f"<b>⚜ Data of <code>{user_id}</code></b>\n\n"
-                f"◉ User: {user_mention}\n"
-                f"◉ Lang: <code>{lang}</code>\n"
-                f"◉ Echo: <code>{echo}</code>\n"
-                f"◉ Auto tr: <code>{auto_tr}</code>\n"
-                f"◉ ChatGPT: <code>{chatgpt}</code>\n"
-                f"◉ ChatGPT Req: <code>{chatgpt_req}/{chatgpt_limit}</code>\n"
-                f"◉ AI Imagine Req: <code>{ai_imagine_req}/{ai_imagine_limit}</code>\n"
-                f"◉ Last Used: <code>{last_used}</code>\n"
+                f"<b>Data of <code>{user_id}</code></b>\n\n"
+                f"• User: {user_mention}\n"
+                f"• Lang: <code>{lang}</code>\n"
+                f"• Echo: <code>{echo}</code>\n"
+                f"• Auto tr: <code>{auto_tr}</code>\n"
+                f"• ChatGPT: <code>{chatgpt}</code>\n"
+                f"• ChatGPT Req: <code>{chatgpt_req}/{chatgpt_limit}</code>\n"
+                f"• AI Imagine Req: <code>{ai_imagine_req}/{ai_imagine_limit}</code>\n"
+                f"• Last Used: <code>{last_used}</code>\n"
             )
             await Message.reply_msg(update, text)
         else:
@@ -708,10 +709,10 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             text = (
                 f"<b>⚜ Data of <code>{chat.id}</code></b>\n\n"
-                f"◉ Title: {title}\n"
-                f"◉ Lang: <code>{lang}</code>\n"
-                f"◉ Echo: <code>{echo}</code>\n"
-                f"◉ Auto tr: <code>{auto_tr}</code>\n"
+                f"• Title: {title}\n"
+                f"• Lang: <code>{lang}</code>\n"
+                f"• Echo: <code>{echo}</code>\n"
+                f"• Auto tr: <code>{auto_tr}</code>\n"
             )
             await Message.reply_msg(update, text)
         else:
@@ -729,13 +730,13 @@ async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
             from_user_id = re_msg.from_user.id
 
     if chat.type == "private" and re_msg:
-        await Message.reply_msg(update, f"◉ Your UserID: <code>{user.id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>")
+        await Message.reply_msg(update, f"• Your UserID: <code>{user.id}</code>\n• Replied UserID: <code>{from_user_id}</code>")
     elif chat.type == "private":
-        await Message.reply_msg(update, f"◉ UserID: <code>{user.id}</code>")
+        await Message.reply_msg(update, f"• UserID: <code>{user.id}</code>")
     elif chat.type in ["group", "supergroup"] and re_msg:
-        await Message.reply_msg(update, f"◉ Your UserID: <code>{user.id}</code>\n◉ Replied UserID: <code>{from_user_id}</code>\n◉ ChatID: <code>{chat.id}</code>")
+        await Message.reply_msg(update, f"• Your UserID: <code>{user.id}</code>\n• Replied UserID: <code>{from_user_id}</code>\n• ChatID: <code>{chat.id}</code>")
     elif chat.type in ["group", "supergroup"]:
-        await Message.reply_msg(update, f"◉ UserID: <code>{user.id}</code>\n◉ ChatID: <code>{chat.id}</code>")
+        await Message.reply_msg(update, f"• UserID: <code>{user.id}</code>\n• ChatID: <code>{chat.id}</code>")
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -770,11 +771,11 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         users = await MongoDB.find("users", "user_id")
-        x = await MongoDB.info_db("users")
+        total_user = await MongoDB.info_db("users")
 
         sent_count = 0
         except_count = 0
-        notify = await Message.send_msg(owner_id, f"Total User: {x[1]}")
+        notify = await Message.send_msg(owner_id, f"Total User: {total_user[1]}")
         for user_id in users:
             try:
                 if replied_msg.text:
@@ -782,7 +783,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 elif replied_msg.caption:
                     await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
                 sent_count += 1
-                await Message.edit_msg(update, f"Total User: {x[1]}\nSent: {sent_count}\nBlocked/Deleted: {except_count}", notify)
+                progress = (sent_count+except_count)*100/total_user[1]
+                await Message.edit_msg(update, f"Total User: {total_user[1]}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {progress}%", notify)
             except Exception as e:
                 except_count += 1
                 print(f"Error Broadcast: {e}")
@@ -799,13 +801,37 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = "▬▬▬▬▬▬▬▬▬▬\n"
         for info in db:
             msg += (
-                f"Doc Name:<code> {info[0]}</code>\n"
-                f"Doc Count:<code> {info[1]}</code>\n"
-                f"Doc Size:<code> {info[2]}</code>\n"
-                f"Actual Size:<code> {info[3]}</code>\n"
+                f"<code>Doc name   :</code> {info[0]}\n"
+                f"<code>Doc count  :</code> {info[1]}\n"
+                f"<code>Doc size   :</code> {info[2]}\n"
+                f"<code>Actual size:</code> {info[3]}\n"
                 f"▬▬▬▬▬▬▬▬▬▬\n"
             )
         await Message.reply_msg(update, f"<b>{msg}</b>")
+    else:
+        await Message.reply_msg(update, "❗ This command is only for bot owner!")
+
+
+async def func_cleardb(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    c_name = "bot_docs"
+    if user.id == int(owner_id):
+        try:
+            await MongoDB.delete_all_doc(c_name)
+            data = {
+                "bot_pic": bot_pic,
+                "telegraph": telegraph,
+                "support_chat": support_chat,
+                "lang_code_list": lang_code_list,
+                "welcome_img": bool(welcome_img),
+                "server_url": server_url,
+                "chatgpt_limit": chatgpt_limit,
+                "ai_imagine_limit": ai_imagine_limit,
+                "usage_reset": usage_reset
+            }
+            await MongoDB.insert_single_data(c_name, data)
+        except Exception as e:
+            print(f"Error cleardb: {e}")
     else:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
@@ -842,17 +868,12 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     data = await MongoDB.find_one(c_name, "_id", find[0])
                 else:
                     data = {
-                            "owner_id": owner_id,
-                            "owner_username": owner_username,
                             "bot_pic": bot_pic,
                             "telegraph": telegraph,
                             "support_chat": support_chat,
                             "lang_code_list": lang_code_list,
                             "welcome_img": bool(welcome_img),
                             "server_url": server_url,
-                            "shortener_api_key": shortener_api_key,
-                            "omdb_api": omdb_api,
-                            "weather_api_key": weather_api_key,
                             "chatgpt_limit": chatgpt_limit,
                             "ai_imagine_limit": ai_imagine_limit,
                             "usage_reset": usage_reset
@@ -865,17 +886,12 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     else:
                         await Message.reply_msg(update, f"Error bsetting: {e}")
 
-                own_id = data.get("owner_id")
-                own_uname = data.get("owner_username")
                 b_pic = data.get("bot_pic")
                 tele_graph = data.get("telegraph")
                 s_chat = data.get("support_chat")
                 lcl = data.get("lang_code_list")
                 wel_img = data.get("welcome_img")
                 ser_url = data.get("server_url")
-                short_key = data.get("shortener_api_key")
-                omdb_key = data.get("omdb_api")
-                weather_key = data.get("weather_api_key")
                 cgpt_l = data.get("chatgpt_limit")
                 imagine_l = data.get("ai_imagine_limit")
                 u_reset = data.get("usage_reset")
@@ -883,21 +899,17 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 msg = (
                     f"<b>Bot Setting</b>\n"
                     f"[collection_name: value]\n\n"
-                    f"<code>owner_id         </code>: <i>{own_id}</i>\n"
-                    f"<code>owner_username   </code>: <i>{own_uname}</i>\n"
                     f"<code>bot_pic          </code>: <i>{b_pic}</i>\n"
                     f"<code>telegraph        </code>: <i>{tele_graph}</i>\n"
                     f"<code>support_chat     </code>: <i>{s_chat}</i>\n"
                     f"<code>lang_code_list   </code>: <i>{lcl}</i>\n"
                     f"<code>welcome_img      </code>: <i>{wel_img}</i>\n"
                     f"<code>server_url       </code>: <i>{ser_url}</i>\n"
-                    f"<code>shortener_api_key</code>: <i>{short_key}</i>\n"
-                    f"<code>omdb_api         </code>: <i>{omdb_key}</i>\n"
-                    f"<code>weather_api_key  </code>: <i>{weather_key}</i>\n"
                     f"<code>chatgpt_limit    </code>: <i>{cgpt_l}</i>\n"
                     f"<code>ai_imagine_limit </code>: <i>{imagine_l}</i>\n"
                     f"<code>usage_reset      </code>: <i>{u_reset}</i>\n\n"
-                    f"<i>/bsetting collection_name -n new_value</i>"
+                    f"<i>/bsetting collection_name -n new_value</i>\n"
+                    f"<i><code>/cleardb</code> - To clear <code>bot_docs</code> entry's and insert entry from <code>config.env</code> file!</i>"
                 )
                 await Message.reply_msg(update, f"<b>{msg}</b>")
         else:
@@ -938,23 +950,23 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user.id == int(owner_id):
         sys_info = (
             f"<b>↺ System info</b>\n\n"
-            f"◉ CPU ⩞\n"
+            f"• CPU\n"
             f"CPU: <code>{psutil.cpu_count()}</code>\n"
             f"CPU (Logical): <code>{psutil.cpu_count(False)}</code>\n"
             f"CPU freq Current: <code>{psutil.cpu_freq()[0]/1024:.2f} Ghz</code>\n"
             f"CPU freq Max: <code>{psutil.cpu_freq()[2]/1024:.2f} Ghz</code>\n\n"
-            f"◉ RAM ⩞\n"
+            f"• RAM\n"
             f"RAM Total: <code>{psutil.virtual_memory()[0]/(1024**3):.2f} GB</code>\n"
             f"RAM Avail: <code>{psutil.virtual_memory()[1]/(1024**3):.2f} GB</code>\n"
             f"RAM Used: <code>{psutil.virtual_memory()[3]/(1024**3):.2f} GB</code>\n"
             f"RAM Free: <code>{psutil.virtual_memory()[4]/(1024**3):.2f} GB</code>\n"
             f"RAM Percent: <code>{psutil.virtual_memory()[2]} %</code>\n\n"
-            f"◉ RAM (Swap) ⩞\n"
+            f"• RAM (Swap)\n"
             f"RAM Total (Swap): <code>{psutil.swap_memory()[0]/(1024**3):.2f} GB</code>\n"
             f"RAM Used (Swap): <code>{psutil.swap_memory()[1]/(1024**3):.2f} GB</code>\n"
             f"RAM Free (Swap): <code>{psutil.swap_memory()[2]/(1024**3):.2f} GB</code>\n"
             f"RAM Percent (Swap): <code>{psutil.swap_memory()[3]} %</code>\n\n"
-            f"◉ Drive/Storage ⩞\n"
+            f"• Drive/Storage\n"
             f"Total Partitions: <code>{len(psutil.disk_partitions())}</code>\n"
             f"Disk Usage Total: <code>{psutil.disk_usage('/')[0]/(1024**3):.2f} GB</code>\n"
             f"Disk Usage Used: <code>{psutil.disk_usage('/')[1]/(1024**3):.2f} GB</code>\n"
@@ -1103,7 +1115,10 @@ def server_alive():
 
 
 async def ex_server_alive():
+    server_url = await MongoDB.get_data("bot_docs", "server_url")
     if len(server_url) != 0:
+        if server_url[0:4] != "http":
+            server_url = f"http://{server_url}"
         while True:
             try:
                 response = requests.get(server_url)
@@ -1149,6 +1164,7 @@ def main():
     # owner
     application.add_handler(CommandHandler("broadcast", func_broadcast, block=False))
     application.add_handler(CommandHandler("database", func_database, block=False))
+    application.add_handler(CommandHandler("cleardb", func_cleardb, block=False))
     application.add_handler(CommandHandler("bsetting", func_bsetting, block=False))
     application.add_handler(CommandHandler("shell", func_shell, block=False))
     application.add_handler(CommandHandler("sys", func_sys, block=False))
