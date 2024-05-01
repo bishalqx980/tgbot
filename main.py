@@ -830,8 +830,11 @@ async def func_cleardb(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "usage_reset": usage_reset
             }
             await MongoDB.insert_single_data(c_name, data)
+            await Message.reply_msg(update, "Database cleaned up! And restored with <code>config.env</code> file entry's!")
         except Exception as e:
-            print(f"Error cleardb: {e}")
+            error = f"Error cleardb: {e}"
+            await Message.reply_msg(update, error)
+            print(error)
     else:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
@@ -908,7 +911,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     f"<code>chatgpt_limit    </code>: <i>{cgpt_l}</i>\n"
                     f"<code>ai_imagine_limit </code>: <i>{imagine_l}</i>\n"
                     f"<code>usage_reset      </code>: <i>{u_reset}</i>\n\n"
-                    f"<i>/bsetting collection_name -n new_value</i>\n"
+                    f"<i>/bsetting collection_name -n new_value (blank new_value means none)</i>\n"
                     f"<i><code>/cleardb</code> - To clear <code>bot_docs</code> entry's and insert entry from <code>config.env</code> file!</i>"
                 )
                 await Message.reply_msg(update, f"<b>{msg}</b>")
