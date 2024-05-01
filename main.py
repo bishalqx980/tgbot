@@ -8,7 +8,7 @@ from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
-from bot import logger, bot_token, bot, owner_id, owner_username, bot_pic, lang_code_list, welcome_img, support_chat, telegraph, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
+from bot import logger, bot_token, bot, owner_id, owner_username, bot_pic, lang_code_list, welcome_img, support_chat, shortener_api_key, omdb_api, weather_api_key, telegraph, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
 from bot.mongodb import MongoDB
 from bot.helper.telegram_helper import Message, Button
 from bot.ping import ping_url
@@ -55,7 +55,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 btn = btn_1 + btn_2
 
             welcome_img = await MongoDB.get_data("bot_docs", "welcome_img")
-            if welcome_img:
+            if welcome_img and bot_pic:
                 await Message.send_img(chat.id, bot_pic, welcome_msg, btn)
             else:
                 await Message.send_msg(chat.id, welcome_msg, btn)
@@ -839,10 +839,20 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 data = await MongoDB.find_one(c_name, "_id", find[0])
             else:
                 data = {
+                        "owner_id": owner_id,
+                        "owner_username": owner_username,
                         "bot_pic": bot_pic,
                         "telegraph": telegraph,
+                        "support_chat": support_chat,
                         "lang_code_list": lang_code_list,
-                        "welcome_img": bool(welcome_img)
+                        "welcome_img": bool(welcome_img),
+                        "server_url": server_url,
+                        "shortener_api_key": shortener_api_key,
+                        "omdb_api": omdb_api,
+                        "weather_api_key": weather_api_key,
+                        "chatgpt_limit": chatgpt_limit,
+                        "ai_imagine_limit": ai_imagine_limit,
+                        "usage_reset": usage_reset
                     }
                 await MongoDB.insert_single_data(c_name, data)
 
@@ -852,18 +862,39 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 else:
                     await Message.reply_msg(update, f"Error bsetting: {e}")
 
+            own_id = data.get("owner_id")
+            own_uname = data.get("owner_username")
             b_pic = data.get("bot_pic")
             tele_graph = data.get("telegraph")
+            s_chat = data.get("support_chat")
             lcl = data.get("lang_code_list")
             wel_img = data.get("welcome_img")
+            ser_url = data.get("server_url")
+            short_key = data.get("shortener_api_key")
+            omdb_key = data.get("omdb_api")
+            weather_key = data.get("weather_api_key")
+            cgpt_l = data.get("chatgpt_limit")
+            imagine_l = data.get("ai_imagine_limit")
+            u_reset = data.get("usage_reset")
+
             msg = (
-                f"<b>Bot Setting</b>\n\n"
-                f"[collection_name: value]\n"
-                f"<i><code>bot_pic</code></i>: <code>{b_pic}</code>\n"
-                f"<i><code>telegraph</code></i>: <code>{tele_graph}</code>\n"
-                f"<i><code>lang_code_list</code></i>: <code>{lcl}</code>\n"
-                f"<i><code>welcome_img</code></i>: <code>{wel_img}</code>\n\n"
-                f"/bsetting collection_name -n new_value"
+                f"<b>Bot Setting</b>\n"
+                f"[collection_name: value]\n\n"
+                f"<code>owner_id         </code>: <i>{own_id}</i>\n"
+                f"<code>owner_username   </code>: <i>{own_uname}</i>\n"
+                f"<code>bot_pic          </code>: <i>{b_pic}</i>\n"
+                f"<code>telegraph        </code>: <i>{tele_graph}</i>\n"
+                f"<code>support_chat     </code>: <i>{s_chat}</i>\n"
+                f"<code>lang_code_list   </code>: <i>{lcl}</i>\n"
+                f"<code>welcome_img      </code>: <i>{wel_img}</i>\n"
+                f"<code>server_url       </code>: <i>{ser_url}</i>\n"
+                f"<code>shortener_api_key</code>: <i>{short_key}</i>\n"
+                f"<code>omdb_api         </code>: <i>{omdb_key}</i>\n"
+                f"<code>weather_api_key  </code>: <i>{weather_key}</i>\n"
+                f"<code>chatgpt_limit    </code>: <i>{cgpt_l}</i>\n"
+                f"<code>ai_imagine_limit </code>: <i>{imagine_l}</i>\n"
+                f"<code>usage_reset      </code>: <i>{u_reset}</i>\n\n"
+                f"<i>/bsetting collection_name -n new_value</i>"
             )
             await Message.reply_msg(update, f"<b>{msg}</b>")
     else:
