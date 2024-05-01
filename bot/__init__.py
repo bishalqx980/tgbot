@@ -4,6 +4,7 @@ from telegram import Bot
 from dotenv import load_dotenv
 from bot.alive import alive
 from SafoneAPI import SafoneAPI
+from g4f.client import Client as g4f
 
 load_dotenv("config.env")
 
@@ -30,6 +31,8 @@ safone_api = SafoneAPI()
 chatgpt_limit = os.getenv("chatgpt_limit")
 ai_imagine_limit = os.getenv("ai_imagine_limit")
 usage_reset = os.getenv("usage_reset")
+#g4f
+g4f = g4f()
 
 bot = Bot(bot_token)
 

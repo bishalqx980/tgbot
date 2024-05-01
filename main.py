@@ -23,6 +23,7 @@ from bot.group_management import func_ban, func_unban, func_kick, func_kickme, f
 from bot.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.weather import weather_info
+from bot.g4f import G4F
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -517,8 +518,8 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             if user.id == int(owner_id):
                 g_msg = "Hi Boss, Generating AI Image please wait..."
-            elif user.id in premium_user:
-                g_msg = f"Hi {user.first_name}, Generating AI Image please wait..."
+            #elif user.id in premium_user:
+                #g_msg = f"Hi {user.first_name}, Generating AI Image please wait..."
             else:
                 if ai_imagine_req >= int(ai_imagine_limit):
                     premium_seller = await MongoDB.get_data("premium", "premium_seller")
@@ -539,7 +540,10 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     g_msg = f"Hi {user.first_name}, Generating AI Image please wait..."
 
             sent_msg = await Message.reply_msg(update, g_msg)
+            """
             imagine = await Safone.imagine(prompt)
+            """
+            imagine = await G4F.imagine(prompt)
             if imagine:
                 try:
                     await Message.del_msg(chat.id, sent_msg)
@@ -1034,8 +1038,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                 if user.id == int(owner_id):
                     g_msg = "Hi Boss, Please wait!! Generating AI Response..."
-                elif user.id in premium_user:
-                    g_msg = f"Hi {user.first_name}, Please wait!! Generating AI Response..."
+                #elif user.id in premium_user:
+                    #g_msg = f"Hi {user.first_name}, Please wait!! Generating AI Response..."
                 else:
                     if chatgpt_req >= int(chatgpt_limit):
                         premium_seller = await MongoDB.get_data("premium", "premium_seller")
@@ -1057,6 +1061,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                 sent_msg = await Message.reply_msg(update, g_msg)
 
+                """
                 safone_ai_res = await Safone.safone_ai(msg)
                 if safone_ai_res:
                     chatgpt = safone_ai_res[0]
@@ -1069,9 +1074,12 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         text = bard.message
                     else:
                         text = chatbot.response
+                """
 
+                g4f_gpt = await G4F.chatgpt(msg)
+                if g4f_gpt:
                     try:
-                        await Message.edit_msg(update, text, sent_msg, parse_mode=ParseMode.MARKDOWN)
+                        await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)
                         chatgpt_req += 1
                         await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
                         await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)

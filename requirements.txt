@@ -1,5 +1,6 @@
 python-telegram-bot==20.7
 python-dotenv
+g4f
 deep-translator
 pymongo
 pytz
