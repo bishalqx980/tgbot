@@ -8,7 +8,7 @@ class MessageStorage:
             "Here's what I can do:\n\n" # break
             "• Get response from <b><i>ChatGPT AI</i></b>\n"
             "• Generate image from your prompt\n"
-            "• Download videos from YouTube\n"
+            "• Download/Search videos from YouTube\n"
             "• Provide movie information\n"
             "• Translate languages\n"
             "• Encode/decode base64\n"

@@ -18,6 +18,7 @@ commands = [
     BotCommand("imagine", "AI Image generator based on your prompt"),
     BotCommand("chatgpt", "ChatGPT AI for your chat"),
     BotCommand("ytdl", "Download youtube video"),
+    BotCommand("yts", "Search video on youtube"),
     BotCommand("stats", "Show your config data"),
     BotCommand("id", "Show chat/user id"),
     BotCommand("ban", "Ban an user from group"),

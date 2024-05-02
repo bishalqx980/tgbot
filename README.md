@@ -8,7 +8,7 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 - **ChatGPT AI:** Get response from ChatGPT AI
 - **AI Imazine:** Generate image from your prompt
 - **Group Management:** Manage Group as an active admin
-- **YouTube Download** Download videos from YouTube
+- **YouTube Download** Download/Search videos from YouTube
 - **Movie Info:** Provide movie information
 - **Language Translator:** Translate languages
 - **Encode/Decode base64:** Encode/decode base64

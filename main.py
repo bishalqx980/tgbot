@@ -665,6 +665,21 @@ async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url,
         await Message.edit_msg(update, "Something Went Wrong...", tmp_msg)
 
 
+async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    keyword = " ".join(context.args)
+    if keyword:
+        result = await YouTubeDownload.yts(keyword)
+        if result:
+            urls = [
+                result[0].watch_url,
+                result[1].watch_url,
+                result[2].watch_url
+            ]
+            for url in urls:
+                await Message.reply_msg(update, url, disable_web_preview=False)
+            await Message.reply_msg(update, f"Video found: {len(result)}\nShowing top {len(urls)}\n{urls}\n\nTo download videos you can use /ytdl")
+
+
 async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -1162,6 +1177,7 @@ def main():
     application.add_handler(CommandHandler("imagine", func_imagine, block=False))
     application.add_handler(CommandHandler("chatgpt", func_chatgpt, block=False))
     application.add_handler(CommandHandler("ytdl", func_ytdl, block=False))
+    application.add_handler(CommandHandler("yts", func_yts, block=False))
     application.add_handler(CommandHandler("stats", func_stats, block=False))
     application.add_handler(CommandHandler("id", func_id, block=False))
     application.add_handler(CommandHandler("ban", func_ban, block=False))

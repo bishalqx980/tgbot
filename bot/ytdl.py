@@ -1,4 +1,4 @@
-from pytube import YouTube
+from pytube import YouTube, Search
 
 
 class YouTubeDownload:
@@ -38,3 +38,13 @@ class YouTubeDownload:
                 print("No stream found for this video")
         except Exception as e:
             print(f"Error ytdl: {e}")
+
+
+    async def yts(keyword):
+        try:
+            print("Searching...")
+            result = Search(keyword).results
+            print(f"Video Found: {len(result)}")
+            return result
+        except Exception as e:
+            print(f"Error yts: {e}")
