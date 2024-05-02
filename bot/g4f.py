@@ -16,7 +16,7 @@ class G4F:
     async def imagine(prompt):
         try:
             response = g4f.images.generate(
-            model="dall-e-3",
+            model="stability-ai/sdxl",
             prompt=prompt
             )
             image_url = response.data[0].url
