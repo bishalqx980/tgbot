@@ -678,6 +678,10 @@ async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for url in urls:
                 await Message.reply_msg(update, url, disable_web_preview=False)
             await Message.reply_msg(update, f"Video found: {len(result)}\nShowing top {len(urls)}\n{urls}\n\nTo download videos you can use /ytdl")
+        else:
+            await Message.reply_msg(update, "Something Went Wrong...")
+    else:
+        await Message.reply_msg(update, "Use <code>/yts keyword</code>\nE.g. <code>/yts google keynote</code>")
 
 
 async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
