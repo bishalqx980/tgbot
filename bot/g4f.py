@@ -16,11 +16,10 @@ class G4F:
     async def imagine(prompt):
         try:
             response = g4f.images.generate(
-            model="gemini",
+            model="dall-e-3",
             prompt=prompt
             )
             image_url = response.data[0].url
             return image_url
         except Exception as e:
-            print(f"Error g4f_chatgpt: {e}")
-            
+            print(f"Error g4f_imagine: {e}")

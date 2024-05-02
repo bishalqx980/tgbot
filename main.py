@@ -517,7 +517,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 ai_imagine_req = 0
 
             if user.id == int(owner_id):
-                g_msg = "Hi Boss, Generating AI Image please wait..."
+                g_msg = "Please wait Boss!! Thinking..."
             #elif user.id in premium_user:
                 #g_msg = f"Hi {user.first_name}, Generating AI Image please wait..."
             else:
@@ -537,7 +537,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await Message.reply_msg(update, text, btn)
                     return
                 else:
-                    g_msg = f"Hi {user.first_name}, Generating AI Image please wait..."
+                    g_msg = f"Please wait {user.first_name}!! Thinking..."
 
             sent_msg = await Message.reply_msg(update, g_msg)
             """
@@ -788,7 +788,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
                 sent_count += 1
                 progress = (sent_count+except_count)*100/total_user[1]
-                await Message.edit_msg(update, f"Total User: {total_user[1]}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {progress}%", notify)
+                await Message.edit_msg(update, f"Total User: {total_user[1]}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {int(progress)}%", notify)
             except Exception as e:
                 except_count += 1
                 print(f"Error Broadcast: {e}")
@@ -1037,7 +1037,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     chatgpt_req = 0
 
                 if user.id == int(owner_id):
-                    g_msg = "Hi Boss, Please wait!! Generating AI Response..."
+                    g_msg = "Please wait Boss!! Thinking..."
                 #elif user.id in premium_user:
                     #g_msg = f"Hi {user.first_name}, Please wait!! Generating AI Response..."
                 else:
@@ -1057,7 +1057,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await Message.reply_msg(update, text, btn)
                         return
                     else:
-                        g_msg = f"Hi {user.first_name}, Please wait!! Generating AI Response..."
+                        g_msg = f"Please wait {user.first_name}!! Thinking..."
 
                 sent_msg = await Message.reply_msg(update, g_msg)
 

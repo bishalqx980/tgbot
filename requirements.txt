@@ -1,6 +1,7 @@
 python-telegram-bot==20.7
 python-dotenv
-g4f
+g4f[all]
+g4f[webdriver]
 deep-translator
 pymongo
 pytz
