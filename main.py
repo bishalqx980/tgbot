@@ -608,7 +608,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["url"] = url
     context.user_data["msg_id"] = e_msg.id
     if chat.type == "private":
-        if url != "":
+        if url:
             btn_name = ["mp4", "mp3"]
             btn_close = ["close"]
             btn = await Button.cbutton(btn_name, btn_name, True)
@@ -649,6 +649,7 @@ async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url,
             except Exception as e:
                 print(f"Error Uploading: {e}")
                 try_attempt += 1
+                await Message.edit_msg(update, f"📤 Uploading... [Retry Attempt: {try_attempt}/{max_attempt}]", tmp_msg)
                 if try_attempt == max_attempt:
                     print(f"Error Uploading: {e}")
                     await Message.send_msg(chat.id, f"Error Uploading: {e}")
@@ -656,8 +657,10 @@ async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url,
                 print(f"Waiting {2**try_attempt}sec before retry...")
                 await asyncio.sleep(2**try_attempt)
         try:
-            os.remove(res[1])
-            print("File Removed...")
+            removeable_files = [res[1], res[2]]
+            for rem in removeable_files:
+                os.remove(rem)
+            print("Files Removed...")
             await Message.del_msg(chat.id, tmp_msg)
         except Exception as e:
             print(f"Error os.remove: {e}")
@@ -677,7 +680,7 @@ async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ]
             for url in urls:
                 await Message.reply_msg(update, url, disable_web_preview=False)
-            await Message.reply_msg(update, f"Video found: {len(result)}\nShowing top {len(urls)}\n{urls}\n\nTo download videos you can use /ytdl")
+            await Message.reply_msg(update, f"Video found: {len(result)}\nShowing top {len(urls)} videos!\nTo download videos you can use /ytdl")
         else:
             await Message.reply_msg(update, "Something Went Wrong...")
     else:

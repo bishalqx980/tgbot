@@ -9,8 +9,8 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     if reply:
-        hostage = reply.from_user
-        getper_hostage = await chat.get_member(hostage.id)
+        victim = reply.from_user
+        getper_victim = await chat.get_member(victim.id)
     get_bot = await bot.get_me()
     getper_bot = await chat.get_member(get_bot.id)
     getper_user = await chat.get_member(user.id)
@@ -25,13 +25,13 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     title = "Admin"
                 """
                 if reply:
-                    if getper_hostage.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                        if getper_hostage.status != ChatMember.BANNED:
-                            ban = await bot.ban_chat_member(chat.id, hostage.id)
+                    if getper_victim.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                        if getper_victim.status != ChatMember.BANNED:
+                            ban = await bot.ban_chat_member(chat.id, victim.id)
                             if ban:
-                                await Message.reply_msg(update, f"{user.mention_html()} has removed user {hostage.mention_html()} from this Group!")
+                                await Message.reply_msg(update, f"{user.mention_html()} has removed user {victim.mention_html()} from this Group!")
                                 try:
-                                    await Message.send_msg(hostage.id, f"{user.mention_html()} has removed you from {chat.title}!")
+                                    await Message.send_msg(victim.id, f"{user.mention_html()} has removed you from {chat.title}!")
                                 except Exception as e:
                                     print(f"Error g_management: {e}")
                             else:
@@ -60,8 +60,8 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     if reply:
-        hostage = reply.from_user
-        getper_hostage = await chat.get_member(hostage.id)
+        victim = reply.from_user
+        getper_victim = await chat.get_member(victim.id)
     get_bot = await bot.get_me()
     getper_bot = await chat.get_member(get_bot.id)
     getper_user = await chat.get_member(user.id)
@@ -76,13 +76,13 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     title = "Admin"
                 """
                 if reply:
-                    if getper_hostage.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                        if getper_hostage.status == ChatMember.BANNED:
-                            unban = await bot.unban_chat_member(chat.id, hostage.id)
+                    if getper_victim.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                        if getper_victim.status == ChatMember.BANNED:
+                            unban = await bot.unban_chat_member(chat.id, victim.id)
                             if unban:
-                                await Message.reply_msg(update, f"{user.mention_html()} has unbanned user {hostage.mention_html()}!")
+                                await Message.reply_msg(update, f"{user.mention_html()} has unbanned user {victim.mention_html()}!")
                                 try:
-                                    await Message.send_msg(hostage.id, f"{user.mention_html()} has unbanned you in {chat.title}!")
+                                    await Message.send_msg(victim.id, f"{user.mention_html()} has unbanned you in {chat.title}!")
                                 except Exception as e:
                                     print(f"Error g_management: {e}")
                             else:
@@ -111,8 +111,8 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     if reply:
-        hostage = reply.from_user
-        getper_hostage = await chat.get_member(hostage.id)
+        victim = reply.from_user
+        getper_victim = await chat.get_member(victim.id)
     get_bot = await bot.get_me()
     getper_bot = await chat.get_member(get_bot.id)
     getper_user = await chat.get_member(user.id)
@@ -127,14 +127,14 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     title = "Admin"
                 """
                 if reply:
-                    if getper_hostage.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                        if getper_hostage.status == ChatMember.MEMBER:
-                            await bot.ban_chat_member(chat.id, hostage.id)
-                            unban = await bot.unban_chat_member(chat.id, hostage.id)
+                    if getper_victim.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                        if getper_victim.status == ChatMember.MEMBER:
+                            await bot.ban_chat_member(chat.id, victim.id)
+                            unban = await bot.unban_chat_member(chat.id, victim.id)
                             if unban:
-                                await Message.reply_msg(update, f"{user.mention_html()} has kicked user {hostage.mention_html()} from this Group!")
+                                await Message.reply_msg(update, f"{user.mention_html()} has kicked user {victim.mention_html()} from this Group!")
                                 try:
-                                    await Message.send_msg(hostage.id, f"{user.mention_html()} has kicked you from {chat.title}!")
+                                    await Message.send_msg(victim.id, f"{user.mention_html()} has kicked you from {chat.title}!")
                                 except Exception as e:
                                     print(f"Error g_management: {e}")
                             else:
@@ -161,18 +161,18 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    hostage = user
-    getper_hostage = await chat.get_member(hostage.id)
+    victim = user
+    getper_victim = await chat.get_member(victim.id)
     get_bot = await bot.get_me()
     getper_bot = await chat.get_member(get_bot.id)
 
     if chat.type in ["group", "supergroup"]:
         if getper_bot.status == ChatMember.ADMINISTRATOR:
-            if getper_hostage.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                await bot.ban_chat_member(chat.id, hostage.id)
-                unban = await bot.unban_chat_member(chat.id, hostage.id)
+            if getper_victim.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                await bot.ban_chat_member(chat.id, victim.id)
+                unban = await bot.unban_chat_member(chat.id, victim.id)
                 if unban:
-                    await Message.reply_msg(update, f"Nice Choice! Get out of my sight!\n{hostage.mention_html()} has choosed the easy way to out!")
+                    await Message.reply_msg(update, f"Nice Choice! Get out of my sight!\n{victim.mention_html()} has choosed the easy way to out!")
                 else:
                     await Message.reply_msg(update, "Something Went Wrong!")
             else:
@@ -193,8 +193,8 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     if reply:
-        hostage = reply.from_user
-        getper_hostage = await chat.get_member(hostage.id)
+        victim = reply.from_user
+        getper_victim = await chat.get_member(victim.id)
     get_bot = await bot.get_me()
     getper_bot = await chat.get_member(get_bot.id)
     getper_user = await chat.get_member(user.id)
@@ -226,13 +226,13 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     title = "Admin"
                 """
                 if reply:
-                    if getper_hostage.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                        if getper_hostage.status != ChatMember.RESTRICTED:
-                            mute = await bot.restrict_chat_member(chat.id, hostage.id, permissions)
+                    if getper_victim.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                        if getper_victim.status != ChatMember.RESTRICTED:
+                            mute = await bot.restrict_chat_member(chat.id, victim.id, permissions)
                             if mute:
-                                await Message.reply_msg(update, f"{user.mention_html()} has muted user {hostage.mention_html()}!")
+                                await Message.reply_msg(update, f"{user.mention_html()} has muted user {victim.mention_html()}!")
                                 try:
-                                    await Message.send_msg(hostage.id, f"{user.mention_html()} has muted you in {chat.title}!")
+                                    await Message.send_msg(victim.id, f"{user.mention_html()} has muted you in {chat.title}!")
                                 except Exception as e:
                                     print(f"Error g_management: {e}")
                             else:
@@ -261,8 +261,8 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     if reply:
-        hostage = reply.from_user
-        getper_hostage = await chat.get_member(hostage.id)
+        victim = reply.from_user
+        getper_victim = await chat.get_member(victim.id)
     get_bot = await bot.get_me()
     getper_bot = await chat.get_member(get_bot.id)
     getper_user = await chat.get_member(user.id)
@@ -292,11 +292,11 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 else:
                     title = "Admin"
                 if reply:
-                    if getper_hostage.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                        if getper_hostage.status == ChatMember.RESTRICTED:
-                            mute = await bot.restrict_chat_member(chat.id, hostage.id, permissions)
+                    if getper_victim.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                        if getper_victim.status == ChatMember.RESTRICTED:
+                            mute = await bot.restrict_chat_member(chat.id, victim.id, permissions)
                             if mute:
-                                await Message.reply_msg(update, f"{user.mention_html()} has unmuted user {hostage.mention_html()}!")
+                                await Message.reply_msg(update, f"{user.mention_html()} has unmuted user {victim.mention_html()}!")
                             else:
                                 await Message.reply_msg(update, "Something Went Wrong!")
                         else:
