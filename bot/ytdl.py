@@ -20,7 +20,7 @@ class YouTubeDownload:
                 progressive = True
             elif extention == "mp3":
                 file_type = "audio"
-            progressive = False
+                progressive = False
             order_by = "abr" # bitrate
             file_path = "ytdl/download/"
             thumbnail = "ytdl/download/thumbnail.png"
