@@ -19,7 +19,7 @@ from bot.omdb_movie_info import get_movie_info
 from bot.utils import calc
 from bot.helper.data_storage import MessageStorage
 from bot.safone import Safone
-from bot.group_management import func_welcome, func_goodbye, func_antibot, func_welcome_user,  func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_adminlist
+from bot.group_management import func_welcome, func_goodbye, func_antibot, track_chat_activities,  func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_adminlist
 from bot.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.weather import weather_info
@@ -1221,7 +1221,7 @@ def main():
     # filters
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
     # Chat Member Handler
-    application.add_handler(ChatMemberHandler(func_welcome_user, ChatMemberHandler.CHAT_MEMBER))
+    application.add_handler(ChatMemberHandler(track_chat_activities, ChatMemberHandler.CHAT_MEMBER))
     # Callback button
     application.add_handler(CallbackQueryHandler(func_callbackbtn, block=False))
     # Check Updates

@@ -39,11 +39,12 @@ async def func_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     msg = " ".join(context.args)
+    get_bot = await bot.get_me()
 
     help_msg = (
-        "This feature will welcome new user in your Group!\n"
+        "This feature will welcome new user in your Group!\n\n"
         "Use <code>/welcome on</code> to turn on.\n"
-        "Use <code>/welcome off</code> to turn off.\n"
+        "Use <code>/welcome off</code> to turn off.\n\n"
         "You can set welcome message by replying your custom message (markdown supported)."
     )
 
@@ -80,7 +81,7 @@ async def func_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         btn = [
             [
-                InlineKeyboardButton("Add me", f"http://t.me/{chk_per[0].username}?startgroup=start")
+                InlineKeyboardButton("Add me", f"http://t.me/{get_bot.username}?startgroup=start")
             ]
         ]
         await Message.send_msg(chat.id, help_msg, btn)
@@ -90,11 +91,12 @@ async def func_goodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     msg = " ".join(context.args)
+    get_bot = await bot.get_me()
 
     help_msg = (
-        "This feature will notify you in group if any user lefts your Group!\n"
+        "This feature will notify you in group if any user lefts your Group!\n\n"
         "Use <code>/goodbye on</code> to turn on.\n"
-        "Use <code>/goodbye off</code> to turn off.\n"
+        "Use <code>/goodbye off</code> to turn off.\n\n"
         "You can set goodbye message by replying your custom message (markdown supported)."
     )
 
@@ -131,7 +133,7 @@ async def func_goodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         btn = [
             [
-                InlineKeyboardButton("Add me", f"http://t.me/{chk_per[0].username}?startgroup=start")
+                InlineKeyboardButton("Add me", f"http://t.me/{get_bot.username}?startgroup=start")
             ]
         ]
         await Message.send_msg(chat.id, help_msg, btn)
@@ -141,9 +143,10 @@ async def func_antibot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     msg = " ".join(context.args)
+    get_bot = await bot.get_me()
 
     help_msg = (
-        "This feature will prevent bots from joining in your Group! [to get protection from spam]\n"
+        "This feature will prevent bots from joining in your Group! [to get protection from spam]\n\n"
         "Use <code>/antibot on</code> to turn on.\n"
         "Use <code>/antibot off</code> to turn off.\n"
     )
@@ -181,13 +184,13 @@ async def func_antibot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         btn = [
             [
-                InlineKeyboardButton("Add me", f"http://t.me/{chk_per[0].username}?startgroup=start")
+                InlineKeyboardButton("Add me", f"http://t.me/{get_bot.username}?startgroup=start")
             ]
         ]
         await Message.send_msg(chat.id, help_msg, btn)
 
 
-async def func_welcome_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     chat_member = update.chat_member
 
@@ -202,7 +205,7 @@ async def func_welcome_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
         antibot = find_group.get("antibot")
 
         check_status = await _chat_member_status(chat_member) #True means user exist and False is not exist
-        if check_status and welcome_msg == "on":
+        if check_status:
             if victim.is_bot and antibot == "on":
                 chk_per = await _check_permission(update, victim)
                 if chk_per:
@@ -215,10 +218,10 @@ async def func_welcome_user(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             await Message.send_msg(chat.id, f"<b>Antibot:</b> {victim.mention_html()} has been added as an admin. I can't ban an admin!")
                     else:
                         await Message.send_msg(chat.id, "<b>Antibot:</b> I'm not an admin of this Group!")
-            else:
+            elif welcome_msg == "on":
                 await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
         elif not check_status and goodbye_msg == "on":
-            await Message.send_msg(chat.id, f"{victim.mention_html()} is no longer with us. Thanks a lot, {user.mention_html()} ...")
+            await Message.send_msg(chat.id, f"{victim.mention_html()} just left the Group...")
 
 
 async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
