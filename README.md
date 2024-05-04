@@ -1,13 +1,17 @@
 # tgbot
-This Telegram bot is built using the `python-telegram-bot` library **_version 20.7_** and performs various tasks within **Telegram**.
+This Telegram bot is built using the `python-telegram-bot` library **_version 20.7_** **[_Updated version 21.1.1_]** and performs various tasks within **Telegram**.
 
 - **This bot can be found as [𝕮𝖎𝖗𝖎 "希里"](https://t.me/MissCiri_bot) on Telegram.**
 
 ## Features ✨:
 
-- **ChatGPT AI:** Get response from ChatGPT AI
+- **ChatGPT AI:** Get response from _ChatGPT AI_
 - **AI Imazine:** Generate image from your prompt
 - **Group Management:** Manage Group as an active admin
+    - Welcome user
+    - **Moderation**: ban, unban, mute, unmute, kick, kickme...
+    - Antibot
+    - many more feature...
 - **YouTube Download** Download/Search videos from YouTube
 - **Movie Info:** Provide movie information
 - **Language Translator:** Translate languages
@@ -82,4 +86,5 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 ## License
 
 MIT © @bishalqx980
+<br>
 Original Creator - [bishalqx980](https://t.me/bishalqx980)

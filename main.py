@@ -7,8 +7,8 @@ import subprocess
 from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, ChatMember
-from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
-from bot import logger, bot_token, bot, owner_id, owner_username, bot_pic, lang_code_list, welcome_img, support_chat, shortener_api_key, omdb_api, weather_api_key, telegraph, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
+from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ChatMemberHandler
+from bot import logger, bot_token, bot, owner_id, owner_username, bot_pic, lang_code_list, welcome_img, support_chat, telegraph, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
 from bot.mongodb import MongoDB
 from bot.helper.telegram_helper import Message, Button
 from bot.ping import ping_url
@@ -19,7 +19,7 @@ from bot.omdb_movie_info import get_movie_info
 from bot.utils import calc
 from bot.helper.data_storage import MessageStorage
 from bot.safone import Safone
-from bot.group_management import func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_adminlist
+from bot.group_management import func_welcome, func_goodbye, func_antibot, func_welcome_user,  func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_adminlist
 from bot.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.weather import weather_info
@@ -169,9 +169,9 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         print(f"Error enabling auto tr: {e}")
                         await Message.reply_msg(update, f"Error: {e}")
                 else:
-                    await Message.reply_msg(update, "😪 You aren't an admin of this chat!")
+                    await Message.reply_msg(update, "You aren't an admin of this Group!")
             else:
-                await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
+                await Message.reply_msg(update, "I'm not an admin of this Group!")
     elif msg == "auto_off":
         if chat.type == "private":
             try:
@@ -193,9 +193,9 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         print(f"Error disabling auto tr: {e}")
                         await Message.reply_msg(update, f"Error: {e}")
                 else:
-                    await Message.reply_msg(update, "😪 You aren't an admin of this chat!")
+                    await Message.reply_msg(update, "You aren't an admin of this Group!")
             else:
-                await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
+                await Message.reply_msg(update, "I'm not an admin of this Group!")
     # checking msg is replied or not
     re_msg = update.message.reply_to_message
     if re_msg:
@@ -269,9 +269,9 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     btn = await Button.ubutton(btn_name, btn_url)
                     await Message.send_msg(chat.id, "<code>lang_code</code> can't be leave empty! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
             else:
-                await Message.reply_msg(update, "😪 You aren't an admin of this chat!")
+                await Message.reply_msg(update, "You aren't an admin of this Group!")
         else:
-            await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
+            await Message.reply_msg(update, "I'm not an admin of this Group!")
 
 
 async def func_b64decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -390,7 +390,7 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif msg == "off":
             try:
                 await MongoDB.update_db("users", "user_id", user.id, "echo", "off")
-                await Message.reply_msg(update, "Echo disabled in this chat!")
+                await Message.reply_msg(update, "Echo has been disabled in this chat!")
             except Exception as e:
                 print(f"Error disabling echo: {e}")
                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
@@ -409,7 +409,7 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     if msg == "on":
                         try:
                             await MongoDB.update_db("groups", "chat_id", chat.id, "echo", "on")
-                            await Message.reply_msg(update, "Echo enabled in this chat!")
+                            await Message.reply_msg(update, "Echo has been enabled in this chat!")
                         except Exception as e:
                             print(f"Error enabling echo: {e}")
                             await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
@@ -423,9 +423,9 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     elif msg == "":
                         await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
                 else:
-                    await Message.reply_msg(update, "😪 You aren't an admin of this chat!")
+                    await Message.reply_msg(update, "You aren't an admin of this Group!")
             else:
-                await Message.reply_msg(update, "🙁 I'm not an admin in this chat!")
+                await Message.reply_msg(update, "I'm not an admin of this Group!")
         else:
             await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
 
@@ -575,14 +575,14 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if msg == "on":
             try:
                 await MongoDB.update_db("users", "user_id", user.id, "chatgpt", "on")
-                await Message.reply_msg(update, "ChatGPT AI enabled in this chat!")
+                await Message.reply_msg(update, "ChatGPT AI has been enabled in this chat!")
             except Exception as e:
                 print(f"Error enabling chatgpt: {e}")
                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
         elif msg == "off":
             try:
                 await MongoDB.update_db("users", "user_id", user.id, "chatgpt", "off")
-                await Message.reply_msg(update, "ChatGPT AI disabled in this chat!")
+                await Message.reply_msg(update, "ChatGPT AI has been disabled in this chat!")
             except Exception as e:
                 print(f"Error disabling chatgpt: {e}")
                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
@@ -657,7 +657,10 @@ async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url,
                 print(f"Waiting {2**try_attempt}sec before retry...")
                 await asyncio.sleep(2**try_attempt)
         try:
-            removeable_files = [res[1], res[2]]
+            if len(res) >= 3:
+                removeable_files = [res[1], res[2]]
+            else:
+                removeable_files = [res[1]]
             for rem in removeable_files:
                 os.remove(rem)
             print("Files Removed...")
@@ -694,7 +697,11 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == "private":
         if msg:
-            user_id = int(msg)
+            if user.id == int(owner_id):
+                user_id = int(msg)
+            else:
+                await Message.reply_msg(update, f"Access Denied! [owner only]")
+                return
         else:
             user_id = user.id
 
@@ -732,13 +739,19 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             lang = find_group.get("lang")
             echo = find_group.get("echo")
             auto_tr = find_group.get("auto_tr")
+            welcome_msg = find_group.get("welcome_msg")
+            goodbye_msg = find_group.get("goodbye_msg")
+            antibot = find_group.get("antibot")
 
             text = (
-                f"<b>⚜ Data of <code>{chat.id}</code></b>\n\n"
+                f"<b>Data of <code>{chat.id}</code></b>\n\n"
                 f"• Title: {title}\n"
                 f"• Lang: <code>{lang}</code>\n"
                 f"• Echo: <code>{echo}</code>\n"
                 f"• Auto tr: <code>{auto_tr}</code>\n"
+                f"• Welcome msg: <code>{welcome_msg}</code>\n"
+                f"• Goodbye msg: <code>{goodbye_msg}</code>\n"
+                f"• Antibot: <code>{antibot}</code>\n"
             )
             await Message.reply_msg(update, text)
         else:
@@ -1187,6 +1200,9 @@ def main():
     application.add_handler(CommandHandler("yts", func_yts, block=False))
     application.add_handler(CommandHandler("stats", func_stats, block=False))
     application.add_handler(CommandHandler("id", func_id, block=False))
+    application.add_handler(CommandHandler("welcome", func_welcome, block=False))
+    application.add_handler(CommandHandler("goodbye", func_goodbye, block=False))
+    application.add_handler(CommandHandler("antibot", func_antibot, block=False))
     application.add_handler(CommandHandler("ban", func_ban, block=False))
     application.add_handler(CommandHandler("unban", func_unban, block=False))
     application.add_handler(CommandHandler("kick", func_kick, block=False))
@@ -1204,6 +1220,8 @@ def main():
     application.add_handler(CommandHandler("sys", func_sys, block=False))
     # filters
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
+    # Chat Member Handler
+    application.add_handler(ChatMemberHandler(func_welcome_user, ChatMemberHandler.CHAT_MEMBER))
     # Callback button
     application.add_handler(CallbackQueryHandler(func_callbackbtn, block=False))
     # Check Updates
