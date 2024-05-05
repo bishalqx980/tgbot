@@ -1015,8 +1015,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if premium_seller == None:
                     premium_seller = f"Owner - @{owner_username}"
                 premium_users = data.get("premium_users")
-                if premium_users:
-                    premium_users_count = len(premium_users)
+                premium_users_count = len(premium_users) if premium_users else 0
 
                 msg = (
                     f"<b>Bot Setting</b>\n"
