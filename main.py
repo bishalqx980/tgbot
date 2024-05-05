@@ -505,6 +505,8 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if find:
                 data = await MongoDB.find_one("bot_docs", "_id", find[0])
                 premium_users = data.get("premium_users")
+                if premium_users == None:
+                    premium_users = []
             
             find_user = await MongoDB.find_one("users", "user_id", user.id)
             ai_imagine_req = find_user.get("ai_imagine_req")
@@ -1015,6 +1017,8 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if premium_seller == None:
                     premium_seller = f"Owner - @{owner_username}"
                 premium_users = data.get("premium_users")
+                if premium_users == None:
+                    premium_users = []
                 premium_users_count = len(premium_users) if premium_users else 0
 
                 msg = (
@@ -1142,6 +1146,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if find:
                     data = await MongoDB.find_one("bot_docs", "_id", find[0])
                     premium_users = data.get("premium_users")
+                    if premium_users == None:
+                        premium_users = []
 
                 find_user = await MongoDB.find_one("users", "user_id", user.id)
                 chatgpt_req = find_user.get("chatgpt_req")
