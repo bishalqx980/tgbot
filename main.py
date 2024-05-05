@@ -501,7 +501,11 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == "private":
         if prompt:
-            premium_user = await MongoDB.get_data("premium", "user_list")
+            find = await MongoDB.find("bot_docs", "_id")
+            if find:
+                data = await MongoDB.find_one("bot_docs", "_id", find[0])
+                premium_users = data.get("premium_users")
+            
             find_user = await MongoDB.find_one("users", "user_id", user.id)
             ai_imagine_req = find_user.get("ai_imagine_req")
             last_used = find_user.get("last_used")
@@ -518,11 +522,15 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             if user.id == int(owner_id):
                 g_msg = "Please wait Boss!! Thinking..."
-            #elif user.id in premium_user:
-                #g_msg = f"Hi {user.first_name}, Generating AI Image please wait..."
+            elif user.id in premium_users:
+                g_msg = f"Please wait {user.first_name}!! Thinking..."
             else:
                 if ai_imagine_req >= int(ai_imagine_limit):
-                    premium_seller = await MongoDB.get_data("premium", "premium_seller")
+                    find = await MongoDB.find("bot_docs", "_id")
+                    if find:
+                        data = await MongoDB.find_one("bot_docs", "_id", find[0])
+                        premium_seller = data.get("premium_seller")
+
                     if premium_seller == None:
                         premium_seller = owner_username
                     text = (
@@ -698,14 +706,17 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type == "private":
         if msg:
             if user.id == int(owner_id):
-                user_id = int(msg)
+                chat_id = int(msg)
             else:
                 await Message.reply_msg(update, f"Access Denied! [owner only]")
                 return
         else:
-            user_id = user.id
+            chat_id = user.id
 
-        find_user = await MongoDB.find_one("users", "user_id", user_id)
+        find_user = await MongoDB.find_one("users", "user_id", chat_id)
+
+        if not find_user:
+            find_group = await MongoDB.find_one("groups", "chat_id", chat_id)
 
         if find_user:
             user_mention = find_user.get("mention")
@@ -716,9 +727,19 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chatgpt_req = find_user.get("chatgpt_req")
             ai_imagine_req = find_user.get("ai_imagine_req")
             last_used = find_user.get("last_used")
+            is_premium = "False"
+
+            find = await MongoDB.find("bot_docs", "_id")
+            if find:
+                data = await MongoDB.find_one("bot_docs", "_id", find[0])
+                premium_users = data.get("premium_user")
+                if premium_users:
+                    if chat_id in premium_users:
+                        is_premium = "True"
 
             text = (
-                f"<b>Data of <code>{user_id}</code></b>\n\n"
+                f"<b>Data of <code>{chat_id}</code></b>\n"
+                f"▬▬▬▬▬▬▬▬▬▬\n"
                 f"• User: {user_mention}\n"
                 f"• Lang: <code>{lang}</code>\n"
                 f"• Echo: <code>{echo}</code>\n"
@@ -727,10 +748,32 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"• ChatGPT Req: <code>{chatgpt_req}/{chatgpt_limit}</code>\n"
                 f"• AI Imagine Req: <code>{ai_imagine_req}/{ai_imagine_limit}</code>\n"
                 f"• Last Used: <code>{last_used}</code>\n"
+                f"• Premium user: <code>{is_premium}</code>\n"
+            )
+            await Message.reply_msg(update, text)
+        elif find_group:
+            title = find_group.get("title")
+            lang = find_group.get("lang")
+            echo = find_group.get("echo")
+            auto_tr = find_group.get("auto_tr")
+            welcome_msg = find_group.get("welcome_msg")
+            goodbye_msg = find_group.get("goodbye_msg")
+            antibot = find_group.get("antibot")
+
+            text = (
+                f"<b>Data of <code>{chat_id}</code></b>\n"
+                f"▬▬▬▬▬▬▬▬▬▬\n"
+                f"• Title: {title}\n"
+                f"• Lang: <code>{lang}</code>\n"
+                f"• Echo: <code>{echo}</code>\n"
+                f"• Auto tr: <code>{auto_tr}</code>\n"
+                f"• Welcome msg: <code>{welcome_msg}</code>\n"
+                f"• Goodbye msg: <code>{goodbye_msg}</code>\n"
+                f"• Antibot: <code>{antibot}</code>\n"
             )
             await Message.reply_msg(update, text)
         else:
-            await Message.reply_msg(update, "User not found!")
+            await Message.reply_msg(update, "User/Chat not found!")
     elif chat.type in ["group", "supergroup"]:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
 
@@ -744,7 +787,8 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             antibot = find_group.get("antibot")
 
             text = (
-                f"<b>Data of <code>{chat.id}</code></b>\n\n"
+                f"<b>Data of <code>{chat.id}</code></b>\n"
+                f"▬▬▬▬▬▬▬▬▬▬\n"
                 f"• Title: {title}\n"
                 f"• Lang: <code>{lang}</code>\n"
                 f"• Echo: <code>{echo}</code>\n"
@@ -779,74 +823,93 @@ async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await Message.reply_msg(update, await MessageStorage.help_msg())
+    user = update.effective_user
+    chat = update.effective_chat
+    bot_info = await bot.get_me()
+
+    if chat.type == "private":
+        await Message.reply_msg(update, await MessageStorage.help_msg())
+    else:
+        btn_name = ["Start me in private"]
+        btn_url = [f"http://t.me/{bot_info.username}?start=start"]
+        btn = await Button.ubutton(btn_name, btn_url)
+        await Message.reply_msg(update, f"Hi, {user.mention_html()}! Start me in private to chat with me 😊!", btn)
 
 
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    chat = update.effective_chat
     replied_msg = update.message.reply_to_message
     user_id = " ".join(context.args)
 
     if user.id == int(owner_id):
-        if replied_msg:
-            if replied_msg.text:
-                msg = replied_msg.text
+        if chat.type == "private":
+            if replied_msg:
+                if replied_msg.text:
+                    msg = replied_msg.text
+                else:
+                    msg = replied_msg.caption
             else:
-                msg = replied_msg.caption
-        else:
-            await Message.reply_msg(update, "Reply a message to broadcast!")
-            return
-        
-        if user_id:
-            try:
-                if replied_msg.text:
-                    await Message.send_msg(user_id, msg)
-                elif replied_msg.caption:
-                    await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
-                await Message.reply_msg(update, "Job Done !!")
-            except Exception as e:
-                print(f"Error Broadcast: {e}")
-                await Message.reply_msg(update, f"Error Broadcast: {e}")
-            return
-        
-        users = await MongoDB.find("users", "user_id")
-        total_user = await MongoDB.info_db("users")
+                await Message.reply_msg(update, "Reply a message to broadcast!")
+                return
+            
+            if user_id:
+                try:
+                    if replied_msg.text:
+                        await Message.send_msg(user_id, msg)
+                    elif replied_msg.caption:
+                        await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
+                    await Message.reply_msg(update, "Job Done !!")
+                except Exception as e:
+                    print(f"Error Broadcast: {e}")
+                    await Message.reply_msg(update, f"Error Broadcast: {e}")
+                return
+            
+            users = await MongoDB.find("users", "user_id")
+            total_user = await MongoDB.info_db("users")
 
-        sent_count = 0
-        except_count = 0
-        notify = await Message.send_msg(owner_id, f"Total User: {total_user[1]}")
-        for user_id in users:
-            try:
-                if replied_msg.text:
-                    await Message.send_msg(user_id, msg)
-                elif replied_msg.caption:
-                    await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
-                sent_count += 1
-                progress = (sent_count+except_count)*100/total_user[1]
-                await Message.edit_msg(update, f"Total User: {total_user[1]}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {int(progress)}%", notify)
-            except Exception as e:
-                except_count += 1
-                print(f"Error Broadcast: {e}")
-        await Message.reply_msg(update, "Job Done !!")
+            sent_count = 0
+            except_count = 0
+            notify = await Message.send_msg(owner_id, f"Total User: {total_user[1]}")
+            for user_id in users:
+                try:
+                    if replied_msg.text:
+                        await Message.send_msg(user_id, msg, parse_mode=ParseMode.MARKDOWN)
+                    elif replied_msg.caption:
+                        await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg, parse_mode=ParseMode.MARKDOWN)     
+                    sent_count += 1
+                    progress = (sent_count+except_count)*100/total_user[1]
+                    await Message.edit_msg(update, f"Total User: {total_user[1]}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {int(progress)}%", notify)
+                except Exception as e:
+                    except_count += 1
+                    print(f"Error Broadcast: {e}")
+            await Message.reply_msg(update, "Job Done !!")
+        else:
+            await Message.reply_msg(update, "⚠ Boss you are in public!")
     else:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    chat = update.effective_chat
     msg = " ".join(context.args)
+
     if user.id == int(owner_id):
-        db = await MongoDB.info_db()
-        msg = "▬▬▬▬▬▬▬▬▬▬\n"
-        for info in db:
-            msg += (
-                f"<code>Doc name   :</code> {info[0]}\n"
-                f"<code>Doc count  :</code> {info[1]}\n"
-                f"<code>Doc size   :</code> {info[2]}\n"
-                f"<code>Actual size:</code> {info[3]}\n"
-                f"▬▬▬▬▬▬▬▬▬▬\n"
-            )
-        await Message.reply_msg(update, f"<b>{msg}</b>")
+        if chat.type == "private":
+            db = await MongoDB.info_db()
+            msg = "▬▬▬▬▬▬▬▬▬▬\n"
+            for info in db:
+                msg += (
+                    f"<code>Doc name   :</code> {info[0]}\n"
+                    f"<code>Doc count  :</code> {info[1]}\n"
+                    f"<code>Doc size   :</code> {info[2]}\n"
+                    f"<code>Actual size:</code> {info[3]}\n"
+                    f"▬▬▬▬▬▬▬▬▬▬\n"
+                )
+            await Message.reply_msg(update, f"<b>{msg}</b>")
+        else:
+            await Message.reply_msg(update, "⚠ Boss you are in public!")
     else:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
@@ -886,7 +949,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if user.id == int(owner_id):
         if chat.type == "private":
-            if key != "":
+            if key:
                 if "-n" in key:
                     index_n = key.index("-n")
                     n_value = key[index_n + len("-n"):].strip()
@@ -895,10 +958,21 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     elif n_value.lower() == "false":
                         n_value = bool(False)
                     key = key[0:index_n].strip()
+                    if key == "collection_name":
+                        await Message.reply_msg(update, "⚠ It's an example!!")
+                        return
                 else:
-                    await Message.reply_msg(update, "-n not provided")
+                    await Message.reply_msg(update, "<code>-n</code> not provided")
                 try:
                     o_value = await MongoDB.get_data(c_name, key)
+                    if key == "premium_users":
+                        if "," in n_value:
+                            storage = []
+                            for user_id in n_value.split(","):
+                                storage.append(int(user_id))
+                            n_value = storage
+                        else:
+                            n_value = [int(n_value)]
                     await MongoDB.update_db(c_name, key, o_value, key, n_value)
                     await Message.reply_msg(update, "Database Updated!")
                 except Exception as e:
@@ -937,6 +1011,10 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 cgpt_l = data.get("chatgpt_limit")
                 imagine_l = data.get("ai_imagine_limit")
                 u_reset = data.get("usage_reset")
+                premium_seller = data.get("premium_seller")
+                if premium_seller == None:
+                    premium_seller = f"Owner - @{owner_username}"
+                premium_users = data.get("premium_users")
 
                 msg = (
                     f"<b>Bot Setting</b>\n"
@@ -949,8 +1027,11 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     f"<code>server_url       </code>: <i>{ser_url}</i>\n"
                     f"<code>chatgpt_limit    </code>: <i>{cgpt_l}</i>\n"
                     f"<code>ai_imagine_limit </code>: <i>{imagine_l}</i>\n"
-                    f"<code>usage_reset      </code>: <i>{u_reset}</i>\n\n"
-                    f"<i>/bsetting collection_name -n new_value (blank new_value means none)</i>\n"
+                    f"<code>usage_reset      </code>: <i>{u_reset}</i>\n"
+                    f"<code>premium_seller    </code>: <i>{premium_seller}</i>\n"
+                    f"<code>premium_users     </code>: <i>{len(premium_users)} » {premium_users}</i>\n\n"
+                    f"<i><code>/bsetting collection_name -n new_value</code> (blank new_value means none)</i>\n"
+                    f"<i>premium_users E.g 12345678, 87654321 ...</i>\n"
                     f"<i><code>/cleardb</code> - To clear <code>bot_docs</code> entry's and insert entry from <code>config.env</code> file!</i>"
                 )
                 await Message.reply_msg(update, f"<b>{msg}</b>")
@@ -1056,7 +1137,11 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
 
             if chatgpt_status == "on":
-                premium_user = await MongoDB.get_data("premium", "user_list")
+                find = await MongoDB.find("bot_docs", "_id")
+                if find:
+                    data = await MongoDB.find_one("bot_docs", "_id", find[0])
+                    premium_users = data.get("premium_users")
+
                 find_user = await MongoDB.find_one("users", "user_id", user.id)
                 chatgpt_req = find_user.get("chatgpt_req")
                 last_used = find_user.get("last_used")
@@ -1073,11 +1158,15 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                 if user.id == int(owner_id):
                     g_msg = "Please wait Boss!! Thinking..."
-                #elif user.id in premium_user:
-                    #g_msg = f"Hi {user.first_name}, Please wait!! Generating AI Response..."
+                elif user.id in premium_users:
+                    g_msg = f"Please wait {user.first_name}!! Thinking..."
                 else:
                     if chatgpt_req >= int(chatgpt_limit):
-                        premium_seller = await MongoDB.get_data("premium", "premium_seller")
+                        find = await MongoDB.find("bot_docs", "_id")
+                        if find:
+                            data = await MongoDB.find_one("bot_docs", "_id", find[0])
+                            premium_seller = data.get("premium_seller")
+
                         if premium_seller == None:
                             premium_seller = owner_username
                         text = (

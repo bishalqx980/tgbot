@@ -205,7 +205,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
         antibot = find_group.get("antibot")
 
         check_status = await _chat_member_status(chat_member) #True means user exist and False is not exist
-        if check_status:
+        if check_status == True:
             if victim.is_bot and antibot == "on":
                 chk_per = await _check_permission(update, victim)
                 if chk_per:
@@ -220,7 +220,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
                         await Message.send_msg(chat.id, "<b>Antibot:</b> I'm not an admin of this Group!")
             elif welcome_msg == "on":
                 await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
-        elif not check_status and goodbye_msg == "on":
+        elif check_status == False and goodbye_msg == "on" and antibot != "on":
             await Message.send_msg(chat.id, f"{victim.mention_html()} just left the Group...")
 
 

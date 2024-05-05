@@ -4,8 +4,8 @@ from bot.helper import commands
 class MessageStorage:
     async def welcome_msg():
         pvt_message = (
-            "Hi {user_mention}! I'm <a href='https://t.me/{bot_username}'>{bot_firstname}</a>, your all-in-one bot!\n"
-            "Here's what I can do:\n\n" # break
+            "Hi {user_mention}! I'm <a href='https://t.me/{bot_username}'>{bot_firstname}</a>, your all-in-one bot!\n\n"
+            "<blockquote>Here's a short list of what I can do:\n\n" # break
             "• Get response from <b><i>ChatGPT AI</i></b>\n"
             "• Generate image from your prompt\n"
             "• Download/Search videos from YouTube\n"
@@ -18,8 +18,12 @@ class MessageStorage:
             "• Echo your message for fun\n"
             "• Take website screenshot\n"
             "• Provide weather information\n"
-            "• Group management & Much more...\n"
-            "• /help for bot help\n\n" # break
+            "• <b>Group management</b>\n"
+            "   <i>- Welcome user\n"
+            "   - Moderation: ban, unban, mute, unmute, kick, kickme...\n"
+            "   - Antibot, etc.</i>\n"
+            "• & Much more...</blockquote>\n\n"
+            "• /help for bot help\n" # break
             "<i>More Feature coming soon...</i>\n"
         )
         group_message = (
