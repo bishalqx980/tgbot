@@ -28,11 +28,18 @@ async def _chat_member_status(c_mem_update: ChatMemberUpdated):
         exist_logic = [ChatMember.MEMBER, ChatMember.ADMINISTRATOR, ChatMember.OWNER]
         if old_status in was_logic and new_status in exist_logic:
             user_exist = True
+            reason = None
         elif old_status in exist_logic and new_status in was_logic:
             user_exist = False
+            if new_status == ChatMember.LEFT:
+                reason = "left"
+            elif new_status == ChatMember.RESTRICTED:
+                reason = "restricted"
+            elif new_status == ChatMember.BANNED:
+                reason = "banned"
         else:
             user_exist = None
-        return user_exist
+        return user_exist, reason
 
 
 async def func_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -205,7 +212,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
         antibot = find_group.get("antibot")
 
         check_status = await _chat_member_status(chat_member) #True means user exist and False is not exist
-        if check_status == True:
+        if check_status[0] == True:
             if victim.is_bot and antibot == "on":
                 chk_per = await _check_permission(update, victim)
                 if chk_per:
@@ -220,7 +227,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
                         await Message.send_msg(chat.id, "<b>Antibot:</b> I'm not an admin of this Group!")
             elif welcome_msg == "on":
                 await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
-        elif check_status == False and goodbye_msg == "on" and antibot != "on":
+        elif check_status[0] == False and check_status[1] == "left" and goodbye_msg == "on":
             await Message.send_msg(chat.id, f"{victim.mention_html()} just left the Group...")
 
 
