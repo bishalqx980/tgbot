@@ -734,7 +734,7 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find = await MongoDB.find("bot_docs", "_id")
             if find:
                 data = await MongoDB.find_one("bot_docs", "_id", find[0])
-                premium_users = data.get("premium_user")
+                premium_users = data.get("premium_users")
                 if premium_users:
                     if chat_id in premium_users:
                         is_premium = "True"
