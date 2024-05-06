@@ -1015,7 +1015,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 u_reset = data.get("usage_reset")
                 premium_seller = data.get("premium_seller")
                 if premium_seller == None:
-                    premium_seller = f"Owner - @{owner_username}"
+                    premium_seller = f"{owner_username}"
                 premium_users = data.get("premium_users")
                 if premium_users == None:
                     premium_users = []
@@ -1033,10 +1033,10 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     f"<code>chatgpt_limit    </code>: <i>{cgpt_l}</i>\n"
                     f"<code>ai_imagine_limit </code>: <i>{imagine_l}</i>\n"
                     f"<code>usage_reset      </code>: <i>{u_reset}</i>\n"
-                    f"<code>premium_seller    </code>: <i>{premium_seller}</i>\n"
+                    f"<code>premium_seller    </code>: <i>@{premium_seller}</i>\n"
                     f"<code>premium_users     </code>: <i>{premium_users_count} » {premium_users}</i>\n\n"
                     f"<i><code>/bsetting collection_name -n new_value</code> (blank new_value means none)</i>\n"
-                    f"<i>premium_users E.g 12345678, 87654321 ...</i>\n"
+                    f"<i>premium_users E.g 12345678, 87654321 ... & premium_seller name without @</i>\n"
                     f"<i><code>/cleardb</code> - To clear <code>bot_docs</code> entry's and insert entry from <code>config.env</code> file!</i>"
                 )
                 await Message.reply_msg(update, f"<b>{msg}</b>")

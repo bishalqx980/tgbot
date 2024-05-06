@@ -52,7 +52,7 @@ async def func_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "This feature will welcome new user in your Group!\n\n"
         "Use <code>/welcome on</code> to turn on.\n"
         "Use <code>/welcome off</code> to turn off.\n\n"
-        "You can set welcome message by replying your custom message (markdown supported)."
+        #"You can set welcome message by replying your custom message (markdown supported)."
     )
 
     if chat.type in ["group", "supergroup"]:
@@ -104,7 +104,7 @@ async def func_goodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "This feature will notify you in group if any user lefts your Group!\n\n"
         "Use <code>/goodbye on</code> to turn on.\n"
         "Use <code>/goodbye off</code> to turn off.\n\n"
-        "You can set goodbye message by replying your custom message (markdown supported)."
+        #"You can set goodbye message by replying your custom message (markdown supported)."
     )
 
     if chat.type in ["group", "supergroup"]:
