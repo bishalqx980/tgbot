@@ -1,4 +1,5 @@
 import requests
+from bot import logger
 
 def ping_url(ping_url):
   try:
@@ -11,5 +12,5 @@ def ping_url(ping_url):
     else:
       return ping_url, "~", status_code
   except Exception as e:
-    print(f"Error (pinging url): {e}")
+    logger.error(f"Error (pinging url): {e}")
     return ping_url, "~", "None"

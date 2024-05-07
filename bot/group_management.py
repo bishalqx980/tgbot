@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardButton, ChatMember, ChatMemberUpdated
 from telegram.ext import ContextTypes
-from bot import bot
+from bot import bot, logger
 from bot.helper.telegram_helper import Message
 from bot.mongodb import MongoDB
 
@@ -68,14 +68,14 @@ async def func_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                 await MongoDB.update_db("groups", "chat_id", chat.id, "welcome_msg", "on")
                                 await Message.reply_msg(update, "Welcome message has been enabled in this chat!\nFrom now I will welcome new members in this Group!")
                             except Exception as e:
-                                print(f"Error enabling welcome_msg: {e}")
+                                logger.error(f"Error enabling welcome_msg: {e}")
                                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
                         elif msg == "off":
                             try:
                                 await MongoDB.update_db("groups", "chat_id", chat.id, "welcome_msg", "off")
                                 await Message.reply_msg(update, "Welcome message has been disabled in this chat!\nI won't welcome new members in this Group!")
                             except Exception as e:
-                                print(f"Error disabling welcome_msg: {e}")
+                                logger.error(f"Error disabling welcome_msg: {e}")
                                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
                         elif msg == "":
                             await Message.reply_msg(update, help_msg)
@@ -120,14 +120,14 @@ async def func_goodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                 await MongoDB.update_db("groups", "chat_id", chat.id, "goodbye_msg", "on")
                                 await Message.reply_msg(update, "Goodbye message has been enabled in this chat!\nFrom now I will notify you in group if any user lefts your Group!")
                             except Exception as e:
-                                print(f"Error enabling goodbye_msg: {e}")
+                                logger.error(f"Error enabling goodbye_msg: {e}")
                                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
                         elif msg == "off":
                             try:
                                 await MongoDB.update_db("groups", "chat_id", chat.id, "goodbye_msg", "off")
                                 await Message.reply_msg(update, "Goodbye message has been disabled in this chat!\nI won't notify you if any user lefts your Group!")
                             except Exception as e:
-                                print(f"Error disabling goodbye_msg: {e}")
+                                logger.error(f"Error disabling goodbye_msg: {e}")
                                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
                         elif msg == "":
                             await Message.reply_msg(update, help_msg)
@@ -171,14 +171,14 @@ async def func_antibot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                 await MongoDB.update_db("groups", "chat_id", chat.id, "antibot", "on")
                                 await Message.reply_msg(update, "Antibot has been enabled in this chat!\nFrom now I will protect your group from bots spam!")
                             except Exception as e:
-                                print(f"Error enabling antibot: {e}")
+                                logger.error(f"Error enabling antibot: {e}")
                                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
                         elif msg == "off":
                             try:
                                 await MongoDB.update_db("groups", "chat_id", chat.id, "antibot", "off")
                                 await Message.reply_msg(update, "Antibot has been disabled in this chat!\nI won't protect your group from bots spam!")
                             except Exception as e:
-                                print(f"Error disabling antibot: {e}")
+                                logger.error(f"Error disabling antibot: {e}")
                                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
                         elif msg == "":
                             await Message.reply_msg(update, help_msg)
@@ -261,7 +261,7 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                     try:
                                         await Message.send_msg(victim.id, f"{user.mention_html()} has removed you from {chat.title}!")
                                     except Exception as e:
-                                        print(f"Error g_management: {e}")
+                                        logger.error(f"Error g_management: {e}")
                                 else:
                                     await Message.reply_msg(update, "Something Went Wrong!")
                             else:
@@ -313,7 +313,7 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                     try:
                                         await Message.send_msg(victim.id, f"{user.mention_html()} has unbanned you in {chat.title}!")
                                     except Exception as e:
-                                        print(f"Error g_management: {e}")
+                                        logger.error(f"Error g_management: {e}")
                                 else:
                                     await Message.reply_msg(update, "Something Went Wrong!")
                             else:
@@ -366,7 +366,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                     try:
                                         await Message.send_msg(victim.id, f"{user.mention_html()} has kicked you from {chat.title}!")
                                     except Exception as e:
-                                        print(f"Error g_management: {e}")
+                                        logger.error(f"Error g_management: {e}")
                                 else:
                                     await Message.reply_msg(update, "Something Went Wrong!")
                             else:
@@ -465,7 +465,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                     try:
                                         await Message.send_msg(victim.id, f"{user.mention_html()} has muted you in {chat.title}!")
                                     except Exception as e:
-                                        print(f"Error g_management: {e}")
+                                        logger.error(f"Error g_management: {e}")
                                 else:
                                     await Message.reply_msg(update, "Something Went Wrong!")
                             else:

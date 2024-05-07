@@ -1,4 +1,4 @@
-from bot import g4f
+from bot import logger, g4f
 
 class G4F:
     async def chatgpt(prompt):
@@ -10,7 +10,7 @@ class G4F:
             response = response.choices[0].message.content
             return response
         except Exception as e:
-            print(f"Error g4f_chatgpt: {e}")
+            logger.error(f"Error g4f_chatgpt: {e}")
 
 
     async def imagine(prompt):
@@ -22,4 +22,4 @@ class G4F:
             image_url = response.data[0].url
             return image_url
         except Exception as e:
-            print(f"Error g4f_imagine: {e}")
+            logger.error(f"Error g4f_imagine: {e}")

@@ -1,5 +1,5 @@
 import requests
-from bot import weather_api_key
+from bot import logger, weather_api_key
 
 def weather_info(location):
     try:
@@ -37,4 +37,4 @@ def weather_info(location):
 
             return loc_name, loc_country, loc_tz_id, loc_localtime, cur_last_updated, cur_temp_c, cur_f_temp_c, cur_temp_f, cur_f_temp_f, cur_wind_mph, cur_wind_kph, cur_wind_deg, cur_humidity, cur_uv, cur_con_text, cur_con_icon
     except Exception as e:
-        print(f"Error (getting weather): {e}")
+        logger.error(f"Error (getting weather): {e}")

@@ -33,7 +33,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_pic = await MongoDB.get_data("bot_docs", "bot_pic")
     support_chat = await MongoDB.get_data("bot_docs", "support_chat")
 
-    if owner_id != "":
+    if owner_id:
         if chat.type == "private":
             welcome_msg = await MessageStorage.welcome_msg()
             welcome_msg = welcome_msg[0].format(
@@ -85,7 +85,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await MongoDB.insert_single_data("groups", data)
                     await Message.reply_msg(update, "Group has been registered successfully...")
                 except Exception as e:
-                    print(f"Error registering group: {e}")
+                    logger.error(f"Error registering group: {e}")
                     await Message.reply_msg(update, "⚠ Group has not registered, something went wrong...")
 
             welcome_msg = await MessageStorage.welcome_msg()
@@ -105,7 +105,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
 
-    if msg != "":
+    if msg:
         imdb_id = None
         year = None
         
@@ -154,7 +154,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await MongoDB.update_db("users", "user_id", user.id, "auto_tr", "on")
                 await Message.reply_msg(update, f"Auto Translator Enabled for this chat!")
             except Exception as e:
-                print(f"Error enabling auto tr: {e}")
+                logger.error(f"Error enabling auto tr: {e}")
                 await Message.reply_msg(update, f"Error: {e}")
         elif chat.type in ["group", "supergroup"]:
             getper_bot = await chat.get_member(bot_info.id)
@@ -166,7 +166,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await MongoDB.update_db("groups", "chat_id", chat.id, "auto_tr", "on")
                         await Message.reply_msg(update, f"Auto Translator Enabled for this chat!")
                     except Exception as e:
-                        print(f"Error enabling auto tr: {e}")
+                        logger.error(f"Error enabling auto tr: {e}")
                         await Message.reply_msg(update, f"Error: {e}")
                 else:
                     await Message.reply_msg(update, "You aren't an admin of this Group!")
@@ -178,7 +178,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await MongoDB.update_db("users", "user_id", user.id, "auto_tr", "off")
                 await Message.reply_msg(update, f"Auto Translator Disabled for this chat!")
             except Exception as e:
-                print(f"Error disabling auto tr: {e}")
+                logger.error(f"Error disabling auto tr: {e}")
                 await Message.reply_msg(update, f"Error: {e}")
         elif chat.type in ["group", "supergroup"]:
             getper_bot = await chat.get_member(bot_info.id)
@@ -190,7 +190,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await MongoDB.update_db("groups", "chat_id", chat.id, "auto_tr", "off")
                         await Message.reply_msg(update, f"Auto Translator Disabled for this chat!")
                     except Exception as e:
-                        print(f"Error disabling auto tr: {e}")
+                        logger.error(f"Error disabling auto tr: {e}")
                         await Message.reply_msg(update, f"Error: {e}")
                 else:
                     await Message.reply_msg(update, "You aren't an admin of this Group!")
@@ -204,11 +204,11 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif re_msg.caption:
             msg = re_msg.caption
     # checking msg is not empty
-    if msg != "":
+    if msg:
         try:
             tr_msg = translate(msg, lang_code)
         except Exception as e:
-            print(f"Error Translator: {e}")
+            logger.error(f"Error Translator: {e}")
             lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
             btn_name = ["Language Code List 📃"]
             btn_url = [lang_code_list]
@@ -230,12 +230,12 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
 
     if chat.type == "private":
-        if msg != "":
+        if msg:
             try:
                 await MongoDB.update_db("users", "user_id", user.id, "lang", msg)
                 await Message.reply_msg(update, f"Language Updated to <code>{msg}</code>. Now you can use /tr command.")
             except Exception as e:
-                print(f"Error setting lang code: {e}")
+                logger.error(f"Error setting lang code: {e}")
                 await Message.reply_msg(update, f"Error: {e}")
         else:
             lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
@@ -250,7 +250,7 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if getper_bot.status == ChatMember.ADMINISTRATOR:
             if getper_user.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                if msg != "":
+                if msg:
                     try:
                         get_chat = await MongoDB.find_one("groups", "chat_id", chat.id)
                         if get_chat:
@@ -260,7 +260,7 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
                             return
                     except Exception as e:
-                        print(f"Error setting lang code: {e}")
+                        logger.error(f"Error setting lang code: {e}")
                         await Message.reply_msg(update, f"Error: {e}")
                 else:
                     lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
@@ -284,7 +284,7 @@ async def func_b64decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         msg = " ".join(context.args)
 
-    if msg != "":
+    if msg:
         decode = decode_b64(msg)
         if decode != None:
             await Message.reply_msg(update, f"Decoded text:\n<code>{decode}</code>")
@@ -304,7 +304,7 @@ async def func_b64encode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         msg = " ".join(context.args)
 
-    if msg != "":
+    if msg:
             encode = encode_b64(msg)
             if encode != None:
                 await Message.reply_msg(update, f"Encoded text:\n<code>{encode}</code>")
@@ -324,7 +324,7 @@ async def func_shortener(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         msg = " ".join(context.args)
 
-    if msg != "":
+    if msg:
         shorted_url = shortener_url(msg)
         if shorted_url:
             await Message.reply_msg(update, shorted_url)
@@ -367,7 +367,7 @@ async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         msg = " ".join(context.args)
 
-    if msg != "":
+    if msg:
         if msg:
             await Message.reply_msg(update, f"Calculation result: <code>{calc(msg):.2f}</code>")
     else:
@@ -385,14 +385,14 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await MongoDB.update_db("users", "user_id", user.id, "echo", "on")
                 await Message.reply_msg(update, "Echo enabled in this chat!")
             except Exception as e:
-                print(f"Error enabling echo: {e}")
+                logger.error(f"Error enabling echo: {e}")
                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
         elif msg == "off":
             try:
                 await MongoDB.update_db("users", "user_id", user.id, "echo", "off")
                 await Message.reply_msg(update, "Echo has been disabled in this chat!")
             except Exception as e:
-                print(f"Error disabling echo: {e}")
+                logger.error(f"Error disabling echo: {e}")
                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
         elif msg == "":
             await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
@@ -411,14 +411,14 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             await MongoDB.update_db("groups", "chat_id", chat.id, "echo", "on")
                             await Message.reply_msg(update, "Echo has been enabled in this chat!")
                         except Exception as e:
-                            print(f"Error enabling echo: {e}")
+                            logger.error(f"Error enabling echo: {e}")
                             await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
                     elif msg == "off":
                         try:
                             await MongoDB.update_db("groups", "chat_id", chat.id, "echo", "off")
                             await Message.reply_msg(update, "Echo disabled in this chat!")
                         except Exception as e:
-                            print(f"Error disabling echo: {e}")
+                            logger.error(f"Error disabling echo: {e}")
                             await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
                     elif msg == "":
                         await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
@@ -443,7 +443,7 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.del_msg(chat.id, sent_msg)
             await Message.send_img(chat.id, webshot, f"✨ {url}")
         except Exception as e:
-            print(f"Error taking webshot: {e}")
+            logger.error(f"Error taking webshot: {e}")
             await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
     else:
         await Message.reply_msg(update, "Use <code>/webshot url</code>\nE.g. <code>/webshot https://google.com</code>")
@@ -562,7 +562,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
                     await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
                 except Exception as e:
-                    print(f"Error Imagine: {e}")
+                    logger.error(f"Error Imagine: {e}")
                     await Message.reply_msg(update, f"Error Imagine: {e}")
             else:
                 await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
@@ -587,14 +587,14 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await MongoDB.update_db("users", "user_id", user.id, "chatgpt", "on")
                 await Message.reply_msg(update, "ChatGPT AI has been enabled in this chat!")
             except Exception as e:
-                print(f"Error enabling chatgpt: {e}")
+                logger.error(f"Error enabling chatgpt: {e}")
                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
         elif msg == "off":
             try:
                 await MongoDB.update_db("users", "user_id", user.id, "chatgpt", "off")
                 await Message.reply_msg(update, "ChatGPT AI has been disabled in this chat!")
             except Exception as e:
-                print(f"Error disabling chatgpt: {e}")
+                logger.error(f"Error disabling chatgpt: {e}")
                 await Message.reply_msg(update, f"Something Went Wrong!\nError: {e}")
         elif msg == "":
             await Message.reply_msg(update, "Use <code>/chatgpt on</code> to turn on.\nUse <code>/chatgpt off</code> to turn off.")
@@ -657,14 +657,14 @@ async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url,
                     await Message.send_audio(chat.id, file_path, title, title, msg_id)
                     break
             except Exception as e:
-                print(f"Error Uploading: {e}")
+                logger.error(f"Error Uploading: {e}")
                 try_attempt += 1
                 await Message.edit_msg(update, f"📤 Uploading... [Retry Attempt: {try_attempt}/{max_attempt}]", tmp_msg)
                 if try_attempt == max_attempt:
-                    print(f"Error Uploading: {e}")
+                    logger.error(f"Error Uploading: {e}")
                     await Message.send_msg(chat.id, f"Error Uploading: {e}")
                     break
-                print(f"Waiting {2**try_attempt}sec before retry...")
+                logger.info(f"Waiting {2**try_attempt}sec before retry...")
                 await asyncio.sleep(2**try_attempt)
         try:
             if len(res) >= 3:
@@ -673,10 +673,10 @@ async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url,
                 removeable_files = [res[1]]
             for rem in removeable_files:
                 os.remove(rem)
-            print("Files Removed...")
+            logger.info("Files Removed...")
             await Message.del_msg(chat.id, tmp_msg)
         except Exception as e:
-            print(f"Error os.remove: {e}")
+            logger.error(f"Error os.remove: {e}")
     else:
         await Message.edit_msg(update, "Something Went Wrong...", tmp_msg)
 
@@ -863,7 +863,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
                     await Message.reply_msg(update, "Job Done !!")
                 except Exception as e:
-                    print(f"Error Broadcast: {e}")
+                    logger.error(f"Error Broadcast: {e}")
                     await Message.reply_msg(update, f"Error Broadcast: {e}")
                 return
             
@@ -876,15 +876,15 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for user_id in users:
                 try:
                     if replied_msg.text:
-                        await Message.send_msg(user_id, msg, parse_mode=ParseMode.MARKDOWN)
+                        await Message.send_msg(user_id, msg)
                     elif replied_msg.caption:
-                        await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg, parse_mode=ParseMode.MARKDOWN)     
+                        await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
                     sent_count += 1
                     progress = (sent_count+except_count)*100/total_user[1]
                     await Message.edit_msg(update, f"Total User: {total_user[1]}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {int(progress)}%", notify)
                 except Exception as e:
                     except_count += 1
-                    print(f"Error Broadcast: {e}")
+                    logger.error(f"Error Broadcast: {e}")
             await Message.reply_msg(update, "Job Done !!")
         else:
             await Message.reply_msg(update, "⚠ Boss you are in public!")
@@ -938,7 +938,7 @@ async def func_cleardb(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             error = f"Error cleardb: {e}"
             await Message.reply_msg(update, error)
-            print(error)
+            logger.error(error)
     else:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
 
@@ -978,7 +978,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await MongoDB.update_db(c_name, key, o_value, key, n_value)
                     await Message.reply_msg(update, "Database Updated!")
                 except Exception as e:
-                    print(f"Error bsetting: {e}")
+                    logger.error(f"Error bsetting: {e}")
                     await Message.reply_msg(update, f"Error bsetting: {e}")
             else:
                 find = await MongoDB.find(c_name, "_id")
@@ -1055,18 +1055,23 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if user.id == int(owner_id):
         if chat.type == "private":
-            if command != "":
-                result = subprocess.run(command, shell=True, capture_output=True, text=True)
-                if result.returncode == 0:
-                    with open('log.txt', 'w') as log_file:
-                        log_file.write(result.stdout)
+            if command:
+                if command == "log":
                     with open("log.txt", "rb") as log_file:
-                        x = log_file.read()
-                        await Message.send_doc(chat.id, x, "log.txt", "log.txt", e_msg.id)
+                        log = log_file.read()
+                    await Message.send_doc(chat.id, log, "log.txt", "log.txt", e_msg.id)
                 else:
-                    await Message.reply_msg(update, result.stderr)
+                    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+                    if result.returncode == 0:
+                        with open('shell.txt', 'w') as shell_file:
+                            shell_file.write(result.stdout)
+                        with open("shell.txt", "rb") as shell_file:
+                            shell = shell_file.read()
+                        await Message.send_doc(chat.id, shell, "shell.txt", "log.txt", e_msg.id)
+                    else:
+                        await Message.reply_msg(update, result.stderr)
             else:
-                await Message.reply_msg(update, "E.g. <code>/shell dir</code> [linux/windows]")
+                await Message.reply_msg(update, "E.g. <code>/shell dir</code> [linux/windows]\n<code>/shell log</code> to get logger file")
         else:
             await Message.reply_msg(update, "⚠ Boss you are in public!")
     else:
@@ -1130,7 +1135,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 try:
                     tr_msg = translate(msg, lang_code)
                 except Exception as e:
-                    print(f"Error Translator: {e}")
+                    logger.error(f"Error Translator: {e}")
                     lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
                     btn_name = ["Language Code List 📃"]
                     btn_url = [lang_code_list]
@@ -1215,7 +1220,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
                         await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
                     except Exception as e:
-                        print(f"Error ChatGPT: {e}")
+                        logger.error(f"Error ChatGPT: {e}")
                         await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
                 else:
                     await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
@@ -1238,7 +1243,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 try:
                     tr_msg = translate(msg, lang_code)
                 except Exception as e:
-                    print(f"Error Translator: {e}")
+                    logger.error(f"Error Translator: {e}")
                     lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
                     btn_name = ["Language Code List 📃"]
                     btn_url = [lang_code_list]
@@ -1265,11 +1270,11 @@ async def ex_server_alive():
             try:
                 response = requests.get(server_url)
                 if response.status_code == 200:
-                    print(f"{server_url} is up and running. ✅")
+                    logger.info(f"{server_url} is up and running. ✅")
                 else:
-                    print(f"{server_url} is down or unreachable. ❌")
+                    logger.warn(f"{server_url} is down or unreachable. ❌")
             except Exception as e:
-                print(f"Error webiste ping: {server_url} > {e}")
+                logger.error(f"Error webiste ping: {server_url} > {e}")
             await asyncio.sleep(180) # 3 min
     else:
         logger.warning("Server URL not provided !!")

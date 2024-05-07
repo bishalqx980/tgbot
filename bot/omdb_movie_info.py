@@ -1,5 +1,5 @@
 import requests
-from bot import omdb_api
+from bot import logger, omdb_api
 
 def get_movie_info(movie_name=None, imdb_id=None, year=None):
   if movie_name:
@@ -7,7 +7,7 @@ def get_movie_info(movie_name=None, imdb_id=None, year=None):
   elif imdb_id:
     url = f"https://omdbapi.com/?apikey={omdb_api}&i={imdb_id}"
   else:
-    print(f"Movie Name or IMDB ID not provided!!")
+    logger.info(f"Movie Name or IMDB ID not provided!!")
     return
 
   try:
@@ -37,4 +37,4 @@ def get_movie_info(movie_name=None, imdb_id=None, year=None):
 
       return poster, content_type, title, released, runtime, genre, director, writer, actors, plot, language, country, awards, meta_score, imdb_rating, imdb_votes, imdb_id, box_office
   except Exception as e:
-    print(f"Error (Getting movie info): {e}")
+    logger.error(f"Error (Getting movie info): {e}")

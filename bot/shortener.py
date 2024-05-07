@@ -1,5 +1,5 @@
 import requests
-from bot import shortener_api_key
+from bot import logger, shortener_api_key
 
 def shortener_url(url):
     try:
@@ -9,4 +9,4 @@ def shortener_url(url):
         if shortened_url:
             return shortened_url
     except Exception as e:
-        print(f"Error (Shorting url): {e}")
+        logger.error(f"Error (Shorting url): {e}")

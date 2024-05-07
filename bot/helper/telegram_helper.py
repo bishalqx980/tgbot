@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.constants import ParseMode
-from bot import bot
+from bot import bot, logger
 
 class Message:
     async def send_msg(chat_id, msg, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
@@ -186,12 +186,12 @@ class Button:
                     else:
                         btn.append([InlineKeyboardButton(b_name, url_link)])
             else:
-                print(f"Error: btn={len(btn_name)} not equal url={len(url)}! Skiping...")
+                logger.error(f"Error: btn={len(btn_name)} not equal url={len(url)}! Skiping...")
 
             buttons = btn+[sbtn]
             return buttons
         except Exception as e:
-            print(f"Error ubutton: {e}")
+            logger.error(f"Error ubutton: {e}")
     
 
     async def cbutton(btn_name, callback_name, same_line=bool(False)):
@@ -209,9 +209,9 @@ class Button:
                     else:
                         btn.append([InlineKeyboardButton(b_name, callback_data=c_name)])
             else:
-                print(f"Error: btn={len(btn_name)} not equal callback={len(callback_name)}! Skiping...")
+                logger.error(f"Error: btn={len(btn_name)} not equal callback={len(callback_name)}! Skiping...")
 
             buttons = btn+[sbtn]
             return buttons
         except Exception as e:
-            print(f"Error cbutton: {e}")
+            logger.error(f"Error cbutton: {e}")

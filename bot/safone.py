@@ -1,4 +1,4 @@
-from bot import safone_api
+from bot import logger, safone_api
 
 class Safone:
     async def safone_ai(msg):
@@ -8,15 +8,15 @@ class Safone:
         try:
             chatgpt_res = await safone_api.chatgpt(msg)
         except Exception as e:
-            print(f"Error ChatGPT: {e}")
+            logger.error(f"Error ChatGPT: {e}")
             try:
                 bard_res = await safone_api.bard(msg)
             except Exception as e:
-                print(f"Error Bard: {e}")
+                logger.error(f"Error Bard: {e}")
                 try:
                     chatbot_res = await safone_api.chatbot(msg)
                 except Exception as e:
-                    print(f"Error Chatbot: {e}")
+                    logger.error(f"Error Chatbot: {e}")
         return chatgpt_res, bard_res, chatbot_res
 
 
@@ -25,7 +25,7 @@ class Safone:
             res = await safone_api.webshot(url)
             return res
         except Exception as e:
-            print(f"Error Webshot: {e}")
+            logger.error(f"Error Webshot: {e}")
 
 
     async def imagine(prompt):
@@ -34,6 +34,6 @@ class Safone:
             res = res[0]
             return res
         except Exception as e:
-            print(f"Error imagine: {e}")
+            logger.error(f"Error imagine: {e}")
 
             

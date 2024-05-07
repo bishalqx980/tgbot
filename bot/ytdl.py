@@ -1,15 +1,15 @@
 import requests
+from bot import logger
 from pytube import YouTube, Search
-
 
 class YouTubeDownload:
     async def ytdl(url, extention):
         try:
-            print("Starting Download...")
+            logger.info("Starting Download...")
             def _on_progress(stream, chunk, bytes_remaining):
                 total_size = stream.filesize
                 progress = (total_size - bytes_remaining) * 100 / total_size
-                print(f"Downloading... {int(progress)}%")
+                logger.info(f"Downloading... {int(progress)}%")
 
             yt = YouTube(url, on_progress_callback=_on_progress)
             title = yt.title
@@ -39,26 +39,26 @@ class YouTubeDownload:
                 if t_res.status_code == 200:
                     with open(thumbnail, "wb") as t_file:
                         t_file.write(t_res.content)
-                        print("Thumbnail Downloaded!")
+                        logger.info("Thumbnail Downloaded!")
                 else:
-                    print("Thumbnail Download Failed!")
+                    logger.info("Thumbnail Download Failed!")
                 if file_path:
-                    print("Video Downloaded!!")
+                    logger.info("Video Downloaded!!")
                 if extention == "mp4":
                     return title, file_path, thumbnail
                 elif extention == "mp3":
                     return title, file_path
             else:
-                print("No stream found for this video")
+                logger.info("No stream found for this video")
         except Exception as e:
-            print(f"Error ytdl: {e}")
+            logger.error(f"Error ytdl: {e}")
 
 
     async def yts(keyword):
         try:
-            print("Searching...")
+            logger.info("Searching...")
             result = Search(keyword).results
-            print(f"Video Found: {len(result)}")
+            logger.info(f"Video Found: {len(result)}")
             return result
         except Exception as e:
-            print(f"Error yts: {e}")
+            logger.error(f"Error yts: {e}")
