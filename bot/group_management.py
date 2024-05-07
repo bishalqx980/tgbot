@@ -676,7 +676,7 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     _bot, bot_permission, user_permission, victim_permission = _chk_per
 
-    if chat.type in ["group", "supergroup"]:
+    if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -718,7 +718,7 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     _bot, bot_permission, user_permission, victim_permission = _chk_per
 
-    if chat.type in ["group", "supergroup"]:
+    if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
