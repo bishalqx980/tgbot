@@ -43,6 +43,10 @@ commands = [
     BotCommand("sys", "owner only")
 ]
 
+command_help = [
+    BotCommand("help", "Show help message")
+]
+
 class BotCommandHelper:
     async def __init__(self, cmd, des):
         self.commad = cmd
@@ -50,7 +54,7 @@ class BotCommandHelper:
 
 
     async def set_bot_command():
-        await bot.set_my_commands(commands)
+        await bot.set_my_commands(command_help)
         logger.info("🤖 Bot commands updated!")
 
 
