@@ -63,7 +63,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     support_chat = await MongoDB.get_data("bot_docs", "support_chat")
 
     msg = (
-        f"Hi {user.mention_html()}! I'm <a href='https://t.me/{_bot.id}'>{_bot.first_name}</a>, your all-in-one bot!\n\n"
+        f"Hi {user.mention_html()}! I'm <a href='https://t.me/{_bot.username}'>{_bot.first_name}</a>, your all-in-one bot!\n\n"
         f"<blockquote>Here's a short list of what I can do:\n\n" # break
         f"• Get response from <b><i>ChatGPT AI</i></b>\n"
         f"• Generate image from your prompt\n"
