@@ -345,9 +345,10 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_data = ["unpin_all", "close"]
         btn = await Button.cbutton(btn_name, btn_data, True)
         await Message.reply_msg(update, f"Do you really want to unpin all messages of this Group?", btn)
+        return
 
     if not reply:
-        await Message.reply_msg(update, "This feature will unpin replied message in your Group!\nUse <code>/unpin all</code> to unpin all pinned messages of Group!")
+        await Message.reply_msg(update, "This feature will unpin replied message!\nUse <code>/unpin all</code> to unpin all pinned messages of Group!")
         return
     
     await bot.unpin_chat_message(chat.id, msg_id)
