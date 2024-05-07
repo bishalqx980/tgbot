@@ -19,7 +19,7 @@ from bot.omdb_movie_info import get_movie_info
 from bot.utils import calc
 from bot.helper.data_storage import MessageStorage
 from bot.safone import Safone
-from bot.group_management import func_welcome, func_goodbye, func_antibot, track_chat_activities,  func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_adminlist
+from bot.group_management import func_welcome, func_goodbye, func_antibot, track_chat_activities, func_pin_msg, func_unpin_msg, func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_lockchat, func_unlockchat, func_adminlist
 from bot.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.weather import weather_info
@@ -1304,12 +1304,16 @@ def main():
     application.add_handler(CommandHandler("welcome", func_welcome, block=False))
     application.add_handler(CommandHandler("goodbye", func_goodbye, block=False))
     application.add_handler(CommandHandler("antibot", func_antibot, block=False))
+    application.add_handler(CommandHandler("pin", func_pin_msg, block=False))
+    application.add_handler(CommandHandler("unpin", func_unpin_msg, block=False))
     application.add_handler(CommandHandler("ban", func_ban, block=False))
     application.add_handler(CommandHandler("unban", func_unban, block=False))
     application.add_handler(CommandHandler("kick", func_kick, block=False))
     application.add_handler(CommandHandler("kickme", func_kickme, block=False))
     application.add_handler(CommandHandler("mute", func_mute, block=False))
     application.add_handler(CommandHandler("unmute", func_unmute, block=False))
+    application.add_handler(CommandHandler("lockchat", func_lockchat, block=False))
+    application.add_handler(CommandHandler("unlockchat", func_unlockchat, block=False))
     application.add_handler(CommandHandler("adminlist", func_adminlist, block=False))
     application.add_handler(CommandHandler("help", func_help, block=False))
     # owner

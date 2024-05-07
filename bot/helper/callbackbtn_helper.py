@@ -22,5 +22,11 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         extention = "mp3"
         await query.message.delete()
         await exe_func_ytdl(update, context, url, extention)
+    elif data == "unpin_all":
+        # importing from main.py
+        from bot.group_management import exe_func_unpin_all_msg
+        chat_id = context.chat_data.get("chat_id")
+        await query.message.delete()
+        await exe_func_unpin_all_msg(update, context, chat_id)
     elif data == "close":
         await query.message.delete()
