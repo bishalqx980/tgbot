@@ -26,7 +26,7 @@ async def _chat_member_status(c_mem_update: ChatMemberUpdated):
 
     old_status, new_status = status
 
-    was_logic = [ChatMember.LEFT, ChatMember.RESTRICTED, ChatMember.BANNED]
+    was_logic = [ChatMember.LEFT, ChatMember.BANNED] #ChatMember.RESTRICTED
     exist_logic = [ChatMember.MEMBER, ChatMember.ADMINISTRATOR, ChatMember.OWNER]
     if old_status in was_logic and new_status in exist_logic:
         user_exist = True
