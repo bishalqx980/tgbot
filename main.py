@@ -584,7 +584,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if not premium_users:
                 premium_users = []
 
-            if user.id not in premium_users or user.id != int(owner_id)::
+            if user.id not in premium_users or user.id != int(owner_id):
                 premium_seller = data.get("premium_seller")
 
                 if not premium_seller:
@@ -681,7 +681,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if not premium_users:
                 premium_users = []
 
-            if user.id not in premium_users or user.id != int(owner_id)::
+            if user.id not in premium_users or user.id != int(owner_id):
                 premium_seller = data.get("premium_seller")
 
                 if not premium_seller:
