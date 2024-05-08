@@ -1185,7 +1185,7 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    msg = update.message.text or update.message.caption
+    msg = update.message.text or update.message.caption if update.message
 
     if chat.type == "private" and msg:
         find_user = await MongoDB.find_one("users", "user_id", user.id)
