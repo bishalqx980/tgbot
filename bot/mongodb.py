@@ -32,7 +32,7 @@ class MongoDB:
             logger.info(f"Inserting Multiple Data in {collection_name} MongoDB...")
             inject = collection.insert_many(data_list)
             inserted_ids = inject.inserted_ids
-            logger.info("Inserted IDs:", inserted_ids)
+            logger.info(f"Inserted IDs: {inserted_ids}")
             return inserted_ids
         except Exception as e:
             logger.error(f"Error (inserting db_data): {e}")

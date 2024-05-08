@@ -177,7 +177,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_user = await MongoDB.find_one("users", "user_id", user.id)
 
         if not find_user:
-            await Message.reply_msg(update, "Something went wrong! Click /start then try again!")
+            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
             return
         
         lang_code = find_user.get("lang")
@@ -444,7 +444,7 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, "I'm not an admin of this Group!")
             return
         
-        if user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
             await Message.reply_msg(update, "You aren't an admin of this Group!")
             return
         
@@ -540,71 +540,82 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     prompt = " ".join(context.args)
 
-    if chat.type != "private":
-        _bot = await bot.get_me()
-        btn_name = ["Start me in private"]
-        btn_url = [f"http://t.me/{_bot.username}?start=start"]
-        btn = await Button.ubutton(btn_name, btn_url)
-        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!", btn)
-        return
-    
     if not prompt:
         await Message.reply_msg(update, "Use <code>/imagine prompt</code>\nE.g. <code>/imagine a cute cat</code>")
         return
     
-    find = await MongoDB.find("bot_docs", "_id")
-    if find:
-        data = await MongoDB.find_one("bot_docs", "_id", find[0])
-        premium_users = data.get("premium_users")
-        if premium_users == None:
-            premium_users = []
-
     find_user = await MongoDB.find_one("users", "user_id", user.id)
-    ai_imagine_req = find_user.get("ai_imagine_req")
-    last_used = find_user.get("last_used")
-    current_time = datetime.now()
 
-    if last_used:
-        calc = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
-        if calc:
-            ai_imagine_req = 0
-            await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
-
-    if ai_imagine_req == None:
-        ai_imagine_req = 0
-
-    if user.id == int(owner_id):
-        g_msg = "Please wait Boss!! Thinking..."
-    elif user.id in premium_users:
-        g_msg = f"Please wait {user.first_name}!! Thinking..."
-    else:
-        if ai_imagine_req >= int(ai_imagine_limit):
-            find = await MongoDB.find("bot_docs", "_id")
-            if find:
-                data = await MongoDB.find_one("bot_docs", "_id", find[0])
-                premium_seller = data.get("premium_seller")
-
-            if premium_seller == None:
-                premium_seller = owner_username
-            text = (
-                f"❗ Your AI Imagine usage limit Exceeded!\n"
-                f"⩙ Usage: {ai_imagine_req} out of {ai_imagine_limit}\n"
-                f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
-                f"OR Contact @{premium_seller} to buy Premium Account!"
-            )
-            btn_name = ["Buy Premium ✨"]
-            btn_url = [f"https://t.me/{premium_seller}"]
-            btn = await Button.ubutton(btn_name, btn_url)
-            await Message.reply_msg(update, text, btn)
+    if not find_user:
+        if chat.type == "private":
+            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
             return
         else:
-            g_msg = f"Please wait {user.first_name}!! Thinking..."
+            _bot = await bot.get_me()
+            btn_name = ["Start me in private"]
+            btn_url = [f"http://t.me/{_bot.username}?start=start"]
+            btn = await Button.ubutton(btn_name, btn_url)
+            await Message.reply_msg(update, f"User isn't registered!\nStart me in private then try again here!", btn)
+            return
+        
+    ai_imagine_req, last_used = find_user.get("ai_imagine_req"), find_user.get("last_used")
+    current_time = datetime.now()
 
-    sent_msg = await Message.reply_msg(update, g_msg)
+    if not ai_imagine_req:
+        ai_imagine_req = 0
+
+    if last_used:
+        find = await MongoDB.find("bot_docs", "_id")
+
+        if not find:
+            await Message.reply_msg(update, "Something went wrong!")
+            return
+        
+        data = await MongoDB.find_one("bot_docs", "_id", find[0])
+        usage_reset, ai_imagine_limit = data.get("usage_reset"), data.get("ai_imagine_limit")
+
+        calc_req = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
+
+        if calc_req:
+            ai_imagine_req = 0
+            await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
+        elif ai_imagine_req >= ai_imagine_limit:
+            premium_users = data.get("premium_users")
+            if not premium_users:
+                premium_users = []
+
+            if user.id not in premium_users:
+                premium_seller = data.get("premium_seller")
+
+                if not premium_seller:
+                    premium_seller = owner_username
+
+                msg = (
+                    f"❗ Your ChatGPT usage limit Exceeded!\n"
+                    f"⩙ Usage: {ai_imagine_req} out of {ai_imagine_limit}\n"
+                    f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
+                    f"OR Contact @{premium_seller} to buy Premium Account!"
+                )
+
+                btn_name = ["Buy Premium ✨"]
+                btn_url = [f"https://t.me/{premium_seller}"]
+                btn = await Button.ubutton(btn_name, btn_url)
+                await Message.send_msg(chat.id, msg, btn)
+                return
+            
+    if user.id == int(owner_id):
+        msg = "Please wait Boss!! Generating..."
+    else:
+        msg = f"Please wait {user.first_name}!! Generating..."
+    
+    sent_msg = await Message.reply_msg(update, msg)
+
     """
     imagine = await Safone.imagine(prompt)
     """
+
     imagine = await G4F.imagine(prompt)
+
     if not imagine:
         await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
         return
@@ -623,32 +634,107 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    msg = " ".join(context.args)
+    prompt = " ".join(context.args)
 
-    if chat.type != "private":
-        _bot = await bot.get_me()
-        btn_name = ["Start me in private"]
-        btn_url = [f"http://t.me/{_bot.username}?start=start"]
-        btn = await Button.ubutton(btn_name, btn_url)
-        await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!", btn)
+    if not prompt:
+        await Message.reply_msg(update, "Use <code>/chatgpt your_prompt</code>\nE.g. <code>/chatgpt What is AI?</code>")
         return
     
-    if msg == "on":
-        try:
-            await MongoDB.update_db("users", "user_id", user.id, "chatgpt", "on")
-            await Message.reply_msg(update, "ChatGPT AI has been enabled in this chat!")
-        except Exception as e:
-            logger.error(f"Error enabling chatgpt: {e}")
-            await Message.reply_msg(update, f"Error: {e}")
-    elif msg == "off":
-        try:
-            await MongoDB.update_db("users", "user_id", user.id, "chatgpt", "off")
-            await Message.reply_msg(update, "ChatGPT AI has been disabled in this chat!")
-        except Exception as e:
-            logger.error(f"Error disabling chatgpt: {e}")
-            await Message.reply_msg(update, f"Error: {e}")
+    find_user = await MongoDB.find_one("users", "user_id", user.id)
+
+    if not find_user:
+        if chat.type == "private":
+            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
+            return
+        else:
+            _bot = await bot.get_me()
+            btn_name = ["Start me in private"]
+            btn_url = [f"http://t.me/{_bot.username}?start=start"]
+            btn = await Button.ubutton(btn_name, btn_url)
+            await Message.reply_msg(update, f"User isn't registered!\nStart me in private then try again here!", btn)
+            return
+        
+    chatgpt_req, last_used = find_user.get("chatgpt_req"), find_user.get("last_used")
+    current_time = datetime.now()
+
+    if not chatgpt_req:
+        chatgpt_req = 0
+
+    if last_used:
+        find = await MongoDB.find("bot_docs", "_id")
+
+        if not find:
+            await Message.reply_msg(update, "Something went wrong!")
+            return
+        
+        data = await MongoDB.find_one("bot_docs", "_id", find[0])
+        usage_reset, chatgpt_limit = data.get("usage_reset"), data.get("chatgpt_limit")
+
+        calc_req = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
+
+        if calc_req:
+            chatgpt_req = 0
+            await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
+        elif chatgpt_req >= chatgpt_limit:
+            premium_users = data.get("premium_users")
+            if not premium_users:
+                premium_users = []
+
+            if user.id not in premium_users:
+                premium_seller = data.get("premium_seller")
+
+                if not premium_seller:
+                    premium_seller = owner_username
+
+                msg = (
+                    f"❗ Your ChatGPT usage limit Exceeded!\n"
+                    f"⩙ Usage: {chatgpt_req} out of {chatgpt_limit}\n"
+                    f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
+                    f"OR Contact @{premium_seller} to buy Premium Account!"
+                )
+
+                btn_name = ["Buy Premium ✨"]
+                btn_url = [f"https://t.me/{premium_seller}"]
+                btn = await Button.ubutton(btn_name, btn_url)
+                await Message.send_msg(chat.id, msg, btn)
+                return
+            
+    if user.id == int(owner_id):
+        msg = "Please wait Boss!! Thinking..."
     else:
-        await Message.reply_msg(update, "Use <code>/chatgpt on</code> to turn on.\nUse <code>/chatgpt off</code> to turn off.")
+        msg = f"Please wait {user.first_name}!! Thinking..."
+    
+    sent_msg = await Message.reply_msg(update, msg)
+
+    """
+    safone_ai_res = await Safone.safone_ai(msg)
+    if safone_ai_res:
+        chatgpt = safone_ai_res[0]
+        bard = safone_ai_res[1]
+        chatbot = safone_ai_res[2]
+
+        if chatgpt:
+            text = chatgpt.message
+        elif bard:
+            text = bard.message
+        else:
+            text = chatbot.response
+    """
+
+    g4f_gpt = await G4F.chatgpt(prompt)
+
+    if not g4f_gpt:
+        await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
+        return
+    
+    try:
+        await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)
+        chatgpt_req += 1
+        await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
+        await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
+    except Exception as e:
+        logger.error(f"Error ChatGPT: {e}")
+        await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
 
 
 async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1050,10 +1136,10 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
         imagine_l = data.get("ai_imagine_limit")
         u_reset = data.get("usage_reset")
         premium_seller = data.get("premium_seller")
-        if premium_seller == None:
+        if not premium_seller:
             premium_seller = f"{owner_username}"
         premium_users = data.get("premium_users")
-        if premium_users == None:
+        if not premium_users:
             premium_users = []
         premium_users_count = len(premium_users) if premium_users else 0
 
@@ -1191,7 +1277,6 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # status
         echo_status = find_user.get("echo")
         auto_tr_status = find_user.get("auto_tr")
-        chatgpt_status = find_user.get("chatgpt")
 
         # Trigger
         if echo_status == "on":
@@ -1212,86 +1297,6 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # tanslate proccess
             if tr_msg != msg:
                 await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
-
-        if chatgpt_status == "on":
-            find = await MongoDB.find("bot_docs", "_id")
-            if find:
-                data = await MongoDB.find_one("bot_docs", "_id", find[0])
-                premium_users = data.get("premium_users")
-                if premium_users == None:
-                    premium_users = []
-
-            find_user = await MongoDB.find_one("users", "user_id", user.id)
-            chatgpt_req = find_user.get("chatgpt_req")
-            last_used = find_user.get("last_used")
-            current_time = datetime.now()
-
-            if last_used:
-                calc = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
-                if calc:
-                    chatgpt_req = 0
-                    await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
-
-            if chatgpt_req == None:
-                chatgpt_req = 0
-
-            if user.id == int(owner_id):
-                g_msg = "Please wait Boss!! Thinking..."
-            elif user.id in premium_users:
-                g_msg = f"Please wait {user.first_name}!! Thinking..."
-            else:
-                if chatgpt_req >= int(chatgpt_limit):
-                    find = await MongoDB.find("bot_docs", "_id")
-                    if find:
-                        data = await MongoDB.find_one("bot_docs", "_id", find[0])
-                        premium_seller = data.get("premium_seller")
-
-                    if premium_seller == None:
-                        premium_seller = owner_username
-                    text = (
-                        f"❗ Your ChatGPT usage limit Exceeded!\n"
-                        f"⩙ Usage: {chatgpt_req} out of {chatgpt_limit}\n"
-                        f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
-                        f"OR Contact @{premium_seller} to buy Premium Account!"
-                    )
-                    btn_name = ["Buy Premium ✨"]
-                    btn_url = [f"https://t.me/{premium_seller}"]
-                    btn = await Button.ubutton(btn_name, btn_url)
-                    await Message.reply_msg(update, text, btn)
-                    return
-                else:
-                    g_msg = f"Please wait {user.first_name}!! Thinking..."
-
-            sent_msg = await Message.reply_msg(update, g_msg)
-
-            """
-            safone_ai_res = await Safone.safone_ai(msg)
-            if safone_ai_res:
-                chatgpt = safone_ai_res[0]
-                bard = safone_ai_res[1]
-                chatbot = safone_ai_res[2]
-
-                if chatgpt:
-                    text = chatgpt.message
-                elif bard:
-                    text = bard.message
-                else:
-                    text = chatbot.response
-            """
-
-            g4f_gpt = await G4F.chatgpt(msg)
-            if not g4f_gpt:
-                await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
-                return
-            
-            try:
-                await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)
-                chatgpt_req += 1
-                await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
-                await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
-            except Exception as e:
-                logger.error(f"Error ChatGPT: {e}")
-                await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
 
     # group's
     elif chat.type in ["group", "supergroup"] and msg:
