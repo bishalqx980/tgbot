@@ -600,7 +600,8 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 btn_name = ["Buy Premium ✨"]
                 btn_url = [f"https://t.me/{premium_seller}"]
                 btn = await Button.ubutton(btn_name, btn_url)
-                await Message.send_msg(chat.id, msg, btn)
+                await Message.send_msg(user.id, msg, btn)
+                await Message.reply_msg(update, "Check bot private message!")
                 return
             
     if user.id == int(owner_id):
@@ -696,7 +697,8 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 btn_name = ["Buy Premium ✨"]
                 btn_url = [f"https://t.me/{premium_seller}"]
                 btn = await Button.ubutton(btn_name, btn_url)
-                await Message.send_msg(chat.id, msg, btn)
+                await Message.send_msg(user.id, msg, btn)
+                await Message.reply_msg(update, "Check bot private message!")
                 return
             
     if user.id == int(owner_id):
