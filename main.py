@@ -580,29 +580,31 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ai_imagine_req = 0
             await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
         elif ai_imagine_req >= ai_imagine_limit:
-            premium_users = data.get("premium_users")
-            if not premium_users:
-                premium_users = []
+            if user.id != int(owner_id):
+                premium_users = data.get("premium_users")
+                if not premium_users:
+                    premium_users = []
 
-            if user.id not in premium_users or user.id != int(owner_id):
-                premium_seller = data.get("premium_seller")
+                if user.id not in premium_users:
+                    premium_seller = data.get("premium_seller")
 
-                if not premium_seller:
-                    premium_seller = owner_username
+                    if not premium_seller:
+                        premium_seller = owner_username
 
-                msg = (
-                    f"❗ Your ChatGPT usage limit Exceeded!\n"
-                    f"⩙ Usage: {ai_imagine_req} out of {ai_imagine_limit}\n"
-                    f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
-                    f"OR Contact @{premium_seller} to buy Premium Account!"
-                )
+                    msg = (
+                        f"❗ Your ChatGPT usage limit Exceeded!\n"
+                        f"⩙ Usage: {ai_imagine_req} out of {ai_imagine_limit}\n"
+                        f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
+                        f"OR Contact @{premium_seller} to buy Premium Account!"
+                    )
 
-                btn_name = ["Buy Premium ✨"]
-                btn_url = [f"https://t.me/{premium_seller}"]
-                btn = await Button.ubutton(btn_name, btn_url)
-                await Message.send_msg(user.id, msg, btn)
-                await Message.reply_msg(update, "Check bot private message!")
-                return
+                    btn_name = ["Buy Premium ✨"]
+                    btn_url = [f"https://t.me/{premium_seller}"]
+                    btn = await Button.ubutton(btn_name, btn_url)
+                    await Message.send_msg(user.id, msg, btn)
+                    if chat.type != "private":
+                        await Message.reply_msg(update, "Check bot private message!")
+                    return
             
     if user.id == int(owner_id):
         msg = "Please wait Boss!! Generating..."
@@ -677,29 +679,31 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chatgpt_req = 0
             await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
         elif chatgpt_req >= chatgpt_limit:
-            premium_users = data.get("premium_users")
-            if not premium_users:
-                premium_users = []
+            if user.id != int(owner_id):
+                premium_users = data.get("premium_users")
+                if not premium_users:
+                    premium_users = []
 
-            if user.id not in premium_users or user.id != int(owner_id):
-                premium_seller = data.get("premium_seller")
+                if user.id not in premium_users:
+                    premium_seller = data.get("premium_seller")
 
-                if not premium_seller:
-                    premium_seller = owner_username
+                    if not premium_seller:
+                        premium_seller = owner_username
 
-                msg = (
-                    f"❗ Your ChatGPT usage limit Exceeded!\n"
-                    f"⩙ Usage: {chatgpt_req} out of {chatgpt_limit}\n"
-                    f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
-                    f"OR Contact @{premium_seller} to buy Premium Account!"
-                )
+                    msg = (
+                        f"❗ Your ChatGPT usage limit Exceeded!\n"
+                        f"⩙ Usage: {chatgpt_req} out of {chatgpt_limit}\n"
+                        f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
+                        f"OR Contact @{premium_seller} to buy Premium Account!"
+                    )
 
-                btn_name = ["Buy Premium ✨"]
-                btn_url = [f"https://t.me/{premium_seller}"]
-                btn = await Button.ubutton(btn_name, btn_url)
-                await Message.send_msg(user.id, msg, btn)
-                await Message.reply_msg(update, "Check bot private message!")
-                return
+                    btn_name = ["Buy Premium ✨"]
+                    btn_url = [f"https://t.me/{premium_seller}"]
+                    btn = await Button.ubutton(btn_name, btn_url)
+                    await Message.send_msg(user.id, msg, btn)
+                    if chat.type != "private":
+                        await Message.reply_msg(update, "Check bot private message!")
+                    return
             
     if user.id == int(owner_id):
         msg = "Please wait Boss!! Thinking..."
