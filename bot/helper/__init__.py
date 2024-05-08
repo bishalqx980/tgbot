@@ -24,6 +24,7 @@ commands = [
     BotCommand("welcome", "Set welcome msg in group"),
     BotCommand("goodbye", "Set goodbye msg in group"),
     BotCommand("antibot", "Restrict other bots from joining in group"),
+    BotCommand("invite", "Generate invite link for Group"),
     BotCommand("pin", "Pin message loudly"),
     BotCommand("unpin", "Unpin a pinned message"),
     BotCommand("ban", "Ban an user from group"),

@@ -19,7 +19,7 @@ from bot.features.base64 import decode_b64, encode_b64
 from bot.features.omdb_movie_info import get_movie_info
 from bot.features.utils import calc
 from bot.features.safone import Safone
-from bot.group_management import func_welcome, func_goodbye, func_antibot, track_chat_activities, func_pin_msg, func_unpin_msg, func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_lockchat, func_unlockchat, func_adminlist
+from bot.group_management import func_welcome, func_goodbye, func_antibot, track_chat_activities, func_invite_link, func_pin_msg, func_unpin_msg, func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_lockchat, func_unlockchat, func_adminlist
 from bot.features.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.features.weather import weather_info
@@ -65,7 +65,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = (
         f"Hi {user.mention_html()}! I'm <a href='https://t.me/{_bot.username}'>{_bot.first_name}</a>, your all-in-one bot!\n\n"
         f"<blockquote>Here's a short list of what I can do:\n\n" # break
-        f"• Get response from <b><i>ChatGPT AI</i></b>\n"
+        f"• Get response from <b>ChatGPT AI</b>\n"
         f"• Generate image from your prompt\n"
         f"• Download/Search videos from YouTube\n"
         f"• Provide movie information\n"
@@ -78,9 +78,6 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"• Take website screenshot\n"
         f"• Provide weather information\n"
         f"• <b>Group management</b>\n"
-        f"   <i>- Welcome user\n"
-        f"   - Moderation: ban, unban, mute, unmute, kick, kickme...\n"
-        f"   - Antibot, etc.</i>\n"
         f"• & Much more...</blockquote>\n\n"
         f"• /help for bot help\n" # break
         f"<i>More Feature coming soon...</i>\n"
@@ -90,7 +87,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_url_1 = [f"http://t.me/{_bot.username}?startgroup=start"]
     btn_name_2 = ["⚡ Developer ⚡", "📘 Source Code"]
     btn_url_2 = [f"https://t.me/bishalqx980", "https://github.com/bishalqx980/tgbot"]
-    btn_name_3 = ["👨🏼‍💻 Support Chat"]
+    btn_name_3 = ["Support Chat"]
     btn_url_3 = [support_chat]
     btn_1 = await Button.ubutton(btn_name_1, btn_url_1)
     btn_2 = await Button.ubutton(btn_name_2, btn_url_2, True)
@@ -931,21 +928,19 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"Error Broadcast: {e}")
         return
     
-    users = await MongoDB.find("users", "user_id")
-    total_user = await MongoDB.info_db("users")
+    users_id = await MongoDB.find("users", "user_id")
 
-    sent_count = 0
-    except_count = 0
-    notify = await Message.send_msg(owner_id, f"Total User: {total_user[1]}")
-    for user_id in users:
+    sent_count, except_count = 0, 0
+    notify = await Message.send_msg(owner_id, f"Total User: {len(users_id)}")
+    for user_id in users_id:
         try:
             if replied_msg.text:
                 await Message.send_msg(user_id, msg)
             elif replied_msg.caption:
                 await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
             sent_count += 1
-            progress = (sent_count+except_count)*100/total_user[1]
-            await Message.edit_msg(update, f"Total User: {total_user[1]}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {int(progress)}%", notify)
+            progress = (sent_count+except_count)*100/len(users_id)
+            await Message.edit_msg(update, f"Total User: {len(users_id)}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {int(progress)}%", notify)
         except Exception as e:
             except_count += 1
             logger.error(f"Error Broadcast: {e}")
@@ -1377,6 +1372,7 @@ def main():
     application.add_handler(CommandHandler("welcome", func_welcome, block=False))
     application.add_handler(CommandHandler("goodbye", func_goodbye, block=False))
     application.add_handler(CommandHandler("antibot", func_antibot, block=False))
+    application.add_handler(CommandHandler("invite", func_invite_link, block=False))
     application.add_handler(CommandHandler("pin", func_pin_msg, block=False))
     application.add_handler(CommandHandler("unpin", func_unpin_msg, block=False))
     application.add_handler(CommandHandler("ban", func_ban, block=False))
