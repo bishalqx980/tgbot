@@ -246,7 +246,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
 
     if user_exist == True:
         if victim.is_bot and antibot == "on":
-            _chk_per = await _check_permission(update, user=user)
+            _chk_per = await _check_permission(update, victim, user)
 
             if not _chk_per:
                 return
@@ -366,7 +366,7 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
 
-    _chk_per = await _check_permission(update, user=user)
+    _chk_per = await _check_permission(update, victim, user)
 
     if not _chk_per:
         return
@@ -414,7 +414,7 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
     
-    _chk_per = await _check_permission(update, user=user)
+    _chk_per = await _check_permission(update, victim, user)
 
     if not _chk_per:
         return
@@ -464,7 +464,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
 
-    _chk_per = await _check_permission(update, user=user)
+    _chk_per = await _check_permission(update, victim, user)
 
     if not _chk_per:
         return
@@ -514,7 +514,7 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     victim = user
 
-    _chk_per = await _check_permission(update, user=user)
+    _chk_per = await _check_permission(update, victim, user)
 
     if not _chk_per:
         return
@@ -528,7 +528,7 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_msg(chat.id, "Add me to manage your Group!", btn)
         return
     
-    if bot_permission.status == ChatMember.ADMINISTRATOR:
+    if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this Group!")
         return
     
@@ -552,7 +552,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
 
-    _chk_per = await _check_permission(update, user=user)
+    _chk_per = await _check_permission(update, victim, user)
 
     if not _chk_per:
         return
@@ -612,7 +612,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
 
-    _chk_per = await _check_permission(update, user=user)
+    _chk_per = await _check_permission(update, victim, user)
 
     if not _chk_per:
         return
