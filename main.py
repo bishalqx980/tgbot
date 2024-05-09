@@ -580,7 +580,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
             ai_imagine_req = 0
             await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
         elif ai_imagine_req >= ai_imagine_limit:
-            if user.id != owner_id:
+            if user.id != int(owner_id):
                 premium_users = data.get("premium_users")
                 if not premium_users:
                     premium_users = []
@@ -606,7 +606,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await Message.reply_msg(update, "Check bot private message!")
                     return
             
-    if user.id == owner_id:
+    if user.id == int(owner_id):
         msg = "Please wait Boss!! Generating..."
     else:
         msg = f"Please wait {user.first_name}!! Generating..."
@@ -679,7 +679,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chatgpt_req = 0
             await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
         elif chatgpt_req >= chatgpt_limit:
-            if user.id != owner_id:
+            if user.id != int(owner_id):
                 premium_users = data.get("premium_users")
                 if not premium_users:
                     premium_users = []
@@ -705,7 +705,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         await Message.reply_msg(update, "Check bot private message!")
                     return
             
-    if user.id == owner_id:
+    if user.id == int(owner_id):
         msg = "Please wait Boss!! Thinking..."
     else:
         msg = f"Please wait {user.first_name}!! Thinking..."
@@ -850,7 +850,7 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == "private":
         if msg:
-            if user.id != owner_id:
+            if user.id != int(owner_id):
                 await Message.reply_msg(update, f"Access Denied! [owner only]")
                 return
             else:
@@ -994,7 +994,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     replied_msg = update.message.reply_to_message
     user_id = " ".join(context.args)
 
-    if user.id != owner_id:
+    if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1044,7 +1044,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     msg = " ".join(context.args)
 
-    if user.id != owner_id:
+    if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1069,7 +1069,7 @@ async def func_cleardb(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     c_name = "bot_docs"
 
-    if user.id != owner_id:
+    if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1100,7 +1100,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     key = " ".join(context.args)
     c_name = "bot_docs"
 
-    if user.id != owner_id:
+    if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1207,7 +1207,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     command = " ".join(context.args)
     command = command.replace("'", "")
 
-    if user.id != owner_id:
+    if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1237,7 +1237,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    if user.id != owner_id:
+    if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
