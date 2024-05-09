@@ -709,7 +709,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     btn = await Button.ubutton(btn_name, btn_url)
                     await Message.send_msg(user.id, msg, btn)
                     if chat.type != "private":
-                        await Message.reply_msg(update, "Check bot private message!")
+                        await Message.reply_msg(update, "Usage limit exceeded! Check bot private message!")
                     return
             
     if user.id == int(owner_id):
