@@ -16,7 +16,7 @@ commands = [
     BotCommand("webshot", "Take Screenshot of any website"),
     BotCommand("weather", "Get weather info"),
     BotCommand("imagine", "AI Image generator"),
-    BotCommand("chatgpt", "ChatGPT AI for your chat"),
+    BotCommand("gpt", "ChatGPT AI for your chat"),
     BotCommand("ytdl", "Download youtube video"),
     BotCommand("yts", "Search video on youtube"),
     BotCommand("stats", "Show your config data"),

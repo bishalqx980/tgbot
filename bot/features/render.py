@@ -3,7 +3,7 @@ from bot import render_api
 
 class Render:
     async def list_services():
-        url = "https://api.render.com/v1/services?name=&limit=20"
+        url = "https://api.render.com/v1/services?limit=20"
 
         headers = {
             "accept": "application/json",
@@ -11,9 +11,6 @@ class Render:
         }
 
         response = requests.get(url, headers=headers)
-        """
-        returns serviceId and other info in text
-        """
 
         return response
     

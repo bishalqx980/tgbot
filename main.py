@@ -1258,8 +1258,7 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             res = await Render.list_services()
             msg, null= "", None
-            if res:
-                res = json.loads(res.text)
+            res = json.loads(res.text)
             for obj in res:
                 service = obj.get("service")
                 s_id = service.get("id")
@@ -1449,7 +1448,7 @@ def main():
     application.add_handler(CommandHandler("webshot", func_webshot, block=False))
     application.add_handler(CommandHandler("weather", func_weather, block=False))
     application.add_handler(CommandHandler("imagine", func_imagine, block=False))
-    application.add_handler(CommandHandler("chatgpt", func_chatgpt, block=False))
+    application.add_handler(CommandHandler("gpt", func_chatgpt, block=False))
     application.add_handler(CommandHandler("ytdl", func_ytdl, block=False))
     application.add_handler(CommandHandler("yts", func_yts, block=False))
     application.add_handler(CommandHandler("stats", func_stats, block=False))
