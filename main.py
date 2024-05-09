@@ -645,8 +645,8 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/gpt your_prompt</code>\nE.g. <code>/gpt What is AI?</code>")
         return
 
-    ignore_words = ["hi", "hello", "how are you"]
-    if prompt in ignore_words:
+    ignore_words = ["hi", "hello", "how are you", "how are you?"]
+    if prompt.lower() in ignore_words:
         await Message.reply_msg(update, "I'm not a chatbot! I was made for answering complex questions...")
         return
         
@@ -737,7 +737,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     g4f_gpt = await G4F.chatgpt(prompt)
 
     if not g4f_gpt:
-        await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
+        await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
         return
     
     try:
