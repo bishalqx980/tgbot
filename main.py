@@ -1351,7 +1351,7 @@ async def ex_server_alive():
                 if response.status_code == 200:
                     logger.info(f"{server_url} is up and running. ✅")
                 else:
-                    logger.warn(f"{server_url} is down or unreachable. ❌")
+                    logger.warning(f"{server_url} is down or unreachable. ❌")
             except Exception as e:
                 logger.error(f"Error webiste ping: {server_url} > {e}")
             await asyncio.sleep(180) # 3 min
