@@ -642,7 +642,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = " ".join(context.args)
 
     if not prompt:
-        await Message.reply_msg(update, "Use <code>/chatgpt your_prompt</code>\nE.g. <code>/chatgpt What is AI?</code>")
+        await Message.reply_msg(update, "Use <code>/gpt your_prompt</code>\nE.g. <code>/gpt What is AI?</code>")
         return
     
     find_user = await MongoDB.find_one("users", "user_id", user.id)
