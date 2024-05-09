@@ -1,4 +1,5 @@
 import os
+import json
 import psutil
 import asyncio
 import requests
@@ -1257,7 +1258,8 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             res = await Render.list_services()
             msg, null= "", None
-            for obj in res.text:
+            res = json.loads(res.text)
+            for obj in res:
                 service = obj.get("service")
                 s_id = service.get("id")
                 s_name = service.get("name")
@@ -1274,10 +1276,18 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         try:
             await Message.reply_msg(update, "Restarting...")
+            o_value = await MongoDB.get_data("bot_docs", "bot_status")
+            if not o_value:
+                data = {
+                    "bot_status": "restart"
+                }
+                await MongoDB.insert_single_data("bot_docs", data)
+            await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "restart")
             await Render.restart(service_id)
         except Exception as e:
             logger.info(f"Error render: {e}")
             await Message.reply_msg(update, f"Error render: {e}")
+            await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
     elif "redeploy" in msg:
         index_redeploy = msg.index("redeploy")
         service_id = msg[index_redeploy + len("redeploy"):].strip()
@@ -1287,10 +1297,18 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         try:
             await Message.reply_msg(update, f"Redeploying... Clearing Cache: {cache_clear}")
+            o_value = await MongoDB.get_data("bot_docs", "bot_status")
+            if not o_value:
+                data = {
+                    "bot_status": "restart"
+                }
+                await MongoDB.insert_single_data("bot_docs", data)
+            await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "restart")
             await Render.redeploy(service_id, cache_clear)
         except Exception as e:
             logger.info(f"Error render: {e}")
             await Message.reply_msg(update, f"Error render: {e}")
+            await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
 
 
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1400,6 +1418,13 @@ def server_alive():
 
 async def ex_server_alive():
     server_url = await MongoDB.get_data("bot_docs", "server_url")
+    bot_status = await MongoDB.get_data("bot_docs", "bot_status")
+
+    if not bot_status or bot_status == "alive":
+        await Message.send_msg(owner_id, "Bot Started!")
+    elif bot_status == "restart":
+        await Message.send_msg(owner_id, "Bot Restarted!")
+
     if len(server_url) != 0:
         if server_url[0:4] != "http":
             server_url = f"http://{server_url}"
