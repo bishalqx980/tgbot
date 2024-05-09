@@ -1258,7 +1258,8 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             res = await Render.list_services()
             msg, null= "", None
-            res = json.loads(res.text)
+            if res:
+                res = json.loads(res.text)
             for obj in res:
                 service = obj.get("service")
                 s_id = service.get("id")
