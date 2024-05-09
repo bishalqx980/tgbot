@@ -1410,8 +1410,8 @@ async def ex_server_alive():
         if not bot_status or bot_status == "alive":
             await Message.send_msg(owner_id, "Bot Started!")
         elif bot_status == "restart":
-            await Message.send_msg(owner_id, "Bot Restarted!")
             await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
+            await Message.send_msg(owner_id, "Bot Restarted!")
     except Exception as e:
         logger.info(f"Error startup_msg: {e}")
 
