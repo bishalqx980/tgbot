@@ -644,7 +644,12 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not prompt:
         await Message.reply_msg(update, "Use <code>/gpt your_prompt</code>\nE.g. <code>/gpt What is AI?</code>")
         return
-    
+
+    ignore_words = ["hi", "hello", "how are you"]
+    if prompt in ignore_words:
+        await Message.reply_msg(update, "I'm not a chatbot! I was made for answering complex questions...")
+        return
+        
     find_user = await MongoDB.find_one("users", "user_id", user.id)
 
     if not find_user:
