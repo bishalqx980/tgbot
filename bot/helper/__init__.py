@@ -41,6 +41,7 @@ commands = [
     BotCommand("database", "owner only"),
     BotCommand("bsetting", "owner only"),
     BotCommand("shell", "owner only"),
+    BotCommand("render", "owner only"),
     BotCommand("sys", "owner only")
 ]
 

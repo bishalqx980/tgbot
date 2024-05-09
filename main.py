@@ -24,6 +24,7 @@ from bot.features.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.features.weather import weather_info
 from bot.features.g4f import G4F
+from bot.features.render import Render
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1235,6 +1236,63 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, result.stderr)
 
 
+async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    msg = " ".join(context.args)
+
+    if user.id != int(owner_id):
+        await Message.reply_msg(update, "❗ This command is only for bot owner!")
+        return
+    
+    if chat.type != "private":
+        await Message.reply_msg(update, "⚠ Boss you are in public!")
+        return
+    
+    if not msg:
+        await Message.reply_msg(update, "E.g. <code>/render list</code>\n<code>/render restart { serviceId }</code>\n<code>/render redeploy { serviceId } {cache_clear « bool} (default True)</code>")
+        return
+    
+    if "list" in msg:
+        try:
+            res = await Render.list_services()
+            msg, null= "", None
+            for obj in res.text:
+                service = obj.get("service")
+                s_id = service.get("id")
+                s_name = service.get("name")
+                if s_id:
+                    msg += f"<b>{s_name}</b>: <code>{s_id}</code>\n"
+            
+            await Message.reply_msg(update, msg)
+        except Exception as e:
+            logger.info(f"Error render: {e}")
+            await Message.reply_msg(update, f"Error render: {e}")
+    elif "restart" in msg:
+        index_restart = msg.index("restart")
+        service_id = msg[index_restart + len("restart"):].strip()
+
+        try:
+            await Message.reply_msg(update, "Restarting...")
+            await Render.restart(service_id)
+        except Exception as e:
+            logger.info(f"Error render: {e}")
+            await Message.reply_msg(update, f"Error render: {e}")
+    elif "redeploy" in msg:
+        index_redeploy = msg.index("redeploy")
+        service_id = msg[index_redeploy + len("redeploy"):].strip()
+        cache_clear = msg[index_redeploy + len(service_id):].strip()
+
+        cache_clear = False if cache_clear.lower() == "false" else True
+
+        try:
+            await Message.reply_msg(update, f"Redeploying... Clearing Cache: {cache_clear}")
+            await Render.redeploy(service_id, cache_clear)
+        except Exception as e:
+            logger.info(f"Error render: {e}")
+            await Message.reply_msg(update, f"Error render: {e}")
+
+
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     if user.id != int(owner_id):
@@ -1402,6 +1460,7 @@ def main():
     application.add_handler(CommandHandler("cleardb", func_cleardb, block=False))
     application.add_handler(CommandHandler("bsetting", func_bsetting, block=False))
     application.add_handler(CommandHandler("shell", func_shell, block=False))
+    application.add_handler(CommandHandler("render", func_render, block=False))
     application.add_handler(CommandHandler("sys", func_sys, block=False))
     # filters
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
