@@ -734,7 +734,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text = chatbot.response
     """
 
-    g4f_gpt = await G4F.chatgpt(prompt)
+    g4f_gpt = await G4F.chatgpt(f"{prompt}, tell me within 100 words.")
 
     if not g4f_gpt:
         await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
