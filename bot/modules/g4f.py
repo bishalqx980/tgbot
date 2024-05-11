@@ -1,13 +1,13 @@
-from bot import logger, g4f
+import g4f
+from bot import logger
 
 class G4F:
     async def chatgpt(prompt):
         try:
-            response = g4f.chat.completions.create(
+            response = g4f.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}]
             )
-            response = response.choices[0].message.content
             return response
         except Exception as e:
             logger.error(f"Error g4f_chatgpt: {e}")

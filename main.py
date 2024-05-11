@@ -10,22 +10,22 @@ from telegram.constants import ParseMode
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ChatMemberHandler
 from bot import logger, bot_token, bot, owner_id, owner_username, bot_pic, lang_code_list, welcome_img, support_chat, telegraph, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
-from bot.mongodb import MongoDB
+from bot.modules.mongodb import MongoDB
 from bot.helper import commands
 from bot.helper.telegram_helper import Message, Button
-from bot.features.ping import ping_url
-from bot.features.shortener import shortener_url
-from bot.features.translator import translate
-from bot.features.base64 import decode_b64, encode_b64
-from bot.features.omdb_movie_info import get_movie_info
-from bot.features.utils import calc
-from bot.features.safone import Safone
-from bot.group_management import func_welcome, func_goodbye, func_antibot, track_chat_activities, func_invite_link, func_pin_msg, func_unpin_msg, func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_lockchat, func_unlockchat, func_adminlist
-from bot.features.ytdl import YouTubeDownload
+from bot.modules.ping import ping_url
+from bot.modules.shortener import shortener_url
+from bot.modules.translator import translate
+from bot.modules.base64 import decode_b64, encode_b64
+from bot.modules.omdb_movie_info import get_movie_info
+from bot.modules.utils import calc
+from bot.modules.safone import Safone
+from bot.modules.group_management import func_welcome, func_goodbye, func_antibot, track_chat_activities, func_invite_link, func_pin_msg, func_unpin_msg, func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_lockchat, func_unlockchat, func_adminlist
+from bot.modules.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
-from bot.features.weather import weather_info
-from bot.features.g4f import G4F
-from bot.features.render import Render
+from bot.modules.weather import weather_info
+from bot.modules.g4f import G4F
+from bot.modules.render import Render
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -736,7 +736,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     g4f_gpt = await G4F.chatgpt(f"{prompt}, tell me within 100 words.")
 
-    if not g4f_gpt:
+    if not g4f_gpt or ["Traffic is abnormal.", "流量异常,"] in g4f_gpt:
         await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
         return
     

@@ -2,7 +2,7 @@ from telegram import Update, ChatMember, ChatMemberUpdated
 from telegram.ext import ContextTypes
 from bot import bot, logger
 from bot.helper.telegram_helper import Message, Button
-from bot.mongodb import MongoDB
+from bot.modules.mongodb import MongoDB
 
 
 async def _check_permission(update: Update, victim=None, user=None):
