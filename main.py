@@ -1324,7 +1324,7 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
             o_value = await MongoDB.get_data("bot_docs", "bot_status")
             await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "restart")
             res = await Render.restart(service_id)
-            if res.status != 200:
+            if res.status_code != 200:
                 await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
                 await Message.edit_msg(update, "Failed to restart...", sent_msg)
         except Exception as e:
@@ -1340,7 +1340,7 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
             o_value = await MongoDB.get_data("bot_docs", "bot_status")
             await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "restart")
             res = await Render.redeploy(service_id)
-            if res.status != 200:
+            if res.status_code != 200:
                 await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
                 await Message.edit_msg(update, "Failed to redeploy...", sent_msg)
         except Exception as e:
@@ -1484,8 +1484,11 @@ async def ex_server_alive():
 
 
 def main():
-    application = ApplicationBuilder().token(bot_token).build()
-
+    try:
+        application = ApplicationBuilder().token(bot_token).build()
+    except Exception as e:
+        logger.info(f"Error: {e}")
+        
     application.add_handler(CommandHandler("start", func_start, block=False))
     application.add_handler(CommandHandler("movie", func_movieinfo, block=False))
     application.add_handler(CommandHandler("tr", func_translator, block=False))
