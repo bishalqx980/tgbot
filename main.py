@@ -1318,12 +1318,15 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif "restart" in msg:
         index_restart = msg.index("restart")
         service_id = msg[index_restart + len("restart"):].strip()
-
+        
         try:
-            await Message.reply_msg(update, "Restarting...")
+            sent_msg = await Message.reply_msg(update, "Restarting...")
             o_value = await MongoDB.get_data("bot_docs", "bot_status")
             await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "restart")
-            await Render.restart(service_id)
+            res = await Render.restart(service_id)
+            if res.status != 200:
+                await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
+                await Message.edit_msg(update, "Failed to restart...", sent_msg)
         except Exception as e:
             logger.info(f"Error render: {e}")
             await Message.reply_msg(update, f"Error render: {e}")
@@ -1333,10 +1336,13 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
         service_id = msg[index_redeploy + len("redeploy"):].strip()
 
         try:
-            await Message.reply_msg(update, f"Redeploying...")
+            sent_msg = await Message.reply_msg(update, f"Redeploying...")
             o_value = await MongoDB.get_data("bot_docs", "bot_status")
             await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "restart")
-            await Render.redeploy(service_id)
+            res = await Render.redeploy(service_id)
+            if res.status != 200:
+                await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
+                await Message.edit_msg(update, "Failed to redeploy...", sent_msg)
         except Exception as e:
             logger.info(f"Error render: {e}")
             await Message.reply_msg(update, f"Error render: {e}")
