@@ -303,6 +303,18 @@ async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, "You aren't an admin of this Group!")
             return
         
+        can_change_info = True
+        
+        if user_permission.status == ChatMember.ADMINISTRATOR:
+            admins = await bot.get_chat_administrators(chat.id)
+            for admin in admins:
+                if admin.user.id == user.id:
+                    can_change_info =  admin.can_change_info
+        
+        if not can_change_info:
+            await Message.reply_msg(update, "You don't have enough rights to change group info!")
+            return
+
         if not msg:
             lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
             btn_name = ["Language Code List 📃"]
@@ -448,6 +460,18 @@ async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
             await Message.reply_msg(update, "You aren't an admin of this Group!")
+            return
+        
+        can_change_info = True
+        
+        if user_permission.status == ChatMember.ADMINISTRATOR:
+            admins = await bot.get_chat_administrators(chat.id)
+            for admin in admins:
+                if admin.user.id == user.id:
+                    can_change_info =  admin.can_change_info
+        
+        if not can_change_info:
+            await Message.reply_msg(update, "You don't have enough rights to change group info!")
             return
         
         if msg == "on":
@@ -736,7 +760,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     g4f_gpt = await G4F.chatgpt(f"{prompt}, tell me within 100 words.")
 
-    if not g4f_gpt or ["Traffic is abnormal.", "流量异常,"] in g4f_gpt:
+    if not g4f_gpt or "流量异常, 请尝试更换网络环境, 如果你觉得ip被误封了, 可尝试邮件联系我们, 当前" in g4f_gpt:
         await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
         return
     
@@ -987,12 +1011,28 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.reply_msg(update, f"Hi, {user.mention_html()}! Start me in private to chat with me 😊!", btn)
         return
-
-    message = "<b>Available Bot Command's</b>\n\n"
-    for cmd in commands:
-        message += (f"/{cmd.command} » <i>{cmd.description}</i>\n")
     
-    await Message.reply_msg(update, message)
+    btn_name_row1 = ["Group Management", "AI"]
+    btn_data_row1 = ["group_management", "ai"]
+
+    btn_name_row2 = ["misc", "Bot owner"]
+    btn_data_row2 = ["misc_func", "owner_func"]
+
+    btn_name_row3 = ["Close"]
+    btn_data_row3 = ["close"]
+
+    row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+    row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+    row3 = await Button.cbutton(btn_name_row3, btn_data_row3)
+
+    msg = (
+        f"Hi {user.mention_html()}! Welcome to the bot help section...\n"
+        f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
+        f"/start - to start the bot\n"
+        f"/help - to see this message"
+    )
+
+    await Message.send_msg(chat.id, msg, row1 + row2 + row3)
 
 
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
