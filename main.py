@@ -9,9 +9,8 @@ from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ChatMemberHandler
-from bot import logger, bot_token, bot, owner_id, owner_username, bot_pic, lang_code_list, welcome_img, support_chat, telegraph, server_url, chatgpt_limit, usage_reset, ai_imagine_limit
+from bot import logger, bot_token, bot, owner_id, owner_username
 from bot.modules.mongodb import MongoDB
-from bot.helper import commands
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.ping import ping_url
 from bot.modules.shortener import shortener_url
@@ -26,6 +25,7 @@ from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.modules.weather import weather_info
 from bot.modules.g4f import G4F
 from bot.modules.render import Render
+from bot.update_db import update_database
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -912,6 +912,9 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if premium_users:
                     if chat_id in premium_users:
                         is_premium = "True"
+            
+            chatgpt_limit = await MongoDB.get_data("bot_docs", "chatgpt_limit")
+            ai_imagine_limit = await MongoDB.get_data("bot_docs", "ai_imagine_limit")
 
             text = (
                 f"<b>Data of <code>{chat_id}</code></b>\n"
@@ -1012,6 +1015,13 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, f"Hi, {user.mention_html()}! Start me in private to chat with me 😊!", btn)
         return
     
+    msg = (
+        f"Hi {user.mention_html()}! Welcome to the bot help section...\n"
+        f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
+        f"/start - to start the bot\n"
+        f"/help - to see this message"
+    )
+
     btn_name_row1 = ["Group Management", "AI"]
     btn_data_row1 = ["group_management", "ai"]
 
@@ -1025,14 +1035,9 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
     row3 = await Button.cbutton(btn_name_row3, btn_data_row3)
 
-    msg = (
-        f"Hi {user.mention_html()}! Welcome to the bot help section...\n"
-        f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
-        f"/start - to start the bot\n"
-        f"/help - to see this message"
-    )
+    btn = row1 + row2 + row3
 
-    await Message.send_msg(chat.id, msg, row1 + row2 + row3)
+    await Message.send_msg(chat.id, msg, btn)
 
 
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1080,6 +1085,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             sent_count += 1
             progress = (sent_count+except_count)*100/len(users_id)
             await Message.edit_msg(update, f"Total User: {len(users_id)}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {int(progress)}%", notify)
+            # sleep for 2sec
+            await asyncio.sleep(2)
         except Exception as e:
             except_count += 1
             logger.error(f"Error Broadcast: {e}")
@@ -1112,40 +1119,9 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await Message.reply_msg(update, f"<b>{msg}</b>")
 
 
-async def func_cleardb(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    c_name = "bot_docs"
-
-    if user.id != int(owner_id):
-        await Message.reply_msg(update, "❗ This command is only for bot owner!")
-        return
-    
-    try:
-        await MongoDB.delete_all_doc(c_name)
-        data = {
-            "bot_pic": bot_pic,
-            "telegraph": telegraph,
-            "support_chat": support_chat,
-            "lang_code_list": lang_code_list,
-            "welcome_img": bool(welcome_img),
-            "server_url": server_url,
-            "chatgpt_limit": chatgpt_limit,
-            "ai_imagine_limit": ai_imagine_limit,
-            "usage_reset": usage_reset
-        }
-        await MongoDB.insert_single_data(c_name, data)
-        await Message.reply_msg(update, "Database cleaned up! And restored with <code>config.env</code> file entry's!")
-    except Exception as e:
-        error = f"Error cleardb: {e}"
-        await Message.reply_msg(update, error)
-        logger.error(error)
-
-
 async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    key = " ".join(context.args)
-    c_name = "bot_docs"
 
     if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
@@ -1155,96 +1131,38 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
     
-    if not key:
-        find = await MongoDB.find(c_name, "_id")
-        if find:
-            data = await MongoDB.find_one(c_name, "_id", find[0])
-        else:
-            data = {
-                    "bot_pic": bot_pic,
-                    "telegraph": telegraph,
-                    "support_chat": support_chat,
-                    "lang_code_list": lang_code_list,
-                    "welcome_img": bool(welcome_img),
-                    "server_url": server_url,
-                    "chatgpt_limit": chatgpt_limit,
-                    "ai_imagine_limit": ai_imagine_limit,
-                    "usage_reset": usage_reset
-                }
-            await MongoDB.insert_single_data(c_name, data)
+    btn_name_row1 = ["Bot pic", "Welcome img"]
+    btn_data_row1 = ["bot_pic", "welcome_img"]
 
-            find = await MongoDB.find(c_name, "_id")
-            if find:
-                data = await MongoDB.find_one(c_name, "_id", find[0])
-            else:
-                await Message.reply_msg(update, f"Error bsetting: {e}")
+    btn_name_row2 = ["Telegraph", "lang code list"]
+    btn_data_row2 = ["telegraph", "lang_code_list"]
 
-        b_pic = data.get("bot_pic")
-        tele_graph = data.get("telegraph")
-        s_chat = data.get("support_chat")
-        lcl = data.get("lang_code_list")
-        wel_img = data.get("welcome_img")
-        ser_url = data.get("server_url")
-        cgpt_l = data.get("chatgpt_limit")
-        imagine_l = data.get("ai_imagine_limit")
-        u_reset = data.get("usage_reset")
-        premium_seller = data.get("premium_seller")
-        if not premium_seller:
-            premium_seller = f"{owner_username}"
-        premium_users = data.get("premium_users")
-        if not premium_users:
-            premium_users = []
-        premium_users_count = len(premium_users) if premium_users else 0
+    btn_name_row3 = ["Support chat", "Server url"]
+    btn_data_row3 = ["support_chat", "server_url"]
 
-        msg = (
-            f"<b>Bot Setting</b>\n"
-            f"[collection_name: value]\n\n"
-            f"<code>bot_pic          </code>: <i>{b_pic}</i>\n"
-            f"<code>telegraph        </code>: <i>{tele_graph}</i>\n"
-            f"<code>support_chat     </code>: <i>{s_chat}</i>\n"
-            f"<code>lang_code_list   </code>: <i>{lcl}</i>\n"
-            f"<code>welcome_img      </code>: <i>{wel_img}</i>\n"
-            f"<code>server_url       </code>: <i>{ser_url}</i>\n"
-            f"<code>chatgpt_limit    </code>: <i>{cgpt_l}</i>\n"
-            f"<code>ai_imagine_limit </code>: <i>{imagine_l}</i>\n"
-            f"<code>usage_reset      </code>: <i>{u_reset}</i>\n"
-            f"<code>premium_seller    </code>: <i>@{premium_seller}</i>\n"
-            f"<code>premium_users     </code>: <i>{premium_users_count} » {premium_users}</i>\n\n"
-            f"<i><code>/bsetting collection_name -n new_value</code> (blank new_value means none)</i>\n"
-            f"<i>premium_users E.g 12345678, 87654321 ... & premium_seller name without @</i>\n"
-            f"<i><code>/cleardb</code> - To clear <code>bot_docs</code> entry's and insert entry from <code>config.env</code> file!</i>"
-        )
-        await Message.reply_msg(update, f"<b>{msg}</b>")
-        return
+    btn_name_row4 = ["ChatGpt limit", "Imagine limit", "Usage reset"]
+    btn_data_row4 = ["chatgpt_limit", "ai_imagine_limit", "usage_reset"]
 
-    if "-n" in key:
-        index_n = key.index("-n")
-        n_value = key[index_n + len("-n"):].strip()
-        if n_value.lower() == "true":
-            n_value = bool(True)
-        elif n_value.lower() == "false":
-            n_value = bool(False)
-        key = key[0:index_n].strip()
-        if key == "collection_name":
-            await Message.reply_msg(update, "⚠ It's an example!!")
-            return
+    btn_name_row5 = ["Premium seller", "Premium users"]
+    btn_data_row5 = ["premium_seller", "premium_users"]
+
+    btn_name_row6 = ["⚠ Restore Settings", "Close"]
+    btn_data_row6 = ["restore_db", "close"]
+
+    row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+    row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+    row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+    row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
+    row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
+    row6 = await Button.cbutton(btn_name_row6, btn_data_row6, True)
+
+    btn = row1 + row2 + row3 + row4 + row5 + row6
+
+    bot_pic = await MongoDB.get_data("bot_docs", "bot_pic")
+    if bot_pic:
+        await Message.send_img(chat.id, bot_pic, "<b>Bot Settings</b>", btn)
     else:
-        await Message.reply_msg(update, "<code>-n</code> not provided")
-    try:
-        o_value = await MongoDB.get_data(c_name, key)
-        if key == "premium_users":
-            if "," in n_value:
-                storage = []
-                for user_id in n_value.split(","):
-                    storage.append(int(user_id))
-                n_value = storage
-            else:
-                n_value = [int(n_value)]
-        await MongoDB.update_db(c_name, key, o_value, key, n_value)
-        await Message.reply_msg(update, "Database Updated!")
-    except Exception as e:
-        logger.error(f"Error bsetting: {e}")
-        await Message.reply_msg(update, f"Error bsetting: {e}")     
+        await Message.send_msg(chat.id, "<b>Bot Setting</b>", btn)
 
 
 async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1398,6 +1316,12 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         echo_status = find_user.get("echo")
         auto_tr_status = find_user.get("auto_tr")
 
+        if context.chat_data.get("status") == "editing" and user.id == int(owner_id):
+            if msg.isdigit():
+                msg = int(msg)
+            context.chat_data["new_value"] = msg
+            return
+
         # Trigger
         if echo_status == "on":
             await Message.reply_msg(update, msg)
@@ -1450,7 +1374,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
 
 
-def server_alive():
+def start_up_work():
+    asyncio.run(update_database())
     asyncio.run(ex_server_alive())
 
 
@@ -1484,10 +1409,7 @@ async def ex_server_alive():
 
 
 def main():
-    try:
-        application = ApplicationBuilder().token(bot_token).build()
-    except Exception as e:
-        logger.info(f"Error: {e}")
+    application = ApplicationBuilder().token(bot_token).build()
         
     application.add_handler(CommandHandler("start", func_start, block=False))
     application.add_handler(CommandHandler("movie", func_movieinfo, block=False))
@@ -1526,7 +1448,6 @@ def main():
     # owner
     application.add_handler(CommandHandler("broadcast", func_broadcast, block=False))
     application.add_handler(CommandHandler("database", func_database, block=False))
-    application.add_handler(CommandHandler("cleardb", func_cleardb, block=False))
     application.add_handler(CommandHandler("bsetting", func_bsetting, block=False))
     application.add_handler(CommandHandler("shell", func_shell, block=False))
     application.add_handler(CommandHandler("render", func_render, block=False))
@@ -1543,6 +1464,6 @@ def main():
 
 if __name__ == "__main__":
     logger.info("🤖 Bot Started !!")
-    thread = threading.Thread(target=server_alive)
+    thread = threading.Thread(target=start_up_work)
     thread.start()
     main()

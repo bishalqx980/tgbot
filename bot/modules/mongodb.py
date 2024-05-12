@@ -7,26 +7,29 @@ db = client[db_name]
 
 class MongoDB:
     async def insert_single_data(collection_name, data):
+        """
+        ex. data = {"name": "John", "age": 30, "city": "New York"}
+        """
         collection = db[collection_name]
-        #ex. data = {"name": "John", "age": 30, "city": "New York"}
 
         try:
             logger.info(f"Inserting Single Data in {collection_name} MongoDB...")
             inject = collection.insert_one(data)
             inserted_id = inject.inserted_id
-            logger.info("Inserted ID:", inserted_id)
+            logger.info(f"Inserted ID: {inserted_id}")
             return inserted_id
         except Exception as e:
             logger.error(f"Error (inserting db_data): {e}")
 
 
     async def insert_multiple_data(collection_name, data_list):
+        """
+        ex. data = [
+            { "name": "Alice", "age": 25, "city": "San Francisco" },
+            { "name": "Bob", "age": 28, "city": "Seattle" },
+        ]
+        """
         collection = db[collection_name]
-
-        # ex. data = [
-        #     { "name": "Alice", "age": 25, "city": "San Francisco" },
-        #     { "name": "Bob", "age": 28, "city": "Seattle" },
-        # ]
 
         try:
             logger.info(f"Inserting Multiple Data in {collection_name} MongoDB...")
@@ -39,11 +42,12 @@ class MongoDB:
 
 
     async def find_one(collection_name, search, match):
-        '''
+        """
         Example: x = find_one(collection_name)\n
         x.get(item)
-        '''
+        """
         collection = db[collection_name]
+        
         try:
             logger.info(f"Finding Data in {collection_name} MongoDB...")
             document = collection.find_one({search: match})

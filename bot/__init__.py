@@ -26,11 +26,13 @@ shortener_api_key = os.getenv("shortener_api_key")
 omdb_api = os.getenv("omdb_api")
 weather_api_key = os.getenv("weather_api_key")
 render_api = os.getenv("render_api")
-#safone api
-safone_api = SafoneAPI()
+#Limits
 chatgpt_limit = os.getenv("chatgpt_limit")
 ai_imagine_limit = os.getenv("ai_imagine_limit")
 usage_reset = os.getenv("usage_reset")
+
+#safone api
+safone_api = SafoneAPI()
 
 bot = Bot(bot_token)
 
