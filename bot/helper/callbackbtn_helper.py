@@ -566,7 +566,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # global close
     elif data == "close":
-        await Message.del_msg(user.id, update.effective_message)
         await query.message.delete()
         context.bot_data.clear()
         context.user_data.clear()
