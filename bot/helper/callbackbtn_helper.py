@@ -507,13 +507,14 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         if edit_data == "premium_users":
-            if "," in new_value:
-                storage = []
-                for user_id in new_value.split(","):
-                    storage.append(int(user_id))
-                new_value = storage
+            if not new_value.isdigit():
+                if "," in new_value:
+                    storage = []
+                    for user_id in new_value.split(","):
+                        storage.append(int(user_id))
+                    new_value = storage
             else:
-                new_value = [int(new_value)]
+                new_value = [new_value]
         
         if not isinstance(new_value, int) and edit_data != "premium_users":
             if new_value.lower() == "true":
