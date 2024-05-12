@@ -1036,8 +1036,12 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     row3 = await Button.cbutton(btn_name_row3, btn_data_row3)
 
     btn = row1 + row2 + row3
-
-    await Message.send_msg(chat.id, msg, btn)
+    
+    bot_pic = await MongoDB.get_data("bot_docs", "bot_pic")
+    if bot_pic:
+        await Message.send_img(chat.id, bot_pic, msg, btn)
+    else:
+        await Message.send_msg(chat.id, msg, btn)
 
 
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
