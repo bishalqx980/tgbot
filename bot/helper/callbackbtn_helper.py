@@ -51,6 +51,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/kickme » The easy way to out\n"
             "/mute » Mute a member in group (member will be unable to send messages etc.)\n"
             "/unmute » Unmute a member (member will be able to send messages etc.)\n"
+            "/del » Delete replied message with notifying/telling something to the member!\n"
             "/lock » Lock the chat (no one can send messages etc.)\n"
             "/unlock » Unlock the chat (back to normal)\n"
             "/adminlist » See chat admins list\n"

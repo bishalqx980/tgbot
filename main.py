@@ -19,7 +19,7 @@ from bot.modules.base64 import decode_b64, encode_b64
 from bot.modules.omdb_movie_info import get_movie_info
 from bot.modules.utils import calc
 from bot.modules.safone import Safone
-from bot.modules.group_management import func_welcome, func_goodbye, func_antibot, track_chat_activities, func_invite_link, func_pin_msg, func_unpin_msg, func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_lockchat, func_unlockchat, func_adminlist
+from bot.modules.group_management import func_welcome, func_goodbye, func_antibot, track_chat_activities, func_invite_link, func_pin_msg, func_unpin_msg, func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_del, func_lockchat, func_unlockchat, func_adminlist
 from bot.modules.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.modules.weather import weather_info
@@ -1445,6 +1445,7 @@ def main():
     application.add_handler(CommandHandler("kickme", func_kickme, block=False))
     application.add_handler(CommandHandler("mute", func_mute, block=False))
     application.add_handler(CommandHandler("unmute", func_unmute, block=False))
+    application.add_handler(CommandHandler("del", func_del, block=False))
     application.add_handler(CommandHandler("lock", func_lockchat, block=False))
     application.add_handler(CommandHandler("unlock", func_unlockchat, block=False))
     application.add_handler(CommandHandler("adminlist", func_adminlist, block=False))

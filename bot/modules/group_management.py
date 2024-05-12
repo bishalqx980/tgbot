@@ -500,7 +500,7 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the user whom you want to ban!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to ban!")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -558,7 +558,7 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the user whom you want to unban!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to unban!")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -617,7 +617,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the user whom you want to kick!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to kick!")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -717,7 +717,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the user whom you want to mute!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to mute!")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -787,7 +787,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the user whom you want to unmute!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to unmute!")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -818,6 +818,55 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await bot.restrict_chat_member(chat.id, victim.id, permissions)
         await Message.reply_msg(update, f"{user.mention_html()} has unmuted user {victim.mention_html()}!")
+    except Exception as e:
+        logger.info(f"Error: {e}")
+        await Message.send_msg(chat.id, f"Error: {e}")
+
+
+async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    reply = update.message.reply_to_message
+    victim = reply.from_user if reply else None
+    reason = " ".join(context.args)
+
+    _chk_per = await _check_permission(update, victim, user)
+
+    if not _chk_per:
+        return
+    
+    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+
+    if chat.type not in ["group", "supergroup"]:
+        btn_name = ["Add me in Group"]
+        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn = await Button.ubutton(btn_name, btn_url)
+        await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
+        return
+    
+    if bot_permission.status != ChatMember.ADMINISTRATOR:
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
+        return
+    
+    if user_permission.status == ChatMember.ADMINISTRATOR:
+        if not admin_rights.get("can_delete_messages"):
+            await Message.reply_msg(update, "You don't have enough rights to delete chat messages!")
+            return
+    
+    if not reply:
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member message which one you want to delete!\nYou can tell something by <code>/del please don't send this message again!</code>")
+        return
+
+    try:
+        await Message.del_msg(chat.id, reply)
+        msg = f"{victim.mention_html()}, your message is deleted by {user.mention_html()}!"
+        if reason:
+            msg = f"{msg}\nReason: {reason}"
+        await Message.send_msg(chat.id, msg)
     except Exception as e:
         logger.info(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")

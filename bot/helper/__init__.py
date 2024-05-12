@@ -33,6 +33,7 @@ commands = [
     BotCommand("kickme", "The easy way to out"),
     BotCommand("mute", "Mute an user (Restrict from group)"),
     BotCommand("unmute", "Unmute an user (Unrestrict from group)"),
+    BotCommand("del", "Delete a message with replying user message"),
     BotCommand("lock", "Lockdown the group"),
     BotCommand("unlock", "Unlock the group"),
     BotCommand("adminlist", "See group admins list"),
