@@ -49,8 +49,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/kickme » The easy way to out\n"
             "/mute » Mute a member in group (member will be unable to send messages etc.)\n"
             "/unmute » Unmute a member (member will be able to send messages etc.)\n"
-            "/lockchat » Lock the chat (no one can send messages etc.)\n"
-            "/unlockchat » Unlock the chat (back to normal)\n"
+            "/lock » Lock the chat (no one can send messages etc.)\n"
+            "/unlock » Unlock the chat (back to normal)\n"
             "/adminlist » See chat admins list\n"
             "/stats » Show chat config data\n\n"
             "<i>Note: Type commands to get more details about the command function!</i>"
@@ -66,7 +66,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sent_msg = query.message
 
         msg = (
-            "Artificial Intelligence functions -\n\n"
+            "Artificial Intelligent functions -\n\n"
             "/imagine » Generate AI image\n"
             "/gpt » Ask any question to ChatGPT\n\n"
             "<i>Note: Type commands to get more details about the command function!</i>"

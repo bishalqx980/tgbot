@@ -758,7 +758,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text = chatbot.response
     """
 
-    g4f_gpt = await G4F.chatgpt(f"{prompt}, tell me within 100 words.")
+    g4f_gpt = await G4F.chatgpt(f"{prompt}, tell me under 300 words.")
 
     if not g4f_gpt or "流量异常, 请尝试更换网络环境, 如果你觉得ip被误封了, 可尝试邮件联系我们, 当前" in g4f_gpt:
         await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
@@ -1519,8 +1519,8 @@ def main():
     application.add_handler(CommandHandler("kickme", func_kickme, block=False))
     application.add_handler(CommandHandler("mute", func_mute, block=False))
     application.add_handler(CommandHandler("unmute", func_unmute, block=False))
-    application.add_handler(CommandHandler("lockchat", func_lockchat, block=False))
-    application.add_handler(CommandHandler("unlockchat", func_unlockchat, block=False))
+    application.add_handler(CommandHandler("lock", func_lockchat, block=False))
+    application.add_handler(CommandHandler("unlock", func_unlockchat, block=False))
     application.add_handler(CommandHandler("adminlist", func_adminlist, block=False))
     application.add_handler(CommandHandler("help", func_help, block=False))
     # owner

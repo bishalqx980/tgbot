@@ -68,7 +68,7 @@ async def func_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
 
     help_msg = (
-        "This feature will welcome new user in your group!\n"
+        "This feature will welcome new user in the chat!\n"
         "Use <code>/welcome on</code> to turn on.\n"
         "Use <code>/welcome off</code> to turn off.\n\n"
         #"You can set welcome message by replying your custom message (markdown supported)."
@@ -96,29 +96,29 @@ async def func_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
     _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin of this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_change_info"):
-            await Message.reply_msg(update, "You don't have enough rights to change group info!")
+            await Message.reply_msg(update, "You don't have enough rights to change chat info!")
             return
     
     if msg == "on":
         try:
             await MongoDB.update_db("groups", "chat_id", chat.id, "welcome_msg", "on")
-            await Message.reply_msg(update, "Welcome message has been enabled in this chat!\nFrom now I will welcome new members in this group!")
+            await Message.reply_msg(update, "Welcome message has been enabled in this chat!\nFrom now I will welcome new members in this chat!")
         except Exception as e:
             logger.error(f"Error enabling welcome_msg: {e}")
             await Message.reply_msg(update, f"Error: {e}")
     elif msg == "off":
         try:
             await MongoDB.update_db("groups", "chat_id", chat.id, "welcome_msg", "off")
-            await Message.reply_msg(update, "Welcome message has been disabled in this chat!\nI won't welcome new members in this group!")
+            await Message.reply_msg(update, "Welcome message has been disabled in this chat!\nI won't welcome new members in this chat!")
         except Exception as e:
             logger.error(f"Error disabling welcome_msg: {e}")
             await Message.reply_msg(update, f"Error: {e}")
@@ -132,7 +132,7 @@ async def func_goodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
 
     help_msg = (
-        "This feature will notify you in group if any user lefts your group!\n\n"
+        "This feature will send farewell message in chat when any user left the chat!\n\n"
         "Use <code>/goodbye on</code> to turn on.\n"
         "Use <code>/goodbye off</code> to turn off.\n\n"
         #"You can set goodbye message by replying your custom message (markdown supported)."
@@ -160,29 +160,29 @@ async def func_goodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
     _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin of this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_change_info"):
-            await Message.reply_msg(update, "You don't have enough rights to change group info!")
+            await Message.reply_msg(update, "You don't have enough rights to change chat info!")
             return
     
     if msg == "on":
         try:
             await MongoDB.update_db("groups", "chat_id", chat.id, "goodbye_msg", "on")
-            await Message.reply_msg(update, "Goodbye message has been enabled in this chat!\nFrom now I will notify you in group if any user lefts your group!")
+            await Message.reply_msg(update, "Goodbye message has been enabled in this chat!\nFrom now I will send farewell message in chat when any user left the chat!")
         except Exception as e:
             logger.error(f"Error enabling goodbye_msg: {e}")
             await Message.reply_msg(update, f"Error: {e}")
     elif msg == "off":
         try:
             await MongoDB.update_db("groups", "chat_id", chat.id, "goodbye_msg", "off")
-            await Message.reply_msg(update, "Goodbye message has been disabled in this chat!\nI won't notify you if any user lefts your group!")
+            await Message.reply_msg(update, "Goodbye message has been disabled in this chat!\nI won't send farewell message in chat if any user left the chat!")
         except Exception as e:
             logger.error(f"Error disabling goodbye_msg: {e}")
             await Message.reply_msg(update, f"Error: {e}")
@@ -196,7 +196,7 @@ async def func_antibot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
 
     help_msg = (
-        "This feature will prevent bots from joining in your group!\n"
+        "This feature will prevent bots from joining in the chat!\n"
         "Use <code>/antibot on</code> to turn on.\n"
         "Use <code>/antibot off</code> to turn off.\n"
     )
@@ -223,29 +223,29 @@ async def func_antibot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin of this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
 
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_change_info"):
-            await Message.reply_msg(update, "You don't have enough rights to change group info!")
+            await Message.reply_msg(update, "You don't have enough rights to change chat info!")
             return
     
     if msg == "on":
         try:
             await MongoDB.update_db("groups", "chat_id", chat.id, "antibot", "on")
-            await Message.reply_msg(update, "Antibot has been enabled in this chat!\nFrom now I will protect your group from bots spam!")
+            await Message.reply_msg(update, "Antibot has been enabled in this chat!\nFrom now I will protect the chat from bots joining!")
         except Exception as e:
             logger.error(f"Error enabling antibot: {e}")
             await Message.reply_msg(update, f"Error: {e}")
     elif msg == "off":
         try:
             await MongoDB.update_db("groups", "chat_id", chat.id, "antibot", "off")
-            await Message.reply_msg(update, "Antibot has been disabled in this chat!\nI won't protect your group from bots spam!")
+            await Message.reply_msg(update, "Antibot has been disabled in this chat!\nI won't protect the chat from bots joining!")
         except Exception as e:
             logger.error(f"Error disabling antibot: {e}")
             await Message.reply_msg(update, f"Error: {e}")
@@ -286,7 +286,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
             _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
             if bot_permission.status != ChatMember.ADMINISTRATOR:
-                await Message.send_msg(chat.id, "<b>Antibot:</b> I'm not an admin of this group!")
+                await Message.send_msg(chat.id, "<b>Antibot:</b> I'm not an admin in this chat!")
                 return
             
             if victim_permission.status == ChatMember.ADMINISTRATOR:
@@ -295,14 +295,14 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
             
             try:
                 await bot.ban_chat_member(chat.id, victim.id)
-                await Message.send_msg(chat.id, f"<b>Antibot</b> has banned {victim.mention_html()} from this group!")
+                await Message.send_msg(chat.id, f"<b>Antibot</b> has banned {victim.mention_html()} from this chat!")
             except Exception as e:
                 logger.info(f"Error: {e}")
                 await Message.send_msg(chat.id, f"Error: {e}")
         elif welcome_msg == "on":
             await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
     elif user_exist == False and reason == "left" and goodbye_msg == "on":
-        await Message.send_msg(chat.id, f"{victim.mention_html()} just left the group...")
+        await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")
 
 
 async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -320,20 +320,20 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "This feature will get invite link of your group!\nAdd me to manage your group!", btn)
+        await Message.send_msg(chat.id, "This feature will get invite link of the chat!\nAdd me to manage the chat!", btn)
         return
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
 
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_invite_users"):
-            await Message.reply_msg(update, "You don't have enough rights to invite users in group!")
+            await Message.reply_msg(update, "You don't have enough rights to invite users in this chat!")
             return
     
     try:
@@ -341,13 +341,13 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if chat.link:
             msg = (
-                f"Group public link: {chat.link}\n"
-                f"Group invite link: {invite_link.invite_link}\n"
+                f"Chat public link: {chat.link}\n"
+                f"Chat invite link: {invite_link.invite_link}\n"
                 f"Generated by: {user.mention_html()}"
             )
         else:
             msg = (
-                f"Group invite link: {invite_link.invite_link}\n"
+                f"Chat invite link: {invite_link.invite_link}\n"
                 f"Generated by: {user.mention_html()}"
             )
 
@@ -374,15 +374,15 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "This feature will pin replied message loudly in your group!\nAdd me to manage your group!", btn)
+        await Message.send_msg(chat.id, "This feature will pin replied message loudly in the chat!\nAdd me to manage the chat!", btn)
         return
 
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
@@ -421,15 +421,15 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "This feature will unpin replied message in your group!\nUse <code>/unpin all</code> to unpin all pinned messages of group!\nAdd me to manage your group!", btn)
+        await Message.send_msg(chat.id, "This feature will unpin replied message in the chat!\nUse <code>/unpin all</code> to unpin all pinned messages of chat!\nAdd me to manage the chat!", btn)
         return
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
@@ -439,18 +439,18 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if msg == "all":
         if user_permission.status != ChatMember.OWNER:
-            await Message.reply_msg(update, "❌ This command is only for group owner!")
+            await Message.reply_msg(update, "❌ This command is only for chat owner!")
             return
         
         context.chat_data["chat_id"] = chat.id
         btn_name = ["⚠ YES", "🍀 NO"]
         btn_data = ["unpin_all", "close"]
         btn = await Button.cbutton(btn_name, btn_data, True)
-        await Message.reply_msg(update, f"Do you really want to unpin all messages of this group?", btn)
+        await Message.reply_msg(update, f"Do you really want to unpin all messages of this chat?", btn)
         return
 
     if not reply:
-        await Message.reply_msg(update, "This feature will unpin replied message!\nUse <code>/unpin all</code> to unpin all pinned messages of group!")
+        await Message.reply_msg(update, "This feature will unpin replied message!\nUse <code>/unpin all</code> to unpin all pinned messages of chat!")
         return
     
     try:
@@ -487,16 +487,16 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin of this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_restrict_members"):
-            await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict group member!")
+            await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict chat member!")
             return
     
     if not reply:
@@ -508,14 +508,14 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if victim_permission.status == ChatMember.BANNED:
-        await Message.reply_msg(update, "The user is already banned in this group!")
+        await Message.reply_msg(update, "The user is already banned in this chat!")
         return
     
     try:
         await bot.ban_chat_member(chat.id, victim.id)
-        await Message.reply_msg(update, f"{user.mention_html()} has removed user {victim.mention_html()} from this group!")
+        await Message.reply_msg(update, f"{user.mention_html()} has banned user {victim.mention_html()} from this chat!")
         try:
-            await Message.send_msg(victim.id, f"{user.mention_html()} has removed you from {chat.title}!")
+            await Message.send_msg(victim.id, f"{user.mention_html()} has banned you from {chat.title}!")
         except Exception as e:
             logger.error(f"Error: {e}")
     except Exception as e:
@@ -545,16 +545,16 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin of this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_restrict_members"):
-            await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict group member!")
+            await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict chat member!")
             return
     
     if not reply:
@@ -562,7 +562,7 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, f"Group admin's can't be banned or unbanned.")
+        await Message.reply_msg(update, f"Chat admin's can't be banned or unbanned.")
         return
     
     if victim_permission.status != ChatMember.BANNED:
@@ -604,16 +604,16 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_restrict_members"):
-            await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict group member!")
+            await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict chat member!")
             return
     
     if not reply:
@@ -625,13 +625,13 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if victim_permission.status != ChatMember.MEMBER:
-        await Message.reply_msg(update, "The user isn't a member of this group!")
+        await Message.reply_msg(update, "The user isn't a member in this chat!")
         return
     
     try:
         await bot.ban_chat_member(chat.id, victim.id)
         await bot.unban_chat_member(chat.id, victim.id)
-        await Message.reply_msg(update, f"{user.mention_html()} has kicked user {victim.mention_html()} from this group!")
+        await Message.reply_msg(update, f"{user.mention_html()} has kicked user {victim.mention_html()} from this chat!")
         try:
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
             await Message.send_msg(victim.id, f"{user.mention_html()} has kicked you from {chat.title}!\nInvite Link: {invite_link.invite_link}")
@@ -662,7 +662,7 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -704,16 +704,16 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
         
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_restrict_members"):
-            await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict group member!")
+            await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict chat member!")
             return
     
     if not reply:
@@ -725,7 +725,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if victim_permission.status == ChatMember.RESTRICTED:
-        await Message.reply_msg(update, "The user is already muted in this group!")
+        await Message.reply_msg(update, "The user is already muted in this chat!")
         return
     
     permissions = {
@@ -774,16 +774,16 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_restrict_members"):
-            await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict group member!")
+            await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict chat member!")
             return
     
     if not reply:
@@ -791,7 +791,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, f"Group admin's can't be muted or unmuted!")
+        await Message.reply_msg(update, f"Chat admin's can't be muted or unmuted!")
         return
     
     if victim_permission.status != ChatMember.RESTRICTED:
@@ -838,20 +838,20 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "This feature will remove all permissions of group! No one will be able to send message Etc.\nAdd me to manage your group!", btn)
+        await Message.send_msg(chat.id, "This feature will remove all permissions of chat! No one will be able to send message etc.\nAdd me to manage the chat!", btn)
         return
         
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_change_info"):
-            await Message.reply_msg(update, "You don't have enough rights to manage group!")
+            await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
             return
     
     permissions = {
@@ -869,7 +869,7 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         await bot.set_chat_permissions(chat.id, permissions)
-        await Message.send_msg(chat.id, f"This group has been Locked!\nEffective admin: {user.mention_html()}")
+        await Message.send_msg(chat.id, f"This chat has been Locked!\nEffective admin: {user.mention_html()}")
     except Exception as e:
         logger.info(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -890,20 +890,20 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "This feature will restore all permissions of group! Everyone will be able to send message Etc.\nAdd me to manage your group!", btn)
+        await Message.send_msg(chat.id, "This feature will restore all permissions of chat! Everyone will be able to send message etc.\nAdd me to manage the chat!", btn)
         return
         
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this group!")
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin of this group!")
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_change_info"):
-            await Message.reply_msg(update, "You don't have enough rights to manage group!")
+            await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
             return
                     
     permissions = {
@@ -921,7 +921,7 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         await bot.set_chat_permissions(chat.id, permissions)
-        await Message.send_msg(chat.id, f"This group has been Unlocked!\nEffective admin: {user.mention_html()}")
+        await Message.send_msg(chat.id, f"This chat has been Unlocked!\nEffective admin: {user.mention_html()}")
     except Exception as e:
         logger.info(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
