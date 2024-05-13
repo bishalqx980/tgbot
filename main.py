@@ -19,7 +19,26 @@ from bot.modules.base64 import decode_b64, encode_b64
 from bot.modules.omdb_movie_info import get_movie_info
 from bot.modules.utils import calc
 from bot.modules.safone import Safone
-from bot.modules.group_management import func_welcome, func_goodbye, func_antibot, track_chat_activities, func_invite_link, func_pin_msg, func_unpin_msg, func_ban, func_unban, func_kick, func_kickme, func_mute, func_unmute, func_del, func_lockchat, func_unlockchat, func_adminlist
+from bot.modules.group_management import (
+    func_welcome,
+    func_goodbye,
+    func_antibot,
+    track_chat_activities,
+    func_invite_link,
+    func_promote,
+    func_demote,
+    func_pin_msg,
+    func_unpin_msg,
+    func_ban,
+    func_unban,
+    func_kick,
+    func_kickme,
+    func_mute,
+    func_unmute,
+    func_del,
+    func_lockchat,
+    func_unlockchat,
+    func_adminlist)
 from bot.modules.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.modules.weather import weather_info
@@ -1437,6 +1456,8 @@ def main():
     application.add_handler(CommandHandler("goodbye", func_goodbye, block=False))
     application.add_handler(CommandHandler("antibot", func_antibot, block=False))
     application.add_handler(CommandHandler("invite", func_invite_link, block=False))
+    application.add_handler(CommandHandler("promote", func_promote, block=False))
+    application.add_handler(CommandHandler("demote", func_demote, block=False))
     application.add_handler(CommandHandler("pin", func_pin_msg, block=False))
     application.add_handler(CommandHandler("unpin", func_unpin_msg, block=False))
     application.add_handler(CommandHandler("ban", func_ban, block=False))

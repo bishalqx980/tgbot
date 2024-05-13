@@ -13,7 +13,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = query.from_user
     sent_msg = query.message
 
-
     # youtube
     if data == "mp4":
         # importing from main.py
@@ -39,17 +38,19 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/setlang » Set chat default language\n"
             "/echo » Make chat fun\n"
             "/id » Show chat/user id\n"
-            "/welcome » To set welcome message in group\n"
-            "/goodbye » To set goodbye message in group\n"
-            "/antibot » Restrict other bots from joining in group\n"
-            "/invite » Generate/Get invite link for Group\n"
-            "/pin » Pin message loudly in group\n"
+            "/welcome » To set welcome message\n"
+            "/goodbye » To set goodbye message\n"
+            "/antibot » Prevent other bots from joining\n"
+            "/invite » Generate/Get invite link\n"
+            "/promote » Promote a member\n"
+            "/demote » Demote a member\n"
+            "/pin » Pin message loudly\n"
             "/unpin » Unpin a pinned message or all pinned messages\n"
-            "/ban » Ban a member from group\n"
-            "/unban » Unban a member from group\n"
-            "/kick » Kick a member from group\n"
+            "/ban » Ban a member\n"
+            "/unban » Unban a member\n"
+            "/kick » Kick a member\n"
             "/kickme » The easy way to out\n"
-            "/mute » Mute a member in group (member will be unable to send messages etc.)\n"
+            "/mute » Mute a member (member will be unable to send messages etc.)\n"
             "/unmute » Unmute a member (member will be able to send messages etc.)\n"
             "/del » Delete replied message with notifying/telling something to the member!\n"
             "/lock » Lock the chat (no one can send messages etc.)\n"
@@ -168,8 +169,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Bot pic: <code>{bot_pic}</code>\n"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -193,8 +194,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<i>Note: True or False</i>"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -217,8 +218,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Telegraph link: <code>{telegraph}</code>\n"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -241,8 +242,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Language code list (link): <code>{lang_code_list}</code>\n"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -265,8 +266,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Support Chat (link): <code>{support_chat}</code>\n"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -290,8 +291,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<i>Note: Bot will fall asleep if you deployed the bot on render (free) and don't set this value...</i>"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -316,8 +317,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<i>Note: This limit is for other users! Will be reset after {usage_reset}hour!</i>"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -342,8 +343,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<i>Note: This limit is for other users! Will be reset after {usage_reset}hour!</i>"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -367,8 +368,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<i>Note: Usage reset time for limited functions like chagpt, imagine etc. (Applicable for users)</i>"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -397,8 +398,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<i>Note: Send premium seller username without @ eg. <code>bishalqx980</code></i>"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -425,8 +426,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<i>Note: Send user ids in a list eg. <code>123456, 125123, ...</code> separated with comma | for single user id eg. <code>123456</code></i>"
         )
 
-        btn_name_row1 = ["Edit Value"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["b_setting_menu", "close"]
@@ -475,7 +476,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     
     elif data == "edit_value":
-
         edit_data = context.chat_data.get("edit_data")
         old_value = context.chat_data.get("old_value")
 
@@ -507,7 +507,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         if edit_data == "premium_users":
-            if not new_value.isdigit():
+            if not isinstance(new_value, int):
                 if "," in new_value:
                     storage = []
                     for user_id in new_value.split(","):
@@ -534,6 +534,22 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.bot_data.clear()
         context.user_data.clear()
         context.chat_data.clear()
+
+    elif data == "remove_value":
+        edit_data = context.chat_data.get("edit_data")
+        old_value = context.chat_data.get("old_value")
+        new_value = None
+
+        if not edit_data:
+            await Message.send_msg(user.id, "I don't know which data to update! Please go back and then try again!")
+            return
+
+        try:
+            await MongoDB.update_db("bot_docs", edit_data, old_value, edit_data, new_value)
+            await Message.send_msg(user.id, f"{edit_data} value set to <code>{new_value}</code>!") 
+        except Exception as e:
+            logger.info(f"Error: {e}")
+            await Message.send_msg(user.id, f"Error: {e}")
 
     elif data == "b_setting_menu":
         btn_name_row1 = ["Bot pic", "Welcome img"]

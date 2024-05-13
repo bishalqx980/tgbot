@@ -8,6 +8,8 @@ from bot.modules.mongodb import MongoDB
 async def _check_permission(update: Update, victim=None, user=None):
     chat = update.effective_chat
 
+    del_msg = await Message.send_msg(chat.id, "Checking permission...")
+
     _bot = await bot.get_me()
     bot_permission = await chat.get_member(_bot.id)
 
@@ -30,6 +32,8 @@ async def _check_permission(update: Update, victim=None, user=None):
                 }
             
     victim_permission = await chat.get_member(victim.id) if victim else None
+
+    await Message.del_msg(chat.id, del_msg)
 
     return _bot, bot_permission, user_permission, admin_rights, victim_permission
 
@@ -67,8 +71,12 @@ async def func_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     msg = " ".join(context.args)
 
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
+
     help_msg = (
-        "This feature will welcome new user in the chat!\n"
+        "This command will welcome new user in the chat!\n"
         "Use <code>/welcome on</code> to turn on.\n"
         "Use <code>/welcome off</code> to turn off.\n\n"
         #"You can set welcome message by replying your custom message (markdown supported)."
@@ -131,8 +139,12 @@ async def func_goodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     msg = " ".join(context.args)
 
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
+
     help_msg = (
-        "This feature will send farewell message in chat when any user left the chat!\n\n"
+        "This command will send farewell message in chat when any user left the chat!\n\n"
         "Use <code>/goodbye on</code> to turn on.\n"
         "Use <code>/goodbye off</code> to turn off.\n\n"
         #"You can set goodbye message by replying your custom message (markdown supported)."
@@ -195,8 +207,12 @@ async def func_antibot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     msg = " ".join(context.args)
 
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
+
     help_msg = (
-        "This feature will prevent bots from joining in the chat!\n"
+        "This command will prevent bots from joining in the chat!\n"
         "Use <code>/antibot on</code> to turn on.\n"
         "Use <code>/antibot off</code> to turn off.\n"
     )
@@ -309,6 +325,10 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
 
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
+
     _chk_per = await _check_permission(update, user=user)
 
     if not _chk_per:
@@ -320,7 +340,7 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "This feature will get invite link of the chat!\nAdd me to manage the chat!", btn)
+        await Message.send_msg(chat.id, "This command will get invite link of the chat!\nAdd me to manage the chat!", btn)
         return
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
@@ -357,11 +377,122 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
+async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    reply = update.message.reply_to_message
+    victim = reply.from_user if reply else None
+    admin_title = " ".join(context.args)
+
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
+
+    _chk_per = await _check_permission(update, victim, user)
+
+    if not _chk_per:
+        return
+    
+    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+
+    if chat.type not in ["group", "supergroup"]:
+        btn_name = ["Add me in Group"]
+        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn = await Button.ubutton(btn_name, btn_url)
+        await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
+        return
+    
+    if bot_permission.status != ChatMember.ADMINISTRATOR:
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
+        return
+    
+    if user_permission.status == ChatMember.ADMINISTRATOR:
+        if not admin_rights.get("can_promote_members"):
+            await Message.reply_msg(update, "You don't have enough rights to promote/demote chat member!")
+            return
+    
+    if not reply:
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to promote!\nTo set admin_title eg. <code>/promote admin_title</code>")
+        return
+    
+    if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        await Message.reply_msg(update, "The user is already an admin!")
+        return
+    
+    try:
+        await bot.promote_chat_member(chat.id, victim.id, can_manage_video_chats=True)
+        msg = f"{user.mention_html()} has promoted user {victim.mention_html()} in this chat!"
+        if admin_title:
+            await bot.set_chat_administrator_custom_title(chat.id, victim.id, admin_title)
+            msg = f"{msg}\nAdmin title: {admin_title}"
+        await Message.reply_msg(update, msg)
+    except Exception as e:
+        logger.info(f"Error: {e}")
+        await Message.send_msg(chat.id, f"Error: {e}")
+
+
+async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    reply = update.message.reply_to_message
+    victim = reply.from_user if reply else None
+
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
+
+    _chk_per = await _check_permission(update, victim, user)
+
+    if not _chk_per:
+        return
+    
+    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+
+    if chat.type not in ["group", "supergroup"]:
+        btn_name = ["Add me in Group"]
+        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn = await Button.ubutton(btn_name, btn_url)
+        await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
+        return
+    
+    if bot_permission.status != ChatMember.ADMINISTRATOR:
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
+        return
+    
+    if user_permission.status == ChatMember.ADMINISTRATOR:
+        if not admin_rights.get("can_promote_members"):
+            await Message.reply_msg(update, "You don't have enough rights to promote/demote chat member!")
+            return
+    
+    if not reply:
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to demote!")
+        return
+    
+    try:
+        await bot.promote_chat_member(chat.id, victim.id)
+        await Message.reply_msg(update, f"{user.mention_html()} has demoted user {victim.mention_html()} in this chat!")
+    except Exception as e:
+        logger.info(f"Error: {e}")
+        await Message.send_msg(chat.id, f"Error: {e}")
+
+
 async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     reply = update.message.reply_to_message
     msg_id = reply.message_id if reply else None
+
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
 
     _chk_per = await _check_permission(update, user=user)
 
@@ -374,7 +505,7 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "This feature will pin replied message loudly in the chat!\nAdd me to manage the chat!", btn)
+        await Message.send_msg(chat.id, "This command will pin replied message loudly in the chat!\nAdd me to manage the chat!", btn)
         return
 
     if bot_permission.status != ChatMember.ADMINISTRATOR:
@@ -409,6 +540,10 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg_id = reply.message_id if reply else None
     msg = " ".join(context.args)
 
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
+
     _chk_per = await _check_permission(update, user=user)
 
     if not _chk_per:
@@ -421,7 +556,7 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "This feature will unpin replied message in the chat!\nUse <code>/unpin all</code> to unpin all pinned messages of chat!\nAdd me to manage the chat!", btn)
+        await Message.send_msg(chat.id, "This command will unpin replied message in the chat!\nUse <code>/unpin all</code> to unpin all pinned messages of chat!\nAdd me to manage the chat!", btn)
         return
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
@@ -450,7 +585,7 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not reply:
-        await Message.reply_msg(update, "This feature will unpin replied message!\nUse <code>/unpin all</code> to unpin all pinned messages of chat!")
+        await Message.reply_msg(update, "This command will unpin replied message!\nUse <code>/unpin all</code> to unpin all pinned messages of chat!")
         return
     
     try:
@@ -471,6 +606,11 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
+    reason = " ".join(context.args)
+
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
 
     _chk_per = await _check_permission(update, victim, user)
 
@@ -500,7 +640,7 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to ban!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to ban!\nTo mention with reason eg. <code>/ban reason</code>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -513,9 +653,15 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         await bot.ban_chat_member(chat.id, victim.id)
-        await Message.reply_msg(update, f"{user.mention_html()} has banned user {victim.mention_html()} from this chat!")
+        msg = f"{user.mention_html()} has banned user {victim.mention_html()} from this chat!"
+        if reason:
+            msg = f"{msg}\nReason: {reason}"
+        await Message.reply_msg(update, msg)
         try:
-            await Message.send_msg(victim.id, f"{user.mention_html()} has banned you from {chat.title}!")
+            msg = f"{user.mention_html()} has banned you from {chat.title}!"
+            if reason:
+                msg = f"{msg}\nReason: {reason}"
+            await Message.send_msg(victim.id, msg)
         except Exception as e:
             logger.error(f"Error: {e}")
     except Exception as e:
@@ -528,6 +674,11 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
+    reason = " ".join(context.args)
+
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
     
     _chk_per = await _check_permission(update, victim, user)
 
@@ -558,7 +709,7 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to unban!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to unban!\nTo mention with reason eg. <code>/unban reason</code>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -571,10 +722,16 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         await bot.unban_chat_member(chat.id, victim.id)
-        await Message.reply_msg(update, f"{user.mention_html()} has unbanned user {victim.mention_html()}!")
+        msg = f"{user.mention_html()} has unbanned user {victim.mention_html()}!"
+        if reason:
+            msg = f"{msg}\nReason: {reason}"
+        await Message.reply_msg(update, msg)
         try:
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
-            await Message.send_msg(victim.id, f"{user.mention_html()} has unbanned you in {chat.title}!\nInvite Link: {invite_link.invite_link}")
+            msg = f"{user.mention_html()} has unbanned you in {chat.title}!\nInvite Link: {invite_link.invite_link}"
+            if reason:
+                msg = f"{msg}\nReason: {reason}"
+            await Message.send_msg(victim.id, msg)
         except Exception as e:
             logger.error(f"Error: {e}")
     except Exception as e:
@@ -587,6 +744,11 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
+    reason = " ".join(context.args)
+
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
 
     _chk_per = await _check_permission(update, victim, user)
 
@@ -617,7 +779,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to kick!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to kick!\nTo mention with reason eg. <code>/kick reason</code>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -631,10 +793,16 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await bot.ban_chat_member(chat.id, victim.id)
         await bot.unban_chat_member(chat.id, victim.id)
-        await Message.reply_msg(update, f"{user.mention_html()} has kicked user {victim.mention_html()} from this chat!")
+        msg = f"{user.mention_html()} has kicked user {victim.mention_html()} from this chat!"
+        if reason:
+            msg = f"{msg}\nReason: {reason}"
+        await Message.reply_msg(update, msg)
         try:
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
-            await Message.send_msg(victim.id, f"{user.mention_html()} has kicked you from {chat.title}!\nInvite Link: {invite_link.invite_link}")
+            msg = f"{user.mention_html()} has kicked you from {chat.title}!\nInvite Link: {invite_link.invite_link}"
+            if reason:
+                msg = f"{msg}\nReason: {reason}"
+            await Message.send_msg(victim.id, msg)
         except Exception as e:
             logger.error(f"Error: {e}")
     except Exception as e:
@@ -688,6 +856,11 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
+    reason = " ".join(context.args)
+
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
 
     _chk_per = await _check_permission(update, victim, user)
 
@@ -717,7 +890,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to mute!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to mute!\nTo mention with reason eg. <code>/mute reason</code>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -747,7 +920,10 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         await bot.restrict_chat_member(chat.id, victim.id, permissions)
-        await Message.reply_msg(update, f"{user.mention_html()} has muted user {victim.mention_html()}!")
+        msg = f"{user.mention_html()} has muted user {victim.mention_html()}!"
+        if reason:
+            msg = f"{msg}\nReason: {reason}"
+        await Message.reply_msg(update, msg)
     except Exception as e:
         logger.info(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -758,6 +934,11 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
+    reason = " ".join(context.args)
+
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
 
     _chk_per = await _check_permission(update, victim, user)
 
@@ -787,7 +968,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to unmute!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to unmute!\nTo mention with reason eg. <code>/unmute reason</code>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -817,7 +998,10 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         await bot.restrict_chat_member(chat.id, victim.id, permissions)
-        await Message.reply_msg(update, f"{user.mention_html()} has unmuted user {victim.mention_html()}!")
+        msg = f"{user.mention_html()} has unmuted user {victim.mention_html()}!"
+        if reason:
+            msg = f"{msg}\nReason: {reason}"
+        await Message.reply_msg(update, msg)
     except Exception as e:
         logger.info(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -826,10 +1010,13 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    e_msg = update.effective_message
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
+
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
 
     _chk_per = await _check_permission(update, victim, user)
 
@@ -859,11 +1046,10 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member message which one you want to delete!\nYou can tell something by <code>/del please don't send this message again!</code>")
+        await Message.reply_msg(update, "I don't know which message to delete! Reply the message that you want to delete!\nTo mention with reason eg. <code>/del reason</code>")
         return
 
     try:
-        await Message.del_msg(chat.id, e_msg)
         await Message.del_msg(chat.id, reply)
         msg = f"{victim.mention_html()}, your message is deleted by {user.mention_html()}!"
         if reason:
@@ -878,6 +1064,10 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
 
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
+
     _chk_per = await _check_permission(update, user=user)
 
     if not _chk_per:
@@ -889,7 +1079,7 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "This feature will remove all permissions of chat! No one will be able to send message etc.\nAdd me to manage the chat!", btn)
+        await Message.send_msg(chat.id, "This command will remove all permissions of chat! No one will be able to send message etc.\nAdd me to manage the chat!", btn)
         return
         
     if bot_permission.status != ChatMember.ADMINISTRATOR:
@@ -930,6 +1120,10 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
 
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
+
     _chk_per = await _check_permission(update, user=user)
 
     if not _chk_per:
@@ -941,7 +1135,7 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "This feature will restore all permissions of chat! Everyone will be able to send message etc.\nAdd me to manage the chat!", btn)
+        await Message.send_msg(chat.id, "This command will restore all permissions of chat! Everyone will be able to send message etc.\nAdd me to manage the chat!", btn)
         return
         
     if bot_permission.status != ChatMember.ADMINISTRATOR:

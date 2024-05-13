@@ -183,7 +183,7 @@ class Button:
         sbtn = []
         try:
             if len(btn_name) == len(url):
-                for b_name, url_link in zip(btn_name, url):
+                for b_name, url_link in zip(btn_name, url): # list1 = [1, 2, 3] list2 = ['a', 'b'] Output: [(1, 'a'), (2, 'b')]
                     if same_line:
                         sbtn.append(InlineKeyboardButton(b_name, url_link))
                     else:
@@ -206,7 +206,7 @@ class Button:
         sbtn = []
         try:
             if len(btn_name) == len(callback_name):
-                for b_name, c_name in zip(btn_name, callback_name):
+                for b_name, c_name in zip(btn_name, callback_name): # list1 = [1, 2, 3] list2 = ['a', 'b'] Output: [(1, 'a'), (2, 'b')]
                     if same_line:
                         sbtn.append(InlineKeyboardButton(b_name, callback_data=c_name))
                     else:
