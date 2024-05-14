@@ -570,11 +570,18 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text = chatbot.response
     """
 
-    g4f_gpt = await G4F.chatgpt(f"{prompt}, tell me under 300 words.")
+    retry_gpt = 0
 
-    if not g4f_gpt or "流量异常, 请尝试更换网络环境, 如果你觉得ip被误封了, 可尝试邮件联系我们, 当前" in g4f_gpt:
-        await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
-        return
+    while retry_gpt != 3:
+        g4f_gpt = await G4F.chatgpt(f"{prompt}, tell me under 300 words.")
+        retry_gpt += 1
+        await Message.edit_msg(update, f"Please wait, ChatGPT is busy!\nAttempt: {retry_gpt}")
+        await asyncio.sleep(3)
+        if g4f_gpt and "流量异常, 请尝试更换网络环境, 如果你觉得ip被误封了, 可尝试邮件联系我们, 当前" not in g4f_gpt:
+            break
+        else:
+            await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
+            return
     
     try:
         await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)
