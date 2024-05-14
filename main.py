@@ -20,9 +20,7 @@ from bot.modules.omdb_movie_info import get_movie_info
 from bot.modules.utils import calc
 from bot.modules.safone import Safone
 from bot.modules.group_management import (
-    func_welcome,
-    func_goodbye,
-    func_antibot,
+    _check_permission,
     track_chat_activities,
     func_invite_link,
     func_promote,
@@ -194,89 +192,27 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = update.message.reply_to_message
     msg = re_msg.text or re_msg.caption if re_msg else " ".join(context.args)
 
-    if chat.type == "private":
-        find_user = await MongoDB.find_one("users", "user_id", user.id)
-
-        if not find_user:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
-            return
-        
-        lang_code = find_user.get("lang")
-
-    elif chat.type in ["group", "supergroup"]:
-        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-
-        if not find_group:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
-            return
-        
-        lang_code = find_group.get("lang")
-
-    if msg == "auto_on":
-        if chat.type == "private":
-            try:
-                await MongoDB.update_db("users", "user_id", user.id, "auto_tr", "on")
-                await Message.reply_msg(update, f"Auto Translator Enabled for this chat!")
-            except Exception as e:
-                logger.error(f"Error enabling auto tr: {e}")
-                await Message.reply_msg(update, f"Error: {e}")
-        elif chat.type in ["group", "supergroup"]:
-            _bot = await bot.get_me()
-            bot_permission = await chat.get_member(_bot.id)
-            user_permission = await chat.get_member(user.id)
-
-            if bot_permission.status != ChatMember.ADMINISTRATOR:
-                await Message.reply_msg(update, "I'm not an admin of this Group!")
-                return
-            
-            if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                await Message.reply_msg(update, "You aren't an admin of this Group!")
-                return
-            
-            try:
-                await MongoDB.update_db("groups", "chat_id", chat.id, "auto_tr", "on")
-                await Message.reply_msg(update, f"Auto Translator Enabled for this chat!")
-            except Exception as e:
-                logger.error(f"Error enabling auto tr: {e}")
-                await Message.reply_msg(update, f"Error: {e}")
-
-    elif msg == "auto_off":
-        if chat.type == "private":
-            try:
-                await MongoDB.update_db("users", "user_id", user.id, "auto_tr", "off")
-                await Message.reply_msg(update, f"Auto Translator Disabled for this chat!")
-            except Exception as e:
-                logger.error(f"Error disabling auto tr: {e}")
-                await Message.reply_msg(update, f"Error: {e}")
-        elif chat.type in ["group", "supergroup"]:
-            bot_permission = await chat.get_member(_bot.id)
-            user_permission = await chat.get_member(user.id)
-
-            if bot_permission.status != ChatMember.ADMINISTRATOR:
-                await Message.reply_msg(update, "I'm not an admin of this Group!")
-                return
-            
-            if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                await Message.reply_msg(update, "You aren't an admin of this Group!")
-                return
-            
-            try:
-                await MongoDB.update_db("groups", "chat_id", chat.id, "auto_tr", "off")
-                await Message.reply_msg(update, f"Auto Translator Disabled for this chat!")
-            except Exception as e:
-                logger.error(f"Error disabling auto tr: {e}")
-                await Message.reply_msg(update, f"Error: {e}")
-
     if not msg:
-        await Message.reply_msg(update, "Use <code>/tr text</code> or reply the text with <code>/tr</code>\nE.g. <code>/tr the text you want to translate</code>\n\nAuto translator mode:\nEnable using <code>/tr auto_on</code>\nDisable using <code>/tr auto_off</code>")
+        await Message.reply_msg(update, "Use <code>/tr text</code> or reply the text with <code>/tr</code>\nE.g. <code>/tr the text you want to translate</code>\n\nEnable auto translator mode from /settings")
+        return
+
+    find_chat = await MongoDB.find_one("users", "user_id", user.id)
+
+    if not find_chat:
+        find_chat = await MongoDB.find_one("groups", "chat_id", chat.id)
+    
+    if not find_chat:
+        await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
         return
     
+    lang_code = find_chat.get("lang")
+
     try:
         tr_msg = translate(msg, lang_code)
     except Exception as e:
         logger.error(f"Error Translator: {e}")
         lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
-        btn_name = ["Language Code List 📃"]
+        btn_name = ["Language code's"]
         btn_url = [lang_code_list]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
@@ -286,73 +222,6 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
     else:
         await Message.reply_msg(update, "Error: Translated text & main text are same!")
-
-
-async def func_setlang(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
-    user = update.effective_user
-    msg = " ".join(context.args)
-
-    if chat.type == "private":
-        if not msg:
-            lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
-            btn_name = ["Language Code List 📃"]
-            btn_url = [lang_code_list]
-            btn = await Button.ubutton(btn_name, btn_url)
-            await Message.send_msg(chat.id, "<code>lang_code</code> can't be leave empty! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
-            return
-        
-        try:
-            await MongoDB.update_db("users", "user_id", user.id, "lang", msg)
-            await Message.reply_msg(update, f"Language Updated to <code>{msg}</code>. Now you can use /tr command.")
-        except Exception as e:
-            logger.error(f"Error setting lang code: {e}")
-            await Message.reply_msg(update, f"Error: {e}")
-
-    elif chat.type in ["group", "supergroup"]:
-        _bot = await bot.get_me()
-        bot_permission = await chat.get_member(_bot.id)
-        user_permission = await chat.get_member(user.id)
-
-        if bot_permission.status != ChatMember.ADMINISTRATOR:
-            await Message.reply_msg(update, "I'm not an admin of this Group!")
-            return
-        
-        if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-            await Message.reply_msg(update, "You aren't an admin of this Group!")
-            return
-        
-        can_change_info = True
-        
-        if user_permission.status == ChatMember.ADMINISTRATOR:
-            admins = await bot.get_chat_administrators(chat.id)
-            for admin in admins:
-                if admin.user.id == user.id:
-                    can_change_info =  admin.can_change_info
-        
-        if not can_change_info:
-            await Message.reply_msg(update, "You don't have enough rights to change group info!")
-            return
-
-        if not msg:
-            lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
-            btn_name = ["Language Code List 📃"]
-            btn_url = [lang_code_list]
-            btn = await Button.ubutton(btn_name, btn_url)
-            await Message.send_msg(chat.id, "<code>lang_code</code> can't be leave empty! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
-            return
-        
-        try:
-            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-            if not find_group:
-                await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
-                return
-            
-            await MongoDB.update_db("groups", "chat_id", chat.id, "lang", msg)
-            await Message.reply_msg(update, f"Language Updated to <code>{msg}</code>. Now you can use /tr command.")
-        except Exception as e:
-            logger.error(f"Error setting lang code: {e}")
-            await Message.reply_msg(update, f"Error: {e}")           
 
 
 async def func_b64decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -437,78 +306,7 @@ async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, f"Calculation result: <code>{calc(msg):.2f}</code>")
     except Exception as e:
         logger.info(f"Can't calc: {e}")
-        await Message.reply_msg(update, f"Can't calc: {e}")
-
-
-async def func_echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
-    user = update.effective_user
-    msg = " ".join(context.args)
-
-    if chat.type == "private":
-        if msg == "on":
-            try:
-                await MongoDB.update_db("users", "user_id", user.id, "echo", "on")
-                await Message.reply_msg(update, "Echo enabled in this chat!")
-            except Exception as e:
-                logger.error(f"Error enabling echo: {e}")
-                await Message.reply_msg(update, f"Error: {e}")
-        elif msg == "off":
-            try:
-                await MongoDB.update_db("users", "user_id", user.id, "echo", "off")
-                await Message.reply_msg(update, "Echo has been disabled in this chat!")
-            except Exception as e:
-                logger.error(f"Error disabling echo: {e}")
-                await Message.reply_msg(update, f"Error: {e}")
-        else:
-            await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")
-    elif chat.type in ["group", "supergroup"]:
-        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-
-        if not find_group:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
-            return
-        
-        _bot = await bot.get_me()
-        bot_permission = await chat.get_member(_bot.id)
-        user_permission = await chat.get_member(user.id)
-
-        if bot_permission.status != ChatMember.ADMINISTRATOR:
-            await Message.reply_msg(update, "I'm not an admin of this Group!")
-            return
-        
-        if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-            await Message.reply_msg(update, "You aren't an admin of this Group!")
-            return
-        
-        can_change_info = True
-        
-        if user_permission.status == ChatMember.ADMINISTRATOR:
-            admins = await bot.get_chat_administrators(chat.id)
-            for admin in admins:
-                if admin.user.id == user.id:
-                    can_change_info =  admin.can_change_info
-        
-        if not can_change_info:
-            await Message.reply_msg(update, "You don't have enough rights to change group info!")
-            return
-        
-        if msg == "on":
-            try:
-                await MongoDB.update_db("groups", "chat_id", chat.id, "echo", "on")
-                await Message.reply_msg(update, "Echo has been enabled in this chat!")
-            except Exception as e:
-                logger.error(f"Error enabling echo: {e}")
-                await Message.reply_msg(update, f"Error: {e}")
-        elif msg == "off":
-            try:
-                await MongoDB.update_db("groups", "chat_id", chat.id, "echo", "off")
-                await Message.reply_msg(update, "Echo disabled in this chat!")
-            except Exception as e:
-                logger.error(f"Error disabling echo: {e}")
-                await Message.reply_msg(update, f"Error: {e}")
-        else:
-            await Message.reply_msg(update, "Use <code>/echo on</code> to turn on.\nUse <code>/echo off</code> to turn off.")         
+        await Message.reply_msg(update, f"Can't calc: {e}")   
 
 
 async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -585,6 +383,9 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     prompt = " ".join(context.args)
 
+    await Message.reply_msg(update, "Out of order! ❌")
+    return
+
     if not prompt:
         await Message.reply_msg(update, "Use <code>/imagine prompt</code>\nE.g. <code>/imagine a cute cat</code>")
         return
@@ -611,10 +412,6 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if last_used:
         find = await MongoDB.find("bot_docs", "_id")
-
-        if not find:
-            await Message.reply_msg(update, "Something went wrong!")
-            return
         
         data = await MongoDB.find_one("bot_docs", "_id", find[0])
         usage_reset, ai_imagine_limit = data.get("usage_reset"), data.get("ai_imagine_limit")
@@ -673,7 +470,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_img(chat.id, imagine, f"✨ {prompt}")
         ai_imagine_req += 1
         await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
-        await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
+        await MongoDB.update_db("users", "user_id", user.id, "last_used", {current_time})
     except Exception as e:
         logger.error(f"Error Imagine: {e}")
         await Message.reply_msg(update, f"Error Imagine: {e}")
@@ -715,10 +512,6 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if last_used:
         find = await MongoDB.find("bot_docs", "_id")
-
-        if not find:
-            await Message.reply_msg(update, "Something went wrong!")
-            return
         
         data = await MongoDB.find_one("bot_docs", "_id", find[0])
         usage_reset, chatgpt_limit = data.get("usage_reset"), data.get("chatgpt_limit")
@@ -893,18 +686,18 @@ async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await Message.reply_msg(update, f"Video found: {len(result)}\nShowing top {len(urls)} videos!\nTo download videos you can use /ytdl")         
 
 
-async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    msg = " ".join(context.args)
+    chat_id = " ".join(context.args)
 
     if chat.type == "private":
-        if msg:
+        if chat_id:
             if user.id != int(owner_id):
                 await Message.reply_msg(update, f"Access Denied! [owner only]")
                 return
             else:
-                chat_id = int(msg)
+                chat_id = int(chat_id)
         else:
             chat_id = user.id
 
@@ -912,93 +705,193 @@ async def func_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not find_user:
             find_group = await MongoDB.find_one("groups", "chat_id", chat_id)
+        
+            if not find_group:
+                await Message.reply_msg(update, "User/Chat not found!")
+                return
 
         if find_user:
             user_mention = find_user.get("mention")
+
             lang = find_user.get("lang")
             echo = find_user.get("echo")
             auto_tr = find_user.get("auto_tr")
-            chatgpt = find_user.get("chatgpt")
+
             chatgpt_req = find_user.get("chatgpt_req")
             ai_imagine_req = find_user.get("ai_imagine_req")
-            last_used = find_user.get("last_used")
-            is_premium = "False"
-
-            find = await MongoDB.find("bot_docs", "_id")
-            if find:
-                data = await MongoDB.find_one("bot_docs", "_id", find[0])
-                premium_users = data.get("premium_users")
-                if premium_users:
-                    if chat_id in premium_users:
-                        is_premium = "True"
             
             chatgpt_limit = await MongoDB.get_data("bot_docs", "chatgpt_limit")
             ai_imagine_limit = await MongoDB.get_data("bot_docs", "ai_imagine_limit")
 
-            text = (
-                f"<b>Data of <code>{chat_id}</code></b>\n"
-                f"▬▬▬▬▬▬▬▬▬▬\n"
+            last_used = find_user.get("last_used")
+
+            premium_users = await MongoDB.get_data("bot_docs", "premium_users")
+            if not premium_users:
+                is_premium = False
+            else:
+                is_premium = True if chat_id in premium_users else False
+
+            
+            context.chat_data["edit_cname"] = "users"
+            context.chat_data["find_data"] = "user_id"
+            context.chat_data["match_data"] = chat_id
+            context.chat_data["chat_id"] = chat.id
+
+            msg = (
+                f"<b>Chat Settings</b> -\n\n"
                 f"• User: {user_mention}\n"
+                f"• ID: <code>{chat_id}</code>\n"
+                f"• Is premium: <code>{is_premium}</code>\n\n"
+
                 f"• Lang: <code>{lang}</code>\n"
                 f"• Echo: <code>{echo}</code>\n"
-                f"• Auto tr: <code>{auto_tr}</code>\n"
-                f"• ChatGPT: <code>{chatgpt}</code>\n"
-                f"• ChatGPT Req: <code>{chatgpt_req}/{chatgpt_limit}</code>\n"
-                f"• AI Imagine Req: <code>{ai_imagine_req}/{ai_imagine_limit}</code>\n"
-                f"• Last Used: <code>{last_used}</code>\n"
-                f"• Premium user: <code>{is_premium}</code>\n"
+                f"• Auto tr: <code>{auto_tr}</code>\n\n"
+
+                f"• ChatGPT: <code>{chatgpt_req}/{chatgpt_limit}</code>\n"
+                f"• AI imagine: <code>{ai_imagine_req}/{ai_imagine_limit}</code>\n"
+                f"• Last used: <code>{last_used}</code>\n"
             )
-            await Message.reply_msg(update, text)
+
+            btn_name_row1 = ["Language", "Auto translate"]
+            btn_data_row1 = ["lang", "auto_tr"]
+
+            btn_name_row2 = ["Echo", "Close"]
+            btn_data_row2 = ["set_echo", "close"]
+
+            row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+            row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+            btn = row1 + row2
+
+            await Message.send_msg(chat.id, msg, btn)
+        
         elif find_group:
             title = find_group.get("title")
             lang = find_group.get("lang")
+
             echo = find_group.get("echo")
             auto_tr = find_group.get("auto_tr")
             welcome_msg = find_group.get("welcome_msg")
             goodbye_msg = find_group.get("goodbye_msg")
             antibot = find_group.get("antibot")
 
-            text = (
-                f"<b>Data of <code>{chat_id}</code></b>\n"
-                f"▬▬▬▬▬▬▬▬▬▬\n"
+            context.chat_data["edit_cname"] = "groups"
+            context.chat_data["find_data"] = "chat_id"
+            context.chat_data["match_data"] = chat_id
+            context.chat_data["chat_id"] = chat.id
+
+            msg = (
+                f"<b>Chat Settings</b> -\n\n"
                 f"• Title: {title}\n"
+                f"• ID: <code>{chat_id}</code>\n\n"
+
                 f"• Lang: <code>{lang}</code>\n"
                 f"• Echo: <code>{echo}</code>\n"
                 f"• Auto tr: <code>{auto_tr}</code>\n"
-                f"• Welcome msg: <code>{welcome_msg}</code>\n"
-                f"• Goodbye msg: <code>{goodbye_msg}</code>\n"
+                f"• Welcome user: <code>{welcome_msg}</code>\n"
+                f"• Goodbye user: <code>{goodbye_msg}</code>\n"
                 f"• Antibot: <code>{antibot}</code>\n"
             )
-            await Message.reply_msg(update, text)
-        else:
-            await Message.reply_msg(update, "User/Chat not found!")
-    elif chat.type in ["group", "supergroup"]:
-        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
 
+            btn_name_row1 = ["Language", "Auto translate"]
+            btn_data_row1 = ["lang", "auto_tr"]
+
+            btn_name_row2 = ["Echo", "Anti bot"]
+            btn_data_row2 = ["set_echo", "antibot"]
+
+            btn_name_row3 = ["Welcome", "Goodbye"]
+            btn_data_row3 = ["welcome_msg", "goodbye_msg"]
+
+            btn_name_row4 = ["Close"]
+            btn_data_row4 = ["close"]
+
+            row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+            row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+            row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+            row4 = await Button.cbutton(btn_name_row4, btn_data_row4)
+
+            btn = row1 + row2 + row3 + row4
+
+            await Message.send_msg(chat.id, msg, btn)
+
+    elif chat.type in ["group", "supergroup"]:
+        if user.is_bot:
+            await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+            return
+
+        _chk_per = await _check_permission(update, user=user)
+
+        if not _chk_per:
+            return
+        
+        _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+            
+        if bot_permission.status != ChatMember.ADMINISTRATOR:
+            await Message.reply_msg(update, "I'm not an admin in this chat!")
+            return
+        
+        if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+            await Message.reply_msg(update, "You aren't an admin in this chat!")
+            return
+        
+        if user_permission.status == ChatMember.ADMINISTRATOR:
+            if not admin_rights.get("can_change_info"):
+                await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
+                return
+
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+        
         if not find_group:
             await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
             return
         
         title = find_group.get("title")
         lang = find_group.get("lang")
+
         echo = find_group.get("echo")
         auto_tr = find_group.get("auto_tr")
         welcome_msg = find_group.get("welcome_msg")
         goodbye_msg = find_group.get("goodbye_msg")
         antibot = find_group.get("antibot")
 
-        text = (
-            f"<b>Data of <code>{chat.id}</code></b>\n"
-            f"▬▬▬▬▬▬▬▬▬▬\n"
+        context.chat_data["edit_cname"] = "groups"
+        context.chat_data["find_data"] = "chat_id"
+        context.chat_data["match_data"] = chat.id
+        context.chat_data["chat_id"] = chat.id
+
+        msg = (
+            f"<b>Chat Settings</b> -\n\n"
             f"• Title: {title}\n"
+            f"• ID: <code>{chat.id}</code>\n\n"
+
             f"• Lang: <code>{lang}</code>\n"
             f"• Echo: <code>{echo}</code>\n"
             f"• Auto tr: <code>{auto_tr}</code>\n"
-            f"• Welcome msg: <code>{welcome_msg}</code>\n"
-            f"• Goodbye msg: <code>{goodbye_msg}</code>\n"
+            f"• Welcome user: <code>{welcome_msg}</code>\n"
+            f"• Goodbye user: <code>{goodbye_msg}</code>\n"
             f"• Antibot: <code>{antibot}</code>\n"
         )
-        await Message.reply_msg(update, text)          
+
+        btn_name_row1 = ["Language", "Auto translate"]
+        btn_data_row1 = ["lang", "auto_tr"]
+
+        btn_name_row2 = ["Echo", "Anti bot"]
+        btn_data_row2 = ["set_echo", "antibot"]
+
+        btn_name_row3 = ["Welcome", "Goodbye"]
+        btn_data_row3 = ["welcome_msg", "goodbye_msg"]
+
+        btn_name_row4 = ["Close"]
+        btn_data_row4 = ["close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+        row4 = await Button.cbutton(btn_name_row4, btn_data_row4)
+
+        btn = row1 + row2 + row3 + row4
+
+        await Message.send_msg(chat.id, msg, btn)
 
 
 async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1153,6 +1046,13 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != "private":
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
+    
+    welcome_img = await MongoDB.get_data("bot_docs", "welcome_img")
+    
+    context.chat_data["edit_cname"] = "bot_docs"
+    context.chat_data["find_data"] = "welcome_img"
+    context.chat_data["match_data"] = welcome_img
+    context.chat_data["chat_id"] = chat.id
     
     btn_name_row1 = ["Bot pic", "Welcome img"]
     btn_data_row1 = ["bot_pic", "welcome_img"]
@@ -1329,6 +1229,13 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     msg = update.message.text or update.message.caption if update.message else None
 
+    if context.chat_data.get("status") == "editing":
+        if msg.isdigit():
+            msg = int(msg)
+        context.chat_data["new_value"] = msg
+        context.chat_data["status"] = ""
+        return
+
     if chat.type == "private" and msg:
         find_user = await MongoDB.find_one("users", "user_id", user.id)
         if not find_user:
@@ -1339,24 +1246,18 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         echo_status = find_user.get("echo")
         auto_tr_status = find_user.get("auto_tr")
 
-        if context.chat_data.get("status") == "editing" and user.id == int(owner_id):
-            if msg.isdigit():
-                msg = int(msg)
-            context.chat_data["new_value"] = msg
-            return
-
         # Trigger
-        if echo_status == "on":
+        if echo_status:
             await Message.reply_msg(update, msg)
 
-        if auto_tr_status == "on":
+        if auto_tr_status:
             lang_code = find_user.get("lang")
             try:
                 tr_msg = translate(msg, lang_code)
             except Exception as e:
                 logger.error(f"Error Translator: {e}")
                 lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
-                btn_name = ["Language Code List 📃"]
+                btn_name = ["Language code's"]
                 btn_url = [lang_code_list]
                 btn = await Button.ubutton(btn_name, btn_url)
                 await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
@@ -1377,17 +1278,17 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         auto_tr_status = find_group.get("auto_tr")
 
         # Trigger
-        if echo_status == "on":
+        if echo_status:
             await Message.reply_msg(update, msg)
             
-        if auto_tr_status == "on":
+        if auto_tr_status:
             lang_code = find_group.get("lang")
             try:
                 tr_msg = translate(msg, lang_code)
             except Exception as e:
                 logger.error(f"Error Translator: {e}")
                 lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
-                btn_name = ["Language Code List 📃"]
+                btn_name = ["Language code's"]
                 btn_url = [lang_code_list]
                 btn = await Button.ubutton(btn_name, btn_url)
                 await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
@@ -1437,24 +1338,19 @@ def main():
     application.add_handler(CommandHandler("start", func_start, block=False))
     application.add_handler(CommandHandler("movie", func_movieinfo, block=False))
     application.add_handler(CommandHandler("tr", func_translator, block=False))
-    application.add_handler(CommandHandler("setlang", func_setlang, block=False))
     application.add_handler(CommandHandler("decode", func_b64decode, block=False))
     application.add_handler(CommandHandler("encode", func_b64encode, block=False))
     application.add_handler(CommandHandler("shortener", func_shortener, block=False))
     application.add_handler(CommandHandler("ping", func_ping, block=False))
     application.add_handler(CommandHandler("calc", func_calc, block=False))
-    application.add_handler(CommandHandler("echo", func_echo, block=False))
     application.add_handler(CommandHandler("webshot", func_webshot, block=False))
     application.add_handler(CommandHandler("weather", func_weather, block=False))
     application.add_handler(CommandHandler("imagine", func_imagine, block=False))
     application.add_handler(CommandHandler("gpt", func_chatgpt, block=False))
     application.add_handler(CommandHandler("ytdl", func_ytdl, block=False))
     application.add_handler(CommandHandler("yts", func_yts, block=False))
-    application.add_handler(CommandHandler("stats", func_stats, block=False))
+    application.add_handler(CommandHandler("settings", func_settings, block=False))
     application.add_handler(CommandHandler("id", func_id, block=False))
-    application.add_handler(CommandHandler("welcome", func_welcome, block=False))
-    application.add_handler(CommandHandler("goodbye", func_goodbye, block=False))
-    application.add_handler(CommandHandler("antibot", func_antibot, block=False))
     application.add_handler(CommandHandler("invite", func_invite_link, block=False))
     application.add_handler(CommandHandler("promote", func_promote, block=False))
     application.add_handler(CommandHandler("demote", func_demote, block=False))

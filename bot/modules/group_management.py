@@ -66,209 +66,6 @@ async def _chat_member_status(c_mem_update: ChatMemberUpdated):
     return user_exist, reason
 
 
-async def func_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
-    user = update.effective_user
-    msg = " ".join(context.args)
-
-    if user.is_bot:
-        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
-        return
-
-    help_msg = (
-        "This command will welcome new user in the chat!\n"
-        "Use <code>/welcome on</code> to turn on.\n"
-        "Use <code>/welcome off</code> to turn off.\n\n"
-        #"You can set welcome message by replying your custom message (markdown supported)."
-    )
-
-    if chat.type not in ["group", "supergroup"]:
-        _bot = await bot.get_me()
-        btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
-        btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, help_msg, btn)
-        return
-    
-    find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-
-    if not find_group:
-        await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
-        return
-    
-    _chk_per = await _check_permission(update, user=user)
-
-    if not _chk_per:
-        return
-    
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
-
-    if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this chat!")
-        return
-    
-    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin in this chat!")
-        return
-    
-    if user_permission.status == ChatMember.ADMINISTRATOR:
-        if not admin_rights.get("can_change_info"):
-            await Message.reply_msg(update, "You don't have enough rights to change chat info!")
-            return
-    
-    if msg == "on":
-        try:
-            await MongoDB.update_db("groups", "chat_id", chat.id, "welcome_msg", "on")
-            await Message.reply_msg(update, "Welcome message has been enabled in this chat!\nFrom now I will welcome new members in this chat!")
-        except Exception as e:
-            logger.error(f"Error enabling welcome_msg: {e}")
-            await Message.reply_msg(update, f"Error: {e}")
-    elif msg == "off":
-        try:
-            await MongoDB.update_db("groups", "chat_id", chat.id, "welcome_msg", "off")
-            await Message.reply_msg(update, "Welcome message has been disabled in this chat!\nI won't welcome new members in this chat!")
-        except Exception as e:
-            logger.error(f"Error disabling welcome_msg: {e}")
-            await Message.reply_msg(update, f"Error: {e}")
-    else:
-        await Message.reply_msg(update, help_msg)
-
-
-async def func_goodbye(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
-    user = update.effective_user
-    msg = " ".join(context.args)
-
-    if user.is_bot:
-        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
-        return
-
-    help_msg = (
-        "This command will send farewell message in chat when any user left the chat!\n\n"
-        "Use <code>/goodbye on</code> to turn on.\n"
-        "Use <code>/goodbye off</code> to turn off.\n\n"
-        #"You can set goodbye message by replying your custom message (markdown supported)."
-    )
-
-    if chat.type not in ["group", "supergroup"]:
-        _bot = await bot.get_me()
-        btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
-        btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, help_msg, btn)
-        return
-    
-    find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-
-    if not find_group:
-        await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
-        return
-    
-    _chk_per = await _check_permission(update, user=user)
-
-    if not _chk_per:
-        return
-    
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
-
-    if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this chat!")
-        return
-    
-    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin in this chat!")
-        return
-    
-    if user_permission.status == ChatMember.ADMINISTRATOR:
-        if not admin_rights.get("can_change_info"):
-            await Message.reply_msg(update, "You don't have enough rights to change chat info!")
-            return
-    
-    if msg == "on":
-        try:
-            await MongoDB.update_db("groups", "chat_id", chat.id, "goodbye_msg", "on")
-            await Message.reply_msg(update, "Goodbye message has been enabled in this chat!\nFrom now I will send farewell message in chat when any user left the chat!")
-        except Exception as e:
-            logger.error(f"Error enabling goodbye_msg: {e}")
-            await Message.reply_msg(update, f"Error: {e}")
-    elif msg == "off":
-        try:
-            await MongoDB.update_db("groups", "chat_id", chat.id, "goodbye_msg", "off")
-            await Message.reply_msg(update, "Goodbye message has been disabled in this chat!\nI won't send farewell message in chat if any user left the chat!")
-        except Exception as e:
-            logger.error(f"Error disabling goodbye_msg: {e}")
-            await Message.reply_msg(update, f"Error: {e}")
-    else:
-        await Message.reply_msg(update, help_msg)
-
-
-async def func_antibot(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
-    user = update.effective_user
-    msg = " ".join(context.args)
-
-    if user.is_bot:
-        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
-        return
-
-    help_msg = (
-        "This command will prevent bots from joining in the chat!\n"
-        "Use <code>/antibot on</code> to turn on.\n"
-        "Use <code>/antibot off</code> to turn off.\n"
-    )
-
-    if chat.type not in ["group", "supergroup"]:
-        _bot = await bot.get_me()
-        btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
-        btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, help_msg, btn)
-        return
-    
-    find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-
-    if not find_group:
-        await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
-        return
-    
-    _chk_per = await _check_permission(update, user=user)
-
-    if not _chk_per:
-        return
-    
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
-
-    if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this chat!")
-        return
-    
-    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin in this chat!")
-        return
-
-    if user_permission.status == ChatMember.ADMINISTRATOR:
-        if not admin_rights.get("can_change_info"):
-            await Message.reply_msg(update, "You don't have enough rights to change chat info!")
-            return
-    
-    if msg == "on":
-        try:
-            await MongoDB.update_db("groups", "chat_id", chat.id, "antibot", "on")
-            await Message.reply_msg(update, "Antibot has been enabled in this chat!\nFrom now I will protect the chat from bots joining!")
-        except Exception as e:
-            logger.error(f"Error enabling antibot: {e}")
-            await Message.reply_msg(update, f"Error: {e}")
-    elif msg == "off":
-        try:
-            await MongoDB.update_db("groups", "chat_id", chat.id, "antibot", "off")
-            await Message.reply_msg(update, "Antibot has been disabled in this chat!\nI won't protect the chat from bots joining!")
-        except Exception as e:
-            logger.error(f"Error disabling antibot: {e}")
-            await Message.reply_msg(update, f"Error: {e}")
-    else:
-        await Message.reply_msg(update, help_msg)
-
-
 async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     chat_member = update.chat_member
@@ -293,7 +90,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
     user_exist, reason = _chk_stat
 
     if user_exist == True:
-        if victim.is_bot and antibot == "on":
+        if victim.is_bot and antibot:
             _chk_per = await _check_permission(update, victim, user)
 
             if not _chk_per:
@@ -315,9 +112,9 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
             except Exception as e:
                 logger.info(f"Error: {e}")
                 await Message.send_msg(chat.id, f"Error: {e}")
-        elif welcome_msg == "on":
+        elif welcome_msg:
             await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
-    elif user_exist == False and reason == "left" and goodbye_msg == "on":
+    elif user_exist == False and reason == "left" and goodbye_msg:
         await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")
 
 
