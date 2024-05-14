@@ -575,7 +575,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     while retry_gpt != 3:
         g4f_gpt = await G4F.chatgpt(f"{prompt}, tell me under 300 words.")
         retry_gpt += 1
-        await Message.edit_msg(update, f"Please wait, ChatGPT is busy!\nAttempt: {retry_gpt}")
+        await Message.edit_msg(update, f"Please wait, ChatGPT is busy!\nAttempt: {retry_gpt}", sent_msg)
         await asyncio.sleep(3)
         if g4f_gpt and "流量异常, 请尝试更换网络环境, 如果你觉得ip被误封了, 可尝试邮件联系我们, 当前" not in g4f_gpt:
             break
