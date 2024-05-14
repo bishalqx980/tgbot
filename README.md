@@ -85,6 +85,6 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 
 ## License
 
-MIT © @bishalqx980
+GPL-3.0 © @bishalqx980
 <br>
 Original Creator - [bishalqx980](https://t.me/bishalqx980)
