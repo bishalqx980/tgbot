@@ -579,7 +579,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await asyncio.sleep(3)
         if g4f_gpt and "流量异常, 请尝试更换网络环境, 如果你觉得ip被误封了, 可尝试邮件联系我们, 当前" not in g4f_gpt:
             break
-        else:
+        elif retry_gpt == 3:
             await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
             return
     
