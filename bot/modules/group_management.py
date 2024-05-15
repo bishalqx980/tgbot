@@ -809,6 +809,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+    e_msg = update.effective_message
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
@@ -849,7 +850,9 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     try:
-        await Message.del_msg(chat.id, reply)
+        message_to_del = [e_msg, reply]
+        for delete_msg in message_to_del:
+            await Message.del_msg(chat.id, delete_msg)
         msg = f"{victim.mention_html()}, your message is deleted by {user.mention_html()}!"
         if reason:
             msg = f"{msg}\nReason: {reason}"
