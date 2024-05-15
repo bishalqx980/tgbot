@@ -220,6 +220,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "images":
         images = await MongoDB.get_data("bot_docs", "images")
 
+        if len(images) > 10:
+            storage, count_image = "", 0
+            for image in images:
+                storage += f"{image},"
+                count_image += 1
+                if count_image == 10:
+                    count_image = 0
+                    await Message.send_msg(user.id, f"{storage}")
+                    images = "Value sent below!"
+
         context.chat_data["edit_data"] = "images"
         context.chat_data["old_value"] = images
 
