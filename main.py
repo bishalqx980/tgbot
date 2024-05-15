@@ -692,7 +692,7 @@ async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/yts keyword</code>\nE.g. <code>/yts google keynote</code>")
         return
     
-    result = await YouTubeDownload.yts(keyword)
+    result = YouTubeDownload.yts(keyword)
     if not result:
         await Message.reply_msg(update, "Something Went Wrong...")  
         return
