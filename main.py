@@ -104,7 +104,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn_name_1 = ["Add in Group"]
     btn_url_1 = [f"http://t.me/{_bot.username}?startgroup=start"]
-    btn_name_2 = ["⚡ Developer ⚡", "📘 Source Code"]
+    btn_name_2 = ["Developer", "Source Code"]
     btn_url_2 = [f"https://t.me/bishalqx980", "https://github.com/bishalqx980/tgbot"]
     btn_name_3 = ["Support Chat"]
     btn_url_3 = [support_chat]
