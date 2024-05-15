@@ -3,7 +3,7 @@ from bot import logger
 from pytube import YouTube, Search
 
 class YouTubeDownload:
-    async def ytdl(url, extention):
+    def ytdl(url, extention):
         try:
             logger.info("Starting Download...")
             def _on_progress(stream, chunk, bytes_remaining):
@@ -54,7 +54,7 @@ class YouTubeDownload:
             logger.error(f"Error ytdl: {e}")
 
 
-    async def yts(keyword):
+    def yts(keyword):
         try:
             logger.info("Searching...")
             result = Search(keyword).results

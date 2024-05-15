@@ -4,6 +4,7 @@ from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.mongodb import MongoDB
+from bot.update_db import update_database
 
 
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -15,20 +16,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # youtube
     if data == "mp4":
-        # importing from main.py
-        from main import exe_func_ytdl
-        url = context.user_data.get("url")
-        extention = "mp4"
-        await query.message.delete()
-        await exe_func_ytdl(update, context, url, extention)
+        context.user_data["content_format"] = data
 
     elif data == "mp3":
-        # importing from main.py
-        from main import exe_func_ytdl
-        url = context.user_data.get("url")
-        extention = "mp3"
-        await query.message.delete()
-        await exe_func_ytdl(update, context, url, extention)
+        context.user_data["content_format"] = data
     
     # Group management
     elif data == "group_management":
@@ -62,7 +53,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif data == "ai":
         msg = (
-            "Artificial Intelligent functions -\n\n"
+            "Artificial intelligence functions -\n\n"
             "/imagine » Generate AI image\n"
             "/gpt » Ask any question to ChatGPT\n\n"
             "<i>Note: Type commands to get more details about the command function!</i>"
@@ -125,7 +116,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"/help - to see this message"
         )
 
-        btn_name_row1 = ["Group Management", "AI"]
+        btn_name_row1 = ["Group Management", "Artificial intelligence"]
         btn_data_row1 = ["group_management", "ai"]
 
         btn_name_row2 = ["misc", "Bot owner"]
@@ -211,6 +202,31 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = (
             "<b>Bot Settings</b> -\n\n"
             f"Telegraph link: <code>{telegraph}</code>\n"
+        )
+
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["b_setting_menu", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
+    
+    elif data == "images":
+        images = await MongoDB.get_data("bot_docs", "images")
+
+        context.chat_data["edit_data"] = "images"
+        context.chat_data["old_value"] = images
+
+        msg = (
+            "<b>Bot Settings</b> -\n\n"
+            f"images: <code>{images}</code>\n\n"
+            "<i>Note: Single image or Upload multiple image link separated by comma!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -465,8 +481,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.delete()
             return
 
-        from bot.update_db import update_database
-
         await MongoDB.delete_all_doc("bot_docs")
 
         res = await update_database()
@@ -515,7 +529,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 new_value = [new_value]
         
-        if not isinstance(new_value, int) and edit_data != "premium_users":
+        if edit_data == "images":
+            if "," in new_value:
+                storage = []
+                for img in new_value.split(","):
+                    storage.append(img)
+                new_value = storage
+            else:
+                new_value = [new_value]
+        
+        if not isinstance(new_value, int) and edit_data not in ["premium_users", "images"]:
             if new_value.lower() == "true":
                 new_value = True
             elif new_value.lower() == "false":
@@ -526,7 +549,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.del_msg(chat_id, del_msg)
             await Message.send_msg(chat_id, f"Database updated!\n\nData: {edit_data}\nValue: <code>{new_value}</code>") 
         except Exception as e:
-            logger.info(f"Error: {e}")
+            logger.error(f"Error: {e}")
             await Message.del_msg(chat_id, del_msg)
             await Message.send_msg(chat_id, f"Error: {e}")
 
@@ -548,15 +571,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await MongoDB.update_db("bot_docs", edit_data, old_value, edit_data, new_value)
             await Message.send_msg(chat_id, f"{edit_data} value set to <code>{new_value}</code>!") 
         except Exception as e:
-            logger.info(f"Error: {e}")
+            logger.error(f"Error: {e}")
             await Message.send_msg(chat_id, f"Error: {e}")
 
     elif data == "b_setting_menu":
         btn_name_row1 = ["Bot pic", "Welcome img"]
         btn_data_row1 = ["bot_pic", "welcome_img"]
 
-        btn_name_row2 = ["Telegraph", "lang code list"]
-        btn_data_row2 = ["telegraph", "lang_code_list"]
+        btn_name_row2 = ["Telegraph", "Images", "Lang code list"]
+        btn_data_row2 = ["telegraph", "images", "lang_code_list"]
 
         btn_name_row3 = ["Support chat", "Server url"]
         btn_data_row3 = ["support_chat", "server_url"]
@@ -645,7 +668,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.del_msg(chat_id, del_msg)
             await Message.send_msg(chat_id, f"Database updated!\n\nData: {edit_data}\nValue: <code>{new_value}</code>") 
         except Exception as e:
-            logger.info(f"Error: {e}")
+            logger.error(f"Error: {e}")
             await Message.del_msg(chat_id, del_msg)
             await Message.send_msg(chat_id, f"Error: {e}")
 
@@ -873,7 +896,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await MongoDB.update_db(edit_cname, find_data, match_data, edit_data, new_value)
             await Message.send_msg(chat_id, f"Database updated!\n\nData: {edit_data}\nValue: <code>{new_value}</code>") 
         except Exception as e:
-            logger.info(f"Error: {e}")
+            logger.error(f"Error: {e}")
             await Message.send_msg(chat_id, f"Error: {e}")
     
     elif data == "false":
@@ -896,7 +919,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await MongoDB.update_db(edit_cname, find_data, match_data, edit_data, new_value)
             await Message.send_msg(chat_id, f"Database updated!\n\nData: {edit_data}\nValue: <code>{new_value}</code>") 
         except Exception as e:
-            logger.info(f"Error: {e}")
+            logger.error(f"Error: {e}")
             await Message.send_msg(chat_id, f"Error: {e}")
 
     elif data == "close":

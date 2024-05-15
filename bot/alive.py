@@ -12,7 +12,5 @@ def index():
 def run():
   app.run(host='0.0.0.0', port=8080)
 
-
 def alive():
-  t = Thread(target=run)
-  t.start()
+  Thread(target=run).start()

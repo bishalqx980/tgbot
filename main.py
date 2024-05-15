@@ -1,10 +1,11 @@
 import os
 import json
 import psutil
+import random
 import asyncio
 import requests
-import threading
 import subprocess
+from threading import Thread
 from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, ChatMember
@@ -215,7 +216,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Language code's"]
         btn_url = [lang_code_list]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+        await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
         return
 
     if tr_msg != msg:
@@ -305,7 +306,7 @@ async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await Message.reply_msg(update, f"Calculation result: <code>{calc(msg):.2f}</code>")
     except Exception as e:
-        logger.info(f"Can't calc: {e}")
+        logger.error(f"Can't calc: {e}")
         await Message.reply_msg(update, f"Can't calc: {e}")   
 
 
@@ -598,9 +599,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     re_msg = update.message.reply_to_message
     url = re_msg.text if re_msg else " ".join(context.args)
-        
-    context.user_data["url"] = url
-    context.user_data["msg_id"] = e_msg.id
+
     if chat.type != "private":
         _bot = await bot.get_me()
         btn_name = ["Start me in private"]
@@ -613,45 +612,60 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")
         return
     
-    btn_name = ["mp4", "mp3"]
-    btn_close = ["close"]
-    btn = await Button.cbutton(btn_name, btn_name, True)
-    btn2 = await Button.cbutton(btn_close, btn_close)
-    await Message.reply_msg(update, f"Select Content Quality/Format\n{url}", btn + btn2)
+    btn_name_row1 = ["Video (mp4)", "Audio (mp3)"]
+    btn_data_row1 = ["mp4", "mp3"]
 
+    btn_name_row2 = ["Cancel"]
+    btn_data_row2 = ["close"]
 
-async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url, extention):
-    chat = update.effective_chat
+    row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+    row2 = await Button.cbutton(btn_name_row2, btn_data_row2)
 
-    tmp_msg = await Message.send_msg(chat.id, "Please Wait...")
-    await Message.edit_msg(update, "📥 Downloading...", tmp_msg)
+    btn = row1 + row2
 
-    res = await YouTubeDownload.ytdl(url, extention)
+    del_msg = await Message.reply_msg(update, f"\nSelect <a href='{url}'>Content</a> Quality/Format", btn, disable_web_preview=False)
 
-    if not res:
-        await Message.edit_msg(update, "Something Went Wrong...", tmp_msg)
+    timeout = 0
+
+    while timeout < 15:
+        content_format = context.user_data.get("content_format")
+        timeout += 1
+        await asyncio.sleep(1)
+        if content_format:
+            break
+    
+    await Message.del_msg(chat.id, del_msg)
+
+    if not content_format:
+        await Message.reply_msg(update, "Timeout!")
         return
     
-    await Message.edit_msg(update, "📤 Uploading...", tmp_msg)
+    sent_msg = await Message.reply_msg(update, "Please Wait...")
+    await Message.edit_msg(update, "📥 Downloading...", sent_msg)
+
+    res = YouTubeDownload.ytdl(url, content_format)
+
+    if not res:
+        await Message.edit_msg(update, "Something Went Wrong...", sent_msg)
+        return
+
+    await Message.edit_msg(update, "📤 Uploading...", sent_msg)
+
     try_attempt, max_attempt = 0, 3
-    msg_id = context.user_data.get("msg_id")
-    while try_attempt <= max_attempt:
+
+    while try_attempt != max_attempt:
         try:
-            if extention == "mp4":
-                title = res[0]
-                file_path = res[1]
-                thumbnail = res[2]
-                await Message.send_vid(chat.id, file_path, thumbnail, title, msg_id)
-                break
-            elif extention == "mp3":
-                title = res[0]
-                file_path = res[1]
-                await Message.send_audio(chat.id, file_path, title, title, msg_id)
+            if content_format == "mp4":
+                title, file_path, thumbnail = res
+                await Message.send_vid(chat.id, file_path, thumbnail, title, e_msg.id)
+            elif content_format == "mp3":
+                title, file_path = res
+                await Message.send_audio(chat.id, file_path, title, title, e_msg.id)
                 break
         except Exception as e:
             logger.error(f"Error Uploading: {e}")
             try_attempt += 1
-            await Message.edit_msg(update, f"📤 Uploading... [Retry Attempt: {try_attempt}/{max_attempt}]", tmp_msg)
+            await Message.edit_msg(update, f"📤 Uploading... [Retry Attempt: {try_attempt}/{max_attempt}]", sent_msg)
             if try_attempt == max_attempt:
                 logger.error(f"Error Uploading: {e}")
                 await Message.send_msg(chat.id, f"Error Uploading: {e}")
@@ -660,13 +674,13 @@ async def exe_func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE, url,
             await asyncio.sleep(2**try_attempt)
     try:
         if len(res) >= 3:
-            removeable_files = [res[1], res[2]]
+            rem_files = [res[1], res[2]]
         else:
-            removeable_files = [res[1]]
-        for rem in removeable_files:
+            rem_files = [res[1]]
+        for rem in rem_files:
             os.remove(rem)
-        logger.info("Files Removed...")
-        await Message.del_msg(chat.id, tmp_msg)
+            logger.info(f"{rem} Removed...")
+        await Message.del_msg(chat.id, sent_msg)
     except Exception as e:
         logger.error(f"Error os.remove: {e}")  
 
@@ -941,7 +955,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"/help - to see this message"
     )
 
-    btn_name_row1 = ["Group Management", "AI"]
+    btn_name_row1 = ["Group Management", "Artificial intelligence"]
     btn_data_row1 = ["group_management", "ai"]
 
     btn_name_row2 = ["misc", "Bot owner"]
@@ -956,9 +970,10 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn = row1 + row2 + row3
     
-    bot_pic = await MongoDB.get_data("bot_docs", "bot_pic")
-    if bot_pic:
-        await Message.send_img(chat.id, bot_pic, msg, btn)
+    images = await MongoDB.get_data("bot_docs", "images")
+    if images:
+        image = random.choice(images).strip()
+        await Message.send_img(chat.id, image, msg, btn)
     else:
         await Message.send_msg(chat.id, msg, btn)
 
@@ -1064,8 +1079,8 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_name_row1 = ["Bot pic", "Welcome img"]
     btn_data_row1 = ["bot_pic", "welcome_img"]
 
-    btn_name_row2 = ["Telegraph", "lang code list"]
-    btn_data_row2 = ["telegraph", "lang_code_list"]
+    btn_name_row2 = ["Telegraph", "Images", "Lang code list"]
+    btn_data_row2 = ["telegraph", "images", "lang_code_list"]
 
     btn_name_row3 = ["Support chat", "Server url"]
     btn_data_row3 = ["support_chat", "server_url"]
@@ -1088,9 +1103,10 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn = row1 + row2 + row3 + row4 + row5 + row6
 
-    bot_pic = await MongoDB.get_data("bot_docs", "bot_pic")
-    if bot_pic:
-        await Message.send_img(chat.id, bot_pic, "<b>Bot Settings</b>", btn)
+    images = await MongoDB.get_data("bot_docs", "images")
+    if images:
+        image = random.choice(images).strip()
+        await Message.send_img(chat.id, image, "<b>Bot Settings</b>", btn)
     else:
         await Message.send_msg(chat.id, "<b>Bot Setting</b>", btn)
 
@@ -1161,7 +1177,7 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             await Message.reply_msg(update, msg)
         except Exception as e:
-            logger.info(f"Error render: {e}")
+            logger.error(f"Error render: {e}")
             await Message.reply_msg(update, f"Error render: {e}")
     elif "restart" in msg:
         index_restart = msg.index("restart")
@@ -1176,7 +1192,7 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
                 await Message.edit_msg(update, "Failed to restart...", sent_msg)
         except Exception as e:
-            logger.info(f"Error render: {e}")
+            logger.error(f"Error render: {e}")
             await Message.reply_msg(update, f"Error render: {e}")
             await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
     elif "redeploy" in msg:
@@ -1192,7 +1208,7 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
                 await Message.edit_msg(update, "Failed to redeploy...", sent_msg)
         except Exception as e:
-            logger.info(f"Error render: {e}")
+            logger.error(f"Error render: {e}")
             await Message.reply_msg(update, f"Error render: {e}")
             await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
 
@@ -1267,7 +1283,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 btn_name = ["Language code's"]
                 btn_url = [lang_code_list]
                 btn = await Button.ubutton(btn_name, btn_url)
-                await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+                await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
                 return
             # tanslate proccess
             if tr_msg != msg:
@@ -1298,19 +1314,14 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 btn_name = ["Language code's"]
                 btn_url = [lang_code_list]
                 btn = await Button.ubutton(btn_name, btn_url)
-                await Message.send_msg(chat.id, "Chat language not found/invalid! Use <code>/setlang lang_code</code> to set your language.\nE.g. <code>/setlang en</code> if your language is English.", btn)
+                await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
                 return
             # tanslate proccess
             if tr_msg != msg:
                 await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
 
 
-def start_up_work():
-    asyncio.run(update_database())
-    asyncio.run(ex_server_alive())
-
-
-async def ex_server_alive():
+async def server_alive():
     server_url = await MongoDB.get_data("bot_docs", "server_url")
     bot_status = await MongoDB.get_data("bot_docs", "bot_status")
     try:
@@ -1320,7 +1331,7 @@ async def ex_server_alive():
             await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
             await Message.send_msg(owner_id, "Bot Restarted!")
     except Exception as e:
-        logger.info(f"Error startup_msg: {e}")
+        logger.error(f"Error startup_msg: {e}")
 
     if len(server_url) != 0:
         if server_url[0:4] != "http":
@@ -1392,7 +1403,13 @@ def main():
 
 
 if __name__ == "__main__":
-    logger.info("🤖 Bot Started !!")
-    thread = threading.Thread(target=start_up_work)
-    thread.start()
-    main()
+    #Thread(target=start_up_work).start()
+
+    async def start_up_work():
+        await update_database()
+        await server_alive()
+    
+    loop = asyncio.get_event_loop()
+    loop.create_task(start_up_work())
+    loop.create_task(main())
+    loop.run_forever()

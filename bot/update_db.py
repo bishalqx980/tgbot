@@ -9,6 +9,7 @@ from bot import (
     welcome_img,
     support_chat,
     telegraph,
+    images,
     mongodb_uri,
     db_name,
     server_url,
@@ -40,6 +41,7 @@ async def update_database():
         #optional
         "support_chat": support_chat,
         "telegraph": telegraph,
+        "images": images,
         #database
         "mongodb_uri": mongodb_uri,
         "db_name": db_name,
