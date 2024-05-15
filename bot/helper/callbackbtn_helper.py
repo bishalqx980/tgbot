@@ -222,16 +222,17 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         context.chat_data["edit_data"] = "images"
         context.chat_data["old_value"] = images
-        
-        if len(images) > 10:
-            storage, count_image = "", 0
-            for image in images:
-                storage += f"{image},"
-                count_image += 1
-                if count_image == 10:
-                    count_image = 0
-                    await Message.send_msg(user.id, f"{storage}")
-                    images = "Value sent below!"
+
+        if images:
+            if len(images) > 10:
+                storage, count_image = "", 0
+                for image in images:
+                    storage += f"{image},"
+                    count_image += 1
+                    if count_image == 10:
+                        count_image = 0
+                        await Message.send_msg(user.id, f"{storage}")
+                        images = "Value sent below!"
                     
         msg = (
             "<b>Bot Settings</b> -\n\n"
