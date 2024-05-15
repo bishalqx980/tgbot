@@ -784,7 +784,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             btn = row1 + row2
 
-            await Message.send_msg(chat.id, msg, btn)
+            images = await MongoDB.get_data("bot_docs", "images")
+            if images:
+                image = random.choice(images).strip()
+                await Message.send_img(chat.id, image, msg, btn)
+            else:
+                await Message.send_msg(chat.id, msg, btn)
         
         elif find_group:
             title = find_group.get("title")
@@ -833,7 +838,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             btn = row1 + row2 + row3 + row4
 
-            await Message.send_msg(chat.id, msg, btn)
+            images = await MongoDB.get_data("bot_docs", "images")
+            if images:
+                image = random.choice(images).strip()
+                await Message.send_img(chat.id, image, msg, btn)
+            else:
+                await Message.send_msg(chat.id, msg, btn)
 
     elif chat.type in ["group", "supergroup"]:
         if user.is_bot:
@@ -912,7 +922,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn = row1 + row2 + row3 + row4
 
-        await Message.send_msg(chat.id, msg, btn)
+        images = await MongoDB.get_data("bot_docs", "images")
+        if images:
+            image = random.choice(images).strip()
+            await Message.send_img(chat.id, image, msg, btn)
+        else:
+            await Message.send_msg(chat.id, msg, btn)
 
 
 async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
