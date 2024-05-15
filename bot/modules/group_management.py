@@ -375,6 +375,8 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         context.chat_data["chat_id"] = chat.id
+        context.chat_data["user_id"] = user.id
+        
         btn_name = ["⚠ YES", "🍀 NO"]
         btn_data = ["unpin_all", "close"]
         btn = await Button.cbutton(btn_name, btn_data, True)

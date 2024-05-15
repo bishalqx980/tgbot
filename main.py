@@ -595,6 +595,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
     chat = update.effective_chat
     e_msg = update.effective_message
     re_msg = update.message.reply_to_message
@@ -611,6 +612,8 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not url:
         await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")
         return
+    
+    context.chat_data["user_id"] = user.id
     
     btn_name_row1 = ["Video (mp4)", "Audio (mp3)"]
     btn_data_row1 = ["mp4", "mp3"]
@@ -757,6 +760,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.chat_data["find_data"] = "user_id"
             context.chat_data["match_data"] = chat_id
             context.chat_data["chat_id"] = chat.id
+            context.chat_data["user_id"] = user.id
 
             msg = (
                 f"<b>Chat Settings</b> -\n\n"
@@ -805,6 +809,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.chat_data["find_data"] = "chat_id"
             context.chat_data["match_data"] = chat_id
             context.chat_data["chat_id"] = chat.id
+            context.chat_data["user_id"] = user.id
 
             msg = (
                 f"<b>Chat Settings</b> -\n\n"
@@ -889,6 +894,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["find_data"] = "chat_id"
         context.chat_data["match_data"] = chat.id
         context.chat_data["chat_id"] = chat.id
+        context.chat_data["user_id"] = user.id
 
         msg = (
             f"<b>Chat Settings</b> -\n\n"
@@ -969,6 +975,8 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"/start - to start the bot\n"
         f"/help - to see this message"
     )
+
+    context.chat_data["user_id"] = user.id
 
     btn_name_row1 = ["Group Management", "Artificial intelligence"]
     btn_data_row1 = ["group_management", "ai"]
@@ -1090,6 +1098,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.chat_data["find_data"] = "welcome_img"
     context.chat_data["match_data"] = welcome_img
     context.chat_data["chat_id"] = chat.id
+    context.chat_data["user_id"] = user.id
     
     btn_name_row1 = ["Bot pic", "Welcome img"]
     btn_data_row1 = ["bot_pic", "welcome_img"]

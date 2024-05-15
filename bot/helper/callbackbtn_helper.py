@@ -9,10 +9,30 @@ from bot.update_db import update_database
 
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    await query.answer()
     data = query.data
     user = query.from_user
     sent_msg = query.message
+
+
+    async def popup(msg):
+        await query.answer(msg, True)
+    
+
+    async def _check_whois():
+        user_id = context.chat_data.get("user_id")
+        if not user_id:
+            error_msg = "Error: user_id not found!"
+            logger.info(error_msg)
+            await popup(error_msg)
+            await query.message.delete()
+            return False
+        
+        if user.id != user_id:
+            await popup("Access Denied!")
+            return False
+        
+        return True
+
 
     # youtube
     if data == "mp4":
@@ -134,6 +154,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
 
     elif data == "unpin_all":
+        access = await _check_whois()
+        if not access:
+            return
+        
         # importing from group_management
         from bot.modules.group_management import exe_func_unpin_all_msg
         chat_id = context.chat_data.get("chat_id")
@@ -617,6 +641,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # chat setting
     elif data == "lang":
+        access = await _check_whois()
+        if not access:
+            return
+        
         edit_cname = context.chat_data.get("edit_cname")
         lang = await MongoDB.get_data(edit_cname, "lang")
 
@@ -646,6 +674,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "set_lang":
+        access = await _check_whois()
+        if not access:
+            return
+        
         chat_id = context.chat_data.get("chat_id")
         if not chat_id:
             logger.info("Error: chat_id not found!")
@@ -684,6 +716,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.send_msg(chat_id, f"Error: {e}")
 
     elif data == "auto_tr":
+        access = await _check_whois()
+        if not access:
+            return
+        
         edit_cname = context.chat_data.get("edit_cname")
         auto_tr = await MongoDB.get_data(edit_cname, "auto_tr")
 
@@ -709,6 +745,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
 
     elif data == "set_echo":
+        access = await _check_whois()
+        if not access:
+            return
+        
         chat_id = context.chat_data.get("chat_id")
         if not chat_id:
             logger.info("Error: chat_id not found!")
@@ -743,6 +783,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "welcome_msg":
+        access = await _check_whois()
+        if not access:
+            return
+        
         chat_id = context.chat_data.get("chat_id")
         if not chat_id:
             logger.info("Error: chat_id not found!")
@@ -777,6 +821,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "goodbye_msg":
+        access = await _check_whois()
+        if not access:
+            return
+        
         chat_id = context.chat_data.get("chat_id")
         if not chat_id:
             logger.info("Error: chat_id not found!")
@@ -811,6 +859,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "antibot":
+        access = await _check_whois()
+        if not access:
+            return
+        
         chat_id = context.chat_data.get("chat_id")
         if not chat_id:
             logger.info("Error: chat_id not found!")
@@ -845,6 +897,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
 
     elif data == "c_setting_menu":
+        access = await _check_whois()
+        if not access:
+            return
+        
         edit_cname = context.chat_data.get("edit_cname")
 
         if edit_cname == "groups":
@@ -888,6 +944,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # global close
     elif data == "true":
+        access = await _check_whois()
+        if not access:
+            return
+        
         chat_id = context.chat_data.get("chat_id") # set from main.py
         if not chat_id:
             logger.info("Error: chat_id not found!")
@@ -911,6 +971,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.send_msg(chat_id, f"Error: {e}")
     
     elif data == "false":
+        access = await _check_whois()
+        if not access:
+            return
+        
         chat_id = context.chat_data.get("chat_id") # set from main.py
         if not chat_id:
             logger.info("Error: chat_id not found!")
@@ -934,4 +998,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.send_msg(chat_id, f"Error: {e}")
 
     elif data == "close":
-        await query.message.delete()
+        access = await _check_whois()
+        if access:
+            await query.message.delete()
