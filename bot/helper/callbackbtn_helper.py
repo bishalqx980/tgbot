@@ -582,7 +582,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             await MongoDB.update_db("bot_docs", edit_data, old_value, edit_data, new_value)
             await Message.del_msg(chat_id, del_msg)
-            await Message.send_msg(chat_id, f"Database updated!\n\nData: {edit_data}\nValue: <code>{new_value}</code>") 
+            await popup(f"Database updated!\n\nData: {edit_data}\nValue: {new_value}")
         except Exception as e:
             logger.error(f"Error: {e}")
             await Message.del_msg(chat_id, del_msg)
@@ -709,7 +709,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             await MongoDB.update_db(edit_cname, find_data, match_data, edit_data, new_value)
             await Message.del_msg(chat_id, del_msg)
-            await Message.send_msg(chat_id, f"Database updated!\n\nData: {edit_data}\nValue: <code>{new_value}</code>") 
+            await popup(f"Database updated!\n\nData: {edit_data}\nValue: {new_value}")
         except Exception as e:
             logger.error(f"Error: {e}")
             await Message.del_msg(chat_id, del_msg)
@@ -1003,7 +1003,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         try:
             await MongoDB.update_db(edit_cname, find_data, match_data, edit_data, new_value)
-            await Message.send_msg(chat_id, f"Database updated!\n\nData: {edit_data}\nValue: <code>{new_value}</code>") 
+            await popup(f"Database updated!\n\nData: {edit_data}\nValue: {new_value}")
         except Exception as e:
             logger.error(f"Error: {e}")
             await Message.send_msg(chat_id, f"Error: {e}")
@@ -1030,7 +1030,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         try:
             await MongoDB.update_db(edit_cname, find_data, match_data, edit_data, new_value)
-            await Message.send_msg(chat_id, f"Database updated!\n\nData: {edit_data}\nValue: <code>{new_value}</code>") 
+            await popup(f"Database updated!\n\nData: {edit_data}\nValue: {new_value}")
         except Exception as e:
             logger.error(f"Error: {e}")
             await Message.send_msg(chat_id, f"Error: {e}")
@@ -1038,4 +1038,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "close":
         access = await _check_whois()
         if access:
-            await query.message.delete()
+            try:
+                chat_id = context.chat_data.get("chat_id")
+                del_msg_pointer = context.chat_data.get("del_msg_pointer")
+                await query.message.delete()
+                await Message.del_msg(chat_id, del_msg_pointer)
+            except Exception as e:
+                logger.error(f"Error: {e}")

@@ -605,6 +605,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     context.chat_data["user_id"] = user.id
+    context.chat_data["del_msg_pointer"] = e_msg
     
     btn_name_row1 = ["Video (mp4)", "Audio (mp3)"]
     btn_data_row1 = ["mp4", "mp3"]
@@ -704,6 +705,7 @@ async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+    e_msg = update.effective_message
     chat_id = " ".join(context.args)
 
     if chat.type == "private":
@@ -752,6 +754,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.chat_data["match_data"] = chat_id
             context.chat_data["chat_id"] = chat.id
             context.chat_data["user_id"] = user.id
+            context.chat_data["del_msg_pointer"] = e_msg
 
             msg = (
                 f"<b>Chat Settings</b> -\n\n"
@@ -802,6 +805,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.chat_data["match_data"] = chat_id
             context.chat_data["chat_id"] = chat.id
             context.chat_data["user_id"] = user.id
+            context.chat_data["del_msg_pointer"] = e_msg
 
             msg = (
                 f"<b>Chat Settings</b> -\n\n"
@@ -891,6 +895,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["match_data"] = chat.id
         context.chat_data["chat_id"] = chat.id
         context.chat_data["user_id"] = user.id
+        context.chat_data["del_msg_pointer"] = e_msg
 
         msg = (
             f"<b>Chat Settings</b> -\n\n"
@@ -957,6 +962,7 @@ async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
+    e_msg = update.effective_message
 
     if chat.type != "private":
         _bot = await bot.get_me()
@@ -974,6 +980,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     context.chat_data["user_id"] = user.id
+    context.chat_data["del_msg_pointer"] = e_msg
 
     btn_name_row1 = ["Group Management", "Artificial intelligence"]
     btn_data_row1 = ["group_management", "ai"]
@@ -1080,6 +1087,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+    e_msg = update.effective_message
 
     if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
@@ -1096,6 +1104,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.chat_data["match_data"] = welcome_img
     context.chat_data["chat_id"] = chat.id
     context.chat_data["user_id"] = user.id
+    context.chat_data["del_msg_pointer"] = e_msg
     
     btn_name_row1 = ["Bot pic", "Welcome img"]
     btn_data_row1 = ["bot_pic", "welcome_img"]
