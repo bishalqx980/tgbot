@@ -24,6 +24,7 @@ from bot.modules.group_management import (
     _check_permission,
     track_my_chat_activities,
     track_chat_activities,
+    _check_del_cmd,
     func_invite_link,
     func_promote,
     func_demote,
@@ -636,7 +637,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_msg = await Message.reply_msg(update, "Please Wait...")
     await Message.edit_msg(update, "📥 Downloading...", sent_msg)
 
-    res = YouTubeDownload.ytdl(url, content_format)
+    res = await YouTubeDownload.ytdl(url, content_format)
 
     if not res:
         await Message.edit_msg(update, "Something Went Wrong...", sent_msg)
@@ -685,7 +686,7 @@ async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/yts keyword</code>\nE.g. <code>/yts google keynote</code>")
         return
     
-    result = YouTubeDownload.yts(keyword)
+    result = await YouTubeDownload.yts(keyword)
     if not result:
         await Message.reply_msg(update, "Something Went Wrong...")  
         return
@@ -794,6 +795,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             welcome_msg = find_group.get("welcome_msg")
             goodbye_msg = find_group.get("goodbye_msg")
             antibot = find_group.get("antibot")
+            del_cmd = find_group.get("del_cmd")
 
             context.chat_data["edit_cname"] = "groups"
             context.chat_data["find_data"] = "chat_id"
@@ -812,6 +814,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"• Welcome user: <code>{welcome_msg}</code>\n"
                 f"• Goodbye user: <code>{goodbye_msg}</code>\n"
                 f"• Antibot: <code>{antibot}</code>\n"
+                f"• Del cmd: <code>{del_cmd}</code>\n"
             )
 
             btn_name_row1 = ["Language", "Auto translate"]
@@ -823,13 +826,13 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn_name_row3 = ["Welcome", "Goodbye"]
             btn_data_row3 = ["welcome_msg", "goodbye_msg"]
 
-            btn_name_row4 = ["Close"]
-            btn_data_row4 = ["close"]
+            btn_name_row4 = ["Del cmd", "Close"]
+            btn_data_row4 = ["del_cmd", "close"]
 
             row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
             row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
             row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
-            row4 = await Button.cbutton(btn_name_row4, btn_data_row4)
+            row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
 
             btn = row1 + row2 + row3 + row4
 
@@ -841,6 +844,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.send_msg(chat.id, msg, btn)
 
     elif chat.type in ["group", "supergroup"]:
+        await _check_del_cmd(update)
+
         if user.is_bot:
             await Message.reply_msg(update, "I don't take permission from anonymous admins!")
             return
@@ -879,6 +884,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         welcome_msg = find_group.get("welcome_msg")
         goodbye_msg = find_group.get("goodbye_msg")
         antibot = find_group.get("antibot")
+        del_cmd = find_group.get("del_cmd")
 
         context.chat_data["edit_cname"] = "groups"
         context.chat_data["find_data"] = "chat_id"
@@ -897,6 +903,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Welcome user: <code>{welcome_msg}</code>\n"
             f"• Goodbye user: <code>{goodbye_msg}</code>\n"
             f"• Antibot: <code>{antibot}</code>\n"
+            f"• Del cmd: <code>{del_cmd}</code>\n"
         )
 
         btn_name_row1 = ["Language", "Auto translate"]
@@ -908,13 +915,13 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row3 = ["Welcome", "Goodbye"]
         btn_data_row3 = ["welcome_msg", "goodbye_msg"]
 
-        btn_name_row4 = ["Close"]
-        btn_data_row4 = ["close"]
+        btn_name_row4 = ["Del cmd", "Close"]
+        btn_data_row4 = ["del_cmd", "close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
         row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
-        row4 = await Button.cbutton(btn_name_row4, btn_data_row4)
+        row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
 
         btn = row1 + row2 + row3 + row4
 
@@ -1264,6 +1271,7 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+    e_msg = update.effective_message
     msg = update.message.text or update.message.caption if update.message else None
 
     if context.chat_data.get("status") == "editing":

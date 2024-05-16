@@ -895,6 +895,44 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2
 
         await Message.edit_msg(update, msg, sent_msg, btn)
+    
+    elif data == "del_cmd":
+        access = await _check_whois()
+        if not access:
+            return
+        
+        chat_id = context.chat_data.get("chat_id")
+        if not chat_id:
+            logger.info("Error: chat_id not found!")
+            await query.message.delete()
+            return
+        edit_cname = context.chat_data.get("edit_cname")
+        if not edit_cname:
+            await Message.send_msg(chat_id, "An error occurred! send command again then try...")
+            return
+
+        del_cmd = await MongoDB.get_data(edit_cname, "del_cmd")
+
+        context.chat_data["edit_data"] = "del_cmd"
+
+        msg = (
+            "<b>Chat Settings</b> -\n\n"
+            f"Del cmd: <code>{del_cmd}</code>\n\n"
+            "<i>Note: This will delete bot commands when you will send a command in chat!</i>"
+        )
+
+        btn_name_row1 = ["Enable", "Disable"]
+        btn_data_row1 = ["true", "false"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["c_setting_menu", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
 
     elif data == "c_setting_menu":
         access = await _check_whois()
@@ -913,13 +951,13 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn_name_row3 = ["Welcome", "Goodbye"]
             btn_data_row3 = ["welcome_msg", "goodbye_msg"]
 
-            btn_name_row4 = ["Close"]
-            btn_data_row4 = ["close"]
+            btn_name_row4 = ["Del cmd", "Close"]
+            btn_data_row4 = ["del_cmd", "close"]
 
             row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
             row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
             row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
-            row4 = await Button.cbutton(btn_name_row4, btn_data_row4)
+            row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
 
             btn = row1 + row2 + row3 + row4
 

@@ -170,6 +170,26 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
         await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")
 
 
+async def _check_del_cmd(update: Update):
+    """
+    only delete group chat commands
+    """
+    chat = update.effective_chat
+    msg = update.effective_message
+
+    if chat.type == "private":
+        return
+
+    find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+    if not find_group:
+        await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+        return
+    
+    del_cmd = find_group.get("del_cmd")
+    if del_cmd:
+        await Message.del_msg(chat.id, msg)
+
+
 async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -233,6 +253,8 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     admin_title = " ".join(context.args)
 
+    await _check_del_cmd(update)
+
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
         return
@@ -290,6 +312,8 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
 
+    await _check_del_cmd(update)
+
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
         return
@@ -338,6 +362,8 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     msg_id = reply.message_id if reply else None
+
+    await _check_del_cmd(update)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -388,6 +414,8 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     msg_id = reply.message_id if reply else None
     msg = " ".join(context.args)
+
+    await _check_del_cmd(update)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -459,6 +487,8 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
 
+    await _check_del_cmd(update)
+
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
         return
@@ -526,6 +556,8 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
+
+    await _check_del_cmd(update)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -597,6 +629,8 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
 
+    await _check_del_cmd(update)
+
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
         return
@@ -666,6 +700,8 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     victim = user
 
+    await _check_del_cmd(update)
+
     _chk_per = await _check_permission(update, victim, user)
 
     if not _chk_per:
@@ -708,6 +744,8 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
+
+    await _check_del_cmd(update)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -786,6 +824,8 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
+
+    await _check_del_cmd(update)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -866,6 +906,8 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
 
+    await _check_del_cmd(update)
+
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
         return
@@ -917,6 +959,8 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+
+    await _check_del_cmd(update)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -974,6 +1018,8 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
 
+    await _check_del_cmd(update)
+
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
         return
@@ -1029,6 +1075,8 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     _bot = await bot.get_me()
+
+    await _check_del_cmd(update)
 
     owner_storage = "<b>Owner:</b>\n"
     admins_storage = ""

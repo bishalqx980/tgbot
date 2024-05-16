@@ -96,29 +96,45 @@ class Message:
 
 
     async def reply_msg(update: Update, msg, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
+        chat = update.effective_chat
         message = update.message
-
-        if message.reply_to_message:
-            message_id = message.reply_to_message.message_id
-        else:
-            message_id = message.message_id
+        message_id = message.reply_to_message.message_id if message.reply_to_message else message.message_id
 
         if btn:
             reply_markup = InlineKeyboardMarkup(btn)
-            sent_msg = await update.message.reply_text(
-                text=msg,
-                disable_web_page_preview=bool(disable_web_preview),
-                reply_to_message_id=message_id,
-                reply_markup=reply_markup,
-                parse_mode=parse_mode
-            )
+            try:
+                sent_msg = await update.message.reply_text(
+                    text=msg,
+                    disable_web_page_preview=bool(disable_web_preview),
+                    reply_to_message_id=message_id,
+                    reply_markup=reply_markup,
+                    parse_mode=parse_mode
+                )
+            except Exception as e:
+                logger.error(f"Error: {e}")
+                sent_msg = await bot.send_message(
+                    chat_id=chat.id,
+                    text=msg,
+                    disable_web_page_preview=bool(disable_web_preview),
+                    reply_markup=reply_markup,
+                    parse_mode=parse_mode
+                )
         else:
-            sent_msg = await update.message.reply_text(
-                text=msg,
-                disable_web_page_preview=bool(disable_web_preview),
-                reply_to_message_id=message_id,
-                parse_mode=parse_mode
-            )
+            try:
+                sent_msg = await update.message.reply_text(
+                    text=msg,
+                    disable_web_page_preview=bool(disable_web_preview),
+                    reply_to_message_id=message_id,
+                    parse_mode=parse_mode
+                )
+            except Exception as e:
+                logger.error(f"Error: {e}")
+                sent_msg = await bot.send_message(
+                    chat_id=chat.id,
+                    text=msg,
+                    disable_web_page_preview=bool(disable_web_preview),
+                    parse_mode=parse_mode
+                )
         return sent_msg
 
 
