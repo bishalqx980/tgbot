@@ -253,11 +253,11 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 for image in images:
                     storage += f"{image},"
                     count_image += 1
-                    if count_image == 10:
-                        count_image = 0
+                    if count_image == 20:
                         await Message.send_msg(user.id, f"{storage}")
-                        images = "Value sent below!"
-                    
+                        storage, count_image = "", 0
+                await Message.send_msg(user.id, f"{storage}")
+                images = "Value sent below!"
         msg = (
             "<b>Bot Settings</b> -\n\n"
             f"images: <code>{images}</code>\n\n"
