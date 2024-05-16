@@ -645,21 +645,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
-        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
             await popup("An error occurred! send command again then try...")
             await query.message.delete()
             return
+        
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
 
-        search_data = "user_id" if edit_cname == "users" else "chat_id"
-
-        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
         if not find_chat:
             await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             await query.message.delete()
@@ -745,21 +740,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
-        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
             await popup("An error occurred! send command again then try...")
             await query.message.delete()
             return
 
-        search_data = "user_id" if edit_cname == "users" else "chat_id"
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
 
-        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
         if not find_chat:
             await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             await query.message.delete()
@@ -793,21 +783,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
-        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
             await popup("An error occurred! send command again then try...")
             await query.message.delete()
             return
 
-        search_data = "user_id" if edit_cname == "users" else "chat_id"
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
 
-        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
         if not find_chat:
             await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             await query.message.delete()
@@ -841,21 +826,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
-        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
             await popup("An error occurred! send command again then try...")
             await query.message.delete()
             return
 
-        search_data = "user_id" if edit_cname == "users" else "chat_id"
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
 
-        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
         if not find_chat:
             await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             await query.message.delete()
@@ -889,21 +869,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
-        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
             await popup("An error occurred! send command again then try...")
             await query.message.delete()
             return
 
-        search_data = "user_id" if edit_cname == "users" else "chat_id"
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
 
-        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
         if not find_chat:
             await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             await query.message.delete()
@@ -937,21 +912,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
-        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
             await popup("An error occurred! send command again then try...")
             await query.message.delete()
             return
 
-        search_data = "user_id" if edit_cname == "users" else "chat_id"
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
 
-        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
         if not find_chat:
             await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             await query.message.delete()
@@ -985,21 +955,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
-        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
             await popup("An error occurred! send command again then try...")
             await query.message.delete()
             return
 
-        search_data = "user_id" if edit_cname == "users" else "chat_id"
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
 
-        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
         if not find_chat:
             await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             await query.message.delete()
