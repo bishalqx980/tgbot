@@ -248,7 +248,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["old_value"] = images
 
         if images:
-            if len(images) > 10:
+            if len(images) > 20:
                 storage, count_image = "", 0
                 for image in images:
                     storage += f"{image},"
@@ -582,6 +582,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             await MongoDB.update_db("bot_docs", edit_data, old_value, edit_data, new_value)
             await Message.del_msg(chat_id, del_msg)
+            if edit_data == "images":
+                new_value = f"{len(new_value)} images"
             await popup(f"Database updated!\n\nData: {edit_data}\nValue: {new_value}")
         except Exception as e:
             logger.error(f"Error: {e}")
