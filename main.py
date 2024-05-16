@@ -22,6 +22,7 @@ from bot.modules.utils import calc
 from bot.modules.safone import Safone
 from bot.modules.group_management import (
     _check_permission,
+    track_my_chat_activities,
     track_chat_activities,
     func_invite_link,
     func_promote,
@@ -57,20 +58,6 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if chat.type != "private":
         _bot = await bot.get_me()
-        find_db = await MongoDB.find_one("groups", "chat_id", chat.id)
-
-        if not find_db:
-            try:
-                data = {
-                    "chat_id": chat.id,
-                    "title": chat.title
-                }
-                await MongoDB.insert_single_data("groups", data)
-                await Message.reply_msg(update, "Group has been registered successfully...")
-            except Exception as e:
-                logger.error(f"Error registering group: {e}")
-                await Message.reply_msg(update, "⚠ Group has not registered, something went wrong...")
-
         btn_name = ["Start me in private"]
         btn_url = [f"http://t.me/{_bot.username}?start=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -122,20 +109,6 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await Message.send_msg(chat.id, msg, btn)
 
-    find_db = await MongoDB.find_one("users", "user_id", user.id)
-    if not find_db:
-        data = {
-            "user_id": user.id,
-            "Name": user.full_name,
-            "username": user.username,
-            "mention": user.mention_html(),
-            "lang": user.language_code
-        }
-        try:
-            await MongoDB.insert_single_data("users", data)
-        except Exception as e:
-            logger.error(f"Error registering user: {e}")
-
 
 async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -161,30 +134,35 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     movie_info = get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
     if movie_info:
-        msg = (
-            f"<b>🎥 Content Type:</b> {movie_info[1]}\n"
-            f"<b>📄 Title:</b> {movie_info[2]}\n"
-            f"<b>👁‍🗨 Released:</b> {movie_info[3]}\n"
-            f"<b>🕐 Time:</b> {movie_info[4]}\n"
-            f"<b>🎨 Genre:</b> {movie_info[5]}\n"
-            f"<b>🤵‍♂️ Director:</b> {movie_info[6]}\n"
-            f"<b>🧑‍💻 Writer:</b> {movie_info[7]}\n"
-            f"<b>👫 Actors:</b> {movie_info[8]}\n" # plot len 9 at the last
-            f"<b>🗣 Language:</b> {movie_info[10]}\n"
-            f"<b>🌐 Country:</b> {movie_info[11]}\n"
-            f"<b>🏆 Awards:</b> {movie_info[12]}\n"
-            f"<b>🎯 Meta Score:</b> {movie_info[13]}\n"
-            f"<b>🎯 IMDB Rating:</b> {movie_info[14]}\n"
-            f"<b>📊 IMDB Votes:</b> {movie_info[15]}\n"
-            f"<b>🏷 IMDB ID:</b> <code>{movie_info[16]}</code>\n"
-            f"<b>💰 BoxOffice:</b> {movie_info[17]}\n\n" # break
-            f"<b>📝 **Plot:</b>\n"
-            f"<pre>{movie_info[9]}</pre>\n"
-        )
-        btn_name = [f"✨ IMDB - {movie_info[2]}"]
-        btn_url = [f"https://www.imdb.com/title/{movie_info[16]}"]
-        btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_img(chat.id, movie_info[0], msg, btn)
+        try:
+            poster, content_type, title, released, runtime, genre, director, writer, actors, plot, language, country, awards, meta_score, imdb_rating, imdb_votes, imdb_id, box_office = movie_info
+            msg = (
+                f"<b>🎥 Content Type:</b> {content_type}\n"
+                f"<b>📄 Title:</b> {title}\n"
+                f"<b>👁‍🗨 Released:</b> {released}\n"
+                f"<b>🕐 Time:</b> {runtime}\n"
+                f"<b>🎨 Genre:</b> {genre}\n"
+                f"<b>🤵‍♂️ Director:</b> {director}\n"
+                f"<b>🧑‍💻 Writer:</b> {writer}\n"
+                f"<b>👫 Actors:</b> {actors}\n" # plot len 9 at the last
+                f"<b>🗣 Language:</b> {language}\n"
+                f"<b>🌐 Country:</b> {country}\n"
+                f"<b>🏆 Awards:</b> {awards}\n"
+                f"<b>🎯 Meta Score:</b> {meta_score}\n"
+                f"<b>🎯 IMDB Rating:</b> {imdb_rating}\n"
+                f"<b>📊 IMDB Votes:</b> {imdb_votes}\n"
+                f"<b>🏷 IMDB ID:</b> <code>{imdb_id}</code>\n"
+                f"<b>💰 BoxOffice:</b> {box_office}\n\n" # break
+                f"<b>📝 **Plot:</b>\n"
+                f"<pre>{plot}</pre>\n"
+            )
+            btn_name = [f"✨ IMDB - {title}"]
+            btn_url = [f"https://www.imdb.com/title/{imdb_id}"]
+            btn = await Button.ubutton(btn_name, btn_url)
+            await Message.send_img(chat.id, poster, msg, btn)
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            await Message.send_msg(chat.id, "Something went wrong!")
 
 
 async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -203,7 +181,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_chat = await MongoDB.find_one("groups", "chat_id", chat.id)
     
     if not find_chat:
-        await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
+        await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
         return
     
     lang_code = find_chat.get("lang")
@@ -283,7 +261,11 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_msg = await Message.reply_msg(update, f"Pinging {url}\nPlease wait...")
     ping = ping_url(url)
 
-    if ping:
+    if not ping:
+        await Message.edit_msg(update, "Something went wrong!", sent_msg)
+        return
+
+    try:
         ping_time, status_code = ping
         if status_code == 200:
             site_status = "<b>∞ Site is online 🟢</b>"
@@ -292,7 +274,15 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Visit Site"]
         btn_url = [url]
         btn = await Button.ubutton(btn_name, btn_url)
-        await Message.edit_msg(update, f"<b>∞ URL:</b> {url}\n<b>∞ Time(ms):</b> <code>{ping_time}</code>\n<b>∞ Response Code:</b> <code>{status_code}</code>\n{site_status}", sent_msg, btn)   
+        msg = {
+            f"<b>∞ URL:</b> {url}\n"
+            f"<b>∞ Time(ms):</b> <code>{ping_time}</code>\n"
+            f"<b>∞ Response Code:</b> <code>{status_code}</code>\n{site_status}"
+        }
+        await Message.edit_msg(update, msg, sent_msg, btn)
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        await Message.edit_msg(update, "Something went wrong!", sent_msg)
 
 
 async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -395,7 +385,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not find_user:
         if chat.type == "private":
-            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
+            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
         else:
             _bot = await bot.get_me()
@@ -495,7 +485,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not find_user:
         if chat.type == "private":
-            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
+            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
         else:
             _bot = await bot.get_me()
@@ -878,7 +868,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         
         if not find_group:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
+            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
         
         title = find_group.get("title")
@@ -1286,7 +1276,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type == "private" and msg:
         find_user = await MongoDB.find_one("users", "user_id", user.id)
         if not find_user:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
+            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
         
         # status
@@ -1317,7 +1307,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif chat.type in ["group", "supergroup"] and msg:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if not find_group:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! click /start to register...\nThen try again!")
+            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
         
         # status
@@ -1419,7 +1409,8 @@ def main():
     # filters
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
     # Chat Member Handler
-    application.add_handler(ChatMemberHandler(track_chat_activities, ChatMemberHandler.CHAT_MEMBER))
+    application.add_handler(ChatMemberHandler(track_my_chat_activities, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking bot/private chat
+    application.add_handler(ChatMemberHandler(track_chat_activities, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup
     # Callback button
     application.add_handler(CallbackQueryHandler(func_callbackbtn, block=False))
     # Check Updates

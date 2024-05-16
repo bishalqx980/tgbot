@@ -66,11 +66,63 @@ async def _chat_member_status(c_mem_update: ChatMemberUpdated):
     return user_exist, reason
 
 
+async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    this will check bot status (where it get banned or added or started or blocked etc.)
+    """
+    chat = update.effective_chat
+    my_chat_member = update.my_chat_member
+    user = my_chat_member.from_user # cause user
+
+    # _chk_stat = await _chat_member_status(my_chat_member) # True means user exist and False is not exist
+
+    # if not _chk_stat:
+    #     return
+    
+    # user_exist, reason = _chk_stat
+
+    if chat.type == "private":
+        find_user = await MongoDB.find_one("users", "user_id", user.id)
+        if not find_user:
+            data = {
+                "user_id": user.id,
+                "Name": user.full_name,
+                "username": user.username,
+                "mention": user.mention_html(),
+                "lang": user.language_code
+            }
+            try:
+                await MongoDB.insert_single_data("users", data)
+            except Exception as e:
+                logger.error(f"Error registering user: {e}")
+
+    elif chat.type in ["group", "supergroup"]:
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+        if not find_group:
+            try:
+                data = {
+                    "chat_id": chat.id,
+                    "title": chat.title
+                }
+                await MongoDB.insert_single_data("groups", data)
+                msg = (
+                    "Thanks for adding me in this nice chat!\n\n"
+                    "Please make me admin in chat, so I can help you managing this chat effectively!\n/help for bot help..."
+                )
+                await Message.send_msg(chat.id, msg)
+            except Exception as e:
+                logger.error(f"Error registering group: {e}")
+                await Message.send_msg(chat.id, "⚠ Group has not registered, something went wrong...")
+
+
 async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    this will check chat status (if any user joined or left etc.)
+    """
     chat = update.effective_chat
     chat_member = update.chat_member
 
-    user = chat_member.from_user
+    user = chat_member.from_user # cause user
     victim = chat_member.new_chat_member.user
 
     find_group = await MongoDB.find_one("groups", "chat_id", chat.id)

@@ -3,6 +3,16 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 
 - **This bot can be found as [𝕮𝖎𝖗𝖎 "希里"](https://t.me/MissCiri_bot) on Telegram.**
 
+```Spread Love ❤️
+_check = "Does the user Starred & forked the repository?"
+if _check:
+    print("Thanks you ❤️ for sharing love & giving me inspiration...")
+else:
+    print("Please 🥺 give a star to this repo! ...And fork it if you want to work with this repo lol!")
+```
+
+<sup>- *Fun fact: _check will always return True! [ becasue you (gave/will give) a star & forked the repo lol ] Thanks :)*</sup>
+
 ## Features ✨:
 
 - **ChatGPT AI:** Get response from _ChatGPT AI_
