@@ -533,7 +533,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         old_value = context.chat_data.get("old_value")
 
         if not edit_data:
-            await Message.send_msg(chat_id, "I don't know which data to update! Please go back and then try again!")
+            await popup("I don't know which data to update! Please go back and then try again!")
             return
 
         del_msg = await Message.send_msg(chat_id, "Now send a value:")
@@ -599,12 +599,12 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         new_value = None
 
         if not edit_data:
-            await Message.send_msg(chat_id, "I don't know which data to update! Please go back and then try again!")
+            await popup("I don't know which data to update! Please go back and then try again!")
             return
 
         try:
             await MongoDB.update_db("bot_docs", edit_data, old_value, edit_data, new_value)
-            await Message.send_msg(chat_id, f"{edit_data} value set to <code>{new_value}</code>!") 
+            await popup(f"{edit_data} value set to {new_value}!")
         except Exception as e:
             logger.error(f"Error: {e}")
             await Message.send_msg(chat_id, f"Error: {e}")
@@ -645,8 +645,27 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
+        chat_id = context.chat_data.get("chat_id")
+        if not chat_id:
+            logger.info("Error: chat_id not found!")
+            await query.message.delete()
+            return
+        
         edit_cname = context.chat_data.get("edit_cname")
-        lang = await MongoDB.get_data(edit_cname, "lang")
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
+
+        search_data = "user_id" if edit_cname == "users" else "chat_id"
+
+        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        if not find_chat:
+            await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            await query.message.delete()
+            return
+        
+        lang = find_chat.get("lang")
 
         lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
 
@@ -683,7 +702,13 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info("Error: chat_id not found!")
             await query.message.delete()
             return
+        
         edit_cname = context.chat_data.get("edit_cname")
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
+
         find_data = context.chat_data.get("find_data")
         match_data = context.chat_data.get("match_data")
         edit_data = "lang"
@@ -720,8 +745,27 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
+        chat_id = context.chat_data.get("chat_id")
+        if not chat_id:
+            logger.info("Error: chat_id not found!")
+            await query.message.delete()
+            return
+        
         edit_cname = context.chat_data.get("edit_cname")
-        auto_tr = await MongoDB.get_data(edit_cname, "auto_tr")
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
+
+        search_data = "user_id" if edit_cname == "users" else "chat_id"
+
+        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        if not find_chat:
+            await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            await query.message.delete()
+            return
+        
+        auto_tr = find_chat.get("auto_tr")
 
         context.chat_data["edit_data"] = "auto_tr"
 
@@ -754,12 +798,22 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info("Error: chat_id not found!")
             await query.message.delete()
             return
+        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
-            await Message.send_msg(chat_id, "An error occurred! send command again then try...")
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
             return
 
-        echo = await MongoDB.get_data(edit_cname, "echo")
+        search_data = "user_id" if edit_cname == "users" else "chat_id"
+
+        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        if not find_chat:
+            await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            await query.message.delete()
+            return
+        
+        echo = find_chat.get("echo")
 
         context.chat_data["edit_data"] = "echo"
 
@@ -792,12 +846,22 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info("Error: chat_id not found!")
             await query.message.delete()
             return
+        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
-            await Message.send_msg(chat_id, "An error occurred! send command again then try...")
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
             return
 
-        welcome_msg = await MongoDB.get_data(edit_cname, "welcome_msg")
+        search_data = "user_id" if edit_cname == "users" else "chat_id"
+
+        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        if not find_chat:
+            await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            await query.message.delete()
+            return
+        
+        welcome_msg = find_chat.get("welcome_msg")
 
         context.chat_data["edit_data"] = "welcome_msg"
 
@@ -830,12 +894,22 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info("Error: chat_id not found!")
             await query.message.delete()
             return
+        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
-            await Message.send_msg(chat_id, "An error occurred! send command again then try...")
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
             return
 
-        goodbye_msg = await MongoDB.get_data(edit_cname, "goodbye_msg")
+        search_data = "user_id" if edit_cname == "users" else "chat_id"
+
+        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        if not find_chat:
+            await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            await query.message.delete()
+            return
+        
+        goodbye_msg = find_chat.get("goodbye_msg")
 
         context.chat_data["edit_data"] = "goodbye_msg"
 
@@ -868,12 +942,22 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info("Error: chat_id not found!")
             await query.message.delete()
             return
+        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
-            await Message.send_msg(chat_id, "An error occurred! send command again then try...")
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
             return
 
-        antibot = await MongoDB.get_data(edit_cname, "antibot")
+        search_data = "user_id" if edit_cname == "users" else "chat_id"
+
+        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        if not find_chat:
+            await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            await query.message.delete()
+            return
+        
+        antibot = find_chat.get("antibot")
 
         context.chat_data["edit_data"] = "antibot"
 
@@ -906,12 +990,22 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info("Error: chat_id not found!")
             await query.message.delete()
             return
+        
         edit_cname = context.chat_data.get("edit_cname")
         if not edit_cname:
-            await Message.send_msg(chat_id, "An error occurred! send command again then try...")
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
             return
 
-        del_cmd = await MongoDB.get_data(edit_cname, "del_cmd")
+        search_data = "user_id" if edit_cname == "users" else "chat_id"
+
+        find_chat = await MongoDB.find_one(edit_cname, search_data, chat_id)
+        if not find_chat:
+            await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            await query.message.delete()
+            return
+        
+        del_cmd = find_chat.get("del_cmd")
 
         context.chat_data["edit_data"] = "del_cmd"
 
@@ -940,6 +1034,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         edit_cname = context.chat_data.get("edit_cname")
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
 
         if edit_cname == "groups":
             btn_name_row1 = ["Language", "Auto translate"]
@@ -986,19 +1084,25 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
-        chat_id = context.chat_data.get("chat_id") # set from main.py
+        chat_id = context.chat_data.get("chat_id")
         if not chat_id:
             logger.info("Error: chat_id not found!")
             await query.message.delete()
             return
+        
         edit_cname = context.chat_data.get("edit_cname") # set from main.py
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
+        
         find_data = context.chat_data.get("find_data") # set from main.py
         match_data = context.chat_data.get("match_data") # set from main.py
         edit_data = context.chat_data.get("edit_data") # set from query data
         new_value = True
 
         if not edit_data:
-            await Message.send_msg(chat_id, "I don't know which data to update! Please go back and then try again!")
+            await popup("I don't know which data to update! Please go back and then try again!")
             return
 
         try:
@@ -1013,19 +1117,25 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not access:
             return
         
-        chat_id = context.chat_data.get("chat_id") # set from main.py
+        chat_id = context.chat_data.get("chat_id")
         if not chat_id:
             logger.info("Error: chat_id not found!")
             await query.message.delete()
             return
+        
         edit_cname = context.chat_data.get("edit_cname") # set from main.py
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
+        
         find_data = context.chat_data.get("find_data") # set from main.py
         match_data = context.chat_data.get("match_data") # set from main.py
         edit_data = context.chat_data.get("edit_data") # set from query data
         new_value = False
 
         if not edit_data:
-            await Message.send_msg(chat_id, "I don't know which data to update! Please go back and then try again!")
+            await popup("I don't know which data to update! Please go back and then try again!")
             return
 
         try:
