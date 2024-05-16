@@ -8,7 +8,7 @@ _check = "Does the user Starred & forked the repository?"
 if _check:
     print("Thanks you ❤️ for sharing love & giving me inspiration...")
 else:
-    print("Please 🥺 give a star to this repo! ...And fork it if you want to work with this repo lol!")
+    print("Please 🥺 give a star to this repo! ...And fork it if you want to work with this repo!")
 ```
 
 <sup>- *Fun fact: _check will always return True! [ becasue you (gave/will give) a star & forked the repo lol ] Thanks :)*</sup>
