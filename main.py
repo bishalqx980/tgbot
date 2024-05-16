@@ -133,36 +133,36 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ You can't use both statement in same message!\n/movie for details.")
 
     movie_info = get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
-    if movie_info:
-        try:
-            poster, content_type, title, released, runtime, genre, director, writer, actors, plot, language, country, awards, meta_score, imdb_rating, imdb_votes, imdb_id, box_office = movie_info
-            msg = (
-                f"<b>🎥 Content Type:</b> {content_type}\n"
-                f"<b>📄 Title:</b> {title}\n"
-                f"<b>👁‍🗨 Released:</b> {released}\n"
-                f"<b>🕐 Time:</b> {runtime}\n"
-                f"<b>🎨 Genre:</b> {genre}\n"
-                f"<b>🤵‍♂️ Director:</b> {director}\n"
-                f"<b>🧑‍💻 Writer:</b> {writer}\n"
-                f"<b>👫 Actors:</b> {actors}\n" # plot len 9 at the last
-                f"<b>🗣 Language:</b> {language}\n"
-                f"<b>🌐 Country:</b> {country}\n"
-                f"<b>🏆 Awards:</b> {awards}\n"
-                f"<b>🎯 Meta Score:</b> {meta_score}\n"
-                f"<b>🎯 IMDB Rating:</b> {imdb_rating}\n"
-                f"<b>📊 IMDB Votes:</b> {imdb_votes}\n"
-                f"<b>🏷 IMDB ID:</b> <code>{imdb_id}</code>\n"
-                f"<b>💰 BoxOffice:</b> {box_office}\n\n" # break
-                f"<b>📝 **Plot:</b>\n"
-                f"<pre>{plot}</pre>\n"
-            )
-            btn_name = [f"✨ IMDB - {title}"]
-            btn_url = [f"https://www.imdb.com/title/{imdb_id}"]
-            btn = await Button.ubutton(btn_name, btn_url)
-            await Message.send_img(chat.id, poster, msg, btn)
-        except Exception as e:
-            logger.error(f"Error: {e}")
-            await Message.send_msg(chat.id, "Something went wrong!")
+
+    if not movie_info:
+        await Message.send_msg(chat.id, "Movie name invalid! or something went wrong!")
+        return
+
+    poster, content_type, title, released, runtime, genre, director, writer, actors, plot, language, country, awards, meta_score, imdb_rating, imdb_votes, imdb_id, box_office = movie_info
+    msg = (
+        f"<b>🎥 Content Type:</b> {content_type}\n"
+        f"<b>📄 Title:</b> {title}\n"
+        f"<b>👁‍🗨 Released:</b> {released}\n"
+        f"<b>🕐 Time:</b> {runtime}\n"
+        f"<b>🎨 Genre:</b> {genre}\n"
+        f"<b>🤵‍♂️ Director:</b> {director}\n"
+        f"<b>🧑‍💻 Writer:</b> {writer}\n"
+        f"<b>👫 Actors:</b> {actors}\n" # plot len 9 at the last
+        f"<b>🗣 Language:</b> {language}\n"
+        f"<b>🌐 Country:</b> {country}\n"
+        f"<b>🏆 Awards:</b> {awards}\n"
+        f"<b>🎯 Meta Score:</b> {meta_score}\n"
+        f"<b>🎯 IMDB Rating:</b> {imdb_rating}\n"
+        f"<b>📊 IMDB Votes:</b> {imdb_votes}\n"
+        f"<b>🏷 IMDB ID:</b> <code>{imdb_id}</code>\n"
+        f"<b>💰 BoxOffice:</b> {box_office}\n\n" # break
+        f"<b>📝 **Plot:</b>\n"
+        f"<pre>{plot}</pre>\n"
+    )
+    btn_name = [f"✨ IMDB - {title}"]
+    btn_url = [f"https://www.imdb.com/title/{imdb_id}"]
+    btn = await Button.ubutton(btn_name, btn_url)
+    await Message.send_img(chat.id, poster, msg, btn)     
 
 
 async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -274,15 +274,15 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Visit Site"]
         btn_url = [url]
         btn = await Button.ubutton(btn_name, btn_url)
-        msg = {
+        msg = (
             f"<b>∞ URL:</b> {url}\n"
             f"<b>∞ Time(ms):</b> <code>{ping_time}</code>\n"
             f"<b>∞ Response Code:</b> <code>{status_code}</code>\n{site_status}"
-        }
+        )
         await Message.edit_msg(update, msg, sent_msg, btn)
     except Exception as e:
         logger.error(f"Error: {e}")
-        await Message.edit_msg(update, "Something went wrong!", sent_msg)
+        await Message.edit_msg(update, f"Error: {e}", sent_msg)
 
 
 async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
