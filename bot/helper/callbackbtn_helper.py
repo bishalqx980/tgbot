@@ -667,6 +667,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
 
+        context.chat_data["edit_data_name"] = "lang"
+
         msg = (
             "<b>Chat Settings</b> -\n\n"
             f"language code: <code>{lang}</code>\n\n"
