@@ -98,16 +98,27 @@ async def _log_channel(chat, user, victim=None, action=None, reason=None):
     log_channel = find_group.get("log_channel")
     if not log_channel:
         return
+    
+    title = chat.title
+    msg = f"<b>Chat:</b> {title}"
 
-    msg = (
-        f"<b>Chat:</b> {chat.title}\n"
-        f"<b>User:</b> {user.mention_html()}\n"
-        f"<b>ID:</b> <code>{user.id}</code>\n"
-        f"<b>Victim:</b> {victim.mention_html()}\n"
-        f"<b>ID:</b> <code>{victim.id}</code>\n"
-        f"<b>Action:</b> {action}\n"
-        f"<b>Reason:</b> {reason}"
-    )
+    if user:
+        user_mention = user.mention_html()
+        user_id = user.id
+
+        msg = f"{msg}\n<b>User:</b> {user_mention}\n<b>ID:</b> <code>{user_id}</code>"
+
+    if victim:
+        victim_mention = victim.mention_html()
+        victim_id = victim.id
+
+        msg = f"{msg}\n<b>Victim:</b> {victim_mention}\n<b>ID:</b> <code>{victim_id}</code>"
+
+    if action:
+        msg = f"{msg}\n<b>Action:</b> {action}"
+
+    if reason:
+        msg = f"{msg}\n<b>Reason:</b> {reason}"
 
     try:
         await Message.send_msg(log_channel, msg)
@@ -192,6 +203,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
         return
 
     welcome_msg = find_group.get("welcome_msg")
+    custom_welcome_msg = find_group.get("custom_welcome_msg")
     goodbye_msg = find_group.get("goodbye_msg")
     antibot = find_group.get("antibot")
 
@@ -227,7 +239,10 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
                 logger.error(f"Error: {e}")
                 await Message.send_msg(chat.id, f"Error: {e}")
         elif welcome_msg:
-            await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
+            if custom_welcome_msg:
+                await Message.send_msg(chat.id, custom_welcome_msg)
+            else:
+                await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
             await _log_channel(chat, user, victim, action="joined")
     elif user_exist == False and reason == "left" and goodbye_msg:
         await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")
@@ -461,6 +476,7 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
+    e_msg = update.effective_message
     reply = update.message.reply_to_message
     msg_id = reply.message_id if reply else None
     msg = " ".join(context.args)
@@ -506,11 +522,17 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         context.chat_data["chat_id"] = chat.id
         context.chat_data["user_id"] = user.id
+        context.chat_data["del_msg_pointer"] = e_msg
         
         btn_name = ["⚠ YES", "🍀 NO"]
         btn_data = ["unpin_all", "close"]
         btn = await Button.cbutton(btn_name, btn_data, True)
-        await Message.reply_msg(update, f"Do you really want to unpin all messages of this chat?", btn)
+        try:
+            await Message.reply_msg(update, f"Do you really want to unpin all messages of this chat?", btn)
+            await _log_channel(chat, user, action="unpinned all messages")
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            await Message.send_msg(chat.id, f"Error: {e}")
         return
 
     if not reply:
@@ -1125,6 +1147,101 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
+
+
+async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    e_msg = update.effective_message
+    reply = update.message.reply_to_message
+    value = reply.text or reply.caption if reply else None
+    keyword = " ".join(context.args)
+
+    await _check_del_cmd(update)
+
+    if user.is_bot:
+        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        return
+
+    _chk_per = await _check_permission(update, user=user)
+
+    if not _chk_per:
+        return
+    
+    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+
+    if chat.type not in ["group", "supergroup"]:
+        btn_name = ["Add me in Group"]
+        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn = await Button.ubutton(btn_name, btn_url)
+        await Message.send_msg(chat.id, "To set custom message/commands in group chat!\nAdd me to manage the chat!", btn)
+        return
+        
+    if bot_permission.status != ChatMember.ADMINISTRATOR:
+        await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        await Message.reply_msg(update, "You aren't an admin in this chat!")
+        return
+    
+    if user_permission.status == ChatMember.ADMINISTRATOR:
+        if not admin_rights.get("can_change_info"):
+            await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
+            return
+    
+    if not value and not keyword:
+        msg = (
+            "To set custom message/command follow the instruction below...\n\n"
+            "Reply the message with command which one you want to set as value for your keyword/command!\n"
+            "Example: <code>/filters hi or /hi</code> send this by replying any message! suppose the message is <code>Hi, How are you!</code>\n"
+            "Next time if you say <blockquote>hi or /hi</blockquote> in chat, the bot will reply with <blockquote>Hi, How are you!</blockquote>\n"
+            "To remove a filter, use <code>/filters existing_filter_keyword</code> (without reply) and exact keyword (with capital letter or small letter)"
+        )
+
+        context.chat_data["user_id"] = user.id
+        context.chat_data["chat_id"] = chat.id
+        context.chat_data["del_msg_pointer"] = e_msg
+
+        btn_name = ["Chat filters", "Close"]
+        btn_data = ["filters", "close"]
+
+        btn = await Button.cbutton(btn_name, btn_data, True)
+
+        try:
+            await Message.reply_msg(update, msg, btn)
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+        return
+
+    find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+    if not find_group:
+        await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+        return
+    
+    filters = find_group.get("filters")
+
+    if filters and keyword and not value:
+        try:
+            del filters[keyword]
+            await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
+            await Message.reply_msg(update, f"{user.mention_html()} has removed filter <code>{keyword}</code>!")
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            await Message.reply_msg(update, "Error: filter keyword not found!")
+        return
+
+    if not filters:
+        data = {
+            keyword: value
+        }
+        await MongoDB.update_db("groups", "chat_id", chat.id, "filters", data)
+    else:
+        filters[keyword] = value
+        await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
+    
+    await Message.reply_msg(update, f"{user.mention_html()} has added filter <code>{keyword}</code>!")
 
 
 async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):

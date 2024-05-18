@@ -58,6 +58,36 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             logger.error(f"Error: {e}")
     
+    elif data == "filters":
+        access = await _check_whois()
+        if not access:
+            return
+        
+        chat_id = context.chat_data.get("chat_id")
+        if not chat_id:
+            await popup("Error: chat_id not found!")
+            await query.message.delete()
+            return
+        
+        try:
+            find_group = await MongoDB.find_one("groups", "chat_id", chat_id)
+            if find_group:
+                filters = find_group.get("filters")
+                msg = f"Chat filters -\n"
+                for keyword in filters:
+                    msg += f"- {keyword}\n"
+
+                btn_name = ["Close"]
+                btn_data = ["close"]
+                btn = await Button.cbutton(btn_name, btn_data)
+
+                await Message.edit_msg(update, msg, sent_msg, btn)
+            else:
+                await popup("Filters not found for this chat!")
+                await query.message.delete()
+        except Exception as e:
+            logger.error(f"Error: {e}")
+    
     # Group management ----------------------------------------------------------------- help starts
     elif data == "group_management":
         msg = (
@@ -77,6 +107,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/del » Delete replied message with notifying/telling something to the member!\n"
             "/lock » Lock the chat (no one can send messages etc.)\n"
             "/unlock » Unlock the chat (back to normal)\n"
+            "/filters » To set custom message/command\n"
             "/adminlist » See chat admins list\n"
             "/settings » Settings of chat (welcome, antibot, translate etc.)\n\n"
             "<i>Note: Type commands to get more details about the command function!</i>"
@@ -835,16 +866,67 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row1 = ["Enable", "Disable"]
         btn_data_row1 = ["true", "false"]
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["c_setting_menu", "close"]
+        btn_name_row2 = ["Set custom message"]
+        btn_data_row2 = ["set_custom_msg"]
+
+        btn_name_row3 = ["Back", "Close"]
+        btn_data_row3 = ["c_setting_menu", "close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2)
+        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
 
-        btn = row1 + row2
+        btn = row1 + row2 + row3
 
         await Message.edit_msg(update, msg, sent_msg, btn)
     
+    elif data == "set_custom_msg":
+        access = await _check_whois()
+        if not access:
+            return
+        
+        edit_cname = context.chat_data.get("edit_cname")
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
+
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
+
+        find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+        if not find_chat:
+            await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            await query.message.delete()
+            return
+        
+        custom_welcome_msg = find_chat.get("custom_welcome_msg")
+
+        context.chat_data["edit_data_name"] = "custom_welcome_msg"
+
+        msg = (
+            "<b>Chat Settings</b> -\n\n"
+            f"Welcome message\n--------------------\n<code>{custom_welcome_msg}</code>\n\n"
+            "<i>Note: This message will be send as greeting message in the chat when a user join!</i>"
+        )
+
+        btn_name_row1 = ["Set custom message"]
+        btn_data_row1 = ["edit_value"]
+
+        btn_name_row2 = ["Set default message"]
+        btn_data_row2 = ["remove_value"]
+
+        btn_name_row3 = ["Back", "Close"]
+        btn_data_row3 = ["welcome_msg", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2)
+        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+
+        btn = row1 + row2 + row3
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
+
     elif data == "goodbye_msg":
         access = await _check_whois()
         if not access:
@@ -887,7 +969,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2
 
         await Message.edit_msg(update, msg, sent_msg, btn)
-    
+
     elif data == "antibot":
         access = await _check_whois()
         if not access:

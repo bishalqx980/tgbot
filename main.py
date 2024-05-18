@@ -39,6 +39,7 @@ from bot.modules.group_management import (
     func_del,
     func_lockchat,
     func_unlockchat,
+    func_filters,
     func_adminlist)
 from bot.modules.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
@@ -1288,14 +1289,21 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await Message.reply_msg(update, sys_info)
 
 
+async def func_filter_services(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
+    
+    try:
+        await Message.del_msg(chat.id, e_msg)
+    except Exception as e:
+        logger.error(f"Error: {e}")
+
+
 async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     e_msg = update.effective_message
     msg = update.message.text or update.message.caption if update.message else None
-
-    # if filters.StatusUpdate.ALL:
-    #     await Message.del_msg(chat.id, e_msg)
 
     if context.chat_data.get("status") == "editing":
         try:
@@ -1344,11 +1352,16 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
         
-        # status
         echo_status = find_group.get("echo")
         auto_tr_status = find_group.get("auto_tr")
+        filters = find_group.get("filters")
 
-        # Trigger
+        if filters:
+            for keyword in filters:
+                filter_msg = msg.lower() if not isinstance(msg, int) else msg
+                if keyword.lower() in filter_msg:
+                    await Message.reply_msg(update, filters[keyword])
+
         if echo_status:
             await Message.reply_msg(update, msg)
             
@@ -1364,7 +1377,6 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 btn = await Button.ubutton(btn_name, btn_url)
                 await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
                 return
-            # tanslate proccess
             if tr_msg != msg:
                 await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
 
@@ -1431,6 +1443,7 @@ def main():
     application.add_handler(CommandHandler("del", func_del, block=False))
     application.add_handler(CommandHandler("lock", func_lockchat, block=False))
     application.add_handler(CommandHandler("unlock", func_unlockchat, block=False))
+    application.add_handler(CommandHandler("filters", func_filters, block=False))
     application.add_handler(CommandHandler("adminlist", func_adminlist, block=False))
     application.add_handler(CommandHandler("help", func_help, block=False))
     # owner
@@ -1441,6 +1454,7 @@ def main():
     application.add_handler(CommandHandler("render", func_render, block=False))
     application.add_handler(CommandHandler("sys", func_sys, block=False))
     # filters
+    application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services, block=False))
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
     # Chat Member Handler
     application.add_handler(ChatMemberHandler(track_my_chat_activities, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking bot/private chat
