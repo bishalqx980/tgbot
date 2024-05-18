@@ -7,30 +7,30 @@ from SafoneAPI import SafoneAPI
 
 load_dotenv("config.env")
 
-bot_token = os.getenv("bot_token")
-owner_id = os.getenv("owner_id")
-owner_username = os.getenv("owner_username")
-bot_pic = os.getenv("bot_pic")
-lang_code_list = os.getenv("lang_code_list")
-welcome_img = os.getenv("welcome_img")
+bot_token = os.getenv("BOT_TOKEN")
+owner_id = os.getenv("OWNER_ID")
+owner_username = os.getenv("OWNER_USERNAME")
+bot_pic = os.getenv("BOT_PIC")
+lang_code_list = os.getenv("LANG_CODE_LIST")
+welcome_img = os.getenv("WELCOME_IMG")
 #optional
-support_chat = os.getenv("support_chat")
-telegraph = os.getenv("telegraph")
-images = os.getenv("images")
+support_chat = os.getenv("SUPPORT_CHAT")
+telegraph = os.getenv("TELEGRAPH")
+images = os.getenv("IMAGES")
 #database
-mongodb_uri = os.getenv("mongodb_uri")
-db_name = os.getenv("db_name")
+mongodb_uri = os.getenv("MONGODB_URI")
+db_name = os.getenv("DB_NAME")
 #alive
-server_url = os.getenv("server_url")
+server_url = os.getenv("SERVER_URL")
 #api's
-shortener_api_key = os.getenv("shortener_api_key")
-omdb_api = os.getenv("omdb_api")
-weather_api_key = os.getenv("weather_api_key")
-render_api = os.getenv("render_api")
+shortener_api_key = os.getenv("SHORTENER_API_KEY")
+omdb_api = os.getenv("OMDB_API")
+weather_api_key = os.getenv("WEATHER_API_KEY")
+render_api = os.getenv("RENDER_API")
 #Limits
-chatgpt_limit = os.getenv("chatgpt_limit")
-ai_imagine_limit = os.getenv("ai_imagine_limit")
-usage_reset = os.getenv("usage_reset")
+chatgpt_limit = os.getenv("CHATGPT_LIMIT")
+ai_imagine_limit = os.getenv("AI_IMAGINE_LIMIT")
+usage_reset = os.getenv("USAGE_RESET")
 
 #safone api
 safone_api = SafoneAPI()

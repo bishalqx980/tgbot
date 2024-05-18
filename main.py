@@ -269,18 +269,17 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         ping_time, status_code = ping
         if status_code == 200:
-            site_status = "<b>∞ Site is online 🟢</b>"
+            site_status = "online"
         else:
-            site_status = "<b>∞ Site is offline/something went wrong 🔴</b>"
-        btn_name = ["Visit Site"]
-        btn_url = [url]
-        btn = await Button.ubutton(btn_name, btn_url)
+            site_status = "offline"
+
         msg = (
-            f"<b>∞ URL:</b> {url}\n"
-            f"<b>∞ Time(ms):</b> <code>{ping_time}</code>\n"
-            f"<b>∞ Response Code:</b> <code>{status_code}</code>\n{site_status}"
+            f"Site: {url}\n"
+            f"R.time(ms): <code>{ping_time}</code>\n"
+            f"R.code: <code>{status_code}</code>\n"
+            f"Status: {site_status}"
         )
-        await Message.edit_msg(update, msg, sent_msg, btn)
+        await Message.edit_msg(update, msg, sent_msg)
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.edit_msg(update, f"Error: {e}", sent_msg)
@@ -477,9 +476,9 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/gpt your_prompt</code>\nE.g. <code>/gpt What is AI?</code>")
         return
 
-    ignore_words = ["hi", "hello", "how are you", "how are you?"]
+    ignore_words = ["hi", "hello"]
     if prompt.lower() in ignore_words:
-        await Message.reply_msg(update, "I'm not a chatbot! I was made for answering complex questions...")
+        await Message.reply_msg(update, "Hello! How can I assist you today?")
         return
         
     find_user = await MongoDB.find_one("users", "user_id", user.id)
@@ -799,6 +798,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             goodbye_msg = find_group.get("goodbye_msg")
             antibot = find_group.get("antibot")
             del_cmd = find_group.get("del_cmd")
+            log_channel = find_group.get("log_channel")
 
             context.chat_data["edit_cname"] = "groups"
             context.chat_data["find_data"] = "chat_id"
@@ -819,6 +819,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"• Goodbye user: <code>{goodbye_msg}</code>\n"
                 f"• Antibot: <code>{antibot}</code>\n"
                 f"• Del cmd: <code>{del_cmd}</code>\n"
+                f"• Log channel: <code>{log_channel}</code>\n"
             )
 
             btn_name_row1 = ["Language", "Auto translate"]
@@ -830,15 +831,19 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn_name_row3 = ["Welcome", "Goodbye"]
             btn_data_row3 = ["welcome_msg", "goodbye_msg"]
 
-            btn_name_row4 = ["Del cmd", "Close"]
-            btn_data_row4 = ["del_cmd", "close"]
+            btn_name_row4 = ["Del cmd", "Log channel"]
+            btn_data_row4 = ["del_cmd", "log_channel"]
+
+            btn_name_row5 = ["Close"]
+            btn_data_row5 = ["close"]
 
             row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
             row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
             row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
             row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
+            row5 = await Button.cbutton(btn_name_row5, btn_data_row5)
 
-            btn = row1 + row2 + row3 + row4
+            btn = row1 + row2 + row3 + row4 + row5
 
             images = await MongoDB.get_data("bot_docs", "images")
             if images:
@@ -889,6 +894,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         goodbye_msg = find_group.get("goodbye_msg")
         antibot = find_group.get("antibot")
         del_cmd = find_group.get("del_cmd")
+        log_channel = find_group.get("log_channel")
 
         context.chat_data["edit_cname"] = "groups"
         context.chat_data["find_data"] = "chat_id"
@@ -909,6 +915,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Goodbye user: <code>{goodbye_msg}</code>\n"
             f"• Antibot: <code>{antibot}</code>\n"
             f"• Del cmd: <code>{del_cmd}</code>\n"
+            f"• Log channel: <code>{log_channel}</code>\n"
         )
 
         btn_name_row1 = ["Language", "Auto translate"]
@@ -920,15 +927,19 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row3 = ["Welcome", "Goodbye"]
         btn_data_row3 = ["welcome_msg", "goodbye_msg"]
 
-        btn_name_row4 = ["Del cmd", "Close"]
-        btn_data_row4 = ["del_cmd", "close"]
+        btn_name_row4 = ["Del cmd", "Log channel"]
+        btn_data_row4 = ["del_cmd", "log_channel"]
+
+        btn_name_row5 = ["Close"]
+        btn_data_row5 = ["close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
         row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
         row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
+        row5 = await Button.cbutton(btn_name_row5, btn_data_row5)
 
-        btn = row1 + row2 + row3 + row4
+        btn = row1 + row2 + row3 + row4 + row5
 
         images = await MongoDB.get_data("bot_docs", "images")
         if images:
@@ -1283,11 +1294,17 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     msg = update.message.text or update.message.caption if update.message else None
 
+    if filters.StatusUpdate.ALL:
+        await Message.del_msg(chat.id, e_msg)
+
     if context.chat_data.get("status") == "editing":
-        if msg.isdigit():
+        try:
             msg = int(msg)
+        except:
+            msg = msg
         context.chat_data["new_value"] = msg
-        context.chat_data["status"] = ""
+        context.chat_data["edit_value_del_msg_pointer"] = e_msg
+        context.chat_data["status"] = None
         return
 
     if chat.type == "private" and msg:

@@ -1,7 +1,7 @@
 import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import logger
+from bot import bot, logger, owner_username
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.mongodb import MongoDB
 from bot.update_db import update_database
@@ -13,35 +13,52 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = query.from_user
     sent_msg = query.message
 
-
     async def popup(msg):
         await query.answer(msg, True)
     
-
     async def _check_whois():
         user_id = context.chat_data.get("user_id")
         if not user_id:
             error_msg = "Error: user_id not found!"
             logger.info(error_msg)
             await popup(error_msg)
-            await query.message.delete()
+            try:
+                await query.message.delete()
+            except Exception as e:
+                logger.error(f"Error: {e}")
             return False
-        
         if user.id != user_id:
             await popup("Access Denied!")
             return False
-        
         return True
 
-
-    # youtube
+    # youtube ------------------------------------------------------------------------ Youtube
     if data == "mp4":
         context.user_data["content_format"] = data
 
     elif data == "mp3":
         context.user_data["content_format"] = data
     
-    # Group management
+    # -------------------------------------------------------------- Group management
+    elif data == "unpin_all":
+        access = await _check_whois()
+        if not access:
+            return
+        
+        chat_id = context.chat_data.get("chat_id")
+        if not chat_id:
+            await popup("Error: chat_id not found!")
+            await query.message.delete()
+            return
+        
+        try:
+            await bot.unpin_all_chat_messages(chat_id)
+            await Message.send_msg(chat_id, "All pinned messages has been unpinned successfully!")
+            await query.message.delete()
+        except Exception as e:
+            logger.error(f"Error: {e}")
+    
+    # Group management ----------------------------------------------------------------- help starts
     elif data == "group_management":
         msg = (
             "Group Moderation Commands -\n\n"
@@ -152,28 +169,18 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2 + row3
 
         await Message.edit_msg(update, msg, sent_msg, btn)
-
-    elif data == "unpin_all":
-        access = await _check_whois()
-        if not access:
-            return
-        
-        # importing from group_management
-        from bot.modules.group_management import exe_func_unpin_all_msg
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
-        await query.message.delete()
-        await exe_func_unpin_all_msg(update, context, chat_id)
-    
-    # bot settings
+    # ---------------------------------------------------------------------------- help ends
+    # bot settings ------------------------------------------------------------- bsettings starts
     elif data == "bot_pic":
-        bot_pic = await MongoDB.get_data("bot_docs", "bot_pic")
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        bot_pic = await MongoDB.get_data(edit_cname, "bot_pic")
 
-        context.chat_data["edit_data"] = "bot_pic"
-        context.chat_data["old_value"] = bot_pic
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "bot_pic"
 
         msg = (
             "<b>Bot Settings</b> -\n\n"
@@ -196,7 +203,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "welcome_img":
         welcome_img = await MongoDB.get_data("bot_docs", "welcome_img")
 
-        context.chat_data["edit_data"] = "welcome_img"
+        context.chat_data["edit_data_name"] = "welcome_img"
 
         msg = (
             "<b>Bot Settings</b> -\n\n"
@@ -218,10 +225,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "telegraph":
-        telegraph = await MongoDB.get_data("bot_docs", "telegraph")
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        telegraph = await MongoDB.get_data(edit_cname, "telegraph")
 
-        context.chat_data["edit_data"] = "telegraph"
-        context.chat_data["old_value"] = telegraph
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "telegraph"
 
         msg = (
             "<b>Bot Settings</b> -\n\n"
@@ -242,10 +254,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "images":
-        images = await MongoDB.get_data("bot_docs", "images")
-        
-        context.chat_data["edit_data"] = "images"
-        context.chat_data["old_value"] = images
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        images = await MongoDB.get_data(edit_cname, "images")
+
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "images"
 
         if images:
             if len(images) > 20:
@@ -258,6 +275,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         storage, count_image = "", 0
                 await Message.send_msg(user.id, f"{storage}")
                 images = "Value sent below!"
+        
         msg = (
             "<b>Bot Settings</b> -\n\n"
             f"images: <code>{images}</code>\n\n"
@@ -278,10 +296,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
 
     elif data == "lang_code_list":
-        lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        lang_code_list = await MongoDB.get_data(edit_cname, "lang_code_list")
 
-        context.chat_data["edit_data"] = "lang_code_list"
-        context.chat_data["old_value"] = lang_code_list
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "lang_code_list"
 
         msg = (
             "<b>Bot Settings</b> -\n\n"
@@ -302,10 +325,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "support_chat":
-        support_chat = await MongoDB.get_data("bot_docs", "support_chat")
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        support_chat = await MongoDB.get_data(edit_cname, "support_chat")
 
-        context.chat_data["edit_data"] = "support_chat"
-        context.chat_data["old_value"] = support_chat
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "support_chat"
 
         msg = (
             "<b>Bot Settings</b> -\n\n"
@@ -326,10 +354,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "server_url":
-        server_url = await MongoDB.get_data("bot_docs", "server_url")
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        server_url = await MongoDB.get_data(edit_cname, "server_url")
 
-        context.chat_data["edit_data"] = "server_url"
-        context.chat_data["old_value"] = server_url
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "server_url"
 
         msg = (
             "<b>Bot Settings</b> -\n\n"
@@ -351,11 +384,17 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "chatgpt_limit":
-        chatgpt_limit = await MongoDB.get_data("bot_docs", "chatgpt_limit")
-        usage_reset = await MongoDB.get_data("bot_docs", "usage_reset")
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        chatgpt_limit = await MongoDB.get_data(edit_cname, "chatgpt_limit")
 
-        context.chat_data["edit_data"] = "chatgpt_limit"
-        context.chat_data["old_value"] = chatgpt_limit
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "chatgpt_limit"
+
+        usage_reset = await MongoDB.get_data("bot_docs", "usage_reset")
 
         msg = (
             "<b>Bot Settings</b> -\n\n"
@@ -377,11 +416,17 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "ai_imagine_limit":
-        ai_imagine_limit = await MongoDB.get_data("bot_docs", "ai_imagine_limit")
-        usage_reset = await MongoDB.get_data("bot_docs", "usage_reset")
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        ai_imagine_limit = await MongoDB.get_data(edit_cname, "ai_imagine_limit")
 
-        context.chat_data["edit_data"] = "ai_imagine_limit"
-        context.chat_data["old_value"] = ai_imagine_limit
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "ai_imagine_limit"
+
+        usage_reset = await MongoDB.get_data("bot_docs", "usage_reset")
 
         msg = (
             "<b>Bot Settings</b> -\n\n"
@@ -403,10 +448,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "usage_reset":
-        usage_reset = await MongoDB.get_data("bot_docs", "usage_reset")
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        usage_reset = await MongoDB.get_data(edit_cname, "usage_reset")
 
-        context.chat_data["edit_data"] = "usage_reset"
-        context.chat_data["old_value"] = usage_reset
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "usage_reset"
 
         msg = (
             "<b>Bot Settings</b> -\n\n"
@@ -428,12 +478,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "premium_seller":
-        from bot import owner_username
-        
-        premium_seller = await MongoDB.get_data("bot_docs", "premium_seller")
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        premium_seller = await MongoDB.get_data(edit_cname, "premium_seller")
 
-        context.chat_data["edit_data"] = "premium_seller"
-        context.chat_data["old_value"] = premium_seller
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "premium_seller"
 
         if not premium_seller:
             premium_seller = owner_username
@@ -458,10 +511,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "premium_users":
-        premium_users = await MongoDB.get_data("bot_docs", "premium_users")
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        premium_users = await MongoDB.get_data(edit_cname, "premium_users")
 
-        context.chat_data["edit_data"] = "premium_users"
-        context.chat_data["old_value"] = premium_users
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "premium_users"
 
         user_count = len(premium_users) if premium_users else 0
 
@@ -512,7 +570,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "confirm_restore_db":
         chat_id = context.chat_data.get("chat_id")
         if not chat_id:
-            logger.info("Error: chat_id not found!")
+            await popup("Error: chat_id not found!")
             await query.message.delete()
             return
 
@@ -522,94 +580,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         msg = "Database data has been restored successfully from <code>config.env</code>!" if res else "Something went wrong!"
         await Message.send_msg(chat_id, msg)
-    
-    elif data == "edit_value":
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
-        edit_data = context.chat_data.get("edit_data")
-        old_value = context.chat_data.get("old_value")
-
-        if not edit_data:
-            await popup("I don't know which data to update! Please go back and then try again!")
-            return
-
-        del_msg = await Message.send_msg(chat_id, "Now send a value:")
-        context.chat_data["status"] = "editing"
-        await asyncio.sleep(2)
-
-        attempt = 0
-
-        while attempt < 7:
-            new_value = context.chat_data.get("new_value")
-            attempt += 1
-            await asyncio.sleep(1)
-            if new_value:
-                break
-        
-        if not new_value:
-            await Message.send_msg(chat_id, "Timeout!")
-            await Message.del_msg(chat_id, del_msg)
-            return
-        
-        if edit_data == "premium_users":
-            if not isinstance(new_value, int):
-                if "," in new_value:
-                    storage = []
-                    for user_id in new_value.split(","):
-                        storage.append(int(user_id))
-                    new_value = storage
-            else:
-                new_value = [new_value]
-        
-        if edit_data == "images":
-            if "," in new_value:
-                storage = []
-                for img in new_value.split(","):
-                    storage.append(img)
-                new_value = storage
-            else:
-                new_value = [new_value]
-        
-        if not isinstance(new_value, int) and edit_data not in ["premium_users", "images"]:
-            if new_value.lower() == "true":
-                new_value = True
-            elif new_value.lower() == "false":
-                new_value = False
-
-        try:
-            await MongoDB.update_db("bot_docs", edit_data, old_value, edit_data, new_value)
-            await Message.del_msg(chat_id, del_msg)
-            if edit_data == "images":
-                new_value = f"{len(new_value)} images"
-            await popup(f"Database updated!\n\nData: {edit_data}\nValue: {new_value}")
-        except Exception as e:
-            logger.error(f"Error: {e}")
-            await Message.del_msg(chat_id, del_msg)
-            await Message.send_msg(chat_id, f"Error: {e}")
-
-    elif data == "remove_value":
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
-        edit_data = context.chat_data.get("edit_data")
-        old_value = context.chat_data.get("old_value")
-        new_value = None
-
-        if not edit_data:
-            await popup("I don't know which data to update! Please go back and then try again!")
-            return
-
-        try:
-            await MongoDB.update_db("bot_docs", edit_data, old_value, edit_data, new_value)
-            await popup(f"{edit_data} value set to {new_value}!")
-        except Exception as e:
-            logger.error(f"Error: {e}")
-            await Message.send_msg(chat_id, f"Error: {e}")
 
     elif data == "b_setting_menu":
         btn_name_row1 = ["Bot pic", "Welcome img"]
@@ -640,8 +610,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2 + row3 + row4 + row5 + row6
         
         await Message.edit_msg(update, "<b>Bot Settings</b>", sent_msg, btn)
-    
-    # chat setting
+    # ---------------------------------------------------------------------------- bsettings ends
+    # chat setting -------------------------------------------------------------- Chat settings starts
     elif data == "lang":
         access = await _check_whois()
         if not access:
@@ -676,7 +646,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_url_row1 = [lang_code_list]
 
         btn_name_row2 = ["Edit Value"]
-        btn_data_row2 = ["set_lang"]
+        btn_data_row2 = ["edit_value"]
 
         btn_name_row3 = ["Back", "Close"]
         btn_data_row3 = ["c_setting_menu", "close"]
@@ -689,53 +659,62 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await Message.edit_msg(update, msg, sent_msg, btn)
     
-    elif data == "set_lang":
-        access = await _check_whois()
-        if not access:
-            return
+    # elif data == "set_lang":
+    #     access = await _check_whois()
+    #     if not access:
+    #         return
         
-        chat_id = context.chat_data.get("chat_id")
-        if not chat_id:
-            logger.info("Error: chat_id not found!")
-            await query.message.delete()
-            return
+    #     chat_id = context.chat_data.get("chat_id")
+    #     if not chat_id:
+    #         await popup("Error: chat_id not found!")
+    #         await query.message.delete()
+    #         return
         
-        edit_cname = context.chat_data.get("edit_cname")
-        if not edit_cname:
-            await popup("An error occurred! send command again then try...")
-            await query.message.delete()
-            return
+    #     edit_cname = context.chat_data.get("edit_cname")
+    #     if not edit_cname:
+    #         await popup("An error occurred! send command again then try...")
+    #         await query.message.delete()
+    #         return
 
-        find_data = context.chat_data.get("find_data")
-        match_data = context.chat_data.get("match_data")
-        edit_data = "lang"
+    #     find_data = context.chat_data.get("find_data")
+    #     match_data = context.chat_data.get("match_data")
+    #     edit_data_name = "lang"
 
-        del_msg = await Message.send_msg(chat_id, "Now send a value:")
-        context.chat_data["status"] = "editing"
-        await asyncio.sleep(1)
+    #     del_msg_1 = await Message.send_msg(chat_id, "Now send a value:")
+    #     context.chat_data["status"] = "editing"
+    #     await asyncio.sleep(1)
 
-        attempt = 0
+    #     attempt = 0
 
-        while attempt < 10:
-            new_value = context.chat_data.get("new_value")
-            attempt += 1
-            await asyncio.sleep(1)
-            if new_value:
-                break
+    #     while attempt < 10:
+    #         new_value = context.chat_data.get("new_value")
+    #         attempt += 1
+    #         await asyncio.sleep(1)
+    #         if new_value:
+    #             break
         
-        if not new_value:
-            await Message.send_msg(chat_id, "Timeout!")
-            await Message.del_msg(chat_id, del_msg)
-            return
+    #     context.chat_data["new_value"] = None
 
-        try:
-            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data, new_value)
-            await Message.del_msg(chat_id, del_msg)
-            await popup(f"Database updated!\n\nData: {edit_data}\nValue: {new_value}")
-        except Exception as e:
-            logger.error(f"Error: {e}")
-            await Message.del_msg(chat_id, del_msg)
-            await Message.send_msg(chat_id, f"Error: {e}")
+    #     try:
+    #         del_msg_2 = context.chat_data.get("edit_value_del_msg_pointer")
+    #         del_msg = [del_msg_1, del_msg_2]
+    #         for delete in del_msg:
+    #             await Message.del_msg(chat_id, delete)
+    #     except Exception as e:
+    #         logger.error(f"Error: {e}")
+        
+    #     if not new_value:
+    #         await popup("Timeout!")
+    #         return
+
+    #     try:
+    #         await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+    #         await Message.del_msg(chat_id, del_msg)
+    #         await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
+    #     except Exception as e:
+    #         logger.error(f"Error: {e}")
+    #         await Message.del_msg(chat_id, del_msg)
+    #         await Message.send_msg(chat_id, f"Error: {e}")
 
     elif data == "auto_tr":
         access = await _check_whois()
@@ -759,7 +738,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         auto_tr = find_chat.get("auto_tr")
 
-        context.chat_data["edit_data"] = "auto_tr"
+        context.chat_data["edit_data_name"] = "auto_tr"
 
         msg = (
             "<b>Chat Settings</b> -\n\n"
@@ -802,7 +781,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         echo = find_chat.get("echo")
 
-        context.chat_data["edit_data"] = "echo"
+        context.chat_data["edit_data_name"] = "echo"
 
         msg = (
             "<b>Chat Settings</b> -\n\n"
@@ -845,7 +824,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         welcome_msg = find_chat.get("welcome_msg")
 
-        context.chat_data["edit_data"] = "welcome_msg"
+        context.chat_data["edit_data_name"] = "welcome_msg"
 
         msg = (
             "<b>Chat Settings</b> -\n\n"
@@ -888,7 +867,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         goodbye_msg = find_chat.get("goodbye_msg")
 
-        context.chat_data["edit_data"] = "goodbye_msg"
+        context.chat_data["edit_data_name"] = "goodbye_msg"
 
         msg = (
             "<b>Chat Settings</b> -\n\n"
@@ -931,7 +910,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         antibot = find_chat.get("antibot")
 
-        context.chat_data["edit_data"] = "antibot"
+        context.chat_data["edit_data_name"] = "antibot"
 
         msg = (
             "<b>Chat Settings</b> -\n\n"
@@ -974,7 +953,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         del_cmd = find_chat.get("del_cmd")
 
-        context.chat_data["edit_data"] = "del_cmd"
+        context.chat_data["edit_data_name"] = "del_cmd"
 
         msg = (
             "<b>Chat Settings</b> -\n\n"
@@ -984,6 +963,49 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn_name_row1 = ["Enable", "Disable"]
         btn_data_row1 = ["true", "false"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["c_setting_menu", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
+    
+    elif data == "log_channel":
+        access = await _check_whois()
+        if not access:
+            return
+        
+        edit_cname = context.chat_data.get("edit_cname")
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
+
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
+
+        context.chat_data["edit_data_name"] = "log_channel"
+
+        find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+        if not find_chat:
+            await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            await query.message.delete()
+            return
+        
+        log_channel = find_chat.get("log_channel")
+
+        msg = (
+            "<b>Chat Settings</b> -\n\n"
+            f"Log channel: <code>{log_channel}</code>\n\n"
+            "<i>Note: This will log every actions occurred in your chat (ban, kick, mute, etc.)\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
+        )
+
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
 
         btn_name_row2 = ["Back", "Close"]
         btn_data_row2 = ["c_setting_menu", "close"]
@@ -1016,15 +1038,19 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn_name_row3 = ["Welcome", "Goodbye"]
             btn_data_row3 = ["welcome_msg", "goodbye_msg"]
 
-            btn_name_row4 = ["Del cmd", "Close"]
-            btn_data_row4 = ["del_cmd", "close"]
+            btn_name_row4 = ["Del cmd", "Log channel"]
+            btn_data_row4 = ["del_cmd", "log_channel"]
+
+            btn_name_row5 = ["Close"]
+            btn_data_row5 = ["close"]
 
             row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
             row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
             row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
             row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
+            row5 = await Button.cbutton(btn_name_row5, btn_data_row5)
 
-            btn = row1 + row2 + row3 + row4
+            btn = row1 + row2 + row3 + row4 + row5
 
         elif edit_cname == "users":
             btn_name_row1 = ["Language", "Auto translate"]
@@ -1044,16 +1070,26 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         await Message.edit_msg(update, "<b>Chat Settings</b> -\n\n<i>Note: Can't show full info in back menu for some technical problem!</i>", sent_msg, btn)
-
-    # global close
-    elif data == "true":
+    # ---------------------------------------------------------------------------- chat settings ends
+    # global ----------------------------------------------------------------- Global
+    elif data == "edit_value":
+        """
+        chat_id --> main
+        edit_cname --> main / query data
+        find_data --> main / query data
+        match_data --> main / query data
+        edit_data_name --> from query data
+        new_value --> from user
+        del_msg_pointer -- optional
+        edit_value_del_msg -- optional
+        """
         access = await _check_whois()
         if not access:
             return
         
         chat_id = context.chat_data.get("chat_id")
         if not chat_id:
-            logger.info("Error: chat_id not found!")
+            await popup("Error: chat_id not found!")
             await query.message.delete()
             return
         
@@ -1065,28 +1101,173 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         find_data = context.chat_data.get("find_data") # set from main.py
         match_data = context.chat_data.get("match_data") # set from main.py
-        edit_data = context.chat_data.get("edit_data") # set from query data
-        new_value = True
+        edit_data_name = context.chat_data.get("edit_data_name") # set from query data
 
-        if not edit_data:
+        if not edit_data_name:
+            await popup("I don't know which data to update! Please go back and then try again!")
+            return
+        
+        del_msg_1 = await Message.send_msg(chat_id, "Now send a value:")
+        context.chat_data["status"] = "editing"
+        await asyncio.sleep(2)
+
+        attempt = 0
+
+        while attempt < 10:
+            new_value = context.chat_data.get("new_value")
+            attempt += 1
+            await asyncio.sleep(1)
+            if new_value:
+                break
+
+        context.chat_data["new_value"] = None
+
+        try:
+            del_msg_2 = context.chat_data.get("edit_value_del_msg_pointer")
+            del_msg = [del_msg_1, del_msg_2]
+            for delete in del_msg:
+                await Message.del_msg(chat_id, delete)
+        except Exception as e:
+            logger.error(f"Error: {e}")
+        
+        if not new_value:
+            await popup("Timeout!")
+            return
+        
+        # ------------------------------------------------ some exceptions
+
+        if edit_data_name == "premium_users":
+            if not isinstance(new_value, int):
+                if "," in new_value:
+                    storage = []
+                    for user_id in new_value.split(","):
+                        storage.append(int(user_id))
+                    new_value = storage
+            else:
+                new_value = [new_value]
+        
+        elif edit_data_name == "images":
+            if "," in new_value:
+                storage = []
+                for img in new_value.split(","):
+                    storage.append(img)
+                new_value = storage
+            else:
+                new_value = [new_value]
+        
+        # if not isinstance(new_value, int) and edit_data_name not in ["premium_users", "images"]:
+        #     if new_value.lower() == "true":
+        #         new_value = True
+        #     elif new_value.lower() == "false":
+        #         new_value = False
+
+        try:
+            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            if edit_data_name in ["premium_users", "images"]:
+                new_value = f"{len(new_value)} items"
+            await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            await Message.send_msg(chat_id, f"Error: {e}")
+
+    elif data == "remove_value":
+        """
+        chat_id --> main
+        edit_cname --> main / query data
+        find_data --> main / query data
+        match_data --> main / query data
+        edit_data_name --> from query data
+        del_msg_pointer -- optional
+        """
+        access = await _check_whois()
+        if not access:
+            return
+        
+        chat_id = context.chat_data.get("chat_id")
+        if not chat_id:
+            await popup("Error: chat_id not found!")
+            await query.message.delete()
+            return
+        
+        edit_cname = context.chat_data.get("edit_cname") # set from main.py
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
+        
+        find_data = context.chat_data.get("find_data") # set from main.py
+        match_data = context.chat_data.get("match_data") # set from main.py
+        edit_data_name = context.chat_data.get("edit_data_name") # set from query data
+        new_value = None
+
+        if not edit_data_name:
             await popup("I don't know which data to update! Please go back and then try again!")
             return
 
         try:
-            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data, new_value)
-            await popup(f"Database updated!\n\nData: {edit_data}\nValue: {new_value}")
+            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            await Message.send_msg(chat_id, f"Error: {e}")
+
+    elif data == "true":
+        """
+        chat_id --> main
+        edit_cname --> main / query data
+        find_data --> main / query data
+        match_data --> main / query data
+        edit_data_name --> from query data
+        del_msg_pointer -- optional
+        """
+        access = await _check_whois()
+        if not access:
+            return
+        
+        chat_id = context.chat_data.get("chat_id")
+        if not chat_id:
+            await popup("Error: chat_id not found!")
+            await query.message.delete()
+            return
+        
+        edit_cname = context.chat_data.get("edit_cname") # set from main.py
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
+        
+        find_data = context.chat_data.get("find_data") # set from main.py
+        match_data = context.chat_data.get("match_data") # set from main.py
+        edit_data_name = context.chat_data.get("edit_data_name") # set from query data
+        new_value = True
+
+        if not edit_data_name:
+            await popup("I don't know which data to update! Please go back and then try again!")
+            return
+
+        try:
+            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
         except Exception as e:
             logger.error(f"Error: {e}")
             await Message.send_msg(chat_id, f"Error: {e}")
     
     elif data == "false":
+        """
+        chat_id --> main
+        edit_cname --> main / query data
+        find_data --> main / query data
+        match_data --> main / query data
+        edit_data_name --> from query data
+        del_msg_pointer -- optional
+        """
         access = await _check_whois()
         if not access:
             return
         
         chat_id = context.chat_data.get("chat_id")
         if not chat_id:
-            logger.info("Error: chat_id not found!")
+            await popup("Error: chat_id not found!")
             await query.message.delete()
             return
         
@@ -1098,16 +1279,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         find_data = context.chat_data.get("find_data") # set from main.py
         match_data = context.chat_data.get("match_data") # set from main.py
-        edit_data = context.chat_data.get("edit_data") # set from query data
+        edit_data_name = context.chat_data.get("edit_data_name") # set from query data
         new_value = False
 
-        if not edit_data:
+        if not edit_data_name:
             await popup("I don't know which data to update! Please go back and then try again!")
             return
 
         try:
-            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data, new_value)
-            await popup(f"Database updated!\n\nData: {edit_data}\nValue: {new_value}")
+            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
         except Exception as e:
             logger.error(f"Error: {e}")
             await Message.send_msg(chat_id, f"Error: {e}")
