@@ -1294,8 +1294,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     msg = update.message.text or update.message.caption if update.message else None
 
-    if filters.StatusUpdate.ALL:
-        await Message.del_msg(chat.id, e_msg)
+    # if filters.StatusUpdate.ALL:
+    #     await Message.del_msg(chat.id, e_msg)
 
     if context.chat_data.get("status") == "editing":
         try:
