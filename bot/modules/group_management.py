@@ -1231,7 +1231,8 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Reply the message with command which one you want to set as value for your keyword/command!\n"
             "Example: <code>/filters hi or /hi</code> send this by replying any message! suppose the message is <code>Hi, How are you!</code>\n"
             "Next time if you say <blockquote>hi or /hi</blockquote> in chat, the bot will reply with <blockquote>Hi, How are you!</blockquote>\n"
-            "To remove a filter, use <code>/filters existing_filter_keyword</code> (without reply) and exact keyword (with capital letter or small letter)"
+            "To remove a filter, use <code>/filters existing_filter_keyword</code> (without reply) and exact keyword (with capital letter or small letter)\n"
+            "To remove all filters, use <code>/filters rem_all</code>"
         )
 
         context.chat_data["user_id"] = user.id
@@ -1270,6 +1271,11 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     filters = find_group.get("filters")
 
     if filters and keyword and not value:
+        if keyword == "rem_all":
+            await MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
+            await Message.reply_msg(update, f"{user.mention_html()} has removed all filters of this chat!")
+            return
+        
         try:
             del filters[keyword]
             await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)

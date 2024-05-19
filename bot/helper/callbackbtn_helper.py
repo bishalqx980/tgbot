@@ -85,8 +85,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 for keyword in filters:
                     msg += f"- {keyword}\n"
 
-                btn_name = ["Close"]
-                btn_data = ["close"]
+                btn_name = ["⚠ Remove all filters", "Close"]
+                btn_data = ["remove_filters", "close"]
                 btn = await Button.cbutton(btn_name, btn_data)
 
                 await Message.edit_msg(update, msg, sent_msg, btn)
@@ -1101,7 +1101,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         msg = (
             "<b>Chat Settings</b> -\n\n"
-            f"Del cmd: <code>{del_cmd}</code>\n\n"
+            f"Delete cmd: <code>{del_cmd}</code>\n\n"
             "<i>Note: This will delete bot commands when you will send a command in chat!</i>"
         )
 
@@ -1167,6 +1167,57 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2
 
         await Message.edit_msg(update, msg, sent_msg, btn)
+    
+    elif data == "del_links":
+        access = await _check_whois()
+        if not access:
+            return
+        
+        edit_cname = context.chat_data.get("edit_cname")
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
+
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
+
+        context.chat_data["edit_data_name"] = "del_links"
+
+        try:
+            find_chat = context.chat_data["db_chat_data"]
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            if find_chat:
+                context.chat_data["db_chat_data"] = find_chat
+            else:
+                await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                await query.message.delete()
+                return
+        
+        del_links = find_chat.get("del_links")
+
+        msg = (
+            "<b>Chat Settings</b> -\n\n"
+            f"Delete links: <code>{del_links}</code>\n\n"
+            "<i>Note: This will delete links in chat and send it converting into base64!</i>\n"
+            "<i>More options coming soon...</i>"
+        )
+
+        btn_name_row1 = ["Enable", "Disable"]
+        btn_data_row1 = ["true", "false"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["c_setting_menu", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
 
     elif data == "c_setting_menu":
         access = await _check_whois()
@@ -1189,17 +1240,17 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn_name_row3 = ["Welcome", "Goodbye"]
             btn_data_row3 = ["welcome_msg", "goodbye_msg"]
 
-            btn_name_row4 = ["Del cmd", "Log channel"]
+            btn_name_row4 = ["Delete cmd", "Log channel"]
             btn_data_row4 = ["del_cmd", "log_channel"]
 
-            btn_name_row5 = ["Close"]
-            btn_data_row5 = ["close"]
+            btn_name_row5 = ["Delete links", "Close"]
+            btn_data_row5 = ["del_links", "close"]
 
             row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
             row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
             row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
             row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
-            row5 = await Button.cbutton(btn_name_row5, btn_data_row5)
+            row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
 
             btn = row1 + row2 + row3 + row4 + row5
 

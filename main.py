@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import psutil
 import random
@@ -16,7 +17,7 @@ from bot.helper.telegram_helper import Message, Button
 from bot.modules.ping import ping_url
 from bot.modules.shortener import shortener_url
 from bot.modules.translator import translate
-from bot.modules.base64 import decode_b64, encode_b64
+from bot.modules.base64 import BASE64
 from bot.modules.omdb_movie_info import get_movie_info
 from bot.modules.utils import calc
 from bot.modules.safone import Safone
@@ -247,7 +248,7 @@ async def func_b64decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/decode the `Encoded` text</code>\nor reply the `Encoded` text with <code>/decode</code>\nE.g. <code>/decode the `Encoded` text you want to decode</code>")
         return
     
-    decode = decode_b64(msg)
+    decode = BASE64.decode(msg)
     if decode:
         await Message.reply_msg(update, f"<code>{decode}</code>")
     else:
@@ -262,7 +263,7 @@ async def func_b64encode(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/encode the `Decoded` or `normal` text</code>\nor reply the `Decoded` or `normal` text with <code>/encode</code>\nE.g. <code>/encode the `Decoded` or `normal` text you want to encode</code>")
         return
     
-    encode = encode_b64(msg)
+    encode = BASE64.encode(msg)
     if encode:
         await Message.reply_msg(update, f"<code>{encode}</code>")
     else:
@@ -875,6 +876,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             goodbye_msg = find_group.get("goodbye_msg")
             antibot = find_group.get("antibot")
             del_cmd = find_group.get("del_cmd")
+            del_links = find_group.get("del_links")
             log_channel = find_group.get("log_channel")
 
             context.chat_data["edit_cname"] = "groups"
@@ -895,7 +897,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"• Welcome user: <code>{welcome_msg}</code>\n"
                 f"• Goodbye user: <code>{goodbye_msg}</code>\n"
                 f"• Antibot: <code>{antibot}</code>\n"
-                f"• Del cmd: <code>{del_cmd}</code>\n"
+                f"• Delete cmd: <code>{del_cmd}</code>\n"
+                f"• Delete links: <code>{del_links}</code>\n"
                 f"• Log channel: <code>{log_channel}</code>\n"
             )
 
@@ -908,17 +911,17 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn_name_row3 = ["Welcome", "Goodbye"]
             btn_data_row3 = ["welcome_msg", "goodbye_msg"]
 
-            btn_name_row4 = ["Del cmd", "Log channel"]
+            btn_name_row4 = ["Delete cmd", "Log channel"]
             btn_data_row4 = ["del_cmd", "log_channel"]
 
-            btn_name_row5 = ["Close"]
-            btn_data_row5 = ["close"]
+            btn_name_row5 = ["Delete links", "Close"]
+            btn_data_row5 = ["del_links", "close"]
 
             row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
             row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
             row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
             row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
-            row5 = await Button.cbutton(btn_name_row5, btn_data_row5)
+            row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
 
             btn = row1 + row2 + row3 + row4 + row5
 
@@ -986,6 +989,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         goodbye_msg = find_group.get("goodbye_msg")
         antibot = find_group.get("antibot")
         del_cmd = find_group.get("del_cmd")
+        del_links = find_group.get("del_links")
         log_channel = find_group.get("log_channel")
 
         context.chat_data["edit_cname"] = "groups"
@@ -1006,7 +1010,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Welcome user: <code>{welcome_msg}</code>\n"
             f"• Goodbye user: <code>{goodbye_msg}</code>\n"
             f"• Antibot: <code>{antibot}</code>\n"
-            f"• Del cmd: <code>{del_cmd}</code>\n"
+            f"• Delete cmd: <code>{del_cmd}</code>\n"
+            f"• Delete links: <code>{del_links}</code>\n"
             f"• Log channel: <code>{log_channel}</code>\n"
         )
 
@@ -1019,17 +1024,17 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row3 = ["Welcome", "Goodbye"]
         btn_data_row3 = ["welcome_msg", "goodbye_msg"]
 
-        btn_name_row4 = ["Del cmd", "Log channel"]
+        btn_name_row4 = ["Delete cmd", "Log channel"]
         btn_data_row4 = ["del_cmd", "log_channel"]
 
-        btn_name_row5 = ["Close"]
-        btn_data_row5 = ["close"]
+        btn_name_row5 = ["Delete links", "Close"]
+        btn_data_row5 = ["del_links", "close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
         row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
         row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
-        row5 = await Button.cbutton(btn_name_row5, btn_data_row5)
+        row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
 
         btn = row1 + row2 + row3 + row4 + row5
 
@@ -1463,6 +1468,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         echo_status = find_group.get("echo")
         auto_tr_status = find_group.get("auto_tr")
         filters = find_group.get("filters")
+        del_links = find_group.get("del_links")
 
         if filters:
             for keyword in filters:
@@ -1484,6 +1490,21 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             value = ""
                         filtered_msg = filtered_msg.replace(key, str(value))
                     await Message.reply_msg(update, filtered_msg)
+        
+        if del_links and msg:
+            pattern = r"(https?://)?(www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=%]*)?"
+            links = re.findall(pattern, msg)
+            full_links = ["".join(link) for link in links]
+            clean_msg = msg
+            for link in full_links:
+                b64_link = BASE64.encode(link)
+                clean_msg = clean_msg.replace(link, f"<code>{b64_link}</code>")
+            try:
+                clean_msg = f"{user.mention_html()}:\n\n{clean_msg}\n\n<i>Delete reason, message contains link/s!</i>"
+                await Message.del_msg(chat.id, e_msg)
+                await Message.send_msg(chat.id, clean_msg)
+            except Exception as e:
+                logger.error(f"Error: {e}")
 
         if echo_status:
             await Message.reply_msg(update, msg)

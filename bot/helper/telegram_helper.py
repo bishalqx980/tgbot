@@ -20,7 +20,6 @@ class Message:
                 disable_web_page_preview=bool(disable_web_preview),
                 parse_mode=parse_mode
             )
-
         return sent_msg
 
     
@@ -41,7 +40,6 @@ class Message:
                 caption=caption,
                 parse_mode=parse_mode
             )
-
         return sent_msg
 
 
@@ -76,23 +74,25 @@ class Message:
 
 
     async def send_audio(chat_id, audio, title, caption=None, reply_msg_id=None):
-        await bot.send_audio(
+        sent_audio = await bot.send_audio(
             chat_id=chat_id,
             audio=audio,
             title=title,
             caption=caption,
             reply_to_message_id=reply_msg_id
         )
+        return sent_audio
 
 
     async def send_doc(chat_id, doc, filename, caption=None, reply_msg_id=None):
-        await bot.send_document(
+        sent_doc = await bot.send_document(
             chat_id=chat_id,
             document=doc,
             filename=filename,
             caption=caption,
             reply_to_message_id=reply_msg_id
         )
+        return sent_doc
 
 
     async def reply_msg(update: Update, msg, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
