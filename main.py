@@ -1499,12 +1499,13 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for link in full_links:
                 b64_link = BASE64.encode(link)
                 clean_msg = clean_msg.replace(link, f"<code>{b64_link}</code>")
-            try:
-                clean_msg = f"{user.mention_html()}:\n\n{clean_msg}\n\n<i>Delete reason, message contains link/s!</i>"
-                await Message.del_msg(chat.id, e_msg)
-                await Message.send_msg(chat.id, clean_msg)
-            except Exception as e:
-                logger.error(f"Error: {e}")
+            if full_links:
+                try:
+                    clean_msg = f"{user.mention_html()}:\n\n{clean_msg}\n\n<i>Delete reason, message contains link/s!</i>"
+                    await Message.del_msg(chat.id, e_msg)
+                    await Message.send_msg(chat.id, clean_msg)
+                except Exception as e:
+                    logger.error(f"Error: {e}")
 
         if echo_status:
             await Message.reply_msg(update, msg)
