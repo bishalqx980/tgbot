@@ -82,17 +82,21 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if find_group:
                 filters = find_group.get("filters")
                 msg = f"Chat filters -\n"
-                for keyword in filters:
-                    msg += f"- {keyword}\n"
+                if filters:
+                    for keyword in filters:
+                        msg += f"- {keyword}\n"
+                else:
+                    msg += "- No filters"
 
-                btn_name = ["⚠ Remove all filters", "Close"]
-                btn_data = ["remove_filters", "close"]
+                btn_name = ["Close"]
+                btn_data = ["close"]
                 btn = await Button.cbutton(btn_name, btn_data)
 
                 await Message.edit_msg(update, msg, sent_msg, btn)
             else:
-                await popup("Filters not found for this chat!")
+                await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 await query.message.delete()
+                return
         except Exception as e:
             logger.error(f"Error: {e}")
     
@@ -155,8 +159,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/weather » Get weather info of any city\n"
             "/ytdl » Download youtube video\n"
             "/yts » Search video on youtube\n"
-            "/settings » Settings of chat\n"
-            "/id » Show chat/user id\n\n"
+            "/id » Show chat/user id\n"
+            "/settings » Settings of chat\n\n"
             "<i>Note: Type commands to get more details about the command function!</i>"
         )
 
