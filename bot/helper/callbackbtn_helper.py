@@ -82,8 +82,11 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if find_group:
                 filters = find_group.get("filters")
                 msg = f"Chat filters -\n"
-                for keyword in filters:
-                    msg += f"- {keyword}\n"
+                if filters:
+                    for keyword in filters:
+                        msg += f"- {keyword}\n"
+                else:
+                    msg += "- No filters"
 
                 btn_name = ["Close"]
                 btn_data = ["close"]
@@ -91,8 +94,9 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                 await Message.edit_msg(update, msg, sent_msg, btn)
             else:
-                await popup("Filters not found for this chat!")
+                await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 await query.message.delete()
+                return
         except Exception as e:
             logger.error(f"Error: {e}")
     
