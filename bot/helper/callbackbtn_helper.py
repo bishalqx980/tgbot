@@ -155,8 +155,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/weather » Get weather info of any city\n"
             "/ytdl » Download youtube video\n"
             "/yts » Search video on youtube\n"
-            "/settings » Settings of chat\n"
-            "/id » Show chat/user id\n\n"
+            "/id » Show chat/user id\n"
+            "/settings » Settings of chat\n\n"
             "<i>Note: Type commands to get more details about the command function!</i>"
         )
 
