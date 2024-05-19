@@ -10,8 +10,8 @@ async def _check_permission(update: Update, victim=None, user=None):
 
     del_msg = await Message.send_msg(chat.id, "Checking permission...")
 
-    _bot = await bot.get_me()
-    bot_permission = await chat.get_member(_bot.id)
+    _bot_info = await bot.get_me()
+    bot_permission = await chat.get_member(_bot_info.id)
 
     user_permission = await chat.get_member(user.id) if user else None
 
@@ -36,7 +36,7 @@ async def _check_permission(update: Update, victim=None, user=None):
     except Exception as e:
         logger.error(f"Error: {e}")
 
-    return _bot, bot_permission, user_permission, admin_rights, victim_permission
+    return _bot_info, bot_permission, user_permission, admin_rights, victim_permission
 
 
 async def _chat_member_status(c_mem_update: ChatMemberUpdated):
@@ -67,7 +67,7 @@ async def _chat_member_status(c_mem_update: ChatMemberUpdated):
     return user_exist, reason
 
 
-async def _check_del_cmd(update: Update):
+async def _check_del_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     only delete group chat commands
     """
@@ -76,31 +76,45 @@ async def _check_del_cmd(update: Update):
 
     if chat.type == "private":
         return
-
-    find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-    if not find_group:
-        await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-        return
     
+    try:
+        find_group = context.chat_data["db_chat_data"]
+    except Exception as e:
+        logger.error(f"Error: {e}")
+
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+        if find_group:
+            context.chat_data["db_chat_data"] = find_group
+        else:
+            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            return
+
     del_cmd = find_group.get("del_cmd")
     if del_cmd:
         await Message.del_msg(chat.id, msg)
 
 
-async def _log_channel(chat, user, victim=None, action=None, reason=None):
+async def _log_channel(context: ContextTypes.DEFAULT_TYPE, chat, user, victim=None, action=None, reason=None):
     """
     sends chat actions to log channel
     """
-    find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-    if not find_group:
-        return
+    try:
+        find_group = context.chat_data["db_chat_data"]
+    except Exception as e:
+        logger.error(f"Error: {e}")
+
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+        if find_group:
+            context.chat_data["db_chat_data"] = find_group
+        else:
+            return
     
     log_channel = find_group.get("log_channel")
     if not log_channel:
         return
     
     title = chat.title
-    msg = f"<b>Chat:</b> {title}"
+    msg = f"#{action}\n<b>Chat:</b> {title}"
 
     if user:
         user_mention = user.mention_html()
@@ -197,10 +211,16 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
     user = chat_member.from_user # cause user
     victim = chat_member.new_chat_member.user
 
-    find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+    try:
+        find_group = context.chat_data["db_chat_data"]
+    except Exception as e:
+        logger.error(f"Error: {e}")
 
-    if not find_group:
-        return
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+        if find_group:
+            context.chat_data["db_chat_data"] = find_group
+        else:
+            return
 
     welcome_msg = find_group.get("welcome_msg")
     custom_welcome_msg = find_group.get("custom_welcome_msg")
@@ -221,7 +241,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
             if not _chk_per:
                 return
             
-            _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+            _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
             if bot_permission.status != ChatMember.ADMINISTRATOR:
                 await Message.send_msg(chat.id, "<b>Antibot:</b> I'm not an admin in this chat!")
@@ -234,26 +254,41 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
             try:
                 await bot.ban_chat_member(chat.id, victim.id)
                 await Message.send_msg(chat.id, f"Antibot has banned {victim.mention_html()} from this chat!")
-                await _log_channel(chat, user, victim, action="antibot")
+                await _log_channel(context, chat, user, victim, action="ANITBOT")
             except Exception as e:
                 logger.error(f"Error: {e}")
                 await Message.send_msg(chat.id, f"Error: {e}")
         elif welcome_msg:
             if custom_welcome_msg:
+                formattings = {
+                    "{first}": victim.first_name,
+                    "{last}": victim.last_name,
+                    "{fullname}": victim.full_name,
+                    "{username}": victim.username,
+                    "{mention}": victim.mention_html(),
+                    "{id}": victim.id,
+                    "{chatname}": chat.title
+                }
+
+                for key, value in formattings.items():
+                    if not value:
+                        value = ""
+                    custom_welcome_msg = custom_welcome_msg.replace(key, str(value))
+
                 await Message.send_msg(chat.id, custom_welcome_msg)
             else:
                 await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
-            await _log_channel(chat, user, victim, action="joined")
+            await _log_channel(context, chat, user, victim, action="JOIN")
     elif user_exist == False and reason == "left" and goodbye_msg:
         await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")
-        await _log_channel(chat, user, victim, action="left")
+        await _log_channel(context, chat, user, victim, action="LEFT")
 
 
 async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -264,11 +299,11 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command will get invite link of the chat!\nAdd me to manage the chat!", btn)
         return
@@ -302,7 +337,7 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
         await Message.send_msg(chat.id, msg)
-        await _log_channel(chat, user, action="invite_link")
+        await _log_channel(context, chat, user, action="INVITE")
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -315,7 +350,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     admin_title = " ".join(context.args)
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -326,11 +361,11 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
@@ -363,7 +398,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await bot.set_chat_administrator_custom_title(chat.id, victim.id, admin_title)
             msg = f"{msg}\nAdmin title: {admin_title}"
         await Message.reply_msg(update, msg)
-        await _log_channel(chat, user, victim, action="promote")
+        await _log_channel(context, chat, user, victim, action="PROMOTE")
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -375,7 +410,7 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -386,11 +421,11 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
@@ -415,7 +450,7 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await bot.promote_chat_member(chat.id, victim.id)
         await Message.reply_msg(update, f"{user.mention_html()} has demoted user {victim.mention_html()} in this chat!")
-        await _log_channel(chat, user, victim, action="demote")
+        await _log_channel(context, chat, user, victim, action="DEMOTE")
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -427,7 +462,7 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     msg_id = reply.message_id if reply else None
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -438,11 +473,11 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command will pin replied message loudly in the chat!\nAdd me to manage the chat!", btn)
         return
@@ -467,7 +502,7 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await bot.pin_chat_message(chat.id, msg_id)
         await Message.send_msg(chat.id, f"Message pinned & notified everyone!")
-        await _log_channel(chat, user, action="message pin")
+        await _log_channel(context, chat, user, action="PIN")
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -481,7 +516,7 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg_id = reply.message_id if reply else None
     msg = " ".join(context.args)
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -492,12 +527,12 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command will unpin replied message in the chat!\nUse <code>/unpin all</code> to unpin all pinned messages of chat!\nAdd me to manage the chat!", btn)
         return
@@ -529,7 +564,7 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = await Button.cbutton(btn_name, btn_data, True)
         try:
             await Message.reply_msg(update, f"Do you really want to unpin all messages of this chat?", btn)
-            await _log_channel(chat, user, action="unpinned all messages")
+            await _log_channel(context, chat, user, action="UNPIN_ALL")
         except Exception as e:
             logger.error(f"Error: {e}")
             await Message.send_msg(chat.id, f"Error: {e}")
@@ -542,7 +577,7 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await bot.unpin_chat_message(chat.id, msg_id)
         await Message.send_msg(chat.id, f"Message unpinned!")
-        await _log_channel(chat, user, action="message unpin")
+        await _log_channel(context, chat, user, action="UNPIN")
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -555,7 +590,7 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -566,11 +601,11 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
@@ -606,7 +641,7 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if reason:
             msg = f"{msg}\nReason: {reason}"
         await Message.reply_msg(update, msg)
-        await _log_channel(chat, user, victim, action="ban", reason=reason)
+        await _log_channel(context, chat, user, victim, action="BAN", reason=reason)
         try:
             msg = f"{user.mention_html()} has banned you from {chat.title}!"
             if reason:
@@ -626,7 +661,7 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -637,12 +672,12 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
@@ -678,7 +713,7 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if reason:
             msg = f"{msg}\nReason: {reason}"
         await Message.reply_msg(update, msg)
-        await _log_channel(chat, user, victim, action="unban", reason=reason)
+        await _log_channel(context, chat, user, victim, action="UNBAN", reason=reason)
         try:
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
             msg = f"{user.mention_html()} has unbanned you in {chat.title}!\nInvite Link: {invite_link.invite_link}"
@@ -699,7 +734,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -710,12 +745,12 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
@@ -758,7 +793,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if reason:
                 msg = f"{msg}\nReason: {reason}"
             await Message.send_msg(victim.id, msg)
-            await _log_channel(chat, user, victim, action="kick", reason=reason)
+            await _log_channel(context, chat, user, victim, action="KICK", reason=reason)
         except Exception as e:
             logger.error(f"Error: {e}")
     except Exception as e:
@@ -771,18 +806,18 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     victim = user
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     _chk_per = await _check_permission(update, victim, user)
 
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]: 
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
@@ -799,7 +834,7 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await bot.ban_chat_member(chat.id, victim.id)
         await bot.unban_chat_member(chat.id, victim.id)
         await Message.reply_msg(update, f"Nice Choice! Get out of my sight!\n{victim.mention_html()} has choosed the easy way to out!")
-        await _log_channel(chat, user, victim, action="kickme")
+        await _log_channel(context, chat, user, victim, action="KICKME")
         try:
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
             await Message.send_msg(victim.id, f"You kicked yourself from {chat.title}!\nInvite Link: {invite_link.invite_link}")
@@ -817,7 +852,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -828,11 +863,11 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
@@ -885,7 +920,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if reason:
             msg = f"{msg}\nReason: {reason}"
         await Message.reply_msg(update, msg)
-        await _log_channel(chat, user, victim, action="mute", reason=reason)
+        await _log_channel(context, chat, user, victim, action="MUTE", reason=reason)
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -898,7 +933,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -909,11 +944,11 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
@@ -966,7 +1001,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if reason:
             msg = f"{msg}\nReason: {reason}"
         await Message.reply_msg(update, msg)
-        await _log_channel(chat, user, victim, action="unmute", reason=reason)
+        await _log_channel(context, chat, user, victim, action="UNMUTE", reason=reason)
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -980,7 +1015,7 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -991,11 +1026,11 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
@@ -1025,7 +1060,7 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if reason:
             msg = f"{msg}\nReason: {reason}"
         await Message.send_msg(chat.id, msg)
-        await _log_channel(chat, user, victim, action="message deleted", reason=reason)
+        await _log_channel(context, chat, user, victim, action="MSG_DEL", reason=reason)
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -1035,7 +1070,7 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -1046,11 +1081,11 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command will remove all permissions of chat! No one will be able to send message etc.\nAdd me to manage the chat!", btn)
         return
@@ -1084,7 +1119,7 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await bot.set_chat_permissions(chat.id, permissions)
         await Message.send_msg(chat.id, f"This chat has been Locked!\nEffective admin: {user.mention_html()}")
-        await _log_channel(chat, user, action="chat locked")
+        await _log_channel(context, chat, user, action="CHAT_LOCK")
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -1094,7 +1129,7 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -1105,11 +1140,11 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command will restore all permissions of chat! Everyone will be able to send message etc.\nAdd me to manage the chat!", btn)
         return
@@ -1143,7 +1178,7 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await bot.set_chat_permissions(chat.id, permissions)
         await Message.send_msg(chat.id, f"This chat has been Unlocked!\nEffective admin: {user.mention_html()}")
-        await _log_channel(chat, user, action="chat unlocked")
+        await _log_channel(context, chat, user, action="CHAT_UNLOCK")
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -1157,7 +1192,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     value = reply.text or reply.caption if reply else None
     keyword = " ".join(context.args)
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -1168,11 +1203,11 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _chk_per:
         return
     
-    _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "To set custom message/commands in group chat!\nAdd me to manage the chat!", btn)
         return
@@ -1196,37 +1231,58 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Reply the message with command which one you want to set as value for your keyword/command!\n"
             "Example: <code>/filters hi or /hi</code> send this by replying any message! suppose the message is <code>Hi, How are you!</code>\n"
             "Next time if you say <blockquote>hi or /hi</blockquote> in chat, the bot will reply with <blockquote>Hi, How are you!</blockquote>\n"
-            "To remove a filter, use <code>/filters existing_filter_keyword</code> (without reply) and exact keyword (with capital letter or small letter)"
+            "To remove a filter, use <code>/filters existing_filter_keyword</code> (without reply) and exact keyword (with capital letter or small letter)\n"
+            "To remove all filters, use <code>/filters rem_all</code>"
         )
 
         context.chat_data["user_id"] = user.id
         context.chat_data["chat_id"] = chat.id
         context.chat_data["del_msg_pointer"] = e_msg
 
-        btn_name = ["Chat filters", "Close"]
-        btn_data = ["filters", "close"]
+        btn_name_row1 = ["See chat filters", "Text formats"]
+        btn_data_row1 = ["filters", "text_formats"]
 
-        btn = await Button.cbutton(btn_name, btn_data, True)
+        btn_name_row2 = ["Close"]
+        btn_data_row2 = ["close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2)
+
+        btn = row1 + row2
 
         try:
             await Message.reply_msg(update, msg, btn)
         except Exception as e:
             logger.error(f"Error: {e}")
-
         return
 
-    find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-    if not find_group:
-        await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-        return
+    try:
+        find_group = context.chat_data["db_chat_data"]
+    except Exception as e:
+        logger.error(f"Error: {e}")
+
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+        if find_group:
+            context.chat_data["db_chat_data"] = find_group
+        else:
+            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+            return
     
     filters = find_group.get("filters")
 
     if filters and keyword and not value:
+        if keyword == "rem_all":
+            await MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
+            await Message.reply_msg(update, f"{user.mention_html()} has removed all filters of this chat!")
+            return
+        
         try:
             del filters[keyword]
             await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
             await Message.reply_msg(update, f"{user.mention_html()} has removed filter <code>{keyword}</code>!")
+            
+            db_chat_data = await MongoDB.find_one("groups", "chat_id", chat.id)
+            context.chat_data["db_chat_data"] = db_chat_data
         except Exception as e:
             logger.error(f"Error: {e}")
             await Message.reply_msg(update, "Error: filter keyword not found!")
@@ -1240,15 +1296,18 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         filters[keyword] = value
         await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
+
+    db_chat_data = await MongoDB.find_one("groups", "chat_id", chat.id)
+    context.chat_data["db_chat_data"] = db_chat_data
     
     await Message.reply_msg(update, f"{user.mention_html()} has added filter <code>{keyword}</code>!")
 
 
 async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    _bot = await bot.get_me()
+    _bot_info = await bot.get_me()
 
-    await _check_del_cmd(update)
+    await _check_del_cmd(update, context)
 
     owner_storage = "<b>Owner:</b>\n"
     admins_storage = ""
@@ -1256,7 +1315,7 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
-        btn_url = [f"http://t.me/{_bot.username}?startgroup=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
