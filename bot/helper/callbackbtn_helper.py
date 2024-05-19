@@ -85,8 +85,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 for keyword in filters:
                     msg += f"- {keyword}\n"
 
-                btn_name = ["⚠ Remove all filters", "Close"]
-                btn_data = ["remove_filters", "close"]
+                btn_name = ["Close"]
+                btn_data = ["close"]
                 btn = await Button.cbutton(btn_name, btn_data)
 
                 await Message.edit_msg(update, msg, sent_msg, btn)
