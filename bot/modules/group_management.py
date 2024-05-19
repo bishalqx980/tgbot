@@ -1274,6 +1274,9 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if keyword == "rem_all":
             await MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
             await Message.reply_msg(update, f"{user.mention_html()} has removed all filters of this chat!")
+            
+            db_chat_data = await MongoDB.find_one("groups", "chat_id", chat.id)
+            context.chat_data["db_chat_data"] = db_chat_data
             return
         
         try:
