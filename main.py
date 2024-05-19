@@ -1607,7 +1607,10 @@ def main():
     # Callback button
     application.add_handler(CallbackQueryHandler(func_callbackbtn, block=False))
     # Check Updates
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    try:
+        application.run_polling(allowed_updates=Update.ALL_TYPES)
+    except Exception as e:
+        logger.error(f"Error: {e}")
 
 
 if __name__ == "__main__":
