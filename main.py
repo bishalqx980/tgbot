@@ -59,20 +59,29 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if chat.type != "private":
-        _bot = await bot.get_me()
+        _bot_info = await bot.get_me()
         btn_name = ["Start me in private"]
-        btn_url = [f"http://t.me/{_bot.username}?start=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, f"Hi, {user.mention_html()}! Start me in private to chat with me 😊!", btn)
         return
     
-    _bot = await bot.get_me()
-    bot_pic = await MongoDB.get_data("bot_docs", "bot_pic")
-    welcome_img = await MongoDB.get_data("bot_docs", "welcome_img")
-    support_chat = await MongoDB.get_data("bot_docs", "support_chat")
+    _bot_info = await bot.get_me()
+
+    try:
+        _bot = context.bot_data["db_bot_data"]
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        find = await MongoDB.find("bot_docs", "_id")
+        _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+        context.bot_data["db_bot_data"] = _bot
+
+    bot_pic = _bot.get("bot_pic")
+    welcome_img = _bot.get("welcome_img")
+    support_chat = _bot.get("support_chat")
 
     msg = (
-        f"Hi {user.mention_html()}! I'm <a href='https://t.me/{_bot.username}'>{_bot.first_name}</a>, your all-in-one bot!\n\n"
+        f"Hi {user.mention_html()}! I'm <a href='https://t.me/{_bot_info.username}'>{_bot_info.first_name}</a>, your all-in-one bot!\n\n"
         f"<blockquote>Here's a short list of what I can do:\n\n" # break
         f"• Get response from <b>ChatGPT AI</b>\n"
         f"• Generate image from your prompt\n"
@@ -93,7 +102,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     btn_name_1 = ["Add in Group"]
-    btn_url_1 = [f"http://t.me/{_bot.username}?startgroup=start"]
+    btn_url_1 = [f"http://t.me/{_bot_info.username}?startgroup=start"]
     btn_name_2 = ["Developer", "Source Code"]
     btn_url_2 = [f"https://t.me/bishalqx980", "https://github.com/bishalqx980/tgbot"]
     btn_name_3 = ["Support Chat"]
@@ -176,25 +185,50 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not msg:
         await Message.reply_msg(update, "Use <code>/tr text</code> or reply the text with <code>/tr</code>\nE.g. <code>/tr the text you want to translate</code>\n\nEnable auto translator mode from /settings")
         return
-
-    find_chat = await MongoDB.find_one("users", "user_id", user.id)
-
-    if not find_chat:
-        find_chat = await MongoDB.find_one("groups", "chat_id", chat.id)
     
-    if not find_chat:
-        await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-        return
-    
-    lang_code = find_chat.get("lang")
+    if chat.type == "private":
+        try:
+            find_user = context.chat_data["db_chat_data"]
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
+            if find_user:
+                context.chat_data["db_chat_data"] = find_user
+            else:
+                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                return
+            
+        lang_code = find_user.get("lang")
+    else:
+        try:
+            find_group = context.chat_data["db_chat_data"]
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+            if find_group:
+                context.chat_data["db_chat_data"] = find_group
+            else:
+                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                return
+            
+        lang_code = find_group.get("lang")
 
     try:
         tr_msg = translate(msg, lang_code)
     except Exception as e:
         logger.error(f"Error Translator: {e}")
-        lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
+        try:
+            _bot = context.bot_data["db_bot_data"]
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            find = await MongoDB.find("bot_docs", "_id")
+            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+            context.bot_data["db_bot_data"] = _bot
+            
         btn_name = ["Language code's"]
-        btn_url = [lang_code_list]
+        btn_url = [_bot.get("lang_code_list")]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
         return
@@ -389,9 +423,9 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
         else:
-            _bot = await bot.get_me()
+            _bot_info = await bot.get_me()
             btn_name = ["Start me in private"]
-            btn_url = [f"http://t.me/{_bot.username}?start=start"]
+            btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
             btn = await Button.ubutton(btn_name, btn_url)
             await Message.reply_msg(update, f"User isn't registered!\nStart me in private then try again here!", btn)
             return
@@ -413,6 +447,9 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if calc_req:
             ai_imagine_req = 0
             await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
+
+            db_chat_data = await MongoDB.find_one("users", "user_id", user.id)
+            context.chat_data["db_chat_data"] = db_chat_data
         elif ai_imagine_req >= ai_imagine_limit:
             if user.id != int(owner_id):
                 premium_users = data.get("premium_users")
@@ -463,6 +500,9 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ai_imagine_req += 1
         await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
         await MongoDB.update_db("users", "user_id", user.id, "last_used", {current_time})
+
+        db_chat_data = await MongoDB.find_one("users", "user_id", user.id)
+        context.chat_data["db_chat_data"] = db_chat_data
     except Exception as e:
         logger.error(f"Error Imagine: {e}")
         await Message.reply_msg(update, f"Error Imagine: {e}")
@@ -481,21 +521,27 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if prompt.lower() in ignore_words:
         await Message.reply_msg(update, "Hello! How can I assist you today?")
         return
-        
-    find_user = await MongoDB.find_one("users", "user_id", user.id)
+    
+    try:
+        find_user = context.chat_data["db_chat_data"]
+    except Exception as e:
+        logger.error(f"Error: {e}")
 
-    if not find_user:
-        if chat.type == "private":
-            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-            return
+        find_user = await MongoDB.find_one("users", "user_id", user.id)
+        if not find_user:
+            if chat.type == "private":
+                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                return
+            else:
+                _bot_info = await bot.get_me()
+                btn_name = ["Start me in private"]
+                btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
+                btn = await Button.ubutton(btn_name, btn_url)
+                await Message.reply_msg(update, f"User isn't registered!\nStart me in private then try again here!", btn)
+                return
         else:
-            _bot = await bot.get_me()
-            btn_name = ["Start me in private"]
-            btn_url = [f"http://t.me/{_bot.username}?start=start"]
-            btn = await Button.ubutton(btn_name, btn_url)
-            await Message.reply_msg(update, f"User isn't registered!\nStart me in private then try again here!", btn)
-            return
-        
+            context.chat_data["db_chat_data"] = find_user
+
     chatgpt_req, last_used = find_user.get("chatgpt_req"), find_user.get("last_used")
     current_time = datetime.now()
 
@@ -503,24 +549,32 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chatgpt_req = 0
 
     if last_used:
-        find = await MongoDB.find("bot_docs", "_id")
-        
-        data = await MongoDB.find_one("bot_docs", "_id", find[0])
-        usage_reset, chatgpt_limit = data.get("usage_reset"), data.get("chatgpt_limit")
+        try:
+            _bot = context.bot_data["db_bot_data"]
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            find = await MongoDB.find("bot_docs", "_id")
+            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+            context.bot_data["db_bot_data"] = _bot
+
+        usage_reset, chatgpt_limit = _bot.get("usage_reset"), _bot.get("chatgpt_limit")
 
         calc_req = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
 
         if calc_req:
             chatgpt_req = 0
             await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
+
+            db_chat_data = await MongoDB.find_one("users", "user_id", user.id)
+            context.chat_data["db_chat_data"] = db_chat_data
         elif chatgpt_req >= chatgpt_limit:
             if user.id != int(owner_id):
-                premium_users = data.get("premium_users")
+                premium_users = _bot.get("premium_users")
                 if not premium_users:
                     premium_users = []
 
                 if user.id not in premium_users:
-                    premium_seller = data.get("premium_seller")
+                    premium_seller = _bot.get("premium_seller")
 
                     if not premium_seller:
                         premium_seller = owner_username
@@ -541,26 +595,24 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     return
             
     if user.id == int(owner_id):
-        msg = "Please wait Boss!! Thinking..."
+        msg = "Please wait Boss!! Generating..."
     else:
-        msg = f"Please wait {user.first_name}!! Thinking..."
+        msg = f"Please wait {user.first_name}!! Generating..."
     
     sent_msg = await Message.reply_msg(update, msg)
 
-    """
-    safone_ai_res = await Safone.safone_ai(msg)
-    if safone_ai_res:
-        chatgpt = safone_ai_res[0]
-        bard = safone_ai_res[1]
-        chatbot = safone_ai_res[2]
+    # safone_ai_res = await Safone.safone_ai(msg)
+    # if safone_ai_res:
+    #     chatgpt = safone_ai_res[0]
+    #     bard = safone_ai_res[1]
+    #     chatbot = safone_ai_res[2]
 
-        if chatgpt:
-            text = chatgpt.message
-        elif bard:
-            text = bard.message
-        else:
-            text = chatbot.response
-    """
+    #     if chatgpt:
+    #         text = chatgpt.message
+    #     elif bard:
+    #         text = bard.message
+    #     else:
+    #         text = chatbot.response
 
     retry_gpt = 0
 
@@ -580,6 +632,9 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chatgpt_req += 1
         await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
         await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
+
+        db_chat_data = await MongoDB.find_one("users", "user_id", user.id)
+        context.chat_data["db_chat_data"] = db_chat_data
     except Exception as e:
         logger.error(f"Error ChatGPT: {e}")
         await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
@@ -593,9 +648,9 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = re_msg.text if re_msg else " ".join(context.args)
 
     if chat.type != "private":
-        _bot = await bot.get_me()
+        _bot_info = await bot.get_me()
         btn_name = ["Start me in private"]
-        btn_url = [f"http://t.me/{_bot.username}?start=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.reply_msg(update, f"Coming Soon...\nYou can use this feature in bot private chat!", btn)
         return
@@ -708,6 +763,14 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     chat_id = " ".join(context.args)
 
+    try:
+        _bot = context.bot_data["db_bot_data"]
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        find = await MongoDB.find("bot_docs", "_id")
+        _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+        context.bot_data["db_bot_data"] = _bot
+
     if chat.type == "private":
         if chat_id:
             if user.id != int(owner_id):
@@ -718,37 +781,45 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             chat_id = user.id
 
-        find_user = await MongoDB.find_one("users", "user_id", chat_id)
+        try:
+            find_user = context.chat_data["db_chat_data"]
+        except Exception as e:
+            logger.error(f"Error: {e}")
 
-        if not find_user:
-            find_group = await MongoDB.find_one("groups", "chat_id", chat_id)
-        
-            if not find_group:
-                await Message.reply_msg(update, "User/Chat not found!")
-                return
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
+            if find_user:
+                context.chat_data["db_chat_data"] = find_user
+            else:
+                try:
+                    find_group = context.chat_data["db_chat_data"]
+                except Exception as e:
+                    logger.error(f"Error: {e}")
 
+                    find_group = await MongoDB.find_one("groups", "chat_id", chat_id)
+                    if find_group:
+                        context.chat_data["db_chat_data"] = find_group
+                    else:
+                        await Message.reply_msg(update, "User/Chat not found!")
+                        return
+             
         if find_user:
             user_mention = find_user.get("mention")
-
             lang = find_user.get("lang")
             echo = find_user.get("echo")
             auto_tr = find_user.get("auto_tr")
-
             chatgpt_req = find_user.get("chatgpt_req")
             ai_imagine_req = find_user.get("ai_imagine_req")
-            
-            chatgpt_limit = await MongoDB.get_data("bot_docs", "chatgpt_limit")
-            ai_imagine_limit = await MongoDB.get_data("bot_docs", "ai_imagine_limit")
-
             last_used = find_user.get("last_used")
 
-            premium_users = await MongoDB.get_data("bot_docs", "premium_users")
+            chatgpt_limit = _bot.get("chatgpt_limit")
+            ai_imagine_limit = _bot.get("ai_imagine_limit")
+
+            premium_users = _bot.get("premium_users")
             if not premium_users:
                 is_premium = False
             else:
                 is_premium = True if chat_id in premium_users else False
 
-            
             context.chat_data["edit_cname"] = "users"
             context.chat_data["find_data"] = "user_id"
             context.chat_data["match_data"] = chat_id
@@ -782,13 +853,18 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             btn = row1 + row2
 
-            images = await MongoDB.get_data("bot_docs", "images")
+            images = _bot.get("images")
             if images:
                 image = random.choice(images).strip()
-                await Message.send_img(chat.id, image, msg, btn)
             else:
+                image = _bot.get("bot_pic")
+            
+            try:
+                await Message.send_img(chat.id, image, msg, btn)
+            except Exception as e:
+                logger.error(f"Error: {e}")
                 await Message.send_msg(chat.id, msg, btn)
-        
+
         elif find_group:
             title = find_group.get("title")
             lang = find_group.get("lang")
@@ -846,15 +922,20 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             btn = row1 + row2 + row3 + row4 + row5
 
-            images = await MongoDB.get_data("bot_docs", "images")
+            images = _bot.get("images")
             if images:
                 image = random.choice(images).strip()
-                await Message.send_img(chat.id, image, msg, btn)
             else:
+                image = _bot.get("bot_pic")
+            
+            try:
+                await Message.send_img(chat.id, image, msg, btn)
+            except Exception as e:
+                logger.error(f"Error: {e}")
                 await Message.send_msg(chat.id, msg, btn)
 
     elif chat.type in ["group", "supergroup"]:
-        await _check_del_cmd(update)
+        await _check_del_cmd(update, context)
 
         if user.is_bot:
             await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -865,7 +946,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not _chk_per:
             return
         
-        _bot, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+        _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
             
         if bot_permission.status != ChatMember.ADMINISTRATOR:
             await Message.reply_msg(update, "I'm not an admin in this chat!")
@@ -880,7 +961,17 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
                 return
 
-        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+        try:
+            find_group = context.chat_data["db_chat_data"]
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+            if find_group:
+                context.chat_data["db_chat_data"] = find_group
+            else:
+                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                return
         
         if not find_group:
             await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
@@ -942,11 +1033,16 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn = row1 + row2 + row3 + row4 + row5
 
-        images = await MongoDB.get_data("bot_docs", "images")
+        images = _bot.get("images")
         if images:
             image = random.choice(images).strip()
-            await Message.send_img(chat.id, image, msg, btn)
         else:
+            image = _bot.get("bot_pic")
+        
+        try:
+            await Message.send_img(chat.id, image, msg, btn)
+        except Exception as e:
+            logger.error(f"Error: {e}")
             await Message.send_msg(chat.id, msg, btn)
 
 
@@ -977,9 +1073,9 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
 
     if chat.type != "private":
-        _bot = await bot.get_me()
+        _bot_info = await bot.get_me()
         btn_name = ["Start me in private"]
-        btn_url = [f"http://t.me/{_bot.username}?start=start"]
+        btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.reply_msg(update, f"Hi, {user.mention_html()}! Start me in private to chat with me 😊!", btn)
         return
@@ -1316,16 +1412,21 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if chat.type == "private" and msg:
-        find_user = await MongoDB.find_one("users", "user_id", user.id)
-        if not find_user:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-            return
+        try:
+            find_user = context.chat_data["db_chat_data"]
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
+            if find_user:
+                context.chat_data["db_chat_data"] = find_user
+            else:
+                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                return
         
-        # status
         echo_status = find_user.get("echo")
         auto_tr_status = find_user.get("auto_tr")
 
-        # Trigger
         if echo_status:
             await Message.reply_msg(update, msg)
 
@@ -1347,10 +1448,17 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # group's
     elif chat.type in ["group", "supergroup"] and msg:
-        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-        if not find_group:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-            return
+        try:
+            find_group = context.chat_data["db_chat_data"]
+        except Exception as e:
+            logger.error(f"Error: {e}")
+
+            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+            if find_group:
+                context.chat_data["db_chat_data"] = find_group
+            else:
+                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                return
         
         echo_status = find_group.get("echo")
         auto_tr_status = find_group.get("auto_tr")
