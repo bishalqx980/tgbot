@@ -1163,7 +1163,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             except_count += 1
             logger.error(f"Error Broadcast: {e}")
-    await Message.reply_msg(update, "Job Done !!")
+    await Message.reply_msg(update, "<blockquote>Broadcast Done!!</blockquote>")
 
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1304,7 +1304,7 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if "list" in msg:
         try:
             res = await Render.list_services()
-            msg, null= "", None
+            msg, null = "", None
             res = json.loads(res.text)
             for obj in res:
                 service = obj.get("service")
@@ -1468,7 +1468,22 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for keyword in filters:
                 filter_msg = msg.lower() if not isinstance(msg, int) else msg
                 if keyword.lower() in filter_msg:
-                    await Message.reply_msg(update, filters[keyword])
+                    filtered_msg = filters[keyword]
+                    formattings = {
+                        "{first}": user.first_name,
+                        "{last}": user.last_name,
+                        "{fullname}": user.full_name,
+                        "{username}": user.username,
+                        "{mention}": user.mention_html(),
+                        "{id}": user.id,
+                        "{chatname}": chat.title
+                    }
+
+                    for key, value in formattings.items():
+                        if not value:
+                            value = ""
+                        filtered_msg = filtered_msg.replace(key, str(value))
+                    await Message.reply_msg(update, filtered_msg)
 
         if echo_status:
             await Message.reply_msg(update, msg)

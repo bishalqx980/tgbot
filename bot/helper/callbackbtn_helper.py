@@ -905,8 +905,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<i>Note: This message will be send as greeting message in the chat when a user join!</i>"
         )
 
-        btn_name_row1 = ["Set custom message"]
-        btn_data_row1 = ["edit_value"]
+        btn_name_row1 = ["Text formats", "Set custom message"]
+        btn_data_row1 = ["text_formats", "edit_value"]
 
         btn_name_row2 = ["Set default message"]
         btn_data_row2 = ["remove_value"]
@@ -914,13 +914,59 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row3 = ["Back", "Close"]
         btn_data_row3 = ["welcome_msg", "close"]
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2)
         row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
 
         btn = row1 + row2 + row3
 
         await Message.edit_msg(update, msg, sent_msg, btn)
+    
+    elif data == "text_formats":
+        access = await _check_whois()
+        if not access:
+            return
+        
+        chat_id = context.chat_data.get("chat_id")
+        if not chat_id:
+            await popup("Error: chat_id not found!")
+            await query.message.delete()
+            return
+        
+        msg = (
+            "<blockquote>Formatting</blockquote>\n"
+            "<code>{first}</code>: The user's firstname\n"
+            "<code>{last}</code>: The user's lastname\n"
+            "<code>{fullname}</code>: The user's fullname\n"
+            "<code>{username}</code>: The user's username\n"
+            "<code>{mention}</code>: To mention the user\n"
+            "<code>{id}</code>: The user's ID\n"
+            "<code>{chatname}</code>: Chat title\n\n"
+            "Example: <code>Hi {mention}, welcome to {chatname}</code>\n"
+            "<blockquote>HTML formatting</blockquote>"
+            "<b>bold</b>\n"
+            "<i>italic</i>\n"
+            "<u>underline</u>\n"
+            "<s>strikethrough</s>\n"
+            "<tg-spoiler>spoiler</tg-spoiler>\n"
+            "<a href='http://www.example.com/'>inline URL</a>\n"
+            "<code>monospace</code>\n"
+            "<pre>code</pre>\n"
+            "<blockquote>Block quotation</blockquote>\n\n"
+        )
+
+        btn_name_row1 = ["Formatting details"]
+        btn_url_row1 = ["https://telegra.ph/Formattings-05-19"]
+
+        btn_name_row2 = ["Close"]
+        btn_data_row2 = ["close"]
+        
+        row1 = await Button.ubutton(btn_name_row1, btn_url_row1)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2)
+
+        btn = row1 + row2
+        
+        await Message.send_msg(chat_id, msg, btn)
 
     elif data == "goodbye_msg":
         access = await _check_whois()
@@ -956,7 +1002,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = (
             "<b>Chat Settings</b> -\n\n"
             f"Goodbye user: <code>{goodbye_msg}</code>\n\n"
-            "<i>Note: This will send a farewell message to chat when a user left!</i>"
+            "<i>Note: This will send a farewell message to chat when a user left!\n</i>"
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -1106,7 +1152,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = (
             "<b>Chat Settings</b> -\n\n"
             f"Log channel: <code>{log_channel}</code>\n\n"
-            "<i>Note: This will log every actions occurred in your chat (ban, kick, mute, etc.)\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
+            "<i>Note: This will log every actions occurred in your chat (ban, kick, mute, etc.) using bot!\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
