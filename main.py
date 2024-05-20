@@ -762,7 +762,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     e_msg = update.effective_message
-    chat_id = " ".join(context.args)
 
     try:
         _bot = context.bot_data["db_bot_data"]
@@ -773,15 +772,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.bot_data["db_bot_data"] = _bot
 
     if chat.type == "private":
-        if chat_id:
-            if user.id != int(owner_id):
-                await Message.reply_msg(update, f"Access Denied! [owner only]")
-                return
-            else:
-                chat_id = int(chat_id)
-        else:
-            chat_id = user.id
-
         try:
             find_user = context.chat_data["db_chat_data"]
         except Exception as e:
@@ -791,151 +781,70 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if find_user:
                 context.chat_data["db_chat_data"] = find_user
             else:
-                try:
-                    find_group = context.chat_data["db_chat_data"]
-                except Exception as e:
-                    logger.error(f"Error: {e}")
+                await Message.reply_msg(update, "User data not found! Block me then start me again! (no need to delete chat)")
+                return
+        
+        user_mention = find_user.get("mention")
+        lang = find_user.get("lang")
+        echo = find_user.get("echo")
+        auto_tr = find_user.get("auto_tr")
+        chatgpt_req = find_user.get("chatgpt_req")
+        ai_imagine_req = find_user.get("ai_imagine_req")
+        last_used = find_user.get("last_used")
 
-                    find_group = await MongoDB.find_one("groups", "chat_id", chat_id)
-                    if find_group:
-                        context.chat_data["db_chat_data"] = find_group
-                    else:
-                        await Message.reply_msg(update, "User/Chat not found!")
-                        return
-             
-        if find_user:
-            user_mention = find_user.get("mention")
-            lang = find_user.get("lang")
-            echo = find_user.get("echo")
-            auto_tr = find_user.get("auto_tr")
-            chatgpt_req = find_user.get("chatgpt_req")
-            ai_imagine_req = find_user.get("ai_imagine_req")
-            last_used = find_user.get("last_used")
+        chatgpt_limit = _bot.get("chatgpt_limit")
+        ai_imagine_limit = _bot.get("ai_imagine_limit")
 
-            chatgpt_limit = _bot.get("chatgpt_limit")
-            ai_imagine_limit = _bot.get("ai_imagine_limit")
+        premium_users = _bot.get("premium_users")
+        if not premium_users:
+            is_premium = False
+        else:
+            is_premium = True if user.id in premium_users else False
 
-            premium_users = _bot.get("premium_users")
-            if not premium_users:
-                is_premium = False
-            else:
-                is_premium = True if chat_id in premium_users else False
+        context.chat_data["edit_cname"] = "users"
+        context.chat_data["find_data"] = "user_id"
+        context.chat_data["match_data"] = user.id
+        context.chat_data["chat_id"] = chat.id
+        context.chat_data["user_id"] = user.id
+        context.chat_data["del_msg_pointer"] = e_msg
 
-            context.chat_data["edit_cname"] = "users"
-            context.chat_data["find_data"] = "user_id"
-            context.chat_data["match_data"] = chat_id
-            context.chat_data["chat_id"] = chat.id
-            context.chat_data["user_id"] = user.id
-            context.chat_data["del_msg_pointer"] = e_msg
+        msg = (
+            f"<b>Chat Settings</b> -\n\n"
+            f"• User: {user_mention}\n"
+            f"• ID: <code>{user.id}</code>\n"
+            f"• Is premium: <code>{is_premium}</code>\n\n"
 
-            msg = (
-                f"<b>Chat Settings</b> -\n\n"
-                f"• User: {user_mention}\n"
-                f"• ID: <code>{chat_id}</code>\n"
-                f"• Is premium: <code>{is_premium}</code>\n\n"
+            f"• Lang: <code>{lang}</code>\n"
+            f"• Echo: <code>{echo}</code>\n"
+            f"• Auto tr: <code>{auto_tr}</code>\n\n"
 
-                f"• Lang: <code>{lang}</code>\n"
-                f"• Echo: <code>{echo}</code>\n"
-                f"• Auto tr: <code>{auto_tr}</code>\n\n"
+            f"• ChatGPT: <code>{chatgpt_req}/{chatgpt_limit}</code>\n"
+            f"• AI imagine: <code>{ai_imagine_req}/{ai_imagine_limit}</code>\n"
+            f"• Last used: <code>{last_used}</code>\n"
+        )
 
-                f"• ChatGPT: <code>{chatgpt_req}/{chatgpt_limit}</code>\n"
-                f"• AI imagine: <code>{ai_imagine_req}/{ai_imagine_limit}</code>\n"
-                f"• Last used: <code>{last_used}</code>\n"
-            )
+        btn_name_row1 = ["Language", "Auto translate"]
+        btn_data_row1 = ["lang", "auto_tr"]
 
-            btn_name_row1 = ["Language", "Auto translate"]
-            btn_data_row1 = ["lang", "auto_tr"]
+        btn_name_row2 = ["Echo", "Close"]
+        btn_data_row2 = ["set_echo", "close"]
 
-            btn_name_row2 = ["Echo", "Close"]
-            btn_data_row2 = ["set_echo", "close"]
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
 
-            row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-            row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        btn = row1 + row2
 
-            btn = row1 + row2
-
-            images = _bot.get("images")
-            if images:
-                image = random.choice(images).strip()
-            else:
-                image = _bot.get("bot_pic")
-            
-            try:
-                await Message.send_img(chat.id, image, msg, btn)
-            except Exception as e:
-                logger.error(f"Error: {e}")
-                await Message.send_msg(chat.id, msg, btn)
-
-        elif find_group:
-            title = find_group.get("title")
-            lang = find_group.get("lang")
-
-            echo = find_group.get("echo")
-            auto_tr = find_group.get("auto_tr")
-            welcome_msg = find_group.get("welcome_msg")
-            goodbye_msg = find_group.get("goodbye_msg")
-            antibot = find_group.get("antibot")
-            del_cmd = find_group.get("del_cmd")
-            del_links = find_group.get("del_links")
-            log_channel = find_group.get("log_channel")
-
-            context.chat_data["edit_cname"] = "groups"
-            context.chat_data["find_data"] = "chat_id"
-            context.chat_data["match_data"] = chat_id
-            context.chat_data["chat_id"] = chat.id
-            context.chat_data["user_id"] = user.id
-            context.chat_data["del_msg_pointer"] = e_msg
-
-            msg = (
-                f"<b>Chat Settings</b> -\n\n"
-                f"• Title: {title}\n"
-                f"• ID: <code>{chat_id}</code>\n\n"
-
-                f"• Lang: <code>{lang}</code>\n"
-                f"• Echo: <code>{echo}</code>\n"
-                f"• Auto tr: <code>{auto_tr}</code>\n"
-                f"• Welcome user: <code>{welcome_msg}</code>\n"
-                f"• Goodbye user: <code>{goodbye_msg}</code>\n"
-                f"• Antibot: <code>{antibot}</code>\n"
-                f"• Delete cmd: <code>{del_cmd}</code>\n"
-                f"• Delete links: <code>{del_links}</code>\n"
-                f"• Log channel: <code>{log_channel}</code>\n"
-            )
-
-            btn_name_row1 = ["Language", "Auto translate"]
-            btn_data_row1 = ["lang", "auto_tr"]
-
-            btn_name_row2 = ["Echo", "Anti bot"]
-            btn_data_row2 = ["set_echo", "antibot"]
-
-            btn_name_row3 = ["Welcome", "Goodbye"]
-            btn_data_row3 = ["welcome_msg", "goodbye_msg"]
-
-            btn_name_row4 = ["Delete cmd", "Log channel"]
-            btn_data_row4 = ["del_cmd", "log_channel"]
-
-            btn_name_row5 = ["Delete links", "Close"]
-            btn_data_row5 = ["del_links", "close"]
-
-            row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-            row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-            row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
-            row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
-            row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
-
-            btn = row1 + row2 + row3 + row4 + row5
-
-            images = _bot.get("images")
-            if images:
-                image = random.choice(images).strip()
-            else:
-                image = _bot.get("bot_pic")
-            
-            try:
-                await Message.send_img(chat.id, image, msg, btn)
-            except Exception as e:
-                logger.error(f"Error: {e}")
-                await Message.send_msg(chat.id, msg, btn)
+        images = _bot.get("images")
+        if images:
+            image = random.choice(images).strip()
+        else:
+            image = _bot.get("bot_pic")
+        
+        try:
+            await Message.send_img(chat.id, image, msg, btn)
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            await Message.send_msg(chat.id, msg, btn)
 
     elif chat.type in ["group", "supergroup"]:
         await _check_del_cmd(update, context)
@@ -1607,10 +1516,7 @@ def main():
     # Callback button
     application.add_handler(CallbackQueryHandler(func_callbackbtn, block=False))
     # Check Updates
-    try:
-        application.run_polling(allowed_updates=Update.ALL_TYPES)
-    except Exception as e:
-        logger.error(f"Error: {e}")
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == "__main__":
