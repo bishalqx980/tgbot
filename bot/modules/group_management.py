@@ -1283,7 +1283,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         try:
-            if keyword.lower() in filters.lower():
+            if keyword.lower() in filters:
                 del filters[keyword]
                 await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
                 await Message.reply_msg(update, f"{user.mention_html()} has removed filter <code>{keyword}</code>!")
