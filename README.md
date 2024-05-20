@@ -11,7 +11,7 @@ else:
     print("Please 🥺 give a star to this repo! ...And fork it if you want to work with this repo!")
 ```
 
-<sup>- *Fun fact: _check will always return True! [ becasue you (gave/will give) a star & forked the repo lol ] Thanks :)*</sup>
+<sup>- *Fun fact: _check will always return True! [ becasue you (gave/will give) a star & fork the repo lol ] Thanks :)*</sup>
 
 ## Features ✨:
 
