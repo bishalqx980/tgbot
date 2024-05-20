@@ -832,8 +832,8 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         await bot.ban_chat_member(chat.id, victim.id)
-        await bot.unban_chat_member(chat.id, victim.id)
         await Message.reply_msg(update, f"Nice Choice! Get out of my sight!\n{victim.mention_html()} has choosed the easy way to out!")
+        await bot.unban_chat_member(chat.id, victim.id)
         await _log_channel(context, chat, user, victim, action="KICKME")
         try:
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
