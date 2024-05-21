@@ -1038,10 +1038,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Example: <code>Hi {mention}, welcome to {chatname}</code>\n"
         )
 
-        btn_name_row1 = ["Back", "Close"]
-        btn_data_row1 = ["set_custom_msg", "close"]
+        btn_name = ["Close"]
+        btn_data = ["close"]
         
-        btn = await Button.ubutton(btn_name_row1, btn_url_row1, True)
+        btn = await Button.ubutton(btn_nam, btn_data, True)
         
         await Message.send_msg(chat_id, msg, btn)
 
