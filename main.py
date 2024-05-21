@@ -962,14 +962,37 @@ async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif re_msg.from_user:
             from_user_id = re_msg.from_user.id
 
-    if chat.type == "private" and re_msg:
-        await Message.reply_msg(update, f"• Your UserID: <code>{user.id}</code>\n• Replied UserID: <code>{from_user_id}</code>")
-    elif chat.type == "private":
-        await Message.reply_msg(update, f"• UserID: <code>{user.id}</code>")
-    elif chat.type in ["group", "supergroup"] and re_msg:
-        await Message.reply_msg(update, f"• Your UserID: <code>{user.id}</code>\n• Replied UserID: <code>{from_user_id}</code>\n• ChatID: <code>{chat.id}</code>")
+    if chat.type == "private":
+        if re_msg:
+            if user.id == from_user_id:
+                msg = (
+                    f"• Your UserID: <code>{user.id}</code>\n"
+                    f"<i>Replied user account is hidden! Can't get user_id</i>"
+                )
+            else:
+                msg = (
+                    f"• Your UserID: <code>{user.id}</code>\n"
+                    f"• Replied UserID: <code>{from_user_id}</code>"
+                )
+        else:
+            msg = (
+                f"• UserID: <code>{user.id}</code>"
+            )
+        await Message.reply_msg(update, msg)
+
     elif chat.type in ["group", "supergroup"]:
-        await Message.reply_msg(update, f"• UserID: <code>{user.id}</code>\n• ChatID: <code>{chat.id}</code>")
+        if re_msg:
+            msg = (
+                f"• Your UserID: <code>{user.id}</code>\n"
+                f"• Replied UserID: <code>{from_user_id}</code>\n"
+                f"• ChatID: <code>{chat.id}</code>"
+            ) 
+        else:
+            msg = (
+                f"• UserID: <code>{user.id}</code>\n"
+                f"• ChatID: <code>{chat.id}</code>"
+            )
+        await Message.reply_msg(update, msg)
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1051,27 +1074,34 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     users_id = await MongoDB.find("users", "user_id")
+    active_status = await MongoDB.find("users", "active_status")
+
+    if len(users_id) == len(active_status):
+        combined_list = list(zip(users_id, active_status))
+        active_users = []
+        for filter_user_id in combined_list:
+            if filter_user_id[1] == True:
+                active_users.append(filter_user_id[0])
+    else:
+        await Message.reply_msg(update, f"Error: Users {len(user_id)} not equal to active_status {len(active_status)}...!")
+        return
 
     sent_count, except_count = 0, 0
-    notify = await Message.send_msg(owner_id, f"Total User: {len(users_id)}")
-    for user_id in users_id:
+    notify = await Message.send_msg(owner_id, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}")
+    for user_id in active_users:
         try:
             if replied_msg.text_html:
                 await Message.send_msg(user_id, msg)
             elif replied_msg.caption:
                 await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
             sent_count += 1
-            progress = (sent_count+except_count)*100/len(users_id)
-            await Message.edit_msg(update, f"Total User: {len(users_id)}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {int(progress)}%", notify)
-            await MongoDB.update_db("users", "user_id", user_id, "active_status", True)
+            progress = (sent_count + except_count) * 100 / len(active_users)
+            await Message.edit_msg(update, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nProgress: {int(progress)}%", notify)
             # sleep for 0.5sec
             await asyncio.sleep(0.5)
         except Exception as e:
             except_count += 1
             logger.error(f"Error Broadcast: {e}")
-            await MongoDB.update_db("users", "user_id", user_id, "active_status", False)
-            # sleep for 0.5sec
-            await asyncio.sleep(0.5)
     await Message.reply_msg(update, "<i>Broadcast Done...!</i>")
 
 
