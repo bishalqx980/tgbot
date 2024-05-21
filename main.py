@@ -1173,6 +1173,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             echo = find_user.get("echo")
             chatgpt_req = find_user.get("chatgpt_req")
             ai_imagine_req = find_user.get("ai_imagine_req")
+            active_status = find_user.get("active_status")
             last_used = find_user.get("last_used")
 
             msg = (
@@ -1184,6 +1185,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"<code>Echo     :</code> {echo}\n"
                 f"<code>ChatGPT  :</code> {chatgpt_req}\n"
                 f"<code>Imagine  :</code> {ai_imagine_req}\n"
+                f"<code>A. status:</code> {active_status}\n"
                 f"<code>Last used:</code> {last_used}\n"
             )
             await Message.reply_msg(update, f"<b>{msg}</b>")
