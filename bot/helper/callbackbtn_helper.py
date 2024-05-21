@@ -193,21 +193,23 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "github_stats":
         github_repo = await MongoDB.get_data("bot_docs", "github_repo")
         latest_commit = await GitHub.get_latest_commit("bishalqx980", "tgbot")
+        if latest_commit:
+            l_c_sha = latest_commit.get("sha")
+            l_c_commit = latest_commit.get("commit") # not for use
+            l_c_message = l_c_commit.get("message")
+            l_c_author = l_c_commit.get("author") # not for use
+            l_c_aname = l_c_author.get("name")
+            l_c_date = l_c_author.get("date")
+            l_c_link = f"https://github.com/bishalqx980/tgbot/commit/{l_c_sha}"
 
-        l_c_sha = latest_commit.get("sha")
-        l_c_commit = latest_commit.get("commit") # not for use
-        l_c_message = l_c_commit.get("message")
-        l_c_author = l_c_commit.get("author") # not for use
-        l_c_aname = l_c_author.get("name")
-        l_c_date = l_c_author.get("date")
-        l_c_link = f"https://github.com/bishalqx980/tgbot/commit/{l_c_sha}"
-
-        msg = (
-            f"<b>» Original repo [ <a href='{l_c_link}'>latest commit</a> ]</b>\n"
-            f"<b>Last update:</b> <code>{l_c_date}</code>\n"
-            f"<b>Commit:</b> <code>{l_c_message}</code>\n"
-            f"<b>Committed by:</b> <code>{l_c_aname}</code>\n"
-        )
+            msg = (
+                f"<b>» Original repo [ <a href='{l_c_link}'>latest commit</a> ]</b>\n"
+                f"<b>Last update:</b> <code>{l_c_date}</code>\n"
+                f"<b>Commit:</b> <code>{l_c_message}</code>\n"
+                f"<b>Committed by:</b> <code>{l_c_aname}</code>\n"
+            )
+        else:
+            msg = "Something went wrong!"
 
         if github_repo:
             try:
