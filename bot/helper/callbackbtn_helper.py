@@ -1041,7 +1041,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name = ["Close"]
         btn_data = ["close"]
         
-        btn = await Button.ubutton(btn_nam, btn_data, True)
+        btn = await Button.cbutton(btn_name, btn_data)
         
         await Message.send_msg(chat_id, msg, btn)
 

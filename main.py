@@ -410,27 +410,30 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     prompt = " ".join(context.args)
 
-    await Message.reply_msg(update, "Out of order! ❌")
-    return
-
     if not prompt:
         await Message.reply_msg(update, "Use <code>/imagine prompt</code>\nE.g. <code>/imagine a cute cat</code>")
         return
     
-    find_user = await MongoDB.find_one("users", "user_id", user.id)
+    try:
+        find_user = context.chat_data["db_chat_data"]
+    except Exception as e:
+        logger.error(f"Error: {e}")
 
-    if not find_user:
-        if chat.type == "private":
-            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-            return
+        find_user = await MongoDB.find_one("users", "user_id", user.id)
+        if not find_user:
+            if chat.type == "private":
+                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                return
+            else:
+                _bot_info = await bot.get_me()
+                btn_name = ["Start me in private"]
+                btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
+                btn = await Button.ubutton(btn_name, btn_url)
+                await Message.reply_msg(update, f"User isn't registered!\nStart me in private then try again here!", btn)
+                return
         else:
-            _bot_info = await bot.get_me()
-            btn_name = ["Start me in private"]
-            btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
-            btn = await Button.ubutton(btn_name, btn_url)
-            await Message.reply_msg(update, f"User isn't registered!\nStart me in private then try again here!", btn)
-            return
-        
+            context.chat_data["db_chat_data"] = find_user
+
     ai_imagine_req, last_used = find_user.get("ai_imagine_req"), find_user.get("last_used")
     current_time = datetime.now()
 
@@ -438,33 +441,38 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ai_imagine_req = 0
 
     if last_used:
-        find = await MongoDB.find("bot_docs", "_id")
-        
-        data = await MongoDB.find_one("bot_docs", "_id", find[0])
-        usage_reset, ai_imagine_limit = data.get("usage_reset"), data.get("ai_imagine_limit")
+        try:
+            _bot = context.bot_data["db_bot_data"]
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            find = await MongoDB.find("bot_docs", "_id")
+            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+            context.bot_data["db_bot_data"] = _bot
+
+        usage_reset, ai_imagine_limit = _bot.get("usage_reset"), _bot.get("ai_imagine_limit")
 
         calc_req = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
 
         if calc_req:
             ai_imagine_req = 0
-            await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
+            await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", ai_imagine_req)
 
             db_chat_data = await MongoDB.find_one("users", "user_id", user.id)
             context.chat_data["db_chat_data"] = db_chat_data
         elif ai_imagine_req >= ai_imagine_limit:
             if user.id != int(owner_id):
-                premium_users = data.get("premium_users")
+                premium_users = _bot.get("premium_users")
                 if not premium_users:
                     premium_users = []
 
                 if user.id not in premium_users:
-                    premium_seller = data.get("premium_seller")
+                    premium_seller = _bot.get("premium_seller")
 
                     if not premium_seller:
                         premium_seller = owner_username
 
                     msg = (
-                        f"❗ Your ChatGPT usage limit Exceeded!\n"
+                        f"❗ Your imagine usage limit Exceeded!\n"
                         f"⩙ Usage: {ai_imagine_req} out of {ai_imagine_limit}\n"
                         f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
                         f"OR Contact @{premium_seller} to buy Premium Account!"
@@ -475,7 +483,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     btn = await Button.ubutton(btn_name, btn_url)
                     await Message.send_msg(user.id, msg, btn)
                     if chat.type != "private":
-                        await Message.reply_msg(update, "Check bot private message!")
+                        await Message.reply_msg(update, "Usage limit exceeded! Check bot private message!")
                     return
             
     if user.id == int(owner_id):
@@ -485,28 +493,30 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sent_msg = await Message.reply_msg(update, msg)
 
-    """
-    imagine = await Safone.imagine(prompt)
-    """
+    retry_gpt = 0
 
-    imagine = await G4F.imagine(prompt)
-
-    if not imagine:
-        await Message.edit_msg(update, "Something Went Wrong!", sent_msg)
-        return
+    while retry_gpt != 3:
+        imagine = await Safone.imagine(prompt)
+        retry_gpt += 1
+        await Message.edit_msg(update, f"Please wait, ImagineAI is busy!\nAttempt: {retry_gpt}", sent_msg)
+        await asyncio.sleep(3)
+        if imagine:
+            break
+        elif retry_gpt == 3:
+            await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
+            return
     
     try:
+        await Message.send_img(chat.id, imagine, f"» {prompt}")
         await Message.del_msg(chat.id, sent_msg)
-        await Message.send_img(chat.id, imagine, f"✨ {prompt}")
-        ai_imagine_req += 1
-        await MongoDB.update_db("users", "user_id", user.id, "ai_imagine_req", ai_imagine_req)
-        await MongoDB.update_db("users", "user_id", user.id, "last_used", {current_time})
-
+        chatgpt_req += 1
+        await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
+        await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
         db_chat_data = await MongoDB.find_one("users", "user_id", user.id)
         context.chat_data["db_chat_data"] = db_chat_data
     except Exception as e:
         logger.error(f"Error Imagine: {e}")
-        await Message.reply_msg(update, f"Error Imagine: {e}")
+        await Message.edit_msg(update, f"Error Imagine: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
 
 
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
