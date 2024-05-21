@@ -10,6 +10,7 @@ from bot import (
     support_chat,
     telegraph,
     images,
+    github_repo,
     mongodb_uri,
     db_name,
     server_url,
@@ -17,7 +18,6 @@ from bot import (
     omdb_api,
     weather_api_key,
     render_api,
-    safone_api,
     chatgpt_limit,
     ai_imagine_limit,
     usage_reset
@@ -42,6 +42,7 @@ async def update_database():
         "support_chat": support_chat,
         "telegraph": telegraph,
         "images": images,
+        "github_repo": github_repo,
         #database
         "mongodb_uri": mongodb_uri,
         "db_name": db_name,

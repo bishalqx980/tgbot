@@ -17,6 +17,7 @@ welcome_img = os.getenv("WELCOME_IMG")
 support_chat = os.getenv("SUPPORT_CHAT")
 telegraph = os.getenv("TELEGRAPH")
 images = os.getenv("IMAGES")
+github_repo = os.getenv("GITHUB_REPO")
 #database
 mongodb_uri = os.getenv("MONGODB_URI")
 db_name = os.getenv("DB_NAME")

@@ -825,17 +825,21 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn = row1 + row2
 
-        images = _bot.get("images")
-        if images:
-            image = random.choice(images).strip()
-        else:
-            image = _bot.get("bot_pic")
-        
         try:
+            images = await MongoDB.get_data("bot_docs", "images")
+            if images:
+                image = random.choice(images).strip()
+            else:
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
             logger.error(f"Error: {e}")
-            await Message.send_msg(chat.id, msg, btn)
+            try:
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                await Message.send_img(chat.id, image, msg, btn)
+            except Exception as e:
+                logger.error(f"Error: {e}")
+                await Message.send_msg(chat.id, msg, btn)
 
     elif chat.type in ["group", "supergroup"]:
         await _check_del_cmd(update, context)
@@ -938,17 +942,21 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn = row1 + row2 + row3 + row4 + row5
 
-        images = _bot.get("images")
-        if images:
-            image = random.choice(images).strip()
-        else:
-            image = _bot.get("bot_pic")
-        
         try:
+            images = await MongoDB.get_data("bot_docs", "images")
+            if images:
+                image = random.choice(images).strip()
+            else:
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
             logger.error(f"Error: {e}")
-            await Message.send_msg(chat.id, msg, btn)
+            try:
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                await Message.send_img(chat.id, image, msg, btn)
+            except Exception as e:
+                logger.error(f"Error: {e}")
+                await Message.send_msg(chat.id, msg, btn)
 
 
 async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1024,21 +1032,30 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_name_row2 = ["misc", "Bot owner"]
     btn_data_row2 = ["misc_func", "owner_func"]
 
-    btn_name_row3 = ["Close"]
-    btn_data_row3 = ["close"]
+    btn_name_row3 = ["GitHub", "Close"]
+    btn_data_row3 = ["github_stats", "close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-    row3 = await Button.cbutton(btn_name_row3, btn_data_row3)
+    row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
 
     btn = row1 + row2 + row3
-    
-    images = await MongoDB.get_data("bot_docs", "images")
-    if images:
-        image = random.choice(images).strip()
+
+    try:
+        images = await MongoDB.get_data("bot_docs", "images")
+        if images:
+            image = random.choice(images).strip()
+        else:
+            image = await MongoDB.get_data("bot_docs", "bot_pic")
         await Message.send_img(chat.id, image, msg, btn)
-    else:
-        await Message.send_msg(chat.id, msg, btn)
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        try:
+            image = await MongoDB.get_data("bot_docs", "bot_pic")
+            await Message.send_img(chat.id, image, msg, btn)
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            await Message.send_msg(chat.id, msg, btn)
 
 
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1244,8 +1261,8 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_name_row5 = ["Premium seller", "Premium users"]
     btn_data_row5 = ["premium_seller", "premium_users"]
 
-    btn_name_row6 = ["⚠ Restore Settings", "Close"]
-    btn_data_row6 = ["restore_db", "close"]
+    btn_name_row6 = ["GitHub", "⚠ Restore Settings", "Close"]
+    btn_data_row6 = ["github_repo", "restore_db", "close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
@@ -1256,12 +1273,21 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn = row1 + row2 + row3 + row4 + row5 + row6
 
-    images = await MongoDB.get_data("bot_docs", "images")
-    if images:
-        image = random.choice(images).strip()
+    try:
+        images = await MongoDB.get_data("bot_docs", "images")
+        if images:
+            image = random.choice(images).strip()
+        else:
+            image = await MongoDB.get_data("bot_docs", "bot_pic")
         await Message.send_img(chat.id, image, "<b>Bot Settings</b>", btn)
-    else:
-        await Message.send_msg(chat.id, "<b>Bot Setting</b>", btn)
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        try:
+            image = await MongoDB.get_data("bot_docs", "bot_pic")
+            await Message.send_img(chat.id, image, "<b>Bot Settings</b>", btn)
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            await Message.send_msg(chat.id, "<b>Bot Settings</b>", btn)
 
 
 async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):

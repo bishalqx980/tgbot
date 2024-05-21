@@ -1,10 +1,12 @@
 import asyncio
+from urllib.parse import urlparse
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import bot, logger, owner_username
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.mongodb import MongoDB
 from bot.update_db import update_database
+from bot.modules.github import GitHub
 
 
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -188,6 +190,61 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await Message.edit_msg(update, msg, sent_msg, btn)
     
+    elif data == "github_stats":
+        github_repo = await MongoDB.get_data("bot_docs", "github_repo")
+        latest_commit = await GitHub.get_latest_commit("bishalqx980", "tgbot")
+
+        l_c_sha = latest_commit.get("sha")
+        l_c_commit = latest_commit.get("commit") # not for use
+        l_c_message = l_c_commit.get("message")
+        l_c_author = l_c_commit.get("author") # not for use
+        l_c_aname = l_c_author.get("name")
+        l_c_date = l_c_author.get("date")
+        l_c_link = f"https://github.com/bishalqx980/tgbot/commit/{l_c_sha}"
+
+        msg = (
+            f"<b>» Original repo [ <a href='{l_c_link}'>latest commit</a> ]</b>\n"
+            f"<b>Last update:</b> <code>{l_c_date}</code>\n"
+            f"<b>Commit:</b> <code>{l_c_message}</code>\n"
+            f"<b>Committed by:</b> <code>{l_c_aname}</code>\n"
+        )
+
+        if github_repo:
+            try:
+                parse_url = urlparse(github_repo)
+                split_all = parse_url.path.strip("/").split("/")
+                username, repo_name = split_all
+
+                bot_repo_commit = await GitHub.get_latest_commit(username, repo_name)
+
+                b_r_sha = bot_repo_commit.get("sha")
+                b_r_commit = bot_repo_commit.get("commit") # not for use
+                b_r_message = b_r_commit.get("message")
+                b_r_author = b_r_commit.get("author") # not for use
+                b_r_aname = b_r_author.get("name")
+                b_r_date = b_r_author.get("date")
+                b_r_link = f"https://github.com/{username}/{repo_name}/commit/{b_r_sha}"
+                
+                msg = (
+                    msg + f"\n<b>» Bot repo [ <a href='{b_r_link}'>commit</a> ]</b>\n"
+                    f"<b>Last update:</b> <code>{b_r_date}</code>\n"
+                    f"<b>Commit:</b> <code>{b_r_message}</code>\n"
+                    f"<b>Committed by:</b> <code>{b_r_aname}</code>\n"
+                )
+
+                if l_c_sha != b_r_sha:
+                    msg += "\n<i>The bot repo isn't updated to the latest commit! ⚠</i>"
+                else:
+                    msg += "\n<i>The bot repo is updated to the latest commit...</i>"
+            except Exception as e:
+                logger.error(f"Error: {e}")
+        
+        btn_name = ["Back", "Close"]
+        btn_data = ["help_menu", "close"]
+        btn = await Button.cbutton(btn_name, btn_data, True)
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
+
     elif data == "help_menu":
         msg = (
             f"Hi! Welcome to the bot help section...\n"
@@ -202,12 +259,12 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row2 = ["misc", "Bot owner"]
         btn_data_row2 = ["misc_func", "owner_func"]
 
-        btn_name_row3 = ["Close"]
-        btn_data_row3 = ["close"]
+        btn_name_row3 = ["GitHub", "Close"]
+        btn_data_row3 = ["github_stats", "close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-        row3 = await Button.cbutton(btn_name_row3, btn_data_row3)
+        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
 
         btn = row1 + row2 + row3
 
@@ -586,6 +643,36 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await Message.edit_msg(update, msg, sent_msg, btn)
     
+    elif data == "github_repo":
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = await MongoDB.find(edit_cname, find_data)
+        github_repo = await MongoDB.get_data(edit_cname, "github_repo")
+
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "github_repo"
+
+        msg = (
+            "<b>Bot Settings</b> -\n\n"
+            f"GitHub repo: <code>{github_repo}</code>\n\n"
+            f"<i>Note: Your bot github repo link, to keep track on updates on latest repo...</i>"
+        )
+
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["b_setting_menu", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
+    
     elif data == "restore_db":
         msg = (
             "<b>Bot Settings</b> -\n\n"
@@ -640,8 +727,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row5 = ["Premium seller", "Premium users"]
         btn_data_row5 = ["premium_seller", "premium_users"]
 
-        btn_name_row6 = ["⚠ Restore Settings", "Close"]
-        btn_data_row6 = ["restore_db", "close"]
+        btn_name_row6 = ["GitHub", "⚠ Restore Settings", "Close"]
+        btn_data_row6 = ["github_repo", "restore_db", "close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
