@@ -1,7 +1,7 @@
 import requests
 
 class GitHub:
-    async def get_latest_commit(owner, repo):
+    def get_latest_commit(owner, repo):
         url = f"https://api.github.com/repos/{owner}/{repo}/commits"
         res = requests.get(url)
 

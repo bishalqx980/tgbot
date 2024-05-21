@@ -192,7 +192,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif data == "github_stats":
         github_repo = await MongoDB.get_data("bot_docs", "github_repo")
-        latest_commit = await GitHub.get_latest_commit("bishalqx980", "tgbot")
+        latest_commit = GitHub.get_latest_commit("bishalqx980", "tgbot")
         if latest_commit:
             l_c_sha = latest_commit.get("sha")
             l_c_commit = latest_commit.get("commit") # not for use
@@ -217,7 +217,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 split_all = parse_url.path.strip("/").split("/")
                 username, repo_name = split_all
 
-                bot_repo_commit = await GitHub.get_latest_commit(username, repo_name)
+                bot_repo_commit = GitHub.get_latest_commit(username, repo_name)
 
                 b_r_sha = bot_repo_commit.get("sha")
                 b_r_commit = bot_repo_commit.get("commit") # not for use
