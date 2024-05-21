@@ -51,7 +51,9 @@ class YouTubeDownload:
             else:
                 logger.info("No stream found for this video")
         except Exception as e:
-            logger.error(f"Error ytdl: {e}")
+            error = f"Error ytdl: {e}"
+            logger.error(error)
+            return error
 
 
     async def yts(keyword):

@@ -947,28 +947,12 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<code>{id}</code>: The user's ID\n"
             "<code>{chatname}</code>: Chat title\n\n"
             "Example: <code>Hi {mention}, welcome to {chatname}</code>\n"
-            "<blockquote>HTML formatting</blockquote>"
-            "<b>bold</b>\n"
-            "<i>italic</i>\n"
-            "<u>underline</u>\n"
-            "<s>strikethrough</s>\n"
-            "<tg-spoiler>spoiler</tg-spoiler>\n"
-            "<a href='http://www.example.com/'>inline URL</a>\n"
-            "<code>monospace</code>\n"
-            "<pre>code</pre>\n"
-            "<blockquote>Block quotation</blockquote>\n\n"
         )
 
-        btn_name_row1 = ["Formatting details"]
-        btn_url_row1 = ["https://telegra.ph/Formattings-05-19"]
-
-        btn_name_row2 = ["Close"]
-        btn_data_row2 = ["close"]
+        btn_name_row1 = ["Back", "Close"]
+        btn_data_row1 = ["set_custom_msg", "close"]
         
-        row1 = await Button.ubutton(btn_name_row1, btn_url_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2)
-
-        btn = row1 + row2
+        btn = await Button.ubutton(btn_name_row1, btn_url_row1, True)
         
         await Message.send_msg(chat_id, msg, btn)
 

@@ -5,10 +5,11 @@ from bot.helper.telegram_helper import Message, Button
 from bot.modules.mongodb import MongoDB
 
 
-async def _check_permission(update: Update, victim=None, user=None):
+async def _check_permission(update: Update, victim=None, user=None, checking_msg=True):
     chat = update.effective_chat
 
-    del_msg = await Message.send_msg(chat.id, "Checking permission...")
+    if checking_msg:
+        del_msg = await Message.send_msg(chat.id, "Checking permission...")
 
     _bot_info = await bot.get_me()
     bot_permission = await chat.get_member(_bot_info.id)
@@ -31,10 +32,12 @@ async def _check_permission(update: Update, victim=None, user=None):
                     "is_anonymous": admin.is_anonymous
                 }
     victim_permission = await chat.get_member(victim.id) if victim else None
-    try:
-        await Message.del_msg(chat.id, del_msg)
-    except Exception as e:
-        logger.error(f"Error: {e}")
+    
+    if checking_msg:
+        try:
+            await Message.del_msg(chat.id, del_msg)
+        except Exception as e:
+            logger.error(f"Error: {e}")
 
     return _bot_info, bot_permission, user_permission, admin_rights, victim_permission
 
@@ -832,8 +835,8 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         await bot.ban_chat_member(chat.id, victim.id)
-        await bot.unban_chat_member(chat.id, victim.id)
         await Message.reply_msg(update, f"Nice Choice! Get out of my sight!\n{victim.mention_html()} has choosed the easy way to out!")
+        await bot.unban_chat_member(chat.id, victim.id)
         await _log_channel(context, chat, user, victim, action="KICKME")
         try:
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
@@ -1189,7 +1192,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
     reply = update.message.reply_to_message
-    value = reply.text or reply.caption if reply else None
+    value = reply.text_html or reply.caption if reply else None
     keyword = " ".join(context.args)
 
     await _check_del_cmd(update, context)

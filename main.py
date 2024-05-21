@@ -181,7 +181,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     re_msg = update.message.reply_to_message
-    msg = re_msg.text or re_msg.caption if re_msg else " ".join(context.args)
+    msg = re_msg.text_html or re_msg.caption_html if re_msg else " ".join(context.args)
 
     if not msg:
         await Message.reply_msg(update, "Use <code>/tr text</code> or reply the text with <code>/tr</code>\nE.g. <code>/tr the text you want to translate</code>\n\nEnable auto translator mode from /settings")
@@ -696,35 +696,26 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     res = await YouTubeDownload.ytdl(url, content_format)
 
-    if not res:
-        await Message.edit_msg(update, "Something Went Wrong...", sent_msg)
+    if len(res) < 2:
+        await Message.edit_msg(update, res, sent_msg)
         return
 
     await Message.edit_msg(update, "📤 Uploading...", sent_msg)
 
-    try_attempt, max_attempt = 0, 3
-
-    while try_attempt != max_attempt:
-        try:
-            if content_format == "mp4":
-                title, file_path, thumbnail = res
-                await Message.send_vid(chat.id, file_path, thumbnail, title, e_msg.id)
-            elif content_format == "mp3":
-                title, file_path = res
-                await Message.send_audio(chat.id, file_path, title, title, e_msg.id)
-                break
-        except Exception as e:
-            logger.error(f"Error Uploading: {e}")
-            try_attempt += 1
-            await Message.edit_msg(update, f"📤 Uploading... [Retry Attempt: {try_attempt}/{max_attempt}]", sent_msg)
-            if try_attempt == max_attempt:
-                logger.error(f"Error Uploading: {e}")
-                await Message.send_msg(chat.id, f"Error Uploading: {e}")
-                break
-            logger.info(f"Waiting {2**try_attempt}sec before retry...")
-            await asyncio.sleep(2**try_attempt)
     try:
-        if len(res) >= 3:
+        if content_format == "mp4":
+            title, file_path, thumbnail = res
+            await Message.send_vid(chat.id, file_path, thumbnail, title, e_msg.id)
+        elif content_format == "mp3":
+            title, file_path = res
+            await Message.send_audio(chat.id, file_path, title, title, e_msg.id)
+    except Exception as e:
+        error = f"Error Uploading: {e}"
+        logger.error(error)
+        await Message.edit_msg(update, error, sent_msg)
+
+    try:
+        if len(res) == 3:
             rem_files = [res[1], res[2]]
         else:
             rem_files = [res[1]]
@@ -1041,7 +1032,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
     
-    msg = replied_msg.text or replied_msg.caption if replied_msg else None
+    msg = replied_msg.text_html or replied_msg.caption_html if replied_msg else None
 
     if not msg:
         await Message.reply_msg(update, "Reply a message to broadcast!")
@@ -1049,7 +1040,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if user_id:
         try:
-            if replied_msg.text:
+            if replied_msg.text_html:
                 await Message.send_msg(user_id, msg)
             elif replied_msg.caption:
                 await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
@@ -1065,7 +1056,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     notify = await Message.send_msg(owner_id, f"Total User: {len(users_id)}")
     for user_id in users_id:
         try:
-            if replied_msg.text:
+            if replied_msg.text_html:
                 await Message.send_msg(user_id, msg)
             elif replied_msg.caption:
                 await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
@@ -1313,7 +1304,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     e_msg = update.effective_message
-    msg = update.message.text or update.message.caption if update.message else None
+    msg = update.message.text_html or update.message.caption_html if update.message else None
 
     if context.chat_data.get("status") == "editing":
         try:
@@ -1379,6 +1370,24 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         filters = find_group.get("filters")
         del_links = find_group.get("del_links")
 
+        if echo_status:
+            await Message.reply_msg(update, msg)
+            
+        if auto_tr_status:
+            lang_code = find_group.get("lang")
+            try:
+                tr_msg = translate(msg, lang_code)
+            except Exception as e:
+                logger.error(f"Error Translator: {e}")
+                lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
+                btn_name = ["Language code's"]
+                btn_url = [lang_code_list]
+                btn = await Button.ubutton(btn_name, btn_url)
+                await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
+                return
+            if tr_msg != msg:
+                await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
+        
         if filters:
             for keyword in filters:
                 filter_msg = msg.lower() if not isinstance(msg, int) else msg
@@ -1399,8 +1408,22 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             value = ""
                         filtered_msg = filtered_msg.replace(key, str(value))
                     await Message.reply_msg(update, filtered_msg)
-        
+
         if del_links and msg:
+            _chk_per = await _check_permission(update, user=user, checking_msg=False)
+
+            if not _chk_per:
+                return
+            
+            _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+
+            if bot_permission.status != ChatMember.ADMINISTRATOR:
+                await Message.send_msg(chat.id, "I'm not an admin in this chat!")
+                return
+            
+            if user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                return
+            
             pattern = r"(https?://)?(www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=%]*)?"
             links = re.findall(pattern, msg)
             full_links = ["".join(link) for link in links]
@@ -1415,24 +1438,6 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     await Message.send_msg(chat.id, clean_msg)
                 except Exception as e:
                     logger.error(f"Error: {e}")
-
-        if echo_status:
-            await Message.reply_msg(update, msg)
-            
-        if auto_tr_status:
-            lang_code = find_group.get("lang")
-            try:
-                tr_msg = translate(msg, lang_code)
-            except Exception as e:
-                logger.error(f"Error Translator: {e}")
-                lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
-                btn_name = ["Language code's"]
-                btn_url = [lang_code_list]
-                btn = await Button.ubutton(btn_name, btn_url)
-                await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
-                return
-            if tr_msg != msg:
-                await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
 
 
 async def server_alive():
