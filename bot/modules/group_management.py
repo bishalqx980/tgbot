@@ -172,6 +172,11 @@ async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT
                 await MongoDB.insert_single_data("users", data)
             except Exception as e:
                 logger.error(f"Error: {e}")
+        
+        if bot_exist:
+            await MongoDB.update_db("users", "user_id", user.id, "active_status", True)
+        else:
+            await MongoDB.update_db("users", "user_id", user.id, "active_status", False)
 
     elif chat.type in ["group", "supergroup"]:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)

@@ -174,7 +174,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = (
             "Bot owner functions -\n\n"
             "/broadcast » Broadcast message to bot users\n"
-            "/database » See bot database\n"
+            "/db » See bot database\n"
             "/bsetting » See bot settings\n"
             "/shell » Use system shell\n"
             "/render » Render functions\n"

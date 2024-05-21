@@ -1063,18 +1063,22 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             sent_count += 1
             progress = (sent_count+except_count)*100/len(users_id)
             await Message.edit_msg(update, f"Total User: {len(users_id)}\nSent: {sent_count}\nBlocked/Deleted: {except_count}\nProgress: {int(progress)}%", notify)
-            # sleep for 2sec
-            await asyncio.sleep(2)
+            await MongoDB.update_db("users", "user_id", user_id, "active_status", True)
+            # sleep for 0.5sec
+            await asyncio.sleep(0.5)
         except Exception as e:
             except_count += 1
             logger.error(f"Error Broadcast: {e}")
-    await Message.reply_msg(update, "<blockquote>Broadcast Done!!</blockquote>")
+            await MongoDB.update_db("users", "user_id", user_id, "active_status", False)
+            # sleep for 0.5sec
+            await asyncio.sleep(0.5)
+    await Message.reply_msg(update, "<i>Broadcast Done...!</i>")
 
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
-    msg = " ".join(context.args)
+    chat_id = " ".join(context.args)
 
     if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
@@ -1082,6 +1086,77 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if chat.type != "private":
         await Message.reply_msg(update, "⚠ Boss you are in public!")
+        return
+    
+    if chat_id:
+        if "-100" in str(chat_id):
+            find_group = await MongoDB.find_one("groups", "chat_id", int(chat_id))
+            if not find_group:
+                await Message.reply_msg(update, "Chat not found!")
+                return
+            
+            title = find_group.get("title")
+            chat_id = find_group.get("chat_id")
+            lang = find_group.get("lang")
+            echo = find_group.get("echo")
+            auto_tr = find_group.get("auto_tr")
+            welcome_msg = find_group.get("welcome_msg")
+            custom_welcome_msg = find_group.get("custom_welcome_msg")
+            goodbye_msg = find_group.get("goodbye_msg")
+            antibot = find_group.get("antibot")
+            del_cmd = find_group.get("del_cmd")
+            del_links = find_group.get("del_links")
+            log_channel = find_group.get("log_channel")
+            filters = find_group.get("filters")
+            if filters:
+                storage = ""
+                for key in filters:
+                    storage += f"» {key}: {filters[key]}\n"
+
+            msg = (
+                f"<code>Title        :</code> {title}\n"
+                f"<code>ID           :</code> <code>{chat_id}</code>\n"
+                f"<code>Lang         :</code> {lang}\n"
+                f"<code>Echo         :</code> {echo}\n"
+                f"<code>Auto tr      :</code> {auto_tr}\n"
+                f"<code>Welcome      :</code> {welcome_msg}\n"
+                f"<blockquote>{custom_welcome_msg}</blockquote>\n"
+                f"<code>Farewell     :</code> {goodbye_msg}\n"
+                f"<code>Antibot      :</code> {antibot}\n"
+                f"<code>Delete cmd   :</code> {del_cmd}\n"
+                f"<code>Delete links :</code> {del_links}\n"
+                f"<code>Log channel  :</code> <code>{log_channel}</code>\n"
+                f"<code>Filters      :</code> <blockquote>{storage}</blockquote>\n"
+            )
+            await Message.reply_msg(update, f"<b>{msg}</b>")
+        else:
+            find_user = await MongoDB.find_one("users", "user_id", int(chat_id))
+            if not find_user:
+                await Message.reply_msg(update, "User not found!")
+                return
+            
+            Name = find_user.get("Name")
+            user_id = find_user.get("user_id")
+            username = find_user.get("username")
+            mention = find_user.get("mention")
+            lang = find_user.get("lang")
+            echo = find_user.get("echo")
+            chatgpt_req = find_user.get("chatgpt_req")
+            ai_imagine_req = find_user.get("ai_imagine_req")
+            last_used = find_user.get("last_used")
+
+            msg = (
+                f"<code>Name     :</code> {Name}\n"
+                f"<code>Mention  :</code> {mention}\n"
+                f"<code>ID       :</code> <code>{user_id}</code>\n"
+                f"<code>Username :</code> @{username}\n"
+                f"<code>Lang     :</code> {lang}\n"
+                f"<code>Echo     :</code> {echo}\n"
+                f"<code>ChatGPT  :</code> {chatgpt_req}\n"
+                f"<code>Imagine  :</code> {ai_imagine_req}\n"
+                f"<code>Last used:</code> {last_used}\n"
+            )
+            await Message.reply_msg(update, f"<b>{msg}</b>")
         return
     
     db = await MongoDB.info_db()
@@ -1094,7 +1169,10 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<code>Actual size:</code> {info[3]}\n"
             f"▬▬▬▬▬▬▬▬▬▬\n"
         )
-    await Message.reply_msg(update, f"<b>{msg}</b>")
+    active_status = await MongoDB.find("users", "active_status")
+    active_users = active_status.count(True)
+    inactive_users = active_status.count(False)
+    await Message.reply_msg(update, f"<b>{msg}Active users: {active_users}\nInactive users: {inactive_users}</b>")
 
 
 async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1507,7 +1585,7 @@ def main():
     application.add_handler(CommandHandler("help", func_help, block=False))
     # owner
     application.add_handler(CommandHandler("broadcast", func_broadcast, block=False))
-    application.add_handler(CommandHandler("database", func_database, block=False))
+    application.add_handler(CommandHandler("db", func_database, block=False))
     application.add_handler(CommandHandler("bsetting", func_bsetting, block=False))
     application.add_handler(CommandHandler("shell", func_shell, block=False))
     application.add_handler(CommandHandler("render", func_render, block=False))
