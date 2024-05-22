@@ -181,11 +181,11 @@ class Message:
                 )
     
 
-    async def del_msg(chat_id, del_msg_pointer):
-        """
-        delete message pointer no need to provide id
-        """
-        msg_id = del_msg_pointer.message_id
+    async def del_msg(chat_id, msg_pointer=None, msg_id=None):
+        if msg_pointer:
+            msg_id = msg_pointer.message_id
+        elif msg_id:
+            msg_id = msg_id
         await bot.delete_message(chat_id=chat_id, message_id=msg_id)
 
 

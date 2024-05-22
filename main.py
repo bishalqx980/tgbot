@@ -38,6 +38,7 @@ from bot.modules.group_management import (
     func_mute,
     func_unmute,
     func_del,
+    func_purge,
     func_lockchat,
     func_unlockchat,
     func_filters,
@@ -1646,6 +1647,7 @@ def main():
     application.add_handler(CommandHandler("mute", func_mute, block=False))
     application.add_handler(CommandHandler("unmute", func_unmute, block=False))
     application.add_handler(CommandHandler("del", func_del, block=False))
+    application.add_handler(CommandHandler("purge", func_purge, block=False))
     application.add_handler(CommandHandler("lock", func_lockchat, block=False))
     application.add_handler(CommandHandler("unlock", func_unlockchat, block=False))
     application.add_handler(CommandHandler("filters", func_filters, block=False))

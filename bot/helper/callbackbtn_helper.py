@@ -119,6 +119,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/mute » Mute a member (member will be unable to send messages etc.)\n"
             "/unmute » Unmute a member (member will be able to send messages etc.)\n"
             "/del » Delete replied message with notifying/telling something to the member!\n"
+            "/purge » Delete every messages from replied message to current message!\n"
             "/lock » Lock the chat (no one can send messages etc.)\n"
             "/unlock » Unlock the chat (back to normal)\n"
             "/filters » To set custom message/command\n"
