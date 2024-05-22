@@ -704,7 +704,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_msg = await Message.reply_msg(update, "Please Wait...")
     await Message.edit_msg(update, "📥 Downloading...", sent_msg)
 
-    res = await YouTubeDownload.ytdl(url, content_format)
+    res = YouTubeDownload.ytdl(url, content_format)
 
     if len(res) < 2:
         await Message.edit_msg(update, res, sent_msg)
@@ -744,7 +744,7 @@ async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/yts keyword</code>\nE.g. <code>/yts google keynote</code>")
         return
     
-    result = await YouTubeDownload.yts(keyword)
+    result = YouTubeDownload.yts(keyword)
     if not result:
         await Message.reply_msg(update, "Something Went Wrong...")  
         return
