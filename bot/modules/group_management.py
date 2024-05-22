@@ -297,6 +297,7 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
 
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -359,6 +360,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin_title = " ".join(context.args)
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -419,6 +421,7 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim = reply.from_user if reply else None
 
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -471,6 +474,7 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg_id = reply.message_id if reply else None
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -525,6 +529,7 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -598,6 +603,7 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reason = " ".join(context.args)
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -669,6 +675,7 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reason = " ".join(context.args)
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -741,6 +748,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reason = " ".join(context.args)
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -811,7 +819,8 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     victim = user
     
-    if chat.type not in ["group", "supergroup"]: 
+    if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -858,6 +867,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reason = " ".join(context.args)
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -939,6 +949,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reason = " ".join(context.args)
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -1021,6 +1032,7 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reason = " ".join(context.args)
 
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -1078,6 +1090,7 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -1133,6 +1146,7 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -1192,6 +1206,7 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -1255,6 +1270,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyword = " ".join(context.args)
     
     if chat.type not in ["group", "supergroup"]:
+        _bot_info = await bot.get_me()
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
@@ -1380,19 +1396,19 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     _bot_info = await bot.get_me()
 
-    await _check_del_cmd(update, context)
-
-    owner_storage = "<b>Owner:</b>\n"
-    admins_storage = ""
-    bots_storage = ""
-
     if chat.type not in ["group", "supergroup"]:
         btn_name = ["Add me in Group"]
         btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "This command is made to be used in group chats, not in pm!", btn)
         return
-    
+
+    await _check_del_cmd(update, context)
+
+    owner_storage = "<b>Owner:</b>\n"
+    admins_storage = ""
+    bots_storage = ""
+      
     admins = await bot.get_chat_administrators(chat.id)
     for admin in admins:
         custom_title = f"- {admin.custom_title}" if admin.custom_title else ""
