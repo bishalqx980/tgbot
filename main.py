@@ -1085,7 +1085,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     msg = replied_msg.text_html or replied_msg.caption_html if replied_msg else None
 
-    if not msg:
+    if not replied_msg:
         await Message.reply_msg(update, "Reply a message to broadcast!\n<code>/broadcast f</code> to forwared message!")
         return
     
@@ -1107,10 +1107,14 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if forward_confirm:
                 await Message.forward_msg(user_id, chat.id, replied_msg.id)
             else:
-                if replied_msg.text_html:
-                    await Message.send_msg(user_id, msg)
-                elif replied_msg.caption:
-                    await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
+                if msg:
+                    if replied_msg.text_html:
+                        await Message.send_msg(user_id, msg)
+                    elif replied_msg.caption:
+                        await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
+                else:
+                    await Message.reply_msg(update, "Message to broadcast, not found!")
+                    return
             await Message.reply_msg(update, "<i>Message Sent...!</i>")
         except Exception as e:
             logger.error(f"Error Broadcast: {e}")
@@ -1137,10 +1141,15 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if forward_confirm:
                 await Message.forward_msg(user_id, chat.id, replied_msg.id)
             else:
-                if replied_msg.text_html:
-                    await Message.send_msg(user_id, msg)
-                elif replied_msg.caption:
-                    await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
+                if msg:
+                    if replied_msg.text_html:
+                        await Message.send_msg(user_id, msg)
+                    elif replied_msg.caption:
+                        await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
+                else:
+                    await Message.reply_msg(update, "Message to broadcast, not found!")
+                    await Message.del_msg(chat.id, notify)
+                    return
             sent_count += 1
             progress = (sent_count + except_count) * 100 / len(active_users)
             await Message.edit_msg(update, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nProgress: {int(progress)}%", notify)
@@ -1358,7 +1367,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    msg = " ".join(context.args)
+    command = " ".join(context.args)
 
     if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
@@ -1368,11 +1377,11 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
     
-    if not msg:
+    if not command:
         await Message.reply_msg(update, "E.g. <code>/render list</code>\n<code>/render restart serviceId</code>\n<code>/render redeploy serviceId cache_clear_bool (default True)</code>")
         return
     
-    if "list" in msg:
+    if "list" in command:
         try:
             res = await Render.list_services()
             msg, null = "", None
@@ -1388,10 +1397,11 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             logger.error(f"Error render: {e}")
             await Message.reply_msg(update, f"Error render: {e}")
-    elif "restart" in msg:
-        index_restart = msg.index("restart")
-        service_id = msg[index_restart + len("restart"):].strip()
-        
+    elif "restart" in command:
+        command = command.split()
+        service_id = command[1]
+        # index_restart = command.index("restart")
+        # service_id = msg[index_restart + len("restart"):].strip()
         try:
             sent_msg = await Message.reply_msg(update, "Restarting...")
             o_value = await MongoDB.get_data("bot_docs", "bot_status")
@@ -1404,10 +1414,11 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.error(f"Error render: {e}")
             await Message.reply_msg(update, f"Error render: {e}")
             await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
-    elif "redeploy" in msg:
-        index_redeploy = msg.index("redeploy")
-        service_id = msg[index_redeploy + len("redeploy"):].strip()
-
+    elif "redeploy" in command:
+        command = command.split()
+        service_id = command[1]
+        # index_redeploy = msg.index("redeploy")
+        # service_id = msg[index_redeploy + len("redeploy"):].strip()
         try:
             sent_msg = await Message.reply_msg(update, f"Redeploying...")
             o_value = await MongoDB.get_data("bot_docs", "bot_status")
