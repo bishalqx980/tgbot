@@ -1073,7 +1073,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     replied_msg = update.message.reply_to_message
-    user_id = " ".join(context.args)
+    inline_text = " ".join(context.args)
 
     if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
@@ -1086,16 +1086,32 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = replied_msg.text_html or replied_msg.caption_html if replied_msg else None
 
     if not msg:
-        await Message.reply_msg(update, "Reply a message to broadcast!")
+        await Message.reply_msg(update, "Reply a message to broadcast!\n<code>/broadcast f</code> to forwared message!")
         return
     
-    if user_id:
-        try:
-            if replied_msg.text_html:
-                await Message.send_msg(user_id, msg)
-            elif replied_msg.caption:
-                await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
-            await Message.reply_msg(update, "Job Done !!")
+    forward_confirm, to_whom = None, None
+
+    if inline_text:
+        inline_text_split = inline_text.split()
+        if len(inline_text_split) == 2:
+            forward_confirm, to_whom = inline_text_split
+        elif len(inline_text_split) == 1:
+            if inline_text_split[0] == "f":
+                forward_confirm = True
+            else:
+                to_whom = inline_text_split[0]
+    
+    if to_whom:
+        try: 
+            user_id = to_whom
+            if forward_confirm:
+                await Message.forward_msg(user_id, chat.id, replied_msg.id)
+            else:
+                if replied_msg.text_html:
+                    await Message.send_msg(user_id, msg)
+                elif replied_msg.caption:
+                    await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)
+            await Message.reply_msg(update, "<i>Message Sent...!</i>")
         except Exception as e:
             logger.error(f"Error Broadcast: {e}")
             await Message.reply_msg(update, f"Error Broadcast: {e}")
@@ -1118,10 +1134,13 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     notify = await Message.send_msg(owner_id, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}")
     for user_id in active_users:
         try:
-            if replied_msg.text_html:
-                await Message.send_msg(user_id, msg)
-            elif replied_msg.caption:
-                await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
+            if forward_confirm:
+                await Message.forward_msg(user_id, chat.id, replied_msg.id)
+            else:
+                if replied_msg.text_html:
+                    await Message.send_msg(user_id, msg)
+                elif replied_msg.caption:
+                    await Message.send_img(user_id, replied_msg.photo[-1].file_id, msg)     
             sent_count += 1
             progress = (sent_count + except_count) * 100 / len(active_users)
             await Message.edit_msg(update, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nProgress: {int(progress)}%", notify)

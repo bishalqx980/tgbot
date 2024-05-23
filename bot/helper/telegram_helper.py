@@ -136,7 +136,21 @@ class Message:
                     parse_mode=parse_mode
                 )
         return sent_msg
+    
 
+    async def forward_msg(chat_id, from_chat_id, msg_id):
+        """
+        chat_id > where you want to send
+        from_chat_id > effective chat id
+        msg_id > effective message id
+        """
+        sent_msg = await bot.forward_message(
+            chat_id=chat_id,
+            from_chat_id=from_chat_id,
+            message_id=msg_id
+        )
+        return sent_msg
+    
 
     async def edit_msg(update: Update, edit_msg_text, sent_msg_pointer, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
         caption_msg = sent_msg_pointer.caption
