@@ -629,7 +629,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     retry_gpt = 0
 
     while retry_gpt != 3:
-        g4f_gpt = await G4F.chatgpt(f"{prompt}, tell me under 300 words.")
+        g4f_gpt = await G4F.chatgpt(f"{prompt}, explain in few sentences and in English.")
         retry_gpt += 1
         await Message.edit_msg(update, f"Please wait, ChatGPT is busy!\nAttempt: {retry_gpt}", sent_msg)
         await asyncio.sleep(3)
