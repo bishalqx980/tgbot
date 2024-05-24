@@ -1499,7 +1499,7 @@ async def server_alive():
     except Exception as e:
         logger.error(f"Error startup_msg: {e}")
 
-    if len(server_url) != 0:
+    if server_url:
         if server_url[0:4] != "http":
             server_url = f"http://{server_url}"
         while True:
