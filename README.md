@@ -54,9 +54,6 @@ else:
 - ❗ OPTIONAL | `shortener_api_key` Get from https://shrinkme.io/
 - ❗ OPTIONAL | `omdb_api` Get from https://www.omdbapi.com/
 - ❗ OPTIONAL | `weather_api_key` Get from https://www.weatherapi.com/
-- `chatgpt_limit` E.g. 10
-- `ai_imagine_limit` E.g. 10
-- `usage_reset` E.g. 24 (in hour)
     <hr>
     <details>
     <summary><b>Local Deploy 🚀</b></summary>

@@ -3,7 +3,7 @@ from bot import render_api
 
 class Render:
     async def list_services():
-        url = "https://api.render.com/v1/services?limit=20"
+        url = "https://api.render.com/v1/services?limit=5"
 
         headers = {
             "accept": "application/json",

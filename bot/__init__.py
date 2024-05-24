@@ -11,12 +11,7 @@ bot_token = os.getenv("BOT_TOKEN")
 owner_id = os.getenv("OWNER_ID")
 owner_username = os.getenv("OWNER_USERNAME")
 bot_pic = os.getenv("BOT_PIC")
-lang_code_list = os.getenv("LANG_CODE_LIST")
 welcome_img = os.getenv("WELCOME_IMG")
-#optional
-support_chat = os.getenv("SUPPORT_CHAT")
-telegraph = os.getenv("TELEGRAPH")
-images = os.getenv("IMAGES")
 github_repo = os.getenv("GITHUB_REPO")
 #database
 mongodb_uri = os.getenv("MONGODB_URI")
@@ -28,11 +23,6 @@ shortener_api_key = os.getenv("SHORTENER_API_KEY")
 omdb_api = os.getenv("OMDB_API")
 weather_api_key = os.getenv("WEATHER_API_KEY")
 render_api = os.getenv("RENDER_API")
-#Limits
-chatgpt_limit = os.getenv("CHATGPT_LIMIT")
-ai_imagine_limit = os.getenv("AI_IMAGINE_LIMIT")
-usage_reset = os.getenv("USAGE_RESET")
-
 #safone api
 safone_api = SafoneAPI()
 

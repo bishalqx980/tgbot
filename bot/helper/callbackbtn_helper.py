@@ -73,7 +73,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         try:
             try:
-                find_group = context.chat_data["db_chat_data"]
+                find_group = context.chat_data["db_group_data"]
             except Exception as e:
                 logger.error(f"Error: {e}")
                 find_group = None
@@ -81,7 +81,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if not find_group:
                 find_group = await MongoDB.find_one("groups", "chat_id", chat_id)
                 if find_group:
-                    context.chat_data["db_chat_data"] = find_group
+                    context.chat_data["db_group_data"] = find_group
 
             if find_group:
                 filters = find_group.get("filters")
@@ -291,7 +291,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         msg = (
             "<b>Bot Settings</b> -\n\n"
-            f"Bot pic: <code>{bot_pic}</code>\n"
+            f"Bot pic: <code>{bot_pic}</code>\n\n"
+            "<i>Note: Send an image url/link to set bot pic!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -331,35 +332,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await Message.edit_msg(update, msg, sent_msg, btn)
     
-    elif data == "telegraph":
-        edit_cname = "bot_docs"
-        find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        telegraph = await MongoDB.get_data(edit_cname, "telegraph")
-
-        context.chat_data["edit_cname"] = edit_cname
-        context.chat_data["find_data"] = find_data
-        context.chat_data["match_data"] = match_data[0]
-        context.chat_data["edit_data_name"] = "telegraph"
-
-        msg = (
-            "<b>Bot Settings</b> -\n\n"
-            f"Telegraph link: <code>{telegraph}</code>\n"
-        )
-
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["edit_value", "remove_value"]
-
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["b_setting_menu", "close"]
-
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-
-        btn = row1 + row2
-
-        await Message.edit_msg(update, msg, sent_msg, btn)
-    
     elif data == "images":
         edit_cname = "bot_docs"
         find_data = "_id"
@@ -387,35 +359,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<b>Bot Settings</b> -\n\n"
             f"images: <code>{images}</code>\n\n"
             "<i>Note: Single image or Upload multiple image link separated by comma!</i>"
-        )
-
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["edit_value", "remove_value"]
-
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["b_setting_menu", "close"]
-
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-
-        btn = row1 + row2
-
-        await Message.edit_msg(update, msg, sent_msg, btn)
-
-    elif data == "lang_code_list":
-        edit_cname = "bot_docs"
-        find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        lang_code_list = await MongoDB.get_data(edit_cname, "lang_code_list")
-
-        context.chat_data["edit_cname"] = edit_cname
-        context.chat_data["find_data"] = find_data
-        context.chat_data["match_data"] = match_data[0]
-        context.chat_data["edit_data_name"] = "lang_code_list"
-
-        msg = (
-            "<b>Bot Settings</b> -\n\n"
-            f"Language code list (link): <code>{lang_code_list}</code>\n"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -490,166 +433,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await Message.edit_msg(update, msg, sent_msg, btn)
     
-    elif data == "chatgpt_limit":
-        edit_cname = "bot_docs"
-        find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        chatgpt_limit = await MongoDB.get_data(edit_cname, "chatgpt_limit")
-
-        context.chat_data["edit_cname"] = edit_cname
-        context.chat_data["find_data"] = find_data
-        context.chat_data["match_data"] = match_data[0]
-        context.chat_data["edit_data_name"] = "chatgpt_limit"
-
-        usage_reset = await MongoDB.get_data("bot_docs", "usage_reset")
-
-        msg = (
-            "<b>Bot Settings</b> -\n\n"
-            f"ChatGPT usage limit: <code>{chatgpt_limit}</code>\n\n"
-            f"<i>Note: This limit is for other users! Will be reset after {usage_reset}hour!</i>"
-        )
-
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["edit_value", "remove_value"]
-
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["b_setting_menu", "close"]
-
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-
-        btn = row1 + row2
-
-        await Message.edit_msg(update, msg, sent_msg, btn)
-    
-    elif data == "ai_imagine_limit":
-        edit_cname = "bot_docs"
-        find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        ai_imagine_limit = await MongoDB.get_data(edit_cname, "ai_imagine_limit")
-
-        context.chat_data["edit_cname"] = edit_cname
-        context.chat_data["find_data"] = find_data
-        context.chat_data["match_data"] = match_data[0]
-        context.chat_data["edit_data_name"] = "ai_imagine_limit"
-
-        usage_reset = await MongoDB.get_data("bot_docs", "usage_reset")
-
-        msg = (
-            "<b>Bot Settings</b> -\n\n"
-            f"AI imagine usage limit: <code>{ai_imagine_limit}</code>\n\n"
-            f"<i>Note: This limit is for other users! Will be reset after {usage_reset}hour!</i>"
-        )
-
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["edit_value", "remove_value"]
-
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["b_setting_menu", "close"]
-
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-
-        btn = row1 + row2
-
-        await Message.edit_msg(update, msg, sent_msg, btn)
-    
-    elif data == "usage_reset":
-        edit_cname = "bot_docs"
-        find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        usage_reset = await MongoDB.get_data(edit_cname, "usage_reset")
-
-        context.chat_data["edit_cname"] = edit_cname
-        context.chat_data["find_data"] = find_data
-        context.chat_data["match_data"] = match_data[0]
-        context.chat_data["edit_data_name"] = "usage_reset"
-
-        msg = (
-            "<b>Bot Settings</b> -\n\n"
-            f"Usage reset (hour): <code>{usage_reset}</code>\n\n"
-            f"<i>Note: Usage reset time for limited functions like chagpt, imagine etc. (Applicable for users)</i>"
-        )
-
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["edit_value", "remove_value"]
-
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["b_setting_menu", "close"]
-
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-
-        btn = row1 + row2
-
-        await Message.edit_msg(update, msg, sent_msg, btn)
-    
-    elif data == "premium_seller":
-        edit_cname = "bot_docs"
-        find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        premium_seller = await MongoDB.get_data(edit_cname, "premium_seller")
-
-        context.chat_data["edit_cname"] = edit_cname
-        context.chat_data["find_data"] = find_data
-        context.chat_data["match_data"] = match_data[0]
-        context.chat_data["edit_data_name"] = "premium_seller"
-
-        if not premium_seller:
-            premium_seller = owner_username
-
-        msg = (
-            "<b>Bot Settings</b> -\n\n"
-            f"Premium seller: @{premium_seller}\n\n"
-            f"<i>Note: Send premium seller username without @ eg. <code>bishalqx980</code></i>"
-        )
-
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["edit_value", "remove_value"]
-
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["b_setting_menu", "close"]
-
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-
-        btn = row1 + row2
-
-        await Message.edit_msg(update, msg, sent_msg, btn)
-    
-    elif data == "premium_users":
-        edit_cname = "bot_docs"
-        find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        premium_users = await MongoDB.get_data(edit_cname, "premium_users")
-
-        context.chat_data["edit_cname"] = edit_cname
-        context.chat_data["find_data"] = find_data
-        context.chat_data["match_data"] = match_data[0]
-        context.chat_data["edit_data_name"] = "premium_users"
-
-        user_count = len(premium_users) if premium_users else 0
-
-        msg = (
-            "<b>Bot Settings</b> -\n\n"
-            f"<i>Total premium user {user_count}</i>\n"
-            f"Premium users: {premium_users}\n\n"
-            f"<i>Note: Send user ids in a list eg. <code>123456, 125123, ...</code> separated with comma | for single user id eg. <code>123456</code></i>"
-        )
-
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["edit_value", "remove_value"]
-
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["b_setting_menu", "close"]
-
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-
-        btn = row1 + row2
-
-        await Message.edit_msg(update, msg, sent_msg, btn)
-    
     elif data == "github_repo":
         edit_cname = "bot_docs"
         find_data = "_id"
@@ -684,8 +467,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = (
             "<b>Bot Settings</b> -\n\n"
             "Which data will be deleted? ⚠\n"
-            "- All bot setting\n"
-            "- premium seller and users id\n\n"
+            "- All bot setting\n\n"
             "Which data won't be deleted?\n"
             "- Bot users/groups data\n\n"
             f"<i>Note: This will erase all bot data/settings from database and restore data/settings from <code>config.env</code></i>"
@@ -722,29 +504,21 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row1 = ["Bot pic", "Welcome img"]
         btn_data_row1 = ["bot_pic", "welcome_img"]
 
-        btn_name_row2 = ["Telegraph", "Images", "Lang code list"]
-        btn_data_row2 = ["telegraph", "images", "lang_code_list"]
+        btn_name_row2 = ["Images", "Support chat"]
+        btn_data_row2 = ["images", "support_chat"]
 
-        btn_name_row3 = ["Support chat", "Server url"]
-        btn_data_row3 = ["support_chat", "server_url"]
+        btn_name_row3 = ["GitHub", "Server url"]
+        btn_data_row3 = ["github_repo", "server_url"]
 
-        btn_name_row4 = ["ChatGpt limit", "Imagine limit", "Usage reset"]
-        btn_data_row4 = ["chatgpt_limit", "ai_imagine_limit", "usage_reset"]
-
-        btn_name_row5 = ["Premium seller", "Premium users"]
-        btn_data_row5 = ["premium_seller", "premium_users"]
-
-        btn_name_row6 = ["GitHub", "⚠ Restore Settings", "Close"]
-        btn_data_row6 = ["github_repo", "restore_db", "close"]
+        btn_name_row4 = ["⚠ Restore Settings", "Close"]
+        btn_data_row4 = ["restore_db", "close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
         row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
         row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
-        row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
-        row6 = await Button.cbutton(btn_name_row6, btn_data_row6, True)
 
-        btn = row1 + row2 + row3 + row4 + row5 + row6
+        btn = row1 + row2 + row3 + row4
         
         await Message.edit_msg(update, "<b>Bot Settings</b>", sent_msg, btn)
     # ---------------------------------------------------------------------------- bsettings ends
@@ -787,8 +561,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.bot_data["db_bot_data"] = _bot
         
         lang = find_chat.get("lang")
-        lang_code_list = _bot.get("lang_code_list")
-
         context.chat_data["edit_data_name"] = "lang"
 
         msg = (
@@ -798,7 +570,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         btn_name_row1 = ["Language code's"]
-        btn_url_row1 = [lang_code_list]
+        btn_url_row1 = ["https://telegra.ph/Language-Code-12-24"]
 
         btn_name_row2 = ["Edit Value"]
         btn_data_row2 = ["edit_value"]
@@ -1439,16 +1211,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         # ------------------------------------------------ some exceptions
-
-        if edit_data_name == "premium_users":
-            if not isinstance(new_value, int):
-                if "," in new_value:
-                    storage = []
-                    for user_id in new_value.split(","):
-                        storage.append(int(user_id))
-                    new_value = storage
-            else:
-                new_value = [new_value]
         
         elif edit_data_name == "images":
             if "," in new_value:
@@ -1458,16 +1220,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 new_value = storage
             else:
                 new_value = [new_value]
-        
-        # if not isinstance(new_value, int) and edit_data_name not in ["premium_users", "images"]:
-        #     if new_value.lower() == "true":
-        #         new_value = True
-        #     elif new_value.lower() == "false":
-        #         new_value = False
 
         try:
             await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
-            if edit_data_name in ["premium_users", "images"]:
+            if edit_data_name in ["images"]:
                 new_value = f"{len(new_value)} items"
             await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
 

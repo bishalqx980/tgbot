@@ -81,7 +81,7 @@ async def _check_del_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     try:
-        find_group = context.chat_data["db_chat_data"]
+        find_group = context.chat_data["db_group_data"]
     except Exception as e:
         logger.error(f"Error: {e}")
         find_group = None
@@ -89,7 +89,7 @@ async def _check_del_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
-            context.chat_data["db_chat_data"] = find_group
+            context.chat_data["db_group_data"] = find_group
         else:
             await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
@@ -104,7 +104,7 @@ async def _log_channel(context: ContextTypes.DEFAULT_TYPE, chat, user, victim=No
     sends chat actions to log channel
     """
     try:
-        find_group = context.chat_data["db_chat_data"]
+        find_group = context.chat_data["db_group_data"]
     except Exception as e:
         logger.error(f"Error: {e}")
         find_group = None
@@ -112,7 +112,7 @@ async def _log_channel(context: ContextTypes.DEFAULT_TYPE, chat, user, victim=No
     if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
-            context.chat_data["db_chat_data"] = find_group
+            context.chat_data["db_group_data"] = find_group
         else:
             return
     
@@ -224,7 +224,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
     victim = chat_member.new_chat_member.user
 
     try:
-        find_group = context.chat_data["db_chat_data"]
+        find_group = context.chat_data["db_group_data"]
     except Exception as e:
         logger.error(f"Error: {e}")
         find_group = None
@@ -232,7 +232,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
     if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
-            context.chat_data["db_chat_data"] = find_group
+            context.chat_data["db_group_data"] = find_group
         else:
             return
 
@@ -1345,7 +1345,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     try:
-        find_group = context.chat_data["db_chat_data"]
+        find_group = context.chat_data["db_group_data"]
     except Exception as e:
         logger.error(f"Error: {e}")
         find_group = None
@@ -1353,7 +1353,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
-            context.chat_data["db_chat_data"] = find_group
+            context.chat_data["db_group_data"] = find_group
         else:
             await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return

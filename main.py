@@ -192,7 +192,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if chat.type == "private":
         try:
-            find_user = context.chat_data["db_chat_data"]
+            find_user = context.chat_data["db_user_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
             find_user = None
@@ -200,7 +200,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not find_user:
             find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
-                context.chat_data["db_chat_data"] = find_user
+                context.chat_data["db_user_data"] = find_user
             else:
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
@@ -208,7 +208,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lang_code = find_user.get("lang")
     else:
         try:
-            find_group = context.chat_data["db_chat_data"]
+            find_group = context.chat_data["db_group_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
             find_group = None
@@ -216,7 +216,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not find_group:
             find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
-                context.chat_data["db_chat_data"] = find_group
+                context.chat_data["db_group_data"] = find_group
             else:
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
@@ -236,7 +236,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.bot_data["db_bot_data"] = _bot
             
         btn_name = ["Language code's"]
-        btn_url = [_bot.get("lang_code_list")]
+        btn_url = ["https://telegra.ph/Language-Code-12-24"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
         return
@@ -414,115 +414,29 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    user = update.effective_user
     prompt = " ".join(context.args)
 
     if not prompt:
         await Message.reply_msg(update, "Use <code>/imagine prompt</code>\nE.g. <code>/imagine a cute cat</code>")
         return
     
-    try:
-        find_user = context.chat_data["db_chat_data"]
-    except Exception as e:
-        logger.error(f"Error: {e}")
-        find_user = None
-        
-    if not find_user:
-        find_user = await MongoDB.find_one("users", "user_id", user.id)
-        if not find_user:
-            if chat.type == "private":
-                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-                return
-            else:
-                _bot_info = await bot.get_me()
-                btn_name = ["Start me in private"]
-                btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
-                btn = await Button.ubutton(btn_name, btn_url)
-                await Message.reply_msg(update, f"User isn't registered!\nStart me in private then try again here!", btn)
-                return
-        else:
-            context.chat_data["db_chat_data"] = find_user
+    sent_msg = await Message.reply_msg(update, "Processing...")
+    retry = 0
 
-    ai_imagine_req, last_used = find_user.get("ai_imagine_req"), find_user.get("last_used")
-    current_time = datetime.now()
-
-    if not ai_imagine_req:
-        ai_imagine_req = 0
-
-    if last_used:
-        try:
-            _bot = context.bot_data["db_bot_data"]
-        except Exception as e:
-            logger.error(f"Error: {e}")
-            find = await MongoDB.find("bot_docs", "_id")
-            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
-            context.bot_data["db_bot_data"] = _bot
-
-        usage_reset, ai_imagine_limit = _bot.get("usage_reset"), _bot.get("ai_imagine_limit")
-
-        calc_req = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
-
-        if calc_req:
-            ai_imagine_req = 0
-            await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", ai_imagine_req)
-
-            db_chat_data = await MongoDB.find_one("users", "user_id", user.id)
-            context.chat_data["db_chat_data"] = db_chat_data
-        elif ai_imagine_req >= ai_imagine_limit:
-            if user.id != int(owner_id):
-                premium_users = _bot.get("premium_users")
-                if not premium_users:
-                    premium_users = []
-
-                if user.id not in premium_users:
-                    premium_seller = _bot.get("premium_seller")
-
-                    if not premium_seller:
-                        premium_seller = owner_username
-
-                    msg = (
-                        f"❗ Your imagine usage limit Exceeded!\n"
-                        f"⩙ Usage: {ai_imagine_req} out of {ai_imagine_limit}\n"
-                        f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
-                        f"OR Contact @{premium_seller} to buy Premium Account!"
-                    )
-
-                    btn_name = ["Buy Premium ✨"]
-                    btn_url = [f"https://t.me/{premium_seller}"]
-                    btn = await Button.ubutton(btn_name, btn_url)
-                    await Message.send_msg(user.id, msg, btn)
-                    if chat.type != "private":
-                        await Message.reply_msg(update, "Usage limit exceeded! Check bot private message!")
-                    return
-            
-    if user.id == int(owner_id):
-        msg = "Please wait Boss!! Generating..."
-    else:
-        msg = f"Please wait {user.first_name}!! Generating..."
-    
-    sent_msg = await Message.reply_msg(update, msg)
-
-    retry_gpt = 0
-
-    while retry_gpt != 3:
+    while retry != 2:
         imagine = await Safone.imagine(prompt)
-        retry_gpt += 1
-        await Message.edit_msg(update, f"Please wait, ImagineAI is busy!\nAttempt: {retry_gpt}", sent_msg)
-        await asyncio.sleep(3)
         if imagine:
             break
-        elif retry_gpt == 3:
+        elif retry == 2:
             await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
             return
+        retry += 1
+        await Message.edit_msg(update, f"Please wait, Imagine is busy!\nAttempt: {retry}", sent_msg)
+        await asyncio.sleep(3)
     
     try:
         await Message.send_img(chat.id, imagine, f"» {prompt}")
         await Message.del_msg(chat.id, sent_msg)
-        chatgpt_req += 1
-        await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
-        await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
-        db_chat_data = await MongoDB.find_one("users", "user_id", user.id)
-        context.chat_data["db_chat_data"] = db_chat_data
     except Exception as e:
         logger.error(f"Error Imagine: {e}")
         await Message.edit_msg(update, f"Error Imagine: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
@@ -530,98 +444,19 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    user = update.effective_user
     prompt = " ".join(context.args)
 
     if not prompt:
         await Message.reply_msg(update, "Use <code>/gpt your_prompt</code>\nE.g. <code>/gpt What is AI?</code>")
         return
-
-    ignore_words = ["hi", "hello"]
-    if prompt.lower() in ignore_words:
+    
+    common_words = ["hi", "hello"]
+    if prompt.lower() in common_words:
         await Message.reply_msg(update, "Hello! How can I assist you today?")
         return
     
-    try:
-        find_user = context.chat_data["db_chat_data"]
-    except Exception as e:
-        logger.error(f"Error: {e}")
-        find_user = None
-        
-    if not find_user:
-        find_user = await MongoDB.find_one("users", "user_id", user.id)
-        if not find_user:
-            if chat.type == "private":
-                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-                return
-            else:
-                _bot_info = await bot.get_me()
-                btn_name = ["Start me in private"]
-                btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
-                btn = await Button.ubutton(btn_name, btn_url)
-                await Message.reply_msg(update, f"User isn't registered!\nStart me in private then try again here!", btn)
-                return
-        else:
-            context.chat_data["db_chat_data"] = find_user
-
-    chatgpt_req, last_used = find_user.get("chatgpt_req"), find_user.get("last_used")
-    current_time = datetime.now()
-
-    if not chatgpt_req:
-        chatgpt_req = 0
-
-    if last_used:
-        try:
-            _bot = context.bot_data["db_bot_data"]
-        except Exception as e:
-            logger.error(f"Error: {e}")
-            find = await MongoDB.find("bot_docs", "_id")
-            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
-            context.bot_data["db_bot_data"] = _bot
-
-        usage_reset, chatgpt_limit = _bot.get("usage_reset"), _bot.get("chatgpt_limit")
-
-        calc_req = (current_time.timestamp() - last_used.timestamp()) >= int(usage_reset)*3600
-
-        if calc_req:
-            chatgpt_req = 0
-            await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
-
-            db_chat_data = await MongoDB.find_one("users", "user_id", user.id)
-            context.chat_data["db_chat_data"] = db_chat_data
-        elif chatgpt_req >= chatgpt_limit:
-            if user.id != int(owner_id):
-                premium_users = _bot.get("premium_users")
-                if not premium_users:
-                    premium_users = []
-
-                if user.id not in premium_users:
-                    premium_seller = _bot.get("premium_seller")
-
-                    if not premium_seller:
-                        premium_seller = owner_username
-
-                    msg = (
-                        f"❗ Your ChatGPT usage limit Exceeded!\n"
-                        f"⩙ Usage: {chatgpt_req} out of {chatgpt_limit}\n"
-                        f"Wait {usage_reset}hour from your <code>last used</code> to reset usage automatically!\n"
-                        f"OR Contact @{premium_seller} to buy Premium Account!"
-                    )
-
-                    btn_name = ["Buy Premium ✨"]
-                    btn_url = [f"https://t.me/{premium_seller}"]
-                    btn = await Button.ubutton(btn_name, btn_url)
-                    await Message.send_msg(user.id, msg, btn)
-                    if chat.type != "private":
-                        await Message.reply_msg(update, "Usage limit exceeded! Check bot private message!")
-                    return
-            
-    if user.id == int(owner_id):
-        msg = "Please wait Boss!! Generating..."
-    else:
-        msg = f"Please wait {user.first_name}!! Generating..."
-    
-    sent_msg = await Message.reply_msg(update, msg)
+    sent_msg = await Message.reply_msg(update, "Processing...")
+    retry = 0
 
     # safone_ai_res = await Safone.safone_ai(msg)
     # if safone_ai_res:
@@ -636,27 +471,19 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     #     else:
     #         text = chatbot.response
 
-    retry_gpt = 0
-
-    while retry_gpt != 3:
+    while retry != 3:
         g4f_gpt = await G4F.chatgpt(f"{prompt}, explain in few sentences and in English.")
-        retry_gpt += 1
-        await Message.edit_msg(update, f"Please wait, ChatGPT is busy!\nAttempt: {retry_gpt}", sent_msg)
-        await asyncio.sleep(3)
         if g4f_gpt and "流量异常, 请尝试更换网络环境, 如果你觉得ip被误封了, 可尝试邮件联系我们, 当前" not in g4f_gpt:
             break
-        elif retry_gpt == 3:
+        elif retry == 3:
             await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
             return
+        retry += 1
+        await Message.edit_msg(update, f"Please wait, ChatGPT is busy!\nAttempt: {retry}", sent_msg)
+        await asyncio.sleep(3)
     
     try:
         await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)
-        chatgpt_req += 1
-        await MongoDB.update_db("users", "user_id", user.id, "chatgpt_req", chatgpt_req)
-        await MongoDB.update_db("users", "user_id", user.id, "last_used", current_time)
-
-        db_chat_data = await MongoDB.find_one("users", "user_id", user.id)
-        context.chat_data["db_chat_data"] = db_chat_data
     except Exception as e:
         logger.error(f"Error ChatGPT: {e}")
         await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
@@ -840,7 +667,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == "private":
         try:
-            find_user = context.chat_data["db_chat_data"]
+            find_user = context.chat_data["db_user_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
             find_user = None
@@ -848,7 +675,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not find_user:
             find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
-                context.chat_data["db_chat_data"] = find_user
+                context.chat_data["db_user_data"] = find_user
             else:
                 await Message.reply_msg(update, "User data not found! Block me then start me again! (no need to delete chat)")
                 return
@@ -857,18 +684,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lang = find_user.get("lang")
         echo = find_user.get("echo")
         auto_tr = find_user.get("auto_tr")
-        chatgpt_req = find_user.get("chatgpt_req")
-        ai_imagine_req = find_user.get("ai_imagine_req")
-        last_used = find_user.get("last_used")
-
-        chatgpt_limit = _bot.get("chatgpt_limit")
-        ai_imagine_limit = _bot.get("ai_imagine_limit")
-
-        premium_users = _bot.get("premium_users")
-        if not premium_users:
-            is_premium = False
-        else:
-            is_premium = True if user.id in premium_users else False
 
         context.chat_data["edit_cname"] = "users"
         context.chat_data["find_data"] = "user_id"
@@ -880,16 +695,11 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = (
             f"<b>Chat Settings</b> -\n\n"
             f"• User: {user_mention}\n"
-            f"• ID: <code>{user.id}</code>\n"
-            f"• Is premium: <code>{is_premium}</code>\n\n"
+            f"• ID: <code>{user.id}</code>\n\n"
 
             f"• Lang: <code>{lang}</code>\n"
             f"• Echo: <code>{echo}</code>\n"
             f"• Auto tr: <code>{auto_tr}</code>\n\n"
-
-            f"• ChatGPT: <code>{chatgpt_req}/{chatgpt_limit}</code>\n"
-            f"• AI imagine: <code>{ai_imagine_req}/{ai_imagine_limit}</code>\n"
-            f"• Last used: <code>{last_used}</code>\n"
         )
 
         btn_name_row1 = ["Language", "Auto translate"]
@@ -947,7 +757,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
 
         try:
-            find_group = context.chat_data["db_chat_data"]
+            find_group = context.chat_data["db_group_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
             find_group = None
@@ -955,7 +765,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not find_group:
             find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
-                context.chat_data["db_chat_data"] = find_group
+                context.chat_data["db_group_data"] = find_group
             else:
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
@@ -1296,8 +1106,6 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             mention = find_user.get("mention")
             lang = find_user.get("lang")
             echo = find_user.get("echo")
-            chatgpt_req = find_user.get("chatgpt_req")
-            ai_imagine_req = find_user.get("ai_imagine_req")
             active_status = find_user.get("active_status")
             last_used = find_user.get("last_used")
 
@@ -1308,8 +1116,6 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"<code>Username :</code> @{username}\n"
                 f"<code>Lang     :</code> {lang}\n"
                 f"<code>Echo     :</code> {echo}\n"
-                f"<code>ChatGPT  :</code> {chatgpt_req}\n"
-                f"<code>Imagine  :</code> {ai_imagine_req}\n"
                 f"<code>A. status:</code> {active_status}\n"
                 f"<code>Last used:</code> {last_used}\n"
             )
@@ -1357,29 +1163,21 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_name_row1 = ["Bot pic", "Welcome img"]
     btn_data_row1 = ["bot_pic", "welcome_img"]
 
-    btn_name_row2 = ["Telegraph", "Images", "Lang code list"]
-    btn_data_row2 = ["telegraph", "images", "lang_code_list"]
+    btn_name_row2 = ["Images", "Support chat"]
+    btn_data_row2 = ["images", "support_chat"]
 
-    btn_name_row3 = ["Support chat", "Server url"]
-    btn_data_row3 = ["support_chat", "server_url"]
+    btn_name_row3 = ["GitHub", "Server url"]
+    btn_data_row3 = ["github_repo", "server_url"]
 
-    btn_name_row4 = ["ChatGpt limit", "Imagine limit", "Usage reset"]
-    btn_data_row4 = ["chatgpt_limit", "ai_imagine_limit", "usage_reset"]
-
-    btn_name_row5 = ["Premium seller", "Premium users"]
-    btn_data_row5 = ["premium_seller", "premium_users"]
-
-    btn_name_row6 = ["GitHub", "⚠ Restore Settings", "Close"]
-    btn_data_row6 = ["github_repo", "restore_db", "close"]
+    btn_name_row4 = ["⚠ Restore Settings", "Close"]
+    btn_data_row4 = ["restore_db", "close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
     row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
     row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
-    row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
-    row6 = await Button.cbutton(btn_name_row6, btn_data_row6, True)
 
-    btn = row1 + row2 + row3 + row4 + row5 + row6
+    btn = row1 + row2 + row3 + row4
 
     try:
         images = await MongoDB.get_data("bot_docs", "images")
@@ -1564,7 +1362,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == "private" and msg:
         try:
-            find_user = context.chat_data["db_chat_data"]
+            find_user = context.chat_data["db_user_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
             find_user = None
@@ -1572,7 +1370,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not find_user:
             find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
-                context.chat_data["db_chat_data"] = find_user
+                context.chat_data["db_user_data"] = find_user
             else:
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
@@ -1589,9 +1387,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 tr_msg = translate(msg, lang_code)
             except Exception as e:
                 logger.error(f"Error Translator: {e}")
-                lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
                 btn_name = ["Language code's"]
-                btn_url = [lang_code_list]
+                btn_url = ["https://telegra.ph/Language-Code-12-24"]
                 btn = await Button.ubutton(btn_name, btn_url)
                 await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
                 return
@@ -1602,7 +1399,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # group's
     elif chat.type in ["group", "supergroup"] and msg:
         try:
-            find_group = context.chat_data["db_chat_data"]
+            find_group = context.chat_data["db_group_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
             find_group = None
@@ -1610,7 +1407,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not find_group:
             find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
-                context.chat_data["db_chat_data"] = find_group
+                context.chat_data["db_group_data"] = find_group
             else:
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
@@ -1629,9 +1426,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 tr_msg = translate(msg, lang_code)
             except Exception as e:
                 logger.error(f"Error Translator: {e}")
-                lang_code_list = await MongoDB.get_data("bot_docs", "lang_code_list")
                 btn_name = ["Language code's"]
-                btn_url = [lang_code_list]
+                btn_url = ["https://telegra.ph/Language-Code-12-24"]
                 btn = await Button.ubutton(btn_name, btn_url)
                 await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
                 return
@@ -1693,6 +1489,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def server_alive():
     server_url = await MongoDB.get_data("bot_docs", "server_url")
     bot_status = await MongoDB.get_data("bot_docs", "bot_status")
+    
     try:
         if not bot_status or bot_status == "alive":
             await Message.send_msg(owner_id, "Bot Started!")
@@ -1717,6 +1514,7 @@ async def server_alive():
             await asyncio.sleep(180) # 3 min
     else:
         logger.warning("Server URL not provided !!")
+        await Message.send_msg(owner_id, "Warning! Server URL not provided!\nGoto /bsetting and setup server url then restart bot...")
 
 
 def main():

@@ -5,11 +5,7 @@ from bot import (
     owner_id,
     owner_username,
     bot_pic,
-    lang_code_list,
     welcome_img,
-    support_chat,
-    telegraph,
-    images,
     github_repo,
     mongodb_uri,
     db_name,
@@ -17,10 +13,7 @@ from bot import (
     shortener_api_key,
     omdb_api,
     weather_api_key,
-    render_api,
-    chatgpt_limit,
-    ai_imagine_limit,
-    usage_reset
+    render_api
 )
 
 
@@ -36,12 +29,7 @@ async def update_database():
         "owner_id": int(owner_id),
         "owner_username": owner_username,
         "bot_pic": bot_pic,
-        "lang_code_list": lang_code_list,
         "welcome_img": bool(welcome_img),
-        #optional
-        "support_chat": support_chat,
-        "telegraph": telegraph,
-        "images": images,
         "github_repo": github_repo,
         #database
         "mongodb_uri": mongodb_uri,
@@ -53,10 +41,6 @@ async def update_database():
         "omdb_api": omdb_api,
         "weather_api_key": weather_api_key,
         "render_api": render_api,
-        #limits
-        "chatgpt_limit": int(chatgpt_limit),
-        "ai_imagine_limit": int(ai_imagine_limit),
-        "usage_reset": int(usage_reset)
     }
 
     try:
