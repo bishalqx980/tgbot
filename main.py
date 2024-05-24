@@ -49,6 +49,8 @@ from bot.modules.weather import weather_info
 from bot.modules.g4f import G4F
 from bot.modules.render import Render
 from bot.update_db import update_database
+from bot.modules.qr import QR
+from bot.modules.telegraph import TELEGRAPH
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -193,7 +195,9 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_user = context.chat_data["db_chat_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
-
+            find_user = None
+        
+        if not find_user:
             find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
                 context.chat_data["db_chat_data"] = find_user
@@ -207,7 +211,9 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_group = context.chat_data["db_chat_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
-
+            find_group = None
+        
+        if not find_group:
             find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
                 context.chat_data["db_chat_data"] = find_group
@@ -419,7 +425,9 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_user = context.chat_data["db_chat_data"]
     except Exception as e:
         logger.error(f"Error: {e}")
-
+        find_user = None
+        
+    if not find_user:
         find_user = await MongoDB.find_one("users", "user_id", user.id)
         if not find_user:
             if chat.type == "private":
@@ -538,7 +546,9 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_user = context.chat_data["db_chat_data"]
     except Exception as e:
         logger.error(f"Error: {e}")
-
+        find_user = None
+        
+    if not find_user:
         find_user = await MongoDB.find_one("users", "user_id", user.id)
         if not find_user:
             if chat.type == "private":
@@ -760,6 +770,60 @@ async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await Message.reply_msg(update, f"Video found: {len(result)}\nShowing top {len(urls)} videos!\nTo download videos you can use /ytdl")         
 
 
+async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    data = " ".join(context.args)
+
+    if not data:
+        await Message.reply_msg(update, "Use <code>/qr url/data/text</code> to generate a QR code img...\nE.g. <code>/qr https://google.com</code>")
+        return
+
+    sent_msg = await Message.reply_msg(update, f"Generating...")
+    gen_qr = QR.gen_qr(data)
+
+    if not gen_qr:
+        await Message.edit_msg(update, "Something went wrong!", sent_msg)
+        return
+
+    try:
+        await Message.send_img(chat.id, gen_qr, data)
+        os.remove(gen_qr)
+        await Message.del_msg(chat.id, sent_msg)
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        await Message.edit_msg(update, f"Error: {e}", sent_msg)
+
+
+async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    re_msg = update.message.reply_to_message
+    if re_msg:
+        photo = re_msg.photo[-1] if re_msg.photo else None
+
+    if not re_msg or not photo:
+        await Message.reply_msg(update, "Reply a photo to get a public link for that photo!")
+        return
+    
+    sent_msg = await Message.reply_msg(update, f"Generating public link...")
+    photo = await bot.get_file(photo.file_id)
+    dir_name = "download/telegraph/"
+    os.makedirs(dir_name, exist_ok=True)
+    f_name = f"{dir_name}image.png"
+    req = requests.get(photo.file_path)
+    with open(f_name, "wb") as f:
+        f.write(req.content)
+    
+    itl = TELEGRAPH.upload_img(f_name)
+    if not itl:
+        await Message.edit_msg(update, "Something went wrong!", sent_msg)
+        return
+
+    try:
+        await Message.edit_msg(update, itl, sent_msg)
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        await Message.edit_msg(update, f"Error: {e}", sent_msg)
+
+
 async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -778,7 +842,9 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_user = context.chat_data["db_chat_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
-
+            find_user = None
+        
+        if not find_user:
             find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
                 context.chat_data["db_chat_data"] = find_user
@@ -883,7 +949,9 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_group = context.chat_data["db_chat_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
-
+            find_group = None
+        
+        if not find_group:
             find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
                 context.chat_data["db_chat_data"] = find_group
@@ -1498,7 +1566,9 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_user = context.chat_data["db_chat_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
-
+            find_user = None
+        
+        if not find_user:
             find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
                 context.chat_data["db_chat_data"] = find_user
@@ -1534,7 +1604,9 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_group = context.chat_data["db_chat_data"]
         except Exception as e:
             logger.error(f"Error: {e}")
-
+            find_group = None
+        
+        if not find_group:
             find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
                 context.chat_data["db_chat_data"] = find_group
@@ -1663,6 +1735,8 @@ def main():
     application.add_handler(CommandHandler("gpt", func_chatgpt, block=False))
     application.add_handler(CommandHandler("ytdl", func_ytdl, block=False))
     application.add_handler(CommandHandler("yts", func_yts, block=False))
+    application.add_handler(CommandHandler("qr", func_gen_qr, block=False))
+    application.add_handler(CommandHandler("itl", func_img_to_link, block=False))
     application.add_handler(CommandHandler("settings", func_settings, block=False))
     application.add_handler(CommandHandler("id", func_id, block=False))
     application.add_handler(CommandHandler("invite", func_invite_link, block=False))

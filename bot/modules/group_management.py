@@ -84,7 +84,9 @@ async def _check_del_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_group = context.chat_data["db_chat_data"]
     except Exception as e:
         logger.error(f"Error: {e}")
-
+        find_group = None
+        
+    if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             context.chat_data["db_chat_data"] = find_group
@@ -105,7 +107,9 @@ async def _log_channel(context: ContextTypes.DEFAULT_TYPE, chat, user, victim=No
         find_group = context.chat_data["db_chat_data"]
     except Exception as e:
         logger.error(f"Error: {e}")
-
+        find_group = None
+        
+    if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             context.chat_data["db_chat_data"] = find_group
@@ -223,7 +227,9 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
         find_group = context.chat_data["db_chat_data"]
     except Exception as e:
         logger.error(f"Error: {e}")
-
+        find_group = None
+        
+    if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             context.chat_data["db_chat_data"] = find_group
@@ -1342,7 +1348,9 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_group = context.chat_data["db_chat_data"]
     except Exception as e:
         logger.error(f"Error: {e}")
-
+        find_group = None
+        
+    if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             context.chat_data["db_chat_data"] = find_group
