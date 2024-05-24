@@ -819,6 +819,7 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         await Message.edit_msg(update, itl, sent_msg)
+        os.remove(f_name)
     except Exception as e:
         logger.error(f"Error: {e}")
         await Message.edit_msg(update, f"Error: {e}", sent_msg)
