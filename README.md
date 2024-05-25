@@ -47,7 +47,6 @@ else:
 - `bot_token` Get from https://t.me/BotFather E.g. 123456:abcdefGHIJK...
 - `owner_id` Get from bot by /id command E.g. 2134776547
 - `owner_username` Your Username E.g. paste like bishalqx980 not @bishalqx980
-- ❗ OPTIONAL | `support_chat` Your bot support chat invite link 
 - `mongodb_uri` Get from https://www.mongodb.com/
 - `db_name` anything E.g. MissCiri_db
 - `server_url` E.g. for render it will be https://your_app_name.onrender.com/
@@ -58,10 +57,18 @@ else:
     <details>
     <summary><b>Local Deploy 🚀</b></summary>
 
+    ----- **Windows** -----
     - Required `python 3.11` or later
     - Open `tgbot` directory on cmd
     - Run on cmd `pip install -r requirements.txt`
     - Finally `python main.py`
+    ----- **Linux** -----
+    - Required `python 3.11` or later
+    - Open `tgbot` directory on shell
+    - Run `python3 -m venv venv`
+    - `source venv/bin/activate`
+    - `pip install -r requirements.txt`
+    - Finally `python3 main.py`
 
     </details>
 

@@ -3,6 +3,7 @@
 *.mp3
 *.mp4
 *.png
+venv
 config.env
 log.txt
 shell.txt
