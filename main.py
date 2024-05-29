@@ -1472,14 +1472,15 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if auto_tr_status and not msg_contains_link:
             try:
                 tr_msg = translate(msg, lang_code)
-                if tr_msg != msg:
-                    await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
             except Exception as e:
                 logger.error(f"Error Translator: {e}")
                 btn_name = ["Language code's"]
                 btn_url = ["https://telegra.ph/Language-Code-12-24"]
                 btn = await Button.ubutton(btn_name, btn_url)
-                await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)   
+                await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
+                
+            if tr_msg != msg:
+                    await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
         
         if filters:
             for keyword in filters:
