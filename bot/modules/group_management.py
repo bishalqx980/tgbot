@@ -1274,6 +1274,11 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     value = reply.text_html or reply.caption if reply else None
     keyword = " ".join(context.args)
+
+    if chat.type == "private":
+        data_to_find = "db_user_data"
+    else:
+        data_to_find = "db_group_data"
     
     if chat.type not in ["group", "supergroup"]:
         _bot_info = await bot.get_me()
@@ -1365,7 +1370,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
             await Message.reply_msg(update, f"{user.mention_html()} has removed all filters of this chat!")
             db_chat_data = await MongoDB.find_one("groups", "chat_id", chat.id)
-            context.chat_data["db_chat_data"] = db_chat_data
+            context.chat_data[data_to_find] = db_chat_data
             return
         
         try:
@@ -1377,7 +1382,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "There is no such filter available for this chat to delete!\nIf you are looking for how to add filters?\n/filters for instruction!")
                 return
             db_chat_data = await MongoDB.find_one("groups", "chat_id", chat.id)
-            context.chat_data["db_chat_data"] = db_chat_data
+            context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
             logger.error(f"Error: {e}")
             await Message.reply_msg(update, f"Error: {e}")
@@ -1396,7 +1401,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
         filters[keyword] = value
         await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
     db_chat_data = await MongoDB.find_one("groups", "chat_id", chat.id)
-    context.chat_data["db_chat_data"] = db_chat_data
+    context.chat_data[data_to_find] = db_chat_data
     await Message.reply_msg(update, f"{user.mention_html()} has added filter <code>{keyword}</code>!")
 
 

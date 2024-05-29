@@ -1,17 +1,14 @@
 import os
-import re
 import json
 import psutil
 import random
 import asyncio
 import requests
 import subprocess
-from threading import Thread
-from datetime import datetime
 from telegram.constants import ParseMode
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ChatMemberHandler
-from bot import logger, bot_token, bot, owner_id, owner_username
+from bot import logger, bot_token, bot, owner_id
 from bot.modules.mongodb import MongoDB
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.ping import ping_url
@@ -51,6 +48,7 @@ from bot.modules.render import Render
 from bot.update_db import update_database
 from bot.modules.qr import QR
 from bot.modules.telegraph import TELEGRAPH
+from bot.modules.re_link_domain import RE_LINK
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -783,7 +781,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         goodbye_msg = find_group.get("goodbye_msg")
         antibot = find_group.get("antibot")
         del_cmd = find_group.get("del_cmd")
-        del_links = find_group.get("del_links")
+        all_links = find_group.get("all_links")
+        allowed_links = find_group.get("allowed_links")
         log_channel = find_group.get("log_channel")
 
         context.chat_data["edit_cname"] = "groups"
@@ -805,7 +804,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Goodbye user: <code>{goodbye_msg}</code>\n"
             f"• Antibot: <code>{antibot}</code>\n"
             f"• Delete cmd: <code>{del_cmd}</code>\n"
-            f"• Delete links: <code>{del_links}</code>\n"
+            f"• All links: <code>{all_links}</code>\n"
+            f"• Allowed links: <code>{allowed_links}</code>\n"
             f"• Log channel: <code>{log_channel}</code>\n"
         )
 
@@ -821,8 +821,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row4 = ["Delete cmd", "Log channel"]
         btn_data_row4 = ["del_cmd", "log_channel"]
 
-        btn_name_row5 = ["Delete links", "Close"]
-        btn_data_row5 = ["del_links", "close"]
+        btn_name_row5 = ["Links", "Close"]
+        btn_data_row5 = ["links_behave", "close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
@@ -1070,7 +1070,8 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             goodbye_msg = find_group.get("goodbye_msg")
             antibot = find_group.get("antibot")
             del_cmd = find_group.get("del_cmd")
-            del_links = find_group.get("del_links")
+            all_links = find_group.get("all_links")
+            allowed_links = find_group.get("allowed_links")
             log_channel = find_group.get("log_channel")
             filters = find_group.get("filters")
             if filters:
@@ -1079,19 +1080,20 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     storage += f"» {key}: {filters[key]}\n"
 
             msg = (
-                f"<code>Title        :</code> {title}\n"
-                f"<code>ID           :</code> <code>{chat_id}</code>\n"
-                f"<code>Lang         :</code> {lang}\n"
-                f"<code>Echo         :</code> {echo}\n"
-                f"<code>Auto tr      :</code> {auto_tr}\n"
-                f"<code>Welcome      :</code> {welcome_msg}\n"
+                f"<code>Title         :</code> {title}\n"
+                f"<code>ID            :</code> <code>{chat_id}</code>\n"
+                f"<code>Lang          :</code> {lang}\n"
+                f"<code>Echo          :</code> {echo}\n"
+                f"<code>Auto tr       :</code> {auto_tr}\n"
+                f"<code>Welcome       :</code> {welcome_msg}\n"
                 f"<blockquote>{custom_welcome_msg}</blockquote>\n"
-                f"<code>Farewell     :</code> {goodbye_msg}\n"
-                f"<code>Antibot      :</code> {antibot}\n"
-                f"<code>Delete cmd   :</code> {del_cmd}\n"
-                f"<code>Delete links :</code> {del_links}\n"
-                f"<code>Log channel  :</code> <code>{log_channel}</code>\n"
-                f"<code>Filters      :</code> <blockquote>{storage}</blockquote>\n"
+                f"<code>Farewell      :</code> {goodbye_msg}\n"
+                f"<code>Antibot       :</code> {antibot}\n"
+                f"<code>Delete cmd    :</code> {del_cmd}\n"
+                f"<code>All links     :</code> {all_links}\n"
+                f"<code>Allowed links:</code> {allowed_links}\n"
+                f"<code>Log channel   :</code> <code>{log_channel}</code>\n"
+                f"<code>Filters       :</code> <blockquote>{storage}</blockquote>\n"
             )
             await Message.reply_msg(update, f"<b>{msg}</b>")
         else:
@@ -1398,6 +1400,16 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # group's
     elif chat.type in ["group", "supergroup"] and msg:
+        _chk_per = await _check_permission(update, user=user, checking_msg=False)
+        if not _chk_per:
+            return
+        
+        _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+
+        if bot_permission.status != ChatMember.ADMINISTRATOR:
+            await Message.send_msg(chat.id, "I'm not an admin in this chat!")
+            return
+        
         try:
             find_group = context.chat_data["db_group_data"]
         except Exception as e:
@@ -1412,27 +1424,62 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
         
+        all_links = find_group.get("all_links")
+        allowed_links = find_group.get("allowed_links")
+        
+        if not allowed_links:
+            allowed_links = []
+        else:
+            storage = []
+            for i in allowed_links:
+                storage.append(i.strip())
+            allowed_links = storage
+
         echo_status = find_group.get("echo")
         auto_tr_status = find_group.get("auto_tr")
+        lang_code = find_group.get("lang")
         filters = find_group.get("filters")
-        del_links = find_group.get("del_links")
 
-        if echo_status:
+        msg_contains_link = False
+
+        if all_links:
+            if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+                links_list = RE_LINK.detect_link(msg)
+                if links_list:
+                    clean_msg = msg
+                    for link in links_list:
+                        domain = RE_LINK.match_domain(link)
+                        if domain not in allowed_links:
+                            if all_links == "delete":
+                                await Message.del_msg(chat.id, e_msg)
+                                msg_contains_link = True
+                                break
+                            if all_links == "convert":
+                                b64_link = BASE64.encode(link)
+                                clean_msg = clean_msg.replace(link, f"<code>{b64_link}</code>")
+                    if all_links != "delete":
+                        try:
+                            clean_msg = f"{user.mention_html()}\n\n{clean_msg}\n\n<i>Delete reason: your message contains forbidden link/s!</i>"
+                            await Message.del_msg(chat.id, e_msg)
+                            await Message.send_msg(chat.id, clean_msg)
+                            msg_contains_link = True
+                        except Exception as e:
+                            logger.error(f"Error: {e}")
+
+        if echo_status and not msg_contains_link:
             await Message.reply_msg(update, msg)
-            
-        if auto_tr_status:
-            lang_code = find_group.get("lang")
+        
+        if auto_tr_status and not msg_contains_link:
             try:
                 tr_msg = translate(msg, lang_code)
+                if tr_msg != msg:
+                    await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
             except Exception as e:
                 logger.error(f"Error Translator: {e}")
                 btn_name = ["Language code's"]
                 btn_url = ["https://telegra.ph/Language-Code-12-24"]
                 btn = await Button.ubutton(btn_name, btn_url)
-                await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
-                return
-            if tr_msg != msg:
-                await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
+                await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)   
         
         if filters:
             for keyword in filters:
@@ -1454,36 +1501,6 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             value = ""
                         filtered_msg = filtered_msg.replace(key, str(value))
                     await Message.reply_msg(update, filtered_msg)
-
-        if del_links and msg:
-            _chk_per = await _check_permission(update, user=user, checking_msg=False)
-
-            if not _chk_per:
-                return
-            
-            _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
-
-            if bot_permission.status != ChatMember.ADMINISTRATOR:
-                await Message.send_msg(chat.id, "I'm not an admin in this chat!")
-                return
-            
-            if user_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                return
-            
-            pattern = r"(https?://)?(www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=%]*)?"
-            links = re.findall(pattern, msg)
-            full_links = ["".join(link) for link in links]
-            clean_msg = msg
-            for link in full_links:
-                b64_link = BASE64.encode(link)
-                clean_msg = clean_msg.replace(link, f"<code>{b64_link}</code>")
-            if full_links:
-                try:
-                    clean_msg = f"{user.mention_html()}:\n\n{clean_msg}\n\n<i>Delete reason, message contains link/s!</i>"
-                    await Message.del_msg(chat.id, e_msg)
-                    await Message.send_msg(chat.id, clean_msg)
-                except Exception as e:
-                    logger.error(f"Error: {e}")
 
 
 async def server_alive():
