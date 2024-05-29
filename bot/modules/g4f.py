@@ -10,7 +10,7 @@ class G4F:
             )
             return response
         except Exception as e:
-            logger.error(f"Error g4f_chatgpt: {e}")
+            logger.error(e)
 
 
     async def imagine(prompt):
@@ -22,4 +22,4 @@ class G4F:
             image_url = response.data[0].url
             return image_url
         except Exception as e:
-            logger.error(f"Error g4f_imagine: {e}")
+            logger.error(e)

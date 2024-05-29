@@ -28,12 +28,11 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = context.chat_data.get("user_id")
         if not user_id:
             error_msg = "Error: user_id not found!"
-            logger.info(error_msg)
             await popup(error_msg)
             try:
                 await query.message.delete()
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
             return False
         if user.id != user_id:
             await popup("Access Denied!")
@@ -64,7 +63,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.send_msg(chat_id, "All pinned messages has been unpinned successfully!")
             await query.message.delete()
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
     
     elif data == "filters":
         access = await _check_whois()
@@ -81,7 +80,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 find_group = context.chat_data["db_group_data"]
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
                 find_group = None
             
             if not find_group:
@@ -108,7 +107,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await query.message.delete()
                 return
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
     
     # Group management ----------------------------------------------------------------- help starts
     elif data == "group_management":
@@ -187,11 +186,12 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = (
             "Bot owner functions -\n\n"
             "/broadcast » Broadcast message to bot users\n"
-            "/db » See bot database\n"
-            "/bsetting » See bot settings\n"
+            "/db » Get bot database\n"
+            "/bsetting » Get bot settings\n"
             "/shell » Use system shell\n"
-            "/render » Render functions\n"
-            "/sys » See system info\n\n"
+            "/log » Get log file (for error handling)\n"
+            "/restart » Restart the bot\n"
+            "/sys » Get system info\n\n"
             "<i>Note: Type commands to get more details about the command function!</i>"
         )
 
@@ -250,7 +250,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 else:
                     msg += "\n<i>The bot repo is updated to the latest commit...</i>"
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
         
         btn_name = ["Back", "Close"]
         btn_data = ["help_menu", "close"]
@@ -546,7 +546,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -561,7 +561,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             _bot = context.bot_data["db_bot_data"]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find = await MongoDB.find("bot_docs", "_id")
             _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
             context.bot_data["db_bot_data"] = _bot
@@ -609,7 +609,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -661,7 +661,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -713,7 +713,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -769,7 +769,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -855,7 +855,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -907,7 +907,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -959,7 +959,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -1013,7 +1013,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -1063,7 +1063,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -1119,7 +1119,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -1171,7 +1171,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_chat = context.chat_data[data_to_find]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_chat = None
         
         if not find_chat:
@@ -1237,7 +1237,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.send_msg(chat_id, f"Error: {e}")
     
     elif data == "c_links":
@@ -1273,7 +1273,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.send_msg(chat_id, f"Error: {e}")
     
     elif data == "none_links":
@@ -1309,7 +1309,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.send_msg(chat_id, f"Error: {e}")
 
     elif data == "c_setting_menu":
@@ -1360,7 +1360,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn = row1 + row2
         
         else:
-            logger.info("Error: edit_cname not found!")
             await query.message.delete()
             return
         
@@ -1423,7 +1422,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for delete in del_msg:
                 await Message.del_msg(chat_id, delete)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
         
         if not new_value:
             await popup("Timeout!")
@@ -1458,7 +1457,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.send_msg(chat_id, f"Error: {e}")
 
     elif data == "remove_value":
@@ -1502,7 +1501,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.send_msg(chat_id, f"Error: {e}")
 
     elif data == "true":
@@ -1546,7 +1545,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.send_msg(chat_id, f"Error: {e}")
     
     elif data == "false":
@@ -1590,7 +1589,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.send_msg(chat_id, f"Error: {e}")
 
     elif data == "close":
@@ -1602,4 +1601,4 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await query.message.delete()
                 await Message.del_msg(chat_id, del_msg_pointer)
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)

@@ -111,7 +111,7 @@ class Message:
                     parse_mode=parse_mode
                 )
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
                 sent_msg = await bot.send_message(
                     chat_id=chat.id,
                     text=msg,
@@ -128,7 +128,7 @@ class Message:
                     parse_mode=parse_mode
                 )
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
                 sent_msg = await bot.send_message(
                     chat_id=chat.id,
                     text=msg,
@@ -224,7 +224,7 @@ class Button:
             buttons = btn+[sbtn]
             return buttons
         except Exception as e:
-            logger.error(f"Error ubutton: {e}")
+            logger.error(e)
     
 
     async def cbutton(btn_name, callback_name, same_line=bool(False)):
@@ -247,4 +247,4 @@ class Button:
             buttons = btn+[sbtn]
             return buttons
         except Exception as e:
-            logger.error(f"Error cbutton: {e}")
+            logger.error(e)

@@ -12,5 +12,5 @@ def ping_url(ping_url):
     else:
       return "~", status_code
   except Exception as e:
-    logger.error(f"Error (pinging url): {e}")
+    logger.error(e)
     return "~", None

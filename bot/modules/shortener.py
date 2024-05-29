@@ -9,4 +9,4 @@ def shortener_url(url):
         if shortened_url:
             return shortened_url
     except Exception as e:
-        logger.error(f"Error (Shorting url): {e}")
+        logger.error(e)

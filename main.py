@@ -1,5 +1,5 @@
 import os
-import json
+import sys
 import psutil
 import random
 import asyncio
@@ -73,7 +73,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _bot = context.bot_data["db_bot_data"]
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         find = await MongoDB.find("bot_docs", "_id")
         _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
         context.bot_data["db_bot_data"] = _bot
@@ -192,7 +192,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_user = context.chat_data["db_user_data"]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_user = None
         
         if not find_user:
@@ -208,7 +208,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_group = context.chat_data["db_group_data"]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_group = None
         
         if not find_group:
@@ -224,11 +224,11 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         tr_msg = translate(msg, lang_code)
     except Exception as e:
-        logger.error(f"Error Translator: {e}")
+        logger.error(e)
         try:
             _bot = context.bot_data["db_bot_data"]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find = await MongoDB.find("bot_docs", "_id")
             _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
             context.bot_data["db_bot_data"] = _bot
@@ -322,7 +322,7 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await Message.edit_msg(update, msg, sent_msg)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.edit_msg(update, f"Error: {e}", sent_msg)
 
 
@@ -337,7 +337,7 @@ async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await Message.reply_msg(update, f"Calculation result: <code>{calc(msg):.2f}</code>")
     except Exception as e:
-        logger.error(f"Can't calc: {e}")
+        logger.error(e)
         await Message.reply_msg(update, f"Can't calc: {e}")   
 
 
@@ -358,7 +358,7 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.del_msg(chat.id, sent_msg)
         await Message.send_img(chat.id, webshot, f"✨ {url}")
     except Exception as e:
-        logger.error(f"Error taking webshot: {e}")
+        logger.error(e)
         await Message.reply_msg(update, f"Error: {e}")      
 
 
@@ -436,7 +436,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_img(chat.id, imagine, f"» {prompt}")
         await Message.del_msg(chat.id, sent_msg)
     except Exception as e:
-        logger.error(f"Error Imagine: {e}")
+        logger.error(e)
         await Message.edit_msg(update, f"Error Imagine: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
 
 
@@ -483,7 +483,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
-        logger.error(f"Error ChatGPT: {e}")
+        logger.error(e)
         await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
 
 
@@ -556,9 +556,8 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
             title, file_path = res
             await Message.send_audio(chat.id, file_path, title, title, e_msg.id)
     except Exception as e:
-        error = f"Error Uploading: {e}"
-        logger.error(error)
-        await Message.edit_msg(update, error, sent_msg)
+        logger.error(e)
+        await Message.edit_msg(update, f"Error Uploading: {e}", sent_msg)
 
     try:
         if len(res) == 3:
@@ -570,7 +569,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"{rem} Removed...")
         await Message.del_msg(chat.id, sent_msg)
     except Exception as e:
-        logger.error(f"Error os.remove: {e}")  
+        logger.error(e) 
 
 
 async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -615,7 +614,7 @@ async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
         os.remove(gen_qr)
         await Message.del_msg(chat.id, sent_msg)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.edit_msg(update, f"Error: {e}", sent_msg)
 
 
@@ -646,7 +645,7 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, itl, sent_msg)
         os.remove(f_name)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.edit_msg(update, f"Error: {e}", sent_msg)
 
 
@@ -658,7 +657,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         _bot = context.bot_data["db_bot_data"]
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         find = await MongoDB.find("bot_docs", "_id")
         _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
         context.bot_data["db_bot_data"] = _bot
@@ -667,7 +666,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_user = context.chat_data["db_user_data"]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_user = None
         
         if not find_user:
@@ -719,12 +718,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             try:
                 image = await MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(chat.id, image, msg, btn)
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
                 await Message.send_msg(chat.id, msg, btn)
 
     elif chat.type in ["group", "supergroup"]:
@@ -757,7 +756,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_group = context.chat_data["db_group_data"]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_group = None
         
         if not find_group:
@@ -840,12 +839,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             try:
                 image = await MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(chat.id, image, msg, btn)
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
                 await Message.send_msg(chat.id, msg, btn)
 
 
@@ -939,12 +938,12 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
             image = await MongoDB.get_data("bot_docs", "bot_pic")
         await Message.send_img(chat.id, image, msg, btn)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         try:
             image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.send_msg(chat.id, msg, btn)
 
 
@@ -996,7 +995,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     return
             await Message.reply_msg(update, "<i>Message Sent...!</i>")
         except Exception as e:
-            logger.error(f"Error Broadcast: {e}")
+            logger.error(e)
             await Message.reply_msg(update, f"Error Broadcast: {e}")
         return
     
@@ -1036,7 +1035,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(0.5)
         except Exception as e:
             except_count += 1
-            logger.error(f"Error Broadcast: {e}")
+            logger.error(e)
     await Message.reply_msg(update, "<i>Broadcast Done...!</i>")
 
 
@@ -1189,12 +1188,12 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
             image = await MongoDB.get_data("bot_docs", "bot_pic")
         await Message.send_img(chat.id, image, "<b>Bot Settings</b>", btn)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         try:
             image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, "<b>Bot Settings</b>", btn)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.send_msg(chat.id, "<b>Bot Settings</b>", btn)
 
 
@@ -1214,29 +1213,24 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not command:
-        await Message.reply_msg(update, "E.g. <code>/shell dir</code> [linux/windows]\n<code>/shell log</code> to get logger file")
+        await Message.reply_msg(update, "E.g. <code>/shell dir</code> [linux]")
         return
     
-    if command == "log":
-        with open("log.txt", "rb") as log_file:
-            log = log_file.read()
-        await Message.send_doc(chat.id, log, "log.txt", "log.txt", e_msg.id)
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    if result.returncode == 0:
+        with open('shell.txt', 'w') as shell_file:
+            shell_file.write(result.stdout)
+        with open("shell.txt", "rb") as shell_file:
+            shell = shell_file.read()
+        await Message.send_doc(chat.id, shell, "shell.txt", "log.txt", e_msg.id)
     else:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        if result.returncode == 0:
-            with open('shell.txt', 'w') as shell_file:
-                shell_file.write(result.stdout)
-            with open("shell.txt", "rb") as shell_file:
-                shell = shell_file.read()
-            await Message.send_doc(chat.id, shell, "shell.txt", "log.txt", e_msg.id)
-        else:
-            await Message.reply_msg(update, result.stderr)
+        await Message.reply_msg(update, result.stderr)
 
 
-async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    command = " ".join(context.args)
+    e_msg = update.effective_message
 
     if user.id != int(owner_id):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
@@ -1246,60 +1240,34 @@ async def func_render(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
     
-    if not command:
-        await Message.reply_msg(update, "E.g. <code>/render list</code>\n<code>/render restart serviceId</code>\n<code>/render redeploy serviceId cache_clear_bool (default True)</code>")
+    with open("log.txt", "rb") as log_file:
+        log = log_file.read()
+    await Message.send_doc(chat.id, log, "log.txt", "log.txt", e_msg.id)
+
+
+async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+
+    if user.id != int(owner_id):
+        await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
-    if "list" in command:
-        try:
-            res = await Render.list_services()
-            msg, null = "", None
-            res = json.loads(res.text)
-            for obj in res:
-                service = obj.get("service")
-                s_id = service.get("id")
-                s_name = service.get("name")
-                if s_id:
-                    msg += f"<b>{s_name}</b>: <code>{s_id}</code>\n"
-            
-            await Message.reply_msg(update, msg)
-        except Exception as e:
-            logger.error(f"Error render: {e}")
-            await Message.reply_msg(update, f"Error render: {e}")
-    elif "restart" in command:
-        command = command.split()
-        service_id = command[1]
-        # index_restart = command.index("restart")
-        # service_id = msg[index_restart + len("restart"):].strip()
-        try:
-            sent_msg = await Message.reply_msg(update, "Restarting...")
-            o_value = await MongoDB.get_data("bot_docs", "bot_status")
-            await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "restart")
-            res = await Render.restart(service_id)
-            if res.status_code != 200:
-                await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
-                await Message.edit_msg(update, "Failed to restart...", sent_msg)
-        except Exception as e:
-            logger.error(f"Error render: {e}")
-            await Message.reply_msg(update, f"Error render: {e}")
-            await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
-    elif "redeploy" in command:
-        command = command.split()
-        service_id = command[1]
-        # index_redeploy = msg.index("redeploy")
-        # service_id = msg[index_redeploy + len("redeploy"):].strip()
-        try:
-            sent_msg = await Message.reply_msg(update, f"Redeploying...")
-            o_value = await MongoDB.get_data("bot_docs", "bot_status")
-            await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "restart")
-            res = await Render.redeploy(service_id)
-            if res.status_code != 200:
-                await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
-                await Message.edit_msg(update, "Failed to redeploy...", sent_msg)
-        except Exception as e:
-            logger.error(f"Error render: {e}")
-            await Message.reply_msg(update, f"Error render: {e}")
-            await MongoDB.update_db("bot_docs", "bot_status", o_value, "bot_status", "alive")
+    if chat.type != "private":
+        await Message.reply_msg(update, "⚠ Boss you are in public!")
+        return
+    
+    bot_status = await MongoDB.get_data("bot_docs", "bot_status")
+    try:
+        if not bot_status or bot_status == "alive":
+            await Message.send_msg(owner_id, "Restaring...")
+            await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "restart")
+            os.execv(sys.executable, ["python"] + sys.argv)
+        elif bot_status == "restart":
+            await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
+            await Message.send_msg(owner_id, "Bot Restarted!")
+    except Exception as e:
+        logger.error(e)
 
 
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1343,7 +1311,7 @@ async def func_filter_services(update: Update, context: ContextTypes.DEFAULT_TYP
     try:
         await Message.del_msg(chat.id, e_msg)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
 
 
 async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1366,7 +1334,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_user = context.chat_data["db_user_data"]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_user = None
         
         if not find_user:
@@ -1388,7 +1356,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 tr_msg = translate(msg, lang_code)
             except Exception as e:
-                logger.error(f"Error Translator: {e}")
+                logger.error(e)
                 btn_name = ["Language code's"]
                 btn_url = ["https://telegra.ph/Language-Code-12-24"]
                 btn = await Button.ubutton(btn_name, btn_url)
@@ -1413,7 +1381,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             find_group = context.chat_data["db_group_data"]
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             find_group = None
         
         if not find_group:
@@ -1464,7 +1432,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             await Message.send_msg(chat.id, clean_msg)
                             msg_contains_link = True
                         except Exception as e:
-                            logger.error(f"Error: {e}")
+                            logger.error(e)
 
         if echo_status and not msg_contains_link:
             await Message.reply_msg(update, msg)
@@ -1473,14 +1441,14 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 tr_msg = translate(msg, lang_code)
             except Exception as e:
-                logger.error(f"Error Translator: {e}")
+                logger.error(e)
                 btn_name = ["Language code's"]
                 btn_url = ["https://telegra.ph/Language-Code-12-24"]
                 btn = await Button.ubutton(btn_name, btn_url)
                 await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
-                
+            
             if tr_msg != msg:
-                    await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
+                await Message.reply_msg(update, tr_msg, parse_mode=ParseMode.MARKDOWN)
         
         if filters:
             for keyword in filters:
@@ -1515,7 +1483,7 @@ async def server_alive():
             await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
             await Message.send_msg(owner_id, "Bot Restarted!")
     except Exception as e:
-        logger.error(f"Error startup_msg: {e}")
+        logger.error(e)
 
     if server_url:
         if server_url[0:4] != "http":
@@ -1528,7 +1496,7 @@ async def server_alive():
                 else:
                     logger.warning(f"{server_url} is down or unreachable. ❌")
             except Exception as e:
-                logger.error(f"Error server_alive: {server_url} > {e}")
+                logger.error(f"{server_url} > {e}")
             await asyncio.sleep(180) # 3 min
     else:
         logger.warning("Server URL not provided !!")
@@ -1579,7 +1547,8 @@ def main():
     application.add_handler(CommandHandler("db", func_database, block=False))
     application.add_handler(CommandHandler("bsetting", func_bsetting, block=False))
     application.add_handler(CommandHandler("shell", func_shell, block=False))
-    application.add_handler(CommandHandler("render", func_render, block=False))
+    application.add_handler(CommandHandler("log", func_log, block=False))
+    application.add_handler(CommandHandler("restart", func_restart, block=False))
     application.add_handler(CommandHandler("sys", func_sys, block=False))
     # filters
     application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services, block=False))

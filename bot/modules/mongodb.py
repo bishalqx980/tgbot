@@ -19,7 +19,7 @@ class MongoDB:
             logger.info(f"Inserted ID: {inserted_id}")
             return inserted_id
         except Exception as e:
-            logger.error(f"Error (inserting db_data): {e}")
+            logger.error(e)
 
 
     async def insert_multiple_data(collection_name, data_list):
@@ -38,7 +38,7 @@ class MongoDB:
             logger.info(f"Inserted IDs: {inserted_ids}")
             return inserted_ids
         except Exception as e:
-            logger.error(f"Error (inserting db_data): {e}")
+            logger.error(e)
 
 
     async def find_one(collection_name, search, match):
@@ -57,7 +57,7 @@ class MongoDB:
                 logger.info("Data Not Found!")
             return document
         except Exception as e:
-            logger.error(f"Error (finding db_data): {e}")
+            logger.error(e)
     
 
     async def find(collection_name, search):
@@ -73,7 +73,7 @@ class MongoDB:
                     logger.info("Data Found: [DATA INFO HIDDEN BECASUE OF DATA PRIVACY]!!")
             return storage
         except Exception as e:
-            logger.error(f"Error (finding db_data): {e}")
+            logger.error(e)
 
 
     async def get_data(collection_name, get_data):
@@ -88,7 +88,7 @@ class MongoDB:
                 logger.info("Data Not Found!")
             return data
         except Exception as e:
-            logger.error(f"Error (Getting db_data): {e}")
+            logger.error(e)
 
 
     async def update_db(collection_name, search, match, update_data_name, update_data_value):
@@ -101,7 +101,7 @@ class MongoDB:
             )
             logger.info(f"{collection_name} MongoDB DATA UPDATED !!")
         except Exception as e:
-            logger.error(f"Error (Updating db_data): {e}")
+            logger.error(e)
 
 
     async def info_db(collection_name=None):
@@ -141,4 +141,4 @@ class MongoDB:
             collection.delete_many({})
             logger.info(f"{collection_name} Data Deleted!!")
         except Exception as e:
-            logger.error(f"Error (Deleting db_data): {e}")
+            logger.error(e)

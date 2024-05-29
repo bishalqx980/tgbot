@@ -63,4 +63,4 @@ class YouTubeDownload:
             logger.info(f"Video Found: {len(result)}")
             return result
         except Exception as e:
-            logger.error(f"Error yts: {e}")
+            logger.error(e)

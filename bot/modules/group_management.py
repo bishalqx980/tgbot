@@ -37,7 +37,7 @@ async def _check_permission(update: Update, victim=None, user=None, checking_msg
         try:
             await Message.del_msg(chat.id, del_msg)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
 
     return _bot_info, bot_permission, user_permission, admin_rights, victim_permission
 
@@ -83,7 +83,7 @@ async def _check_del_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         find_group = context.chat_data["db_group_data"]
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         find_group = None
         
     if not find_group:
@@ -106,7 +106,7 @@ async def _log_channel(context: ContextTypes.DEFAULT_TYPE, chat, user, victim=No
     try:
         find_group = context.chat_data["db_group_data"]
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         find_group = None
         
     if not find_group:
@@ -144,7 +144,7 @@ async def _log_channel(context: ContextTypes.DEFAULT_TYPE, chat, user, victim=No
     try:
         await Message.send_msg(log_channel, msg)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
 
 
 async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -175,7 +175,7 @@ async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT
             try:
                 await MongoDB.insert_single_data("users", data)
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
         
         if bot_exist:
             await MongoDB.update_db("users", "user_id", user.id, "active_status", True)
@@ -192,7 +192,7 @@ async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT
                 }
                 await MongoDB.insert_single_data("groups", data)
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
                 await Message.send_msg(chat.id, f"⚠ Group has not registered! Error: {e}")
                 return
         if bot_exist:
@@ -204,13 +204,13 @@ async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT
                 await Message.send_msg(chat.id, msg)
                 await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
     else:
         if bot_exist:
             try:
                 await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
 
 
 async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -226,7 +226,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
     try:
         find_group = context.chat_data["db_group_data"]
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         find_group = None
         
     if not find_group:
@@ -270,7 +270,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
                 await Message.send_msg(chat.id, f"Antibot has banned {victim.mention_html()} from this chat!")
                 await _log_channel(context, chat, user, victim, action="ANITBOT")
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
                 await Message.send_msg(chat.id, f"Error: {e}")
         elif welcome_msg:
             if custom_welcome_msg:
@@ -354,7 +354,7 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg)
         await _log_channel(context, chat, user, action="INVITE")
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -416,7 +416,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg)
         await _log_channel(context, chat, user, victim, action="PROMOTE")
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -469,7 +469,7 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, f"{user.mention_html()} has demoted user {victim.mention_html()} in this chat!")
         await _log_channel(context, chat, user, victim, action="DEMOTE")
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -522,7 +522,7 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, f"Message pinned & notified everyone!")
         await _log_channel(context, chat, user, action="PIN")
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -584,7 +584,7 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"Do you really want to unpin all messages of this chat?", btn)
             await _log_channel(context, chat, user, action="UNPIN_ALL")
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.send_msg(chat.id, f"Error: {e}")
         return
 
@@ -597,7 +597,7 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, f"Message unpinned!")
         await _log_channel(context, chat, user, action="UNPIN")
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -667,9 +667,9 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 msg = f"{msg}\nReason: {reason}"
             await Message.send_msg(victim.id, msg)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -740,9 +740,9 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 msg = f"{msg}\nReason: {reason}"
             await Message.send_msg(victim.id, msg)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -814,9 +814,9 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.send_msg(victim.id, msg)
             await _log_channel(context, chat, user, victim, action="KICK", reason=reason)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -859,9 +859,9 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
             await Message.send_msg(victim.id, f"You kicked yourself from {chat.title}!\nInvite Link: {invite_link.invite_link}")
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -943,7 +943,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg)
         await _log_channel(context, chat, user, victim, action="MUTE", reason=reason)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -1025,7 +1025,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg)
         await _log_channel(context, chat, user, victim, action="UNMUTE", reason=reason)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -1085,7 +1085,7 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_msg(chat.id, msg)
         await _log_channel(context, chat, user, victim, action="MSG_DEL", reason=reason)
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -1139,11 +1139,11 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 await Message.del_msg(chat.id, msg_id=msg_id)
             except Exception as e:
-                logger.error(f"Error: {e}")
+                logger.error(e)
         await Message.edit_msg(update, f"Purge completed!", sent_msg)
         await _log_channel(context, chat, user, action="MSG_PURGE")
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -1203,7 +1203,7 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_msg(chat.id, f"This chat has been Locked!\nEffective admin: {user.mention_html()}")
         await _log_channel(context, chat, user, action="CHAT_LOCK")
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -1263,7 +1263,7 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_msg(chat.id, f"This chat has been Unlocked!\nEffective admin: {user.mention_html()}")
         await _log_channel(context, chat, user, action="CHAT_UNLOCK")
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
 
 
@@ -1342,7 +1342,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             await Message.reply_msg(update, msg, btn)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
         return
     
     if not keyword:
@@ -1352,7 +1352,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         find_group = context.chat_data["db_group_data"]
     except Exception as e:
-        logger.error(f"Error: {e}")
+        logger.error(e)
         find_group = None
         
     if not find_group:
@@ -1384,7 +1384,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
             db_chat_data = await MongoDB.find_one("groups", "chat_id", chat.id)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
             await Message.reply_msg(update, f"Error: {e}")
         return
     

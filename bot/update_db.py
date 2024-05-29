@@ -48,5 +48,5 @@ async def update_database():
         logger.info("Database updated from config.env ...")
         return True
     except Exception as e:
-        logger.warning(f"Error: {e}")
+        logger.warning(e)
         return False

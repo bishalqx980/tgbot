@@ -11,4 +11,4 @@ class TELEGRAPH:
             link = f"https://telegra.ph{path.get('src')}"
             return link
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)

@@ -8,7 +8,7 @@ class BASE64:
             if decoded_text:
                 return decoded_text
         except Exception as e:
-            logger.error(f"Error (Decoding): {e}")
+            logger.error(e)
 
 
     def encode(text): 
@@ -17,4 +17,4 @@ class BASE64:
             if encoded_text:
                 return encoded_text
         except Exception as e:
-            logger.error(f"Error (Encoding): {e}")
+            logger.error(e)

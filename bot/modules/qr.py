@@ -14,4 +14,4 @@ class QR:
                 f.write(req.content)
                 return f_name
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error(e)
