@@ -12,8 +12,7 @@ from bot import (
     server_url,
     shortener_api_key,
     omdb_api,
-    weather_api_key,
-    render_api
+    weather_api_key
 )
 
 
@@ -39,8 +38,7 @@ async def update_database():
         #api's
         "shortener_api_key": shortener_api_key,
         "omdb_api": omdb_api,
-        "weather_api_key": weather_api_key,
-        "render_api": render_api,
+        "weather_api_key": weather_api_key
     }
 
     try:

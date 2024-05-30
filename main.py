@@ -1,11 +1,13 @@
 import os
 import sys
+import time
 import psutil
 import random
 import asyncio
 import requests
 import subprocess
 from telegram.constants import ParseMode
+from telegram.error import Forbidden
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ChatMemberHandler
 from bot import logger, bot_token, bot, owner_id
@@ -38,13 +40,14 @@ from bot.modules.group_management import (
     func_purge,
     func_lockchat,
     func_unlockchat,
+    func_filter,
+    func_remove,
     func_filters,
     func_adminlist)
 from bot.modules.ytdl import YouTubeDownload
 from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.modules.weather import weather_info
 from bot.modules.g4f import G4F
-from bot.modules.render import Render
 from bot.update_db import update_database
 from bot.modules.qr import QR
 from bot.modules.telegraph import TELEGRAPH
@@ -60,67 +63,71 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg)
         return
     
-    if chat.type != "private":
-        _bot_info = await bot.get_me()
-        btn_name = ["Start me in private"]
-        btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
-        btn = await Button.ubutton(btn_name, btn_url)
-        await Message.send_msg(chat.id, f"Hi, {user.mention_html()}! Start me in private to chat with me 😊!", btn)
-        return
-    
-    _bot_info = await bot.get_me()
-
     try:
-        _bot = context.bot_data["db_bot_data"]
+        _bot_info = await bot.get_me()
+
+        try:
+            _bot = context.bot_data["db_bot_data"]
+        except Exception as e:
+            logger.error(e)
+            find = await MongoDB.find("bot_docs", "_id")
+            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+            context.bot_data["db_bot_data"] = _bot
+
+        bot_pic = _bot.get("bot_pic")
+        welcome_img = _bot.get("welcome_img")
+        support_chat = _bot.get("support_chat")
+
+        msg = (
+            f"Hi {user.mention_html()}! I'm <a href='https://t.me/{_bot_info.username}'>{_bot_info.first_name}</a>, your all-in-one bot!\n\n"
+            f"<blockquote>Here's a short list of what I can do:\n\n" # break
+            f"• Get response from <b>ChatGPT AI</b>\n"
+            f"• Generate image from your prompt\n"
+            f"• Download/Search videos from YouTube\n"
+            f"• Provide movie information\n"
+            f"• Translate languages\n"
+            f"• Encode/decode base64\n"
+            f"• Shorten URLs\n"
+            f"• Ping any URL\n"
+            f"• Be your calculator\n"
+            f"• Echo your message for fun\n"
+            f"• Take website screenshot\n"
+            f"• Provide weather information\n"
+            f"• <b>Group management</b>\n"
+            f"• & Much more...</blockquote>\n\n"
+            f"• /help for bot help\n" # break
+            f"<i>More Feature coming soon...</i>\n"
+        )
+
+        btn_name_1 = ["Add in Group"]
+        btn_url_1 = [f"http://t.me/{_bot_info.username}?startgroup=start"]
+        btn_name_2 = ["Developer", "Source Code"]
+        btn_url_2 = [f"https://t.me/bishalqx980", "https://github.com/bishalqx980/tgbot"]
+        btn_name_3 = ["Support Chat"]
+        btn_url_3 = [support_chat]
+        btn_1 = await Button.ubutton(btn_name_1, btn_url_1)
+        btn_2 = await Button.ubutton(btn_name_2, btn_url_2, True)
+        if support_chat:
+            btn_3 = await Button.ubutton(btn_name_3, btn_url_3)
+            btn = btn_1 + btn_2 + btn_3
+        else:
+            btn = btn_1 + btn_2
+
+        if welcome_img and bot_pic:
+            await Message.send_img(user.id, bot_pic, msg, btn)
+        else:
+            await Message.send_msg(user.id, msg, btn)
+
+        if chat.type != "private":
+            _bot_info = await bot.get_me()
+            await Message.reply_msg(update, f"Sent in your pm! <a href='http://t.me/{_bot_info.username}'>Check</a>")
+    
+    except Forbidden:
+        _bot_info = await bot.get_me()
+        await Message.reply_msg(update, f"Hola, {user.mention_html()}!\n<a href='http://t.me/{_bot_info.username}'>Start me</a> in pm to chat with me!")
+    
     except Exception as e:
         logger.error(e)
-        find = await MongoDB.find("bot_docs", "_id")
-        _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
-        context.bot_data["db_bot_data"] = _bot
-
-    bot_pic = _bot.get("bot_pic")
-    welcome_img = _bot.get("welcome_img")
-    support_chat = _bot.get("support_chat")
-
-    msg = (
-        f"Hi {user.mention_html()}! I'm <a href='https://t.me/{_bot_info.username}'>{_bot_info.first_name}</a>, your all-in-one bot!\n\n"
-        f"<blockquote>Here's a short list of what I can do:\n\n" # break
-        f"• Get response from <b>ChatGPT AI</b>\n"
-        f"• Generate image from your prompt\n"
-        f"• Download/Search videos from YouTube\n"
-        f"• Provide movie information\n"
-        f"• Translate languages\n"
-        f"• Encode/decode base64\n"
-        f"• Shorten URLs\n"
-        f"• Ping any URL\n"
-        f"• Be your calculator\n"
-        f"• Echo your message for fun\n"
-        f"• Take website screenshot\n"
-        f"• Provide weather information\n"
-        f"• <b>Group management</b>\n"
-        f"• & Much more...</blockquote>\n\n"
-        f"• /help for bot help\n" # break
-        f"<i>More Feature coming soon...</i>\n"
-    )
-
-    btn_name_1 = ["Add in Group"]
-    btn_url_1 = [f"http://t.me/{_bot_info.username}?startgroup=start"]
-    btn_name_2 = ["Developer", "Source Code"]
-    btn_url_2 = [f"https://t.me/bishalqx980", "https://github.com/bishalqx980/tgbot"]
-    btn_name_3 = ["Support Chat"]
-    btn_url_3 = [support_chat]
-    btn_1 = await Button.ubutton(btn_name_1, btn_url_1)
-    btn_2 = await Button.ubutton(btn_name_2, btn_url_2, True)
-    if support_chat:
-        btn_3 = await Button.ubutton(btn_name_3, btn_url_3)
-        btn = btn_1 + btn_2 + btn_3
-    else:
-        btn = btn_1 + btn_2
-
-    if welcome_img and bot_pic:
-        await Message.send_img(chat.id, bot_pic, msg, btn)
-    else:
-        await Message.send_msg(chat.id, msg, btn)
 
 
 async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -896,55 +903,74 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     e_msg = update.effective_message
-
-    if chat.type != "private":
-        _bot_info = await bot.get_me()
-        btn_name = ["Start me in private"]
-        btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
-        btn = await Button.ubutton(btn_name, btn_url)
-        await Message.reply_msg(update, f"Hi, {user.mention_html()}! Start me in private to chat with me 😊!", btn)
-        return
     
-    msg = (
-        f"Hi {user.mention_html()}! Welcome to the bot help section...\n"
-        f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
-        f"/start - to start the bot\n"
-        f"/help - to see this message"
-    )
-
-    context.chat_data["user_id"] = user.id
-    context.chat_data["del_msg_pointer"] = e_msg
-
-    btn_name_row1 = ["Group Management", "Artificial intelligence"]
-    btn_data_row1 = ["group_management", "ai"]
-
-    btn_name_row2 = ["misc", "Bot owner"]
-    btn_data_row2 = ["misc_func", "owner_func"]
-
-    btn_name_row3 = ["GitHub", "Close"]
-    btn_data_row3 = ["github_stats", "close"]
-
-    row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-    row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-    row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
-
-    btn = row1 + row2 + row3
-
     try:
-        images = await MongoDB.get_data("bot_docs", "images")
-        if images:
-            image = random.choice(images).strip()
-        else:
-            image = await MongoDB.get_data("bot_docs", "bot_pic")
-        await Message.send_img(chat.id, image, msg, btn)
-    except Exception as e:
-        logger.error(e)
+        db = await MongoDB.info_db()
+        for i in db:
+            if i[0] == "users":
+                total_users = i[1]
+                break
+            else:
+                total_users = "❓"
+        
+        active_status = await MongoDB.find("users", "active_status")
+        active_users = active_status.count(True)
+        inactive_users = active_status.count(False)
+
+        msg = (
+            f"Hi {user.mention_html()}! Welcome to the bot help section...\n"
+            f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
+            f"/start - to start the bot\n"
+            f"/help - to see this message\n\n"
+            f"T.users: {total_users} |"
+            f"A.users: {active_users} |"
+            f"Inactive: {inactive_users}"
+        )
+
+        context.chat_data["user_id"] = user.id
+        context.chat_data["del_msg_pointer"] = e_msg
+
+        btn_name_row1 = ["Group Management", "Artificial intelligence"]
+        btn_data_row1 = ["group_management", "ai"]
+
+        btn_name_row2 = ["misc", "Bot owner"]
+        btn_data_row2 = ["misc_func", "owner_func"]
+
+        btn_name_row3 = ["GitHub", "Close"]
+        btn_data_row3 = ["github_stats", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+
+        btn = row1 + row2 + row3
+
         try:
-            image = await MongoDB.get_data("bot_docs", "bot_pic")
-            await Message.send_img(chat.id, image, msg, btn)
+            images = await MongoDB.get_data("bot_docs", "images")
+            if images:
+                image = random.choice(images).strip()
+            else:
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
+            await Message.send_img(user.id, image, msg, btn)
         except Exception as e:
             logger.error(e)
-            await Message.send_msg(chat.id, msg, btn)
+            try:
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                await Message.send_img(user.id, image, msg, btn)
+            except Exception as e:
+                logger.error(e)
+                await Message.send_msg(user.id, msg, btn)
+        
+        if chat.type != "private":
+            _bot_info = await bot.get_me()
+            await Message.reply_msg(update, f"Sent in your pm! <a href='http://t.me/{_bot_info.username}'>Check</a>")
+
+    except Forbidden:
+        _bot_info = await bot.get_me()
+        await Message.reply_msg(update, f"Hola, {user.mention_html()}!\n<a href='http://t.me/{_bot_info.username}'>Start me</a> in pm to chat with me!")
+        
+    except Exception as e:
+        logger.error(e)
 
 
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1014,6 +1040,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     sent_count, except_count = 0, 0
     notify = await Message.send_msg(owner_id, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}")
+    start_time = time.time()
     for user_id in active_users:
         try:
             if forward_confirm:
@@ -1036,7 +1063,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             except_count += 1
             logger.error(e)
-    await Message.reply_msg(update, "<i>Broadcast Done...!</i>")
+    end_time = time.time()
+    await Message.reply_msg(update, f"<i>Broadcast Done...!\nTime took: {(end_time - start_time):.2f}</i>")
 
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1539,6 +1567,8 @@ def main():
     application.add_handler(CommandHandler("purge", func_purge, block=False))
     application.add_handler(CommandHandler("lock", func_lockchat, block=False))
     application.add_handler(CommandHandler("unlock", func_unlockchat, block=False))
+    application.add_handler(CommandHandler("filter", func_filter, block=False))
+    application.add_handler(CommandHandler("remove", func_remove, block=False))
     application.add_handler(CommandHandler("filters", func_filters, block=False))
     application.add_handler(CommandHandler("adminlist", func_adminlist, block=False))
     application.add_handler(CommandHandler("help", func_help, block=False))

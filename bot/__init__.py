@@ -22,7 +22,6 @@ server_url = os.getenv("SERVER_URL")
 shortener_api_key = os.getenv("SHORTENER_API_KEY")
 omdb_api = os.getenv("OMDB_API")
 weather_api_key = os.getenv("WEATHER_API_KEY")
-render_api = os.getenv("RENDER_API")
 #safone api
 safone_api = SafoneAPI()
 

@@ -129,7 +129,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/purge » Delete every messages from replied message to current message!\n"
             "/lock » Lock the chat (no one can send messages etc.)\n"
             "/unlock » Unlock the chat (back to normal)\n"
-            "/filters » To set custom message/command\n"
+            "/filters | /filter | /remove » To see/set/remove custom message/command\n"
             "/adminlist » See chat admins list\n"
             "/settings » Settings of chat (welcome, antibot, translate etc.)\n\n"
             "<i>Note: Type commands to get more details about the command function!</i>"
@@ -259,11 +259,26 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
 
     elif data == "help_menu":
+        db = await MongoDB.info_db()
+        for i in db:
+            if i[0] == "users":
+                total_users = i[1]
+                break
+            else:
+                total_users = "❓"
+        
+        active_status = await MongoDB.find("users", "active_status")
+        active_users = active_status.count(True)
+        inactive_users = active_status.count(False)
+
         msg = (
-            f"Hi! Welcome to the bot help section...\n"
+            f"Hi {user.mention_html()}! Welcome to the bot help section...\n"
             f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
             f"/start - to start the bot\n"
-            f"/help - to see this message"
+            f"/help - to see this message\n\n"
+            f"T.users: {total_users} |"
+            f"A.users: {active_users} |"
+            f"Inactive: {inactive_users}"
         )
 
         btn_name_row1 = ["Group Management", "Artificial intelligence"]
@@ -791,11 +806,11 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<i>Note: This message will be send as greeting message in the chat when a user join!</i>"
         )
 
-        btn_name_row1 = ["Text formats", "Set custom message"]
-        btn_data_row1 = ["text_formats", "edit_value"]
+        btn_name_row1 = ["Set default message", "Set custom message"]
+        btn_data_row1 = ["remove_value", "edit_value"]
 
-        btn_name_row2 = ["Set default message"]
-        btn_data_row2 = ["remove_value"]
+        btn_name_row2 = ["Text formatting"]
+        btn_data_row2 = ["text_formats"]
 
         btn_name_row3 = ["Back", "Close"]
         btn_data_row3 = ["welcome_msg", "close"]
@@ -1322,8 +1337,56 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await popup("An error occurred! send command again then try...")
             await query.message.delete()
             return
+        
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
+        
+        try:
+            find_chat = context.chat_data[data_to_find]
+        except Exception as e:
+            logger.error(e)
+            find_chat = None
+        
+        if not find_chat:
+            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            if find_chat:
+                context.chat_data[data_to_find] = find_chat
+            else:
+                await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                await query.message.delete()
+                return
+        
+        if data_to_find == "db_group_data":
+            title = find_chat.get("title")
+            lang = find_chat.get("lang")
 
-        if edit_cname == "groups":
+            echo = find_chat.get("echo")
+            auto_tr = find_chat.get("auto_tr")
+            welcome_msg = find_chat.get("welcome_msg")
+            goodbye_msg = find_chat.get("goodbye_msg")
+            antibot = find_chat.get("antibot")
+            del_cmd = find_chat.get("del_cmd")
+            all_links = find_chat.get("all_links")
+            allowed_links = find_chat.get("allowed_links")
+            log_channel = find_chat.get("log_channel")
+
+            msg = (
+                f"<b>Chat Settings</b> -\n\n"
+                f"• Title: {title}\n"
+                f"• ID: <code>{chat.id}</code>\n\n"
+
+                f"• Lang: <code>{lang}</code>\n"
+                f"• Echo: <code>{echo}</code>\n"
+                f"• Auto tr: <code>{auto_tr}</code>\n"
+                f"• Welcome user: <code>{welcome_msg}</code>\n"
+                f"• Goodbye user: <code>{goodbye_msg}</code>\n"
+                f"• Antibot: <code>{antibot}</code>\n"
+                f"• Delete cmd: <code>{del_cmd}</code>\n"
+                f"• All links: <code>{all_links}</code>\n"
+                f"• Allowed links: <code>{allowed_links}</code>\n"
+                f"• Log channel: <code>{log_channel}</code>\n"
+            )
+
             btn_name_row1 = ["Language", "Auto translate"]
             btn_data_row1 = ["lang", "auto_tr"]
 
@@ -1347,7 +1410,22 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             btn = row1 + row2 + row3 + row4 + row5
 
-        elif edit_cname == "users":
+        elif data_to_find == "db_user_data":
+            user_mention = find_chat.get("mention")
+            lang = find_chat.get("lang")
+            echo = find_chat.get("echo")
+            auto_tr = find_chat.get("auto_tr")
+
+            msg = (
+                f"<b>Chat Settings</b> -\n\n"
+                f"• User: {user_mention}\n"
+                f"• ID: <code>{user.id}</code>\n\n"
+
+                f"• Lang: <code>{lang}</code>\n"
+                f"• Echo: <code>{echo}</code>\n"
+                f"• Auto tr: <code>{auto_tr}</code>\n\n"
+            )
+
             btn_name_row1 = ["Language", "Auto translate"]
             btn_data_row1 = ["lang", "auto_tr"]
 
@@ -1358,12 +1436,12 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
 
             btn = row1 + row2
-        
+
         else:
             await query.message.delete()
             return
         
-        await Message.edit_msg(update, "<b>Chat Settings</b> -\n\n<i>Note: Can't show full info in back menu for some technical problem!</i>", sent_msg, btn)
+        await Message.edit_msg(update, msg, sent_msg, btn)
     # ---------------------------------------------------------------------------- chat settings ends
     # global ----------------------------------------------------------------- Global
     elif data == "edit_value":
@@ -1452,6 +1530,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
             if edit_data_name in ["images", "allowed_links"]:
                 new_value = f"{len(new_value)} items"
+            elif edit_data_name == "custom_welcome_msg":
+                new_value = "Check in message..."
             await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
 
             db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
