@@ -1,3 +1,4 @@
+import asyncio
 from telegram import Update, ChatMember, ChatMemberUpdated
 from telegram.ext import ContextTypes
 from bot import bot, logger
@@ -155,6 +156,12 @@ async def _pm_error(chat_id):
     await Message.send_msg(chat_id, "This command is made to be used in group chats, not in pm!", btn)
 
 
+async def _timer_del_msg(update: Update, msg_pointer=None, msg_id=None):
+    chat = update.effective_chat
+    await asyncio.sleep(180) # wait 3 min
+    await Message.del_msg(chat.id, msg_pointer=msg_pointer, msg_id=msg_id)
+
+
 async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     this will check bot status (where it get banned or added or started or blocked etc.)
@@ -297,12 +304,14 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
                         value = ""
                     custom_welcome_msg = custom_welcome_msg.replace(key, str(value))
 
-                await Message.send_msg(chat.id, custom_welcome_msg)
+                sent_msg = await Message.send_msg(chat.id, custom_welcome_msg)
             else:
-                await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
+                sent_msg = await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
             await _log_channel(context, chat, user, victim, action="JOIN")
+            await _timer_del_msg(update, sent_msg)
     elif user_exist == False and reason == "left" and goodbye_msg:
-        await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")
+        sent_msg = await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")
+        await _timer_del_msg(update, sent_msg)
         await _log_channel(context, chat, user, victim, action="LEFT")
 
 
