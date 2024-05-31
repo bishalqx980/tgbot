@@ -43,7 +43,7 @@ else:
 <details>
 <summary><b>Setup 📦</b></summary>
 
-- Fillup `sample_config.env` file value's
+- Rename `sample_config.env` to `config.env` then fillup `config.env` file value's
 - `bot_token` Get from https://t.me/BotFather E.g. 123456:abcdefGHIJK...
 - `owner_id` Get from bot by /id command E.g. 2134776547
 - `owner_username` Your Username E.g. paste like bishalqx980 not @bishalqx980
