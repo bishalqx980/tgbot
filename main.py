@@ -6,6 +6,7 @@ import random
 import asyncio
 import requests
 import subprocess
+from threading import Thread
 from telegram.constants import ParseMode
 from telegram.error import Forbidden
 from telegram import Update, ChatMember
@@ -70,8 +71,8 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             _bot = context.bot_data["db_bot_data"]
         except Exception as e:
             logger.error(e)
-            find = await MongoDB.find("bot_docs", "_id")
-            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+            find = MongoDB.find("bot_docs", "_id")
+            _bot = MongoDB.find_one("bot_docs", "_id", find[0])
             context.bot_data["db_bot_data"] = _bot
 
         bot_pic = _bot.get("bot_pic")
@@ -153,9 +154,13 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ You can't use both statement in same message!\n/movie for details.")
 
     movie_info = get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
-
+    
     if not movie_info:
-        await Message.send_msg(chat.id, "Movie name invalid! or something went wrong!")
+        await Message.send_msg(chat.id, "Movie name invalid!")
+        return
+    
+    if movie_info == 0:
+        await Message.send_msg(chat.id, "omdb_api not found!")
         return
 
     poster, content_type, title, released, runtime, genre, director, writer, actors, plot, language, country, awards, meta_score, imdb_rating, imdb_votes, imdb_id, box_office = movie_info
@@ -203,7 +208,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_user = None
         
         if not find_user:
-            find_user = await MongoDB.find_one("users", "user_id", user.id)
+            find_user = MongoDB.find_one("users", "user_id", user.id)
             if find_user:
                 context.chat_data["db_user_data"] = find_user
             else:
@@ -219,7 +224,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_group = None
         
         if not find_group:
-            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+            find_group = MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
                 context.chat_data["db_group_data"] = find_group
             else:
@@ -236,8 +241,8 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             _bot = context.bot_data["db_bot_data"]
         except Exception as e:
             logger.error(e)
-            find = await MongoDB.find("bot_docs", "_id")
-            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+            find = MongoDB.find("bot_docs", "_id")
+            _bot = MongoDB.find_one("bot_docs", "_id", find[0])
             context.bot_data["db_bot_data"] = _bot
             
         btn_name = ["Language code's"]
@@ -287,14 +292,17 @@ async def func_shortener(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = re_msg.text or re_msg.caption if re_msg else " ".join(context.args)
 
     if not msg:
-        await Message.reply_msg(update, "Use <code>/shortener url</code>\nor reply the url with <code>/shortener</code>\nE.g. <code>/shortener https://google.com</code>")
+        await Message.reply_msg(update, "Use <code>/short url</code>\nor reply the url with <code>/short</code>\nE.g. <code>/short https://google.com</code>")
         return
     
     shorted_url = shortener_url(msg)
-    if shorted_url:
-        await Message.reply_msg(update, shorted_url)
+    if shorted_url == 0:
+        msg = "shrinkme_api not found!"
+    elif shorted_url:
+        msg = shorted_url
     else:
-        await Message.reply_msg(update, f"Invalid URL!")
+        msg = "Invalid url!"
+    await Message.reply_msg(update, msg)
 
 
 async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -379,6 +387,10 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     info = weather_info(location)
 
     if not info:
+        await Message.reply_msg(update, "weather_api not found!")
+        return
+    
+    if not info:
         await Message.reply_msg(update, "Something went wrong!")
         return
     
@@ -448,7 +460,6 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
     prompt = " ".join(context.args)
 
     if not prompt:
@@ -463,21 +474,8 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_msg = await Message.reply_msg(update, "Processing...")
     retry = 0
 
-    # safone_ai_res = await Safone.safone_ai(msg)
-    # if safone_ai_res:
-    #     chatgpt = safone_ai_res[0]
-    #     bard = safone_ai_res[1]
-    #     chatbot = safone_ai_res[2]
-
-    #     if chatgpt:
-    #         text = chatgpt.message
-    #     elif bard:
-    #         text = bard.message
-    #     else:
-    #         text = chatbot.response
-
     while retry != 3:
-        g4f_gpt = await G4F.chatgpt(f"{prompt}, explain in few sentences and in English.")
+        g4f_gpt = G4F.chatgpt(f"{prompt}, explain in few sentences and in English.")
         if g4f_gpt and "流量异常, 请尝试更换网络环境, 如果你觉得ip被误封了, 可尝试邮件联系我们, 当前" not in g4f_gpt:
             break
         elif retry == 3:
@@ -536,6 +534,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         timeout += 1
         await asyncio.sleep(1)
         if content_format:
+            context.user_data["content_format"] = None
             break
     
     await Message.del_msg(chat.id, del_msg)
@@ -548,9 +547,9 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await Message.edit_msg(update, "📥 Downloading...", sent_msg)
 
     res = YouTubeDownload.ytdl(url, content_format)
-
-    if len(res) < 2:
-        await Message.edit_msg(update, res, sent_msg)
+    
+    if res[0] == 0:
+        await Message.edit_msg(update, res[1], sent_msg)
         return
 
     await Message.edit_msg(update, "📤 Uploading...", sent_msg)
@@ -665,8 +664,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         _bot = context.bot_data["db_bot_data"]
     except Exception as e:
         logger.error(e)
-        find = await MongoDB.find("bot_docs", "_id")
-        _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+        find = MongoDB.find("bot_docs", "_id")
+        _bot = MongoDB.find_one("bot_docs", "_id", find[0])
         context.bot_data["db_bot_data"] = _bot
 
     if chat.type == "private":
@@ -677,7 +676,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_user = None
         
         if not find_user:
-            find_user = await MongoDB.find_one("users", "user_id", user.id)
+            find_user = MongoDB.find_one("users", "user_id", user.id)
             if find_user:
                 context.chat_data["db_user_data"] = find_user
             else:
@@ -718,16 +717,16 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2
 
         try:
-            images = await MongoDB.get_data("bot_docs", "images")
+            images = MongoDB.get_data("bot_docs", "images")
             if images:
                 image = random.choice(images).strip()
             else:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
             logger.error(e)
             try:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(chat.id, image, msg, btn)
             except Exception as e:
                 logger.error(e)
@@ -767,7 +766,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_group = None
         
         if not find_group:
-            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+            find_group = MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
                 context.chat_data["db_group_data"] = find_group
             else:
@@ -839,16 +838,16 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2 + row3 + row4 + row5
 
         try:
-            images = await MongoDB.get_data("bot_docs", "images")
+            images = MongoDB.get_data("bot_docs", "images")
             if images:
                 image = random.choice(images).strip()
             else:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
             logger.error(e)
             try:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(chat.id, image, msg, btn)
             except Exception as e:
                 logger.error(e)
@@ -905,7 +904,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     
     try:
-        db = await MongoDB.info_db()
+        db = MongoDB.info_db()
         for i in db:
             if i[0] == "users":
                 total_users = i[1]
@@ -913,7 +912,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 total_users = "❓"
         
-        active_status = await MongoDB.find("users", "active_status")
+        active_status = MongoDB.find("users", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
 
@@ -922,8 +921,8 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
             f"/start - to start the bot\n"
             f"/help - to see this message\n\n"
-            f"T.users: {total_users} |"
-            f"A.users: {active_users} |"
+            f"T.users: {total_users} | "
+            f"A.users: {active_users} | "
             f"Inactive: {inactive_users}"
         )
 
@@ -946,16 +945,16 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2 + row3
 
         try:
-            images = await MongoDB.get_data("bot_docs", "images")
+            images = MongoDB.get_data("bot_docs", "images")
             if images:
                 image = random.choice(images).strip()
             else:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(user.id, image, msg, btn)
         except Exception as e:
             logger.error(e)
             try:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(user.id, image, msg, btn)
             except Exception as e:
                 logger.error(e)
@@ -1025,8 +1024,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"Error Broadcast: {e}")
         return
     
-    users_id = await MongoDB.find("users", "user_id")
-    active_status = await MongoDB.find("users", "active_status")
+    users_id = MongoDB.find("users", "user_id")
+    active_status = MongoDB.find("users", "active_status")
 
     if len(users_id) == len(active_status):
         combined_list = list(zip(users_id, active_status))
@@ -1082,7 +1081,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if chat_id:
         if "-100" in str(chat_id):
-            find_group = await MongoDB.find_one("groups", "chat_id", int(chat_id))
+            find_group = MongoDB.find_one("groups", "chat_id", int(chat_id))
             if not find_group:
                 await Message.reply_msg(update, "Chat not found!")
                 return
@@ -1124,7 +1123,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             await Message.reply_msg(update, f"<b>{msg}</b>")
         else:
-            find_user = await MongoDB.find_one("users", "user_id", int(chat_id))
+            find_user = MongoDB.find_one("users", "user_id", int(chat_id))
             if not find_user:
                 await Message.reply_msg(update, "User not found!")
                 return
@@ -1151,7 +1150,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"<b>{msg}</b>")
         return
     
-    db = await MongoDB.info_db()
+    db = MongoDB.info_db()
     msg = "▬▬▬▬▬▬▬▬▬▬\n"
     for info in db:
         msg += (
@@ -1161,7 +1160,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<code>Actual size:</code> {info[3]}\n"
             f"▬▬▬▬▬▬▬▬▬▬\n"
         )
-    active_status = await MongoDB.find("users", "active_status")
+    active_status = MongoDB.find("users", "active_status")
     active_users = active_status.count(True)
     inactive_users = active_status.count(False)
     await Message.reply_msg(update, f"<b>{msg}Active users: {active_users}\nInactive users: {inactive_users}</b>")
@@ -1180,7 +1179,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
     
-    welcome_img = await MongoDB.get_data("bot_docs", "welcome_img")
+    welcome_img = MongoDB.get_data("bot_docs", "welcome_img")
     
     context.chat_data["edit_cname"] = "bot_docs"
     context.chat_data["find_data"] = "welcome_img"
@@ -1198,27 +1197,31 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_name_row3 = ["GitHub", "Server url"]
     btn_data_row3 = ["github_repo", "server_url"]
 
-    btn_name_row4 = ["⚠ Restore Settings", "Close"]
-    btn_data_row4 = ["restore_db", "close"]
+    btn_name_row4 = ["Shrinkme API", "OMDB API", "Weather API"]
+    btn_data_row4 = ["shrinkme_api", "omdb_api", "weather_api"]
+
+    btn_name_row5 = ["⚠ Restore Settings", "Close"]
+    btn_data_row5 = ["restore_db", "close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
     row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
     row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
+    row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
 
-    btn = row1 + row2 + row3 + row4
+    btn = row1 + row2 + row3 + row4 + row5
 
     try:
-        images = await MongoDB.get_data("bot_docs", "images")
+        images = MongoDB.get_data("bot_docs", "images")
         if images:
             image = random.choice(images).strip()
         else:
-            image = await MongoDB.get_data("bot_docs", "bot_pic")
+            image = MongoDB.get_data("bot_docs", "bot_pic")
         await Message.send_img(chat.id, image, "<b>Bot Settings</b>", btn)
     except Exception as e:
         logger.error(e)
         try:
-            image = await MongoDB.get_data("bot_docs", "bot_pic")
+            image = MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, "<b>Bot Settings</b>", btn)
         except Exception as e:
             logger.error(e)
@@ -1241,7 +1244,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not command:
-        await Message.reply_msg(update, "E.g. <code>/shell dir</code> [linux]")
+        await Message.reply_msg(update, "E.g. <code>/shell dir/ls</code> [linux/Windows Depend on your hosting device]")
         return
     
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -1250,7 +1253,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
             shell_file.write(result.stdout)
         with open("shell.txt", "rb") as shell_file:
             shell = shell_file.read()
-        await Message.send_doc(chat.id, shell, "shell.txt", "log.txt", e_msg.id)
+        await Message.send_doc(chat.id, shell, "shell.txt", "shell.txt", e_msg.id)
     else:
         await Message.reply_msg(update, result.stderr)
 
@@ -1285,14 +1288,14 @@ async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
     
-    bot_status = await MongoDB.get_data("bot_docs", "bot_status")
+    bot_status = MongoDB.get_data("bot_docs", "bot_status")
     try:
         if not bot_status or bot_status == "alive":
             await Message.send_msg(owner_id, "Restaring...")
-            await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "restart")
+            MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "restart")
             os.execv(sys.executable, ["python"] + sys.argv)
         elif bot_status == "restart":
-            await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
+            MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
             await Message.send_msg(owner_id, "Bot Restarted!")
     except Exception as e:
         logger.error(e)
@@ -1366,7 +1369,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_user = None
         
         if not find_user:
-            find_user = await MongoDB.find_one("users", "user_id", user.id)
+            find_user = MongoDB.find_one("users", "user_id", user.id)
             if find_user:
                 context.chat_data["db_user_data"] = find_user
             else:
@@ -1413,7 +1416,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_group = None
         
         if not find_group:
-            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+            find_group = MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
                 context.chat_data["db_group_data"] = find_group
             else:
@@ -1501,14 +1504,14 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def server_alive():
-    server_url = await MongoDB.get_data("bot_docs", "server_url")
-    bot_status = await MongoDB.get_data("bot_docs", "bot_status")
+    server_url = MongoDB.get_data("bot_docs", "server_url")
+    bot_status = MongoDB.get_data("bot_docs", "bot_status")
     
     try:
         if not bot_status or bot_status == "alive":
             await Message.send_msg(owner_id, "Bot Started!")
         elif bot_status == "restart":
-            await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
+            MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
             await Message.send_msg(owner_id, "Bot Restarted!")
     except Exception as e:
         logger.error(e)
@@ -1539,7 +1542,7 @@ def main():
     application.add_handler(CommandHandler("tr", func_translator, block=False))
     application.add_handler(CommandHandler("decode", func_b64decode, block=False))
     application.add_handler(CommandHandler("encode", func_b64encode, block=False))
-    application.add_handler(CommandHandler("shortener", func_shortener, block=False))
+    application.add_handler(CommandHandler("short", func_shortener, block=False))
     application.add_handler(CommandHandler("ping", func_ping, block=False))
     application.add_handler(CommandHandler("calc", func_calc, block=False))
     application.add_handler(CommandHandler("webshot", func_webshot, block=False))

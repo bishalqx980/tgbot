@@ -10,14 +10,14 @@ from bot import (
     mongodb_uri,
     db_name,
     server_url,
-    shortener_api_key,
+    shrinkme_api,
     omdb_api,
-    weather_api_key
+    weather_api
 )
 
 
 async def update_database():
-    find = await MongoDB.find("bot_docs", "_id")
+    find = MongoDB.find("bot_docs", "_id")
 
     if find:
         logger.info("MongoDB Database Exist! Skiping update...")
@@ -36,13 +36,13 @@ async def update_database():
         #alive
         "server_url": server_url,
         #api's
-        "shortener_api_key": shortener_api_key,
+        "shrinkme_api": shrinkme_api,
         "omdb_api": omdb_api,
-        "weather_api_key": weather_api_key
+        "weather_api": weather_api
     }
 
     try:
-        await MongoDB.insert_single_data("bot_docs", data)
+        MongoDB.insert_single_data("bot_docs", data)
         logger.info("Database updated from config.env ...")
         return True
     except Exception as e:

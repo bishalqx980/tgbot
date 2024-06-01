@@ -50,9 +50,9 @@ else:
 - `mongodb_uri` Get from https://www.mongodb.com/
 - `db_name` anything E.g. MissCiri_db
 - `server_url` E.g. for render it will be https://your_app_name.onrender.com/
-- ❗ OPTIONAL | `shortener_api_key` Get from https://shrinkme.io/
+- ❗ OPTIONAL | `shrinkme_api` Get from https://shrinkme.io/
 - ❗ OPTIONAL | `omdb_api` Get from https://www.omdbapi.com/
-- ❗ OPTIONAL | `weather_api_key` Get from https://www.weatherapi.com/
+- ❗ OPTIONAL | `weather_api` Get from https://www.weatherapi.com/
     <hr>
     <details>
     <summary><b>Local Deploy 🚀</b></summary>

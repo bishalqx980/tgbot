@@ -6,12 +6,7 @@ class YouTubeDownload:
     def ytdl(url, extention):
         try:
             logger.info("Starting Download...")
-            def _on_progress(stream, chunk, bytes_remaining):
-                total_size = stream.filesize
-                progress = (total_size - bytes_remaining) * 100 / total_size
-                logger.info(f"Downloading... {int(progress)}%")
-
-            yt = YouTube(url, on_progress_callback=_on_progress)
+            yt = YouTube(url)
             title = yt.title
             thumbnail_url = yt.thumbnail_url
             extention = extention # mp3/mp4
@@ -23,7 +18,7 @@ class YouTubeDownload:
                 progressive = False
             order_by = "abr" # bitrate
             file_path = "ytdl/download/"
-            thumbnail = "ytdl/download/thumbnail.png"
+            thumbnail = "ytdl/download/thumbnail.jpg"
 
             stream = (
                 yt.streams
@@ -51,9 +46,8 @@ class YouTubeDownload:
             else:
                 logger.info("No stream found for this video")
         except Exception as e:
-            error = f"Error ytdl: {e}"
-            logger.error(error)
-            return error
+            logger.error(e)
+            return 0, f"{e}"
 
 
     def yts(keyword):

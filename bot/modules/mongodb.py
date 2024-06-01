@@ -6,7 +6,7 @@ client = pymongo.MongoClient(mongodb_uri)
 db = client[db_name]
 
 class MongoDB:
-    async def insert_single_data(collection_name, data):
+    def insert_single_data(collection_name, data):
         """
         ex. data = {"name": "John", "age": 30, "city": "New York"}
         """
@@ -22,7 +22,7 @@ class MongoDB:
             logger.error(e)
 
 
-    async def insert_multiple_data(collection_name, data_list):
+    def insert_multiple_data(collection_name, data_list):
         """
         ex. data = [
             { "name": "Alice", "age": 25, "city": "San Francisco" },
@@ -41,7 +41,7 @@ class MongoDB:
             logger.error(e)
 
 
-    async def find_one(collection_name, search, match):
+    def find_one(collection_name, search, match):
         """
         Example: x = find_one(collection_name)\n
         x.get(item)
@@ -60,7 +60,7 @@ class MongoDB:
             logger.error(e)
     
 
-    async def find(collection_name, search):
+    def find(collection_name, search):
         collection = db[collection_name]
         try:
             logger.info(f"Finding Data in {collection_name} MongoDB...")
@@ -76,7 +76,7 @@ class MongoDB:
             logger.error(e)
 
 
-    async def get_data(collection_name, get_data):
+    def get_data(collection_name, get_data):
         collection = db[collection_name]
         try:
             logger.info(f"Getting Data from {collection_name} MongoDB...")
@@ -91,7 +91,7 @@ class MongoDB:
             logger.error(e)
 
 
-    async def update_db(collection_name, search, match, update_data_name, update_data_value):
+    def update_db(collection_name, search, match, update_data_name, update_data_value):
         collection = db[collection_name]
         try:
             logger.info(f"Updating {collection_name} MongoDB Data...")
@@ -104,7 +104,7 @@ class MongoDB:
             logger.error(e)
 
 
-    async def info_db(collection_name=None):
+    def info_db(collection_name=None):
         docs_name = db.list_collection_names()
         if collection_name:
             logger.info(f"Getting Info about {collection_name} MongoDB...")
@@ -134,7 +134,7 @@ class MongoDB:
             return storage
 
 
-    async def delete_all_doc(collection_name):
+    def delete_all_doc(collection_name):
         collection = db[collection_name]
         try:
             logger.info(f"{collection_name} Data deleting process started...")

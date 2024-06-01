@@ -5,28 +5,6 @@ from dotenv import load_dotenv
 from bot.alive import alive
 from SafoneAPI import SafoneAPI
 
-load_dotenv("config.env")
-
-bot_token = os.getenv("BOT_TOKEN")
-owner_id = os.getenv("OWNER_ID")
-owner_username = os.getenv("OWNER_USERNAME")
-bot_pic = os.getenv("BOT_PIC")
-welcome_img = os.getenv("WELCOME_IMG")
-github_repo = os.getenv("GITHUB_REPO")
-#database
-mongodb_uri = os.getenv("MONGODB_URI")
-db_name = os.getenv("DB_NAME")
-#alive
-server_url = os.getenv("SERVER_URL")
-#api's
-shortener_api_key = os.getenv("SHORTENER_API_KEY")
-omdb_api = os.getenv("OMDB_API")
-weather_api_key = os.getenv("WEATHER_API_KEY")
-#safone api
-safone_api = SafoneAPI()
-
-bot = Bot(bot_token)
-
 with open('log.txt', 'w'):
     pass
 
@@ -45,6 +23,39 @@ logging.getLogger("").addHandler(console)
 
 logger = logging.getLogger(__name__)
 
+config_file = load_dotenv("config.env")
+if not config_file:
+    logger.error("config.env not found...\nExiting...")
+    exit(1)
+
+bot_token = os.getenv("BOT_TOKEN")
+owner_id = os.getenv("OWNER_ID")
+owner_username = os.getenv("OWNER_USERNAME")
+bot_pic = os.getenv("BOT_PIC")
+welcome_img = os.getenv("WELCOME_IMG")
+github_repo = os.getenv("GITHUB_REPO")
+#database
+mongodb_uri = os.getenv("MONGODB_URI")
+db_name = os.getenv("DB_NAME")
+#alive
+server_url = os.getenv("SERVER_URL")
+#api's
+shrinkme_api = os.getenv("SHRINKME_API")
+omdb_api = os.getenv("OMDB_API")
+weather_api = os.getenv("WEATHER_API")
+
+variables = [bot_token, mongodb_uri, db_name]
+for variable in variables:
+    if len(variable) == 0:
+        logger.error(f"Check config.env again... [some value are empty]")
+        exit(1)
+    else:
+        pass
+
+#safone api
+safone_api = SafoneAPI()
+
+bot = Bot(bot_token)
 
 logger.info(
 '''Developed by

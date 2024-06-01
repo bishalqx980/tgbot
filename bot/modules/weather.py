@@ -1,9 +1,15 @@
 import requests
-from bot import logger, weather_api_key
+from bot import logger
+from bot.modules.mongodb import MongoDB
 
 def weather_info(location):
+    weather_api = MongoDB.get_data("bot_docs", "weather_api")
+    if not weather_api:
+        logger.error("weather_api not found!")
+        return 0
+    
     try:
-        post_url = f"https://api.weatherapi.com/v1/current.json?key={weather_api_key}&q={location}&aqi=no"
+        post_url = f"https://api.weatherapi.com/v1/current.json?key={weather_api}&q={location}&aqi=no"
         response = requests.get(post_url)
         weather_data = response.json()
         if weather_data:
@@ -38,3 +44,4 @@ def weather_info(location):
             return loc_name, loc_country, loc_tz_id, loc_localtime, cur_last_updated, cur_temp_c, cur_f_temp_c, cur_temp_f, cur_f_temp_f, cur_wind_mph, cur_wind_kph, cur_wind_deg, cur_humidity, cur_uv, cur_con_text, cur_con_icon
     except Exception as e:
         logger.error(e)
+        

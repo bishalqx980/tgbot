@@ -2,7 +2,7 @@ import asyncio
 from urllib.parse import urlparse
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import bot, logger, owner_username
+from bot import bot, logger
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.mongodb import MongoDB
 from bot.update_db import update_database
@@ -84,7 +84,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 find_group = None
             
             if not find_group:
-                find_group = await MongoDB.find_one("groups", "chat_id", chat_id)
+                find_group = MongoDB.find_one("groups", "chat_id", chat_id)
                 if find_group:
                     context.chat_data["db_group_data"] = find_group
 
@@ -162,7 +162,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/tr » Translate any language\n"
             "/decode » Decode - base64 to text\n"
             "/encode » Encode - text to base64\n"
-            "/shortener » Short any url\n"
+            "/short » Short any url\n"
             "/ping » Ping any url\n"
             "/calc » Calculate any math (supported syntex: +, -, *, /)\n"
             "/webshot » Take Screenshot of any website\n"
@@ -202,7 +202,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "github_stats":
-        github_repo = await MongoDB.get_data("bot_docs", "github_repo")
+        github_repo = MongoDB.get_data("bot_docs", "github_repo")
         latest_commit = GitHub.get_latest_commit("bishalqx980", "tgbot")
         if latest_commit:
             l_c_sha = latest_commit.get("sha")
@@ -259,7 +259,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
 
     elif data == "help_menu":
-        db = await MongoDB.info_db()
+        db = MongoDB.info_db()
         for i in db:
             if i[0] == "users":
                 total_users = i[1]
@@ -267,7 +267,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 total_users = "❓"
         
-        active_status = await MongoDB.find("users", "active_status")
+        active_status = MongoDB.find("users", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
 
@@ -302,8 +302,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "bot_pic":
         edit_cname = "bot_docs"
         find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        bot_pic = await MongoDB.get_data(edit_cname, "bot_pic")
+        match_data = MongoDB.find(edit_cname, find_data)
+        bot_pic = MongoDB.get_data(edit_cname, "bot_pic")
 
         context.chat_data["edit_cname"] = edit_cname
         context.chat_data["find_data"] = find_data
@@ -311,7 +311,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "bot_pic"
 
         msg = (
-            "<b>Bot Settings</b> -\n\n"
+            "<u><b>Bot Settings</b></u>\n\n"
             f"Bot pic: <code>{bot_pic}</code>\n\n"
             "<i>Note: Send an image url/link to set bot pic!</i>"
         )
@@ -330,12 +330,12 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "welcome_img":
-        welcome_img = await MongoDB.get_data("bot_docs", "welcome_img")
+        welcome_img = MongoDB.get_data("bot_docs", "welcome_img")
 
         context.chat_data["edit_data_name"] = "welcome_img"
 
         msg = (
-            "<b>Bot Settings</b> -\n\n"
+            "<u><b>Bot Settings</b></u>\n\n"
             f"Welcome img: {welcome_img}\n\n"
             "<i>Note: Should bot show bot_pic on start?</i>"
         )
@@ -356,8 +356,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "images":
         edit_cname = "bot_docs"
         find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        images = await MongoDB.get_data(edit_cname, "images")
+        match_data = MongoDB.find(edit_cname, find_data)
+        images = MongoDB.get_data(edit_cname, "images")
 
         context.chat_data["edit_cname"] = edit_cname
         context.chat_data["find_data"] = find_data
@@ -377,7 +377,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 images = "Value sent below!"
         
         msg = (
-            "<b>Bot Settings</b> -\n\n"
+            "<u><b>Bot Settings</b></u>\n\n"
             f"images: <code>{images}</code>\n\n"
             "<i>Note: Single image or Upload multiple image link separated by comma!</i>"
         )
@@ -398,8 +398,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "support_chat":
         edit_cname = "bot_docs"
         find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        support_chat = await MongoDB.get_data(edit_cname, "support_chat")
+        match_data = MongoDB.find(edit_cname, find_data)
+        support_chat = MongoDB.get_data(edit_cname, "support_chat")
 
         context.chat_data["edit_cname"] = edit_cname
         context.chat_data["find_data"] = find_data
@@ -407,7 +407,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "support_chat"
 
         msg = (
-            "<b>Bot Settings</b> -\n\n"
+            "<u><b>Bot Settings</b></u>\n\n"
             f"Support Chat (link): <code>{support_chat}</code>\n"
         )
 
@@ -427,8 +427,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "server_url":
         edit_cname = "bot_docs"
         find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        server_url = await MongoDB.get_data(edit_cname, "server_url")
+        match_data = MongoDB.find(edit_cname, find_data)
+        server_url = MongoDB.get_data(edit_cname, "server_url")
 
         context.chat_data["edit_cname"] = edit_cname
         context.chat_data["find_data"] = find_data
@@ -436,9 +436,99 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "server_url"
 
         msg = (
-            "<b>Bot Settings</b> -\n\n"
+            "<u><b>Bot Settings</b></u>\n\n"
             f"Server url: <code>{server_url}</code>\n\n"
             "<i>Note: Bot will fall asleep if you deployed the bot on render (free) and don't set this value...</i>"
+        )
+
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["b_setting_menu", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
+    
+    elif data == "shrinkme_api":
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = MongoDB.find(edit_cname, find_data)
+        shrinkme_api = MongoDB.get_data(edit_cname, "shrinkme_api")
+
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "shrinkme_api"
+
+        msg = (
+            "<u><b>Bot Settings</b></u>\n\n"
+            f"Shrinkme API: <code>{shrinkme_api}</code>\n\n"
+            "<i>Note: This api for /short command!</i>"
+        )
+
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["b_setting_menu", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
+    
+    elif data == "omdb_api":
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = MongoDB.find(edit_cname, find_data)
+        omdb_api = MongoDB.get_data(edit_cname, "omdb_api")
+
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "omdb_api"
+
+        msg = (
+            "<u><b>Bot Settings</b></u>\n\n"
+            f"OMDB API: <code>{omdb_api}</code>\n\n"
+            "<i>Note: This api for /movie command!</i>"
+        )
+
+        btn_name_row1 = ["Edit Value", "Remove Value"]
+        btn_data_row1 = ["edit_value", "remove_value"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["b_setting_menu", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
+    
+    elif data == "weather_api":
+        edit_cname = "bot_docs"
+        find_data = "_id"
+        match_data = MongoDB.find(edit_cname, find_data)
+        weather_api = MongoDB.get_data(edit_cname, "weather_api")
+
+        context.chat_data["edit_cname"] = edit_cname
+        context.chat_data["find_data"] = find_data
+        context.chat_data["match_data"] = match_data[0]
+        context.chat_data["edit_data_name"] = "weather_api"
+
+        msg = (
+            "<u><b>Bot Settings</b></u>\n\n"
+            f"Weather API: <code>{weather_api}</code>\n\n"
+            "<i>Note: This api for /weather command!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -457,8 +547,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data == "github_repo":
         edit_cname = "bot_docs"
         find_data = "_id"
-        match_data = await MongoDB.find(edit_cname, find_data)
-        github_repo = await MongoDB.get_data(edit_cname, "github_repo")
+        match_data = MongoDB.find(edit_cname, find_data)
+        github_repo = MongoDB.get_data(edit_cname, "github_repo")
 
         context.chat_data["edit_cname"] = edit_cname
         context.chat_data["find_data"] = find_data
@@ -466,7 +556,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "github_repo"
 
         msg = (
-            "<b>Bot Settings</b> -\n\n"
+            "<u><b>Bot Settings</b></u>\n\n"
             f"GitHub repo: <code>{github_repo}</code>\n\n"
             f"<i>Note: Your bot github repo link, to keep track on updates on latest repo...</i>"
         )
@@ -486,7 +576,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif data == "restore_db":
         msg = (
-            "<b>Bot Settings</b> -\n\n"
+            "<u><b>Bot Settings</b></u>\n\n"
             "Which data will be deleted? ⚠\n"
             "- All bot setting\n\n"
             "Which data won't be deleted?\n"
@@ -514,7 +604,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.delete()
             return
 
-        await MongoDB.delete_all_doc("bot_docs")
+        MongoDB.delete_all_doc("bot_docs")
 
         res = await update_database()
 
@@ -531,15 +621,19 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row3 = ["GitHub", "Server url"]
         btn_data_row3 = ["github_repo", "server_url"]
 
-        btn_name_row4 = ["⚠ Restore Settings", "Close"]
-        btn_data_row4 = ["restore_db", "close"]
+        btn_name_row4 = ["Shrinkme API", "OMDB API", "Weather API"]
+        btn_data_row4 = ["shrinkme_api", "omdb_api", "weather_api"]
+
+        btn_name_row5 = ["⚠ Restore Settings", "Close"]
+        btn_data_row5 = ["restore_db", "close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
         row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
         row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
+        row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
 
-        btn = row1 + row2 + row3 + row4
+        btn = row1 + row2 + row3 + row4 + row5
         
         await Message.edit_msg(update, "<b>Bot Settings</b>", sent_msg, btn)
     # ---------------------------------------------------------------------------- bsettings ends
@@ -565,7 +659,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -577,16 +671,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             _bot = context.bot_data["db_bot_data"]
         except Exception as e:
             logger.error(e)
-            find = await MongoDB.find("bot_docs", "_id")
-            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+            find = MongoDB.find("bot_docs", "_id")
+            _bot = MongoDB.find_one("bot_docs", "_id", find[0])
             context.bot_data["db_bot_data"] = _bot
         
         lang = find_chat.get("lang")
         context.chat_data["edit_data_name"] = "lang"
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
-            f"language code: <code>{lang}</code>\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
+            f"Language code: <code>{lang}</code>\n\n"
             "<i>Note: Get your country language code from the below link!\neg. English language code is <code>en</code></i>"
         )
 
@@ -628,7 +722,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -641,7 +735,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "auto_tr"
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"Auto translate: <code>{auto_tr}</code>\n\n"
             "<i>Note: This will automatically translate chat conversation into chat default language!</i>"
         )
@@ -680,7 +774,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -693,7 +787,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "echo"
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"Echo: <code>{echo}</code>\n\n"
             "<i>Note: This will repeat user message!</i>"
         )
@@ -732,7 +826,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -745,7 +839,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "welcome_msg"
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"Welcome user: <code>{welcome_msg}</code>\n\n"
             "<i>Note: This will welcome the new chat member!</i>"
         )
@@ -788,7 +882,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -801,7 +895,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "custom_welcome_msg"
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"Welcome message\n--------------------\n<code>{custom_welcome_msg}</code>\n\n"
             "<i>Note: This message will be send as greeting message in the chat when a user join!</i>"
         )
@@ -874,7 +968,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -887,7 +981,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "goodbye_msg"
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"Goodbye user: <code>{goodbye_msg}</code>\n\n"
             "<i>Note: This will send a farewell message to chat when a user left!\n</i>"
         )
@@ -926,7 +1020,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -939,7 +1033,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "antibot"
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"Antibot: <code>{antibot}</code>\n\n"
             "<i>Note: This will prevent other bot from joining in chat!</i>"
         )
@@ -978,7 +1072,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -991,7 +1085,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "del_cmd"
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"Delete cmd: <code>{del_cmd}</code>\n\n"
             "<i>Note: This will delete bot commands when you will send a command in chat!</i>"
         )
@@ -1032,7 +1126,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -1043,7 +1137,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log_channel = find_chat.get("log_channel")
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"Log channel: <code>{log_channel}</code>\n\n"
             "<i>Note: This will log every actions occurred in your chat (ban, kick, mute, etc.) using bot!\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
         )
@@ -1082,7 +1176,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -1094,7 +1188,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         allowed_links = find_chat.get("allowed_links")
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"All links: <code>{all_links}</code>\n"
             f"Allowed links: <code>{allowed_links}</code>\n\n"
             "<i>Note: Select whether it will delete or convert the links into base64 or do nothing if links in message!</i>\n"
@@ -1138,7 +1232,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -1149,7 +1243,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         all_links = find_chat.get("all_links")
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"All links: <code>{all_links}</code>\n\n"
             "<i>Note: Select whether bot will delete the message or convert link into base64 or do nothing!</i>"
         )
@@ -1190,7 +1284,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -1201,7 +1295,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         allowed_links = find_chat.get("allowed_links")
 
         msg = (
-            "<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"Allowed links: <code>{allowed_links}</code>\n\n"
             "<i>Note: Send domain name of allowed links eg. <code>google.com</code> multiple domain will be separated by comma!</i>"
         )
@@ -1246,10 +1340,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         try:
-            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
             await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
 
-            db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
+            db_chat_data = MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
             logger.error(e)
@@ -1282,10 +1376,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         try:
-            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
             await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
 
-            db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
+            db_chat_data = MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
             logger.error(e)
@@ -1318,10 +1412,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         try:
-            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
             await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
 
-            db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
+            db_chat_data = MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
             logger.error(e)
@@ -1348,7 +1442,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_chat = None
         
         if not find_chat:
-            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            find_chat = MongoDB.find_one(edit_cname, find_data, match_data)
             if find_chat:
                 context.chat_data[data_to_find] = find_chat
             else:
@@ -1371,7 +1465,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             log_channel = find_chat.get("log_channel")
 
             msg = (
-                f"<b>Chat Settings</b> -\n\n"
+                f"<u><b>Chat Settings</b></u>\n\n"
                 f"• Title: {title}\n"
                 f"• ID: <code>{chat.id}</code>\n\n"
 
@@ -1417,7 +1511,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             auto_tr = find_chat.get("auto_tr")
 
             msg = (
-                f"<b>Chat Settings</b> -\n\n"
+                f"<u><b>Chat Settings</b></u>\n\n"
                 f"• User: {user_mention}\n"
                 f"• ID: <code>{user.id}</code>\n\n"
 
@@ -1527,14 +1621,14 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 new_value = [new_value]
 
         try:
-            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
             if edit_data_name in ["images", "allowed_links"]:
                 new_value = f"{len(new_value)} items"
             elif edit_data_name == "custom_welcome_msg":
                 new_value = "Check in message..."
             await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
 
-            db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
+            db_chat_data = MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
             logger.error(e)
@@ -1575,10 +1669,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         try:
-            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
             await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
 
-            db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
+            db_chat_data = MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
             logger.error(e)
@@ -1619,10 +1713,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         try:
-            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
             await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
 
-            db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
+            db_chat_data = MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
             logger.error(e)
@@ -1663,10 +1757,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         try:
-            await MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
+            MongoDB.update_db(edit_cname, find_data, match_data, edit_data_name, new_value)
             await popup(f"Database updated!\n\nData: {edit_data_name}\nValue: {new_value}")
 
-            db_chat_data = await MongoDB.find_one(edit_cname, find_data, match_data)
+            db_chat_data = MongoDB.find_one(edit_cname, find_data, match_data)
             context.chat_data[data_to_find] = db_chat_data
         except Exception as e:
             logger.error(e)
