@@ -1284,19 +1284,15 @@ async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
-    if chat.type != "private":
-        await Message.reply_msg(update, "⚠ Boss you are in public!")
-        return
-    
     bot_status = MongoDB.get_data("bot_docs", "bot_status")
     try:
         if not bot_status or bot_status == "alive":
-            await Message.send_msg(owner_id, "Restaring...")
+            await Message.send_msg(chat.id, "Restaring...")
             MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "restart")
             os.execv(sys.executable, ["python"] + sys.argv)
         elif bot_status == "restart":
             MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
-            await Message.send_msg(owner_id, "Bot Restarted!")
+            await Message.send_msg(chat.id, "Bot Restarted!")
     except Exception as e:
         logger.error(e)
 
