@@ -1,3 +1,5 @@
+import re
+import time
 import asyncio
 from telegram import Update, ChatMember, ChatMemberUpdated
 from telegram.ext import ContextTypes
@@ -154,6 +156,30 @@ async def _pm_error(chat_id):
     btn_url = [f"http://t.me/{_bot_info.username}?startgroup=start"]
     btn = await Button.ubutton(btn_name, btn_url)
     await Message.send_msg(chat_id, "This command is made to be used in group chats, not in pm!", btn)
+
+
+def _extract_time_reason(string):
+    time_regex = re.compile(r'(\d+)([smhd])')
+    find_time = time_regex.findall(string)
+    
+    multipliers = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+    time_duration = None
+    logical_time = None
+
+    if find_time:
+        for value, unit in find_time:
+            value = int(value)
+            unit = unit.lower()
+            time_duration = time.time() + value * multipliers.get(unit)
+            if (value < 35 and unit == "s") or (value > 365 and unit == "d"):
+                logical_time = "forever"
+                time_duration = None
+            else:
+                logical_time = f"{value}{unit}"
+    
+    reason = re.sub(time_regex, '', string).strip()
+
+    return time_duration, logical_time, reason
 
 
 async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -888,7 +914,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to mute!\nTo mention with reason eg. <code>/mute reason</code>")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to mute!\nTo mention with reason eg. <code>/mute reason</code>\nTo give a duration of mute <code>/mute time</code> or <code>/mute time reason</code>\n<pre>50second » 50s\n45minute » 45m\n5hour » 5h\n3days » 3d</pre>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -919,11 +945,20 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "can_send_voice_notes": False
     }
 
-    try:
-        await bot.restrict_chat_member(chat.id, victim.id, permissions)
-        msg = f"{user.mention_html()} has muted user {victim.mention_html()}!"
+    msg = f"{user.mention_html()} has muted user {victim.mention_html()}!\n"
+    until_date = None
+    time = None
+
+    if reason:
+        time, logical_time, reason = _extract_time_reason(reason)
+        if time:
+            msg = f"{msg}<b>Duration</b>: {logical_time}\n"
+            until_date = time
         if reason:
-            msg = f"{msg}\nReason: {reason}"
+            msg = f"{msg}<b>Reason</b>: {reason}"
+    
+    try:
+        await bot.restrict_chat_member(chat.id, victim.id, permissions, until_date)
         await Message.reply_msg(update, msg)
         await _log_channel(context, chat, user, victim, action="MUTE", reason=reason)
     except Exception as e:
@@ -1057,7 +1092,10 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         message_to_del = [e_msg, reply]
         for delete_msg in message_to_del:
-            await Message.del_msg(chat.id, delete_msg)
+            try:
+                await Message.del_msg(chat.id, delete_msg)
+            except:
+                pass
         msg = f"{victim.mention_html()}, your message is deleted by {user.mention_html()}!"
         if reason:
             msg = f"{msg}\nReason: {reason}"

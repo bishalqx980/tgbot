@@ -1351,6 +1351,9 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     msg = update.message.text_html or update.message.caption_html if update.message else None
 
+    if user.id == 777000:
+        return
+
     if context.chat_data.get("status") == "editing":
         try:
             msg = int(msg)
