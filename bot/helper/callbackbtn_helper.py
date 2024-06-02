@@ -276,8 +276,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
             f"/start - to start the bot\n"
             f"/help - to see this message\n\n"
-            f"T.users: {total_users} |"
-            f"A.users: {active_users} |"
+            f"T.users: {total_users} | "
+            f"A.users: {active_users} | "
             f"Inactive: {inactive_users}"
         )
 
