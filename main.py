@@ -259,17 +259,20 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_b64decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = update.message.reply_to_message
-    msg = re_msg.text or re_msg.caption if re_msg else " ".join(context.args)
+    msg = " ".join(context.args)
 
     if not msg:
-        await Message.reply_msg(update, "Use <code>/decode the `Encoded` text</code>\nor reply the `Encoded` text with <code>/decode</code>\nE.g. <code>/decode the `Encoded` text you want to decode</code>")
-        return
+        if re_msg:
+            msg = re_msg.text or re_msg.caption
+        else:
+            await Message.reply_msg(update, "Use <code>/decode the `Encoded` text</code>\nor reply the `Encoded` text with <code>/decode</code>\nE.g. <code>/decode the `Encoded` text you want to decode</code>")
+            return
     
     decode = BASE64.decode(msg)
     if decode:
         await Message.reply_msg(update, f"<code>{decode}</code>")
     else:
-        await Message.reply_msg(update, f"Invalid text!")
+        await Message.reply_msg(update, f"Invalid base64!")
 
 
 async def func_b64encode(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -277,8 +280,11 @@ async def func_b64encode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = re_msg.text or re_msg.caption if re_msg else " ".join(context.args)
 
     if not msg:
-        await Message.reply_msg(update, "Use <code>/encode the `Decoded` or `normal` text</code>\nor reply the `Decoded` or `normal` text with <code>/encode</code>\nE.g. <code>/encode the `Decoded` or `normal` text you want to encode</code>")
-        return
+        if re_msg:
+            msg = re_msg.text or re_msg.caption
+        else:
+            await Message.reply_msg(update, "Use <code>/encode the `Decoded` or `normal` text</code>\nor reply the `Decoded` or `normal` text with <code>/encode</code>\nE.g. <code>/encode the `Decoded` or `normal` text you want to encode</code>")
+            return
     
     encode = BASE64.encode(msg)
     if encode:
@@ -696,7 +702,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["del_msg_pointer"] = e_msg
 
         msg = (
-            f"<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"• User: {user_mention}\n"
             f"• ID: <code>{user.id}</code>\n\n"
 
@@ -798,7 +804,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["del_msg_pointer"] = e_msg
 
         msg = (
-            f"<b>Chat Settings</b> -\n\n"
+            "<u><b>Chat Settings</b></u>\n\n"
             f"• Title: {title}\n"
             f"• ID: <code>{chat.id}</code>\n\n"
 
@@ -978,7 +984,11 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     replied_msg = update.message.reply_to_message
     inline_text = " ".join(context.args)
 
-    if user.id != int(owner_id):
+    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    power_users = sudo_users if sudo_users else []
+    power_users.append(int(owner_id))
+
+    if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1038,7 +1048,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     sent_count, except_count = 0, 0
-    notify = await Message.send_msg(owner_id, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}")
+    notify = await Message.send_msg(user.id, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}")
     start_time = time.time()
     for user_id in active_users:
         try:
@@ -1071,7 +1081,11 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     chat_id = " ".join(context.args)
 
-    if user.id != int(owner_id):
+    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    power_users = sudo_users if sudo_users else []
+    power_users.append(int(owner_id))
+
+    if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1171,7 +1185,11 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
 
-    if user.id != int(owner_id):
+    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    power_users = sudo_users if sudo_users else []
+    power_users.append(int(owner_id))
+
+    if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1194,8 +1212,8 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_name_row2 = ["Images", "Support chat"]
     btn_data_row2 = ["images", "support_chat"]
 
-    btn_name_row3 = ["GitHub", "Server url"]
-    btn_data_row3 = ["github_repo", "server_url"]
+    btn_name_row3 = ["GitHub", "Server url", "Sudo"]
+    btn_data_row3 = ["github_repo", "server_url", "sudo_users"]
 
     btn_name_row4 = ["Shrinkme API", "OMDB API", "Weather API"]
     btn_data_row4 = ["shrinkme_api", "omdb_api", "weather_api"]
@@ -1217,15 +1235,15 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
             image = random.choice(images).strip()
         else:
             image = MongoDB.get_data("bot_docs", "bot_pic")
-        await Message.send_img(chat.id, image, "<b>Bot Settings</b>", btn)
+        await Message.send_img(chat.id, image, "<u><b>Bot Settings</b></u>", btn)
     except Exception as e:
         logger.error(e)
         try:
             image = MongoDB.get_data("bot_docs", "bot_pic")
-            await Message.send_img(chat.id, image, "<b>Bot Settings</b>", btn)
+            await Message.send_img(chat.id, image, "<u><b>Bot Settings</b></u>", btn)
         except Exception as e:
             logger.error(e)
-            await Message.send_msg(chat.id, "<b>Bot Settings</b>", btn)
+            await Message.send_msg(chat.id, "<u><b>Bot Settings</b></u>", btn)
 
 
 async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1235,7 +1253,11 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     command = " ".join(context.args)
     command = command.replace("'", "")
 
-    if user.id != int(owner_id):
+    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    power_users = sudo_users if sudo_users else []
+    power_users.append(int(owner_id))
+
+    if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1263,7 +1285,11 @@ async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
 
-    if user.id != int(owner_id):
+    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    power_users = sudo_users if sudo_users else []
+    power_users.append(int(owner_id))
+
+    if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1280,7 +1306,11 @@ async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
 
-    if user.id != int(owner_id):
+    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    power_users = sudo_users if sudo_users else []
+    power_users.append(int(owner_id))
+
+    if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1290,19 +1320,24 @@ async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_status = MongoDB.get_data("bot_docs", "bot_status")
     try:
         if not bot_status or bot_status == "alive":
-            await Message.send_msg(owner_id, "Restaring...")
+            await Message.send_msg(user.id, "Restaring...")
             MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "restart")
             os.execv(sys.executable, ["python"] + sys.argv)
         elif bot_status == "restart":
             MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
-            await Message.send_msg(owner_id, "Bot Restarted!")
+            await Message.send_msg(user.id, "Bot Restarted!")
     except Exception as e:
         logger.error(e)
 
 
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    if user.id != int(owner_id):
+
+    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    power_users = sudo_users if sudo_users else []
+    power_users.append(int(owner_id))
+
+    if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
     
@@ -1448,17 +1483,18 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 links_list = RE_LINK.detect_link(msg)
                 if links_list:
                     clean_msg = msg
+                    allowed_links_count = 0
                     for link in links_list:
                         domain = RE_LINK.match_domain(link)
-                        if domain not in allowed_links:
+                        if domain in allowed_links:
+                            allowed_links_count += 1
+                        else:
                             if all_links == "delete":
-                                await Message.del_msg(chat.id, e_msg)
-                                msg_contains_link = True
-                                break
+                                clean_msg = clean_msg.replace(link, f"<code>forbidden link</code>")
                             if all_links == "convert":
                                 b64_link = BASE64.encode(link)
                                 clean_msg = clean_msg.replace(link, f"<code>{b64_link}</code>")
-                    if all_links != "delete":
+                    if allowed_links_count != len(links_list):
                         try:
                             clean_msg = f"{user.mention_html()}\n\n{clean_msg}\n\n<i>Delete reason: your message contains forbidden link/s!</i>"
                             await Message.del_msg(chat.id, e_msg)
@@ -1466,7 +1502,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             msg_contains_link = True
                         except Exception as e:
                             logger.error(e)
-
+        
         if echo_status and not msg_contains_link:
             await Message.reply_msg(update, msg)
         
@@ -1508,13 +1544,24 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def server_alive():
     server_url = MongoDB.get_data("bot_docs", "server_url")
     bot_status = MongoDB.get_data("bot_docs", "bot_status")
+    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    power_users = sudo_users if sudo_users else []
+    power_users.append(int(owner_id))
     
     try:
         if not bot_status or bot_status == "alive":
-            await Message.send_msg(owner_id, "Bot Started!")
+            for user_id in power_users:
+                try:
+                    await Message.send_msg(user_id, "Bot Started!")
+                except Exception as e:
+                    logger.error(e)
         elif bot_status == "restart":
             MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
-            await Message.send_msg(owner_id, "Bot Restarted!")
+            for user_id in power_users:
+                try:
+                    await Message.send_msg(user_id, "Bot Restarted!")
+                except Exception as e:
+                    logger.error(e)
     except Exception as e:
         logger.error(e)
 
