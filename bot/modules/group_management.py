@@ -90,7 +90,7 @@ async def _check_del_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_group = None
         
     if not find_group:
-        find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             context.chat_data["db_group_data"] = find_group
         else:
@@ -113,7 +113,7 @@ async def _log_channel(context: ContextTypes.DEFAULT_TYPE, chat, user, victim=No
         find_group = None
         
     if not find_group:
-        find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             context.chat_data["db_group_data"] = find_group
         else:
@@ -198,7 +198,7 @@ async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT
     bot_exist, reason = _chk_stat
 
     if chat.type == "private":
-        find_user = MongoDB.find_one("users", "user_id", user.id)
+        find_user = await MongoDB.find_one("users", "user_id", user.id)
         if not find_user:
             data = {
                 "user_id": user.id,
@@ -208,24 +208,24 @@ async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT
                 "lang": user.language_code
             }
             try:
-                MongoDB.insert_single_data("users", data)
+                await MongoDB.insert_single_data("users", data)
             except Exception as e:
                 logger.error(e)
         
         if bot_exist:
-            MongoDB.update_db("users", "user_id", user.id, "active_status", True)
+            await MongoDB.update_db("users", "user_id", user.id, "active_status", True)
         else:
-            MongoDB.update_db("users", "user_id", user.id, "active_status", False)
+            await MongoDB.update_db("users", "user_id", user.id, "active_status", False)
 
     elif chat.type in ["group", "supergroup"]:
-        find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if not find_group:
             try:
                 data = {
                     "chat_id": chat.id,
                     "title": chat.title
                 }
-                MongoDB.insert_single_data("groups", data)
+                await MongoDB.insert_single_data("groups", data)
             except Exception as e:
                 logger.error(e)
                 await Message.send_msg(chat.id, f"⚠ Group has not registered! Error: {e}")
@@ -265,7 +265,7 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
         find_group = None
         
     if not find_group:
-        find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             context.chat_data["db_group_data"] = find_group
         else:
@@ -1338,7 +1338,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_group = None
     
     if not find_group:
-        find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             context.chat_data["db_group_data"] = find_group
         else:
@@ -1350,12 +1350,12 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = {
             keyword: value
         }
-        MongoDB.update_db("groups", "chat_id", chat.id, "filters", data)
+        await MongoDB.update_db("groups", "chat_id", chat.id, "filters", data)
     else:
         filters[keyword] = value
-        MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
+        await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
 
-    db_group_data = MongoDB.find_one("groups", "chat_id", chat.id)
+    db_group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
     context.chat_data["db_group_data"] = db_group_data
     await Message.reply_msg(update, f"{user.mention_html()} has added filter <code>{keyword}</code>!")
 
@@ -1410,7 +1410,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_group = None
         
     if not find_group:
-        find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             context.chat_data["db_group_data"] = find_group
         else:
@@ -1421,23 +1421,23 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if filters and keyword:
         if keyword == "clear_all":
-            MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
+            await MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
             await Message.reply_msg(update, f"{user.mention_html()} has removed all filters of this chat!")
 
-            db_group_data = MongoDB.find_one("groups", "chat_id", chat.id)
+            db_group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
             context.chat_data["db_group_data"] = db_group_data
             return
         
         try:
             if keyword.lower() in filters:
                 del filters[keyword]
-                MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
+                await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
                 await Message.reply_msg(update, f"{user.mention_html()} has removed filter <code>{keyword}</code>!")
             else:
                 await Message.reply_msg(update, "There are no such filter available for this chat to delete!\nCheckout /filters")
                 return
             
-            db_group_data = MongoDB.find_one("groups", "chat_id", chat.id)
+            db_group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
             context.chat_data["db_group_data"] = db_group_data
         except Exception as e:
             logger.error(e)
@@ -1482,7 +1482,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_group = None
         
     if not find_group:
-        find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
             context.chat_data["db_group_data"] = find_group
         else:

@@ -71,8 +71,8 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             _bot = context.bot_data["db_bot_data"]
         except Exception as e:
             logger.error(e)
-            find = MongoDB.find("bot_docs", "_id")
-            _bot = MongoDB.find_one("bot_docs", "_id", find[0])
+            find = await MongoDB.find("bot_docs", "_id")
+            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
             context.bot_data["db_bot_data"] = _bot
 
         bot_pic = _bot.get("bot_pic")
@@ -81,7 +81,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         msg = (
             f"Hi {user.mention_html()}! I'm <a href='https://t.me/{_bot_info.username}'>{_bot_info.first_name}</a>, your all-in-one bot!\n\n"
-            f"<blockquote>Here's a short list of what I can do:\n\n" # break
+            f"<blockquote>Here's a short summary of what I can do:\n\n" # break
             f"• Get response from <b>ChatGPT AI</b>\n"
             f"• Generate image from your prompt\n"
             f"• Download/Search videos from YouTube\n"
@@ -97,8 +97,11 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• <b>Group management</b>\n"
             f"• & Much more...</blockquote>\n\n"
             f"• /help for bot help\n" # break
-            f"<i>More Feature coming soon...</i>\n"
+            f"<i>More Feature coming soon...</i>"
         )
+
+        if _bot_info.username != "MissCiri_bot":
+            msg += "\n\nCloned bot of @MissCiri_bot"
 
         btn_name_1 = ["Add in Group"]
         btn_url_1 = [f"http://t.me/{_bot_info.username}?startgroup=start"]
@@ -108,18 +111,20 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_url_3 = [support_chat]
         btn_1 = await Button.ubutton(btn_name_1, btn_url_1)
         btn_2 = await Button.ubutton(btn_name_2, btn_url_2, True)
+        btn = btn_1 + btn_2
         if support_chat:
-            btn_3 = await Button.ubutton(btn_name_3, btn_url_3)
-            btn = btn_1 + btn_2 + btn_3
-        else:
-            btn = btn_1 + btn_2
-
+            try:
+                btn_3 = await Button.ubutton(btn_name_3, btn_url_3)
+                btn = btn_1 + btn_2 + btn_3
+            except Exception as e:
+                logger.error(e)
+        
         if welcome_img and bot_pic:
             await Message.send_img(user.id, bot_pic, msg, btn)
         else:
             await Message.send_msg(user.id, msg, btn)
         
-        find_user = MongoDB.find_one("users", "user_id", user.id)
+        find_user = await MongoDB.find_one("users", "user_id", user.id)
         if not find_user:
             data = {
                 "user_id": user.id,
@@ -131,7 +136,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }
 
             try:
-                MongoDB.insert_single_data("users", data)
+                await MongoDB.insert_single_data("users", data)
             except Exception as e:
                 logger.error(e)
         
@@ -169,7 +174,7 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif "-i" and "-y" in msg:
         await Message.reply_msg(update, "⚠ You can't use both statement in same message!\n/movie for details.")
 
-    movie_info = get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
+    movie_info = await get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
     
     if not movie_info:
         await Message.send_msg(chat.id, "Movie name invalid!")
@@ -224,7 +229,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_user = None
         
         if not find_user:
-            find_user = MongoDB.find_one("users", "user_id", user.id)
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
                 context.chat_data["db_user_data"] = find_user
             else:
@@ -240,7 +245,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_group = None
         
         if not find_group:
-            find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
                 context.chat_data["db_group_data"] = find_group
             else:
@@ -250,15 +255,15 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lang_code = find_group.get("lang")
 
     try:
-        tr_msg = translate(msg, lang_code)
+        tr_msg = await translate(msg, lang_code)
     except Exception as e:
         logger.error(e)
         try:
             _bot = context.bot_data["db_bot_data"]
         except Exception as e:
             logger.error(e)
-            find = MongoDB.find("bot_docs", "_id")
-            _bot = MongoDB.find_one("bot_docs", "_id", find[0])
+            find = await MongoDB.find("bot_docs", "_id")
+            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
             context.bot_data["db_bot_data"] = _bot
             
         btn_name = ["Language code's"]
@@ -302,7 +307,7 @@ async def func_b64encode(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, "Use <code>/encode the `Decoded` or `normal` text</code>\nor reply the `Decoded` or `normal` text with <code>/encode</code>\nE.g. <code>/encode the `Decoded` or `normal` text you want to encode</code>")
             return
     
-    encode = BASE64.encode(msg)
+    encode = await BASE64.encode(msg)
     if encode:
         await Message.reply_msg(update, f"<code>{encode}</code>")
     else:
@@ -317,7 +322,7 @@ async def func_shortener(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/short url</code>\nor reply the url with <code>/short</code>\nE.g. <code>/short https://google.com</code>")
         return
     
-    shorted_url = shortener_url(msg)
+    shorted_url = await shortener_url(msg)
     if shorted_url == 0:
         msg = "shrinkme_api not found!"
     elif shorted_url:
@@ -338,7 +343,7 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
         url = f"http://{url}"
 
     sent_msg = await Message.reply_msg(update, f"Pinging {url}\nPlease wait...")
-    ping = ping_url(url)
+    ping = await ping_url(url)
 
     if not ping:
         await Message.edit_msg(update, "Something went wrong!", sent_msg)
@@ -372,7 +377,7 @@ async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     try:
-        await Message.reply_msg(update, f"Calculation result: <code>{calc(msg):.2f}</code>")
+        await Message.reply_msg(update, f"Calculation result: <code>{await calc(msg):.2f}</code>")
     except Exception as e:
         logger.error(e)
         await Message.reply_msg(update, f"Can't calc: {e}")   
@@ -406,7 +411,7 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/weather location_name</code>\nE.g. <code>/weather london</code>")
         return
     
-    info = weather_info(location)
+    info = await weather_info(location)
 
     if not info:
         await Message.reply_msg(update, "weather_api not found!")
@@ -497,7 +502,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     retry = 0
 
     while retry != 3:
-        g4f_gpt = G4F.chatgpt(f"{prompt}, explain in few sentences and in English.")
+        g4f_gpt = await G4F.chatgpt(f"{prompt}, explain in few sentences and in English.")
         if g4f_gpt and "流量异常, 请尝试更换网络环境, 如果你觉得ip被误封了, 可尝试邮件联系我们, 当前" not in g4f_gpt:
             break
         elif retry == 3:
@@ -568,7 +573,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_msg = await Message.reply_msg(update, "Please Wait...")
     await Message.edit_msg(update, "📥 Downloading...", sent_msg)
 
-    res = YouTubeDownload.ytdl(url, content_format)
+    res = await YouTubeDownload.ytdl(url, content_format)
     
     if res[0] == 0:
         await Message.edit_msg(update, res[1], sent_msg)
@@ -607,7 +612,7 @@ async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/yts keyword</code>\nE.g. <code>/yts google keynote</code>")
         return
     
-    result = YouTubeDownload.yts(keyword)
+    result = await YouTubeDownload.yts(keyword)
     if not result:
         await Message.reply_msg(update, "Something Went Wrong...")  
         return
@@ -631,7 +636,7 @@ async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     sent_msg = await Message.reply_msg(update, f"Generating...")
-    gen_qr = QR.gen_qr(data)
+    gen_qr = await QR.gen_qr(data)
 
     if not gen_qr:
         await Message.edit_msg(update, "Something went wrong!", sent_msg)
@@ -664,7 +669,7 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with open(f_name, "wb") as f:
         f.write(req.content)
     
-    itl = TELEGRAPH.upload_img(f_name)
+    itl = await TELEGRAPH.upload_img(f_name)
     if not itl:
         await Message.edit_msg(update, "Something went wrong!", sent_msg)
         return
@@ -686,8 +691,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         _bot = context.bot_data["db_bot_data"]
     except Exception as e:
         logger.error(e)
-        find = MongoDB.find("bot_docs", "_id")
-        _bot = MongoDB.find_one("bot_docs", "_id", find[0])
+        find = await MongoDB.find("bot_docs", "_id")
+        _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
         context.bot_data["db_bot_data"] = _bot
 
     if chat.type == "private":
@@ -698,7 +703,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_user = None
         
         if not find_user:
-            find_user = MongoDB.find_one("users", "user_id", user.id)
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
                 context.chat_data["db_user_data"] = find_user
             else:
@@ -739,16 +744,16 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2
 
         try:
-            images = MongoDB.get_data("bot_docs", "images")
+            images = await MongoDB.get_data("bot_docs", "images")
             if images:
                 image = random.choice(images).strip()
             else:
-                image = MongoDB.get_data("bot_docs", "bot_pic")
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
             logger.error(e)
             try:
-                image = MongoDB.get_data("bot_docs", "bot_pic")
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(chat.id, image, msg, btn)
             except Exception as e:
                 logger.error(e)
@@ -788,7 +793,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_group = None
         
         if not find_group:
-            find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
                 context.chat_data["db_group_data"] = find_group
             else:
@@ -860,16 +865,16 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2 + row3 + row4 + row5
 
         try:
-            images = MongoDB.get_data("bot_docs", "images")
+            images = await MongoDB.get_data("bot_docs", "images")
             if images:
                 image = random.choice(images).strip()
             else:
-                image = MongoDB.get_data("bot_docs", "bot_pic")
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
             logger.error(e)
             try:
-                image = MongoDB.get_data("bot_docs", "bot_pic")
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(chat.id, image, msg, btn)
             except Exception as e:
                 logger.error(e)
@@ -926,7 +931,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     
     try:
-        db = MongoDB.info_db()
+        db = await MongoDB.info_db()
         for i in db:
             if i[0] == "users":
                 total_users = i[1]
@@ -934,7 +939,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 total_users = "❓"
         
-        active_status = MongoDB.find("users", "active_status")
+        active_status = await MongoDB.find("users", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
 
@@ -967,20 +972,36 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2 + row3
 
         try:
-            images = MongoDB.get_data("bot_docs", "images")
+            images = await MongoDB.get_data("bot_docs", "images")
             if images:
                 image = random.choice(images).strip()
             else:
-                image = MongoDB.get_data("bot_docs", "bot_pic")
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(user.id, image, msg, btn)
         except Exception as e:
             logger.error(e)
             try:
-                image = MongoDB.get_data("bot_docs", "bot_pic")
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(user.id, image, msg, btn)
             except Exception as e:
                 logger.error(e)
                 await Message.send_msg(user.id, msg, btn)
+        
+        find_user = await MongoDB.find_one("users", "user_id", user.id)
+        if not find_user:
+            data = {
+                "user_id": user.id,
+                "Name": user.full_name,
+                "username": user.username,
+                "mention": user.mention_html(),
+                "lang": user.language_code,
+                "active_status": True
+            }
+
+            try:
+                await MongoDB.insert_single_data("users", data)
+            except Exception as e:
+                logger.error(e)
         
         if chat.type != "private":
             _bot_info = await bot.get_me()
@@ -1000,7 +1021,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     replied_msg = update.message.reply_to_message
     inline_text = " ".join(context.args)
 
-    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
     power_users = sudo_users if sudo_users else []
     power_users.append(int(owner_id))
 
@@ -1050,8 +1071,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"Error Broadcast: {e}")
         return
     
-    users_id = MongoDB.find("users", "user_id")
-    active_status = MongoDB.find("users", "active_status")
+    users_id = await MongoDB.find("users", "user_id")
+    active_status = await MongoDB.find("users", "active_status")
 
     if len(users_id) == len(active_status):
         combined_list = list(zip(users_id, active_status))
@@ -1097,7 +1118,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     chat_id = " ".join(context.args)
 
-    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
     power_users = sudo_users if sudo_users else []
     power_users.append(int(owner_id))
 
@@ -1111,7 +1132,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if chat_id:
         if "-100" in str(chat_id):
-            find_group = MongoDB.find_one("groups", "chat_id", int(chat_id))
+            find_group = await MongoDB.find_one("groups", "chat_id", int(chat_id))
             if not find_group:
                 await Message.reply_msg(update, "Chat not found!")
                 return
@@ -1153,7 +1174,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             await Message.reply_msg(update, f"<b>{msg}</b>")
         else:
-            find_user = MongoDB.find_one("users", "user_id", int(chat_id))
+            find_user = await MongoDB.find_one("users", "user_id", int(chat_id))
             if not find_user:
                 await Message.reply_msg(update, "User not found!")
                 return
@@ -1180,7 +1201,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"<b>{msg}</b>")
         return
     
-    db = MongoDB.info_db()
+    db = await MongoDB.info_db()
     msg = "▬▬▬▬▬▬▬▬▬▬\n"
     for info in db:
         msg += (
@@ -1190,7 +1211,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<code>Actual size:</code> {info[3]}\n"
             f"▬▬▬▬▬▬▬▬▬▬\n"
         )
-    active_status = MongoDB.find("users", "active_status")
+    active_status = await MongoDB.find("users", "active_status")
     active_users = active_status.count(True)
     inactive_users = active_status.count(False)
     await Message.reply_msg(update, f"<b>{msg}Active users: {active_users}\nInactive users: {inactive_users}</b>")
@@ -1201,7 +1222,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
 
-    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
     power_users = sudo_users if sudo_users else []
     power_users.append(int(owner_id))
 
@@ -1213,7 +1234,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
     
-    welcome_img = MongoDB.get_data("bot_docs", "welcome_img")
+    welcome_img = await MongoDB.get_data("bot_docs", "welcome_img")
     
     context.chat_data["edit_cname"] = "bot_docs"
     context.chat_data["find_data"] = "welcome_img"
@@ -1246,16 +1267,16 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn = row1 + row2 + row3 + row4 + row5
 
     try:
-        images = MongoDB.get_data("bot_docs", "images")
+        images = await MongoDB.get_data("bot_docs", "images")
         if images:
             image = random.choice(images).strip()
         else:
-            image = MongoDB.get_data("bot_docs", "bot_pic")
+            image = await MongoDB.get_data("bot_docs", "bot_pic")
         await Message.send_img(chat.id, image, "<u><b>Bot Settings</b></u>", btn)
     except Exception as e:
         logger.error(e)
         try:
-            image = MongoDB.get_data("bot_docs", "bot_pic")
+            image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, "<u><b>Bot Settings</b></u>", btn)
         except Exception as e:
             logger.error(e)
@@ -1269,7 +1290,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     command = " ".join(context.args)
     command = command.replace("'", "")
 
-    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
     power_users = sudo_users if sudo_users else []
     power_users.append(int(owner_id))
 
@@ -1301,7 +1322,7 @@ async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
 
-    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
     power_users = sudo_users if sudo_users else []
     power_users.append(int(owner_id))
 
@@ -1322,7 +1343,7 @@ async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
 
-    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
     power_users = sudo_users if sudo_users else []
     power_users.append(int(owner_id))
 
@@ -1333,14 +1354,14 @@ async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != "private":
         await Message.reply_msg(update, "Check pm!")
     
-    bot_status = MongoDB.get_data("bot_docs", "bot_status")
+    bot_status = await MongoDB.get_data("bot_docs", "bot_status")
     try:
         if not bot_status or bot_status == "alive":
             await Message.send_msg(user.id, "Restaring...")
-            MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "restart")
+            await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "restart")
             os.execv(sys.executable, ["python"] + sys.argv)
         elif bot_status == "restart":
-            MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
+            await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
             await Message.send_msg(user.id, "Bot Restarted!")
     except Exception as e:
         logger.error(e)
@@ -1349,7 +1370,7 @@ async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
 
-    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
     power_users = sudo_users if sudo_users else []
     power_users.append(int(owner_id))
 
@@ -1422,7 +1443,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_user = None
         
         if not find_user:
-            find_user = MongoDB.find_one("users", "user_id", user.id)
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
                 context.chat_data["db_user_data"] = find_user
             else:
@@ -1438,7 +1459,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if auto_tr_status:
             lang_code = find_user.get("lang")
             try:
-                tr_msg = translate(msg, lang_code)
+                tr_msg = await translate(msg, lang_code)
             except Exception as e:
                 logger.error(e)
                 btn_name = ["Language code's"]
@@ -1469,7 +1490,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             find_group = None
         
         if not find_group:
-            find_group = MongoDB.find_one("groups", "chat_id", chat.id)
+            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
                 context.chat_data["db_group_data"] = find_group
             else:
@@ -1496,19 +1517,19 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if all_links:
             if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                links_list = RE_LINK.detect_link(msg)
+                links_list = await RE_LINK.detect_link(msg)
                 if links_list:
                     clean_msg = msg
                     allowed_links_count = 0
                     for link in links_list:
-                        domain = RE_LINK.match_domain(link)
+                        domain = await RE_LINK.match_domain(link)
                         if domain in allowed_links:
                             allowed_links_count += 1
                         else:
                             if all_links == "delete":
                                 clean_msg = clean_msg.replace(link, f"<code>forbidden link</code>")
                             if all_links == "convert":
-                                b64_link = BASE64.encode(link)
+                                b64_link = await BASE64.encode(link)
                                 clean_msg = clean_msg.replace(link, f"<code>{b64_link}</code>")
                     if allowed_links_count != len(links_list):
                         try:
@@ -1524,7 +1545,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         if auto_tr_status and not msg_contains_link:
             try:
-                tr_msg = translate(msg, lang_code)
+                tr_msg = await translate(msg, lang_code)
             except Exception as e:
                 logger.error(e)
                 btn_name = ["Language code's"]
@@ -1558,9 +1579,9 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def server_alive():
-    server_url = MongoDB.get_data("bot_docs", "server_url")
-    bot_status = MongoDB.get_data("bot_docs", "bot_status")
-    sudo_users = MongoDB.get_data("bot_docs", "sudo_users")
+    server_url = await MongoDB.get_data("bot_docs", "server_url")
+    bot_status = await MongoDB.get_data("bot_docs", "bot_status")
+    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
     power_users = sudo_users if sudo_users else []
     power_users.append(int(owner_id))
     
@@ -1572,7 +1593,7 @@ async def server_alive():
                 except Exception as e:
                     logger.error(e)
         elif bot_status == "restart":
-            MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
+            await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
             for user_id in power_users:
                 try:
                     await Message.send_msg(user_id, "Bot Restarted!")

@@ -2,8 +2,8 @@ import requests
 from bot import logger
 from bot.modules.mongodb import MongoDB
 
-def shortener_url(url):
-    shrinkme_api = MongoDB.get_data("bot_docs", "shrinkme_api")
+async def shortener_url(url):
+    shrinkme_api = await MongoDB.get_data("bot_docs", "shrinkme_api")
     if not shrinkme_api:
         logger.error("shrinkme_api not found!")
         return 0

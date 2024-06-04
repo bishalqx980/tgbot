@@ -1,7 +1,7 @@
 import requests
 from bot import logger
 
-def ping_url(ping_url):
+async def ping_url(ping_url):
   try:
     response = requests.get(ping_url)
     status_code = response.status_code

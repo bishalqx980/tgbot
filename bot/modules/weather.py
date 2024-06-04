@@ -2,8 +2,8 @@ import requests
 from bot import logger
 from bot.modules.mongodb import MongoDB
 
-def weather_info(location):
-    weather_api = MongoDB.get_data("bot_docs", "weather_api")
+async def weather_info(location):
+    weather_api = await MongoDB.get_data("bot_docs", "weather_api")
     if not weather_api:
         logger.error("weather_api not found!")
         return 0
