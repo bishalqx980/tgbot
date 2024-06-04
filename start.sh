@@ -1,0 +1,1 @@
+python update.py & cd tgbot & python main.py
