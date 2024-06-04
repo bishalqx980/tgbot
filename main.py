@@ -1308,11 +1308,14 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     if result.returncode == 0:
+        if not result.stdout:
+            await Message.reply_msg(update, "None")
+            return
         with open('shell.txt', 'w') as shell_file:
             shell_file.write(result.stdout)
         with open("shell.txt", "rb") as shell_file:
             shell = shell_file.read()
-        await Message.send_doc(chat.id, shell, "shell.txt", "shell.txt", e_msg.id)
+        await Message.send_doc(chat.id, shell, "shell.txt", command, e_msg.id)
     else:
         await Message.reply_msg(update, result.stderr)
 

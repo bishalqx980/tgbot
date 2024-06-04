@@ -468,7 +468,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"$udo users: <code>{sudo_users}</code>\n\n"
-            "<i><b>Note</b>: The power user! Sudo users have owner function access!</i>"
+            "<i><b>Note</b>: The power user! Sudo users have owner function access!\nAdd user_id eg. <code>2134776547</code></i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
