@@ -289,7 +289,7 @@ async def func_b64decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, "Use <code>/decode the `Encoded` text</code>\nor reply the `Encoded` text with <code>/decode</code>\nE.g. <code>/decode the `Encoded` text you want to decode</code>")
             return
     
-    decode = BASE64.decode(msg)
+    decode = await BASE64.decode(msg)
     if decode:
         await Message.reply_msg(update, f"<code>{decode}</code>")
     else:
@@ -298,7 +298,7 @@ async def func_b64decode(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_b64encode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = update.message.reply_to_message
-    msg = re_msg.text or re_msg.caption if re_msg else " ".join(context.args)
+    msg = " ".join(context.args)
 
     if not msg:
         if re_msg:
