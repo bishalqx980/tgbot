@@ -1,7 +1,7 @@
 import re
 
 class RE_LINK:
-    def detect_link(text):
+    async def detect_link(text):
         """
         text = 'Google: google.com'
         return ['google.com']
@@ -12,7 +12,7 @@ class RE_LINK:
         return links_list
     
 
-    def match_domain(link):
+    async def match_domain(link):
         """
         google.com, bing.com
         """

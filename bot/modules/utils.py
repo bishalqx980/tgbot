@@ -1,6 +1,6 @@
 from bot import logger
 
-def calc(math):
+async def calc(math):
     try:
         return eval(math)
     except Exception as e:

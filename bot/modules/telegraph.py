@@ -5,7 +5,7 @@ telegraph = Telegraph()
 telegraph.create_account("YOUR_NIGHTMARE")
 
 class TELEGRAPH:
-    def upload_img(image_path):
+    async def upload_img(image_path):
         try:
             path = telegraph.upload_file(image_path)[0]
             link = f"https://telegra.ph{path.get('src')}"

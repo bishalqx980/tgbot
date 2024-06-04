@@ -2,7 +2,7 @@ import requests
 from bot import logger, render_api
 
 class Render:
-    def list_services():
+    async def list_services():
         if not render_api:
             logger.error("render_api not found!")
             return
@@ -19,7 +19,7 @@ class Render:
         return response
     
 
-    def restart(serviceId):
+    async def restart(serviceId):
         if not render_api:
             logger.error("render_api not found!")
             return
@@ -36,7 +36,7 @@ class Render:
         return response
     
 
-    def redeploy(serviceId, clear_cache=True):
+    async def redeploy(serviceId, clear_cache=True):
         if not render_api:
             logger.error("render_api not found!")
             return

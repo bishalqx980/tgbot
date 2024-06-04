@@ -17,7 +17,7 @@ from bot import (
 
 
 async def update_database():
-    find = MongoDB.find("bot_docs", "_id")
+    find = await MongoDB.find("bot_docs", "_id")
 
     if find:
         logger.info("MongoDB Database Exist! Skiping update...")
@@ -42,7 +42,7 @@ async def update_database():
     }
 
     try:
-        MongoDB.insert_single_data("bot_docs", data)
+        await MongoDB.insert_single_data("bot_docs", data)
         logger.info("Database updated from config.env ...")
         return True
     except Exception as e:

@@ -2,7 +2,7 @@ import g4f
 from bot import logger
 
 class G4F:
-    def chatgpt(prompt):
+    async def chatgpt(prompt):
         try:
             response = g4f.ChatCompletion.create(
                 model="gpt-3.5-turbo",
@@ -13,7 +13,7 @@ class G4F:
             logger.error(e)
 
 
-    def imagine(prompt):
+    async def imagine(prompt):
         try:
             response = g4f.images.generate(
             model="stability-ai/sdxl",
