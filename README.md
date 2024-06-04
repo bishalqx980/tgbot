@@ -71,7 +71,7 @@ else:
     - Run `python3 -m venv venv`
     - `source venv/bin/activate`
     - `pip install -r requirements.txt`
-    - Finally `python3 main.py`
+    - Finally `bash start.sh`
 
     </details>
 
