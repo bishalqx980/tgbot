@@ -61,7 +61,7 @@ else:
     - Required `python 3.11` or later
     - Open `tgbot` directory on cmd
     - Run on cmd `pip install -r requirements.txt`
-    - Finally `python main.py`
+    - Finally `start.cmd`
 
     <br>
 
