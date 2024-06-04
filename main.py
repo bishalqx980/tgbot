@@ -488,7 +488,6 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
     prompt = " ".join(context.args)
 
     if not prompt:
@@ -515,7 +514,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await asyncio.sleep(3)
     
     try:
-        await Message.edit_msg(update, f"{g4f_gpt}\n\n<b>Req by</b>: {user.mention_html()}", sent_msg, parse_mode=ParseMode.MARKDOWN)
+        await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
         logger.error(e)
         await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
