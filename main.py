@@ -118,7 +118,23 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.send_img(user.id, bot_pic, msg, btn)
         else:
             await Message.send_msg(user.id, msg, btn)
+        
+        find_user = MongoDB.find_one("users", "user_id", user.id)
+        if not find_user:
+            data = {
+                "user_id": user.id,
+                "Name": user.full_name,
+                "username": user.username,
+                "mention": user.mention_html(),
+                "lang": user.language_code,
+                "active_status": True
+            }
 
+            try:
+                MongoDB.insert_single_data("users", data)
+            except Exception as e:
+                logger.error(e)
+        
         if chat.type != "private":
             _bot_info = await bot.get_me()
             await Message.reply_msg(update, f"Sent in your pm! <a href='http://t.me/{_bot_info.username}'>Check</a>")
@@ -1585,7 +1601,7 @@ async def server_alive():
 
 def main():
     application = ApplicationBuilder().token(bot_token).build()
-        
+
     application.add_handler(CommandHandler("start", func_start, block=False))
     application.add_handler(CommandHandler("movie", func_movieinfo, block=False))
     application.add_handler(CommandHandler("tr", func_translator, block=False))
