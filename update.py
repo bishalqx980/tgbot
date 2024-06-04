@@ -1,4 +1,5 @@
 import os
+import shutil
 from subprocess import run as srun
 
 UPSTREAM_REPO = "https://github.com/bishalqx980/tgbot"
@@ -9,10 +10,14 @@ if os.path.exists(".git"):
     try:
         srun(["rm", "-rf", ".git"]) # linux only
     except Exception as e:
-        print(f"{e}\nmost probably you are using windows...")
+        print(e)
+        try:
+            shutil.rmtree(".git")
+        except Exception as e:
+            print(e)
 
 commands = [
-    "git init",
+    f"git init -b {UPSTREAM_BRANCH}",
     "git config --global user.name bishalqx980",
     "git config --global user.email bishalqx680@gmail.com",
     "git add .",
