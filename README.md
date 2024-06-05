@@ -68,8 +68,6 @@ else:
     ----- **Linux** -----
     - Required `python 3.11` or later
     - Open `tgbot` directory on shell
-    - Run `python3 -m venv venv`
-    - `source venv/bin/activate`
     - `pip install -r requirements.txt`
     - Finally `bash start.sh`
 

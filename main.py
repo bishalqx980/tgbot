@@ -459,7 +459,28 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
+    e_msg = update.effective_message
     prompt = " ".join(context.args)
+
+    if chat.type != "private":
+        try:
+            find_group = context.chat_data["db_group_data"]
+        except Exception as e:
+            logger.error(e)
+            find_group = None
+        
+        if not find_group:
+            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+            if find_group:
+                context.chat_data["db_group_data"] = find_group
+            else:
+                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                return
+        
+        ai_status = find_group.get("ai_status")
+        if not ai_status:
+            await Message.del_msg(chat.id, e_msg)
+            return
 
     if not prompt:
         await Message.reply_msg(update, "Use <code>/imagine prompt</code>\nE.g. <code>/imagine a cute cat</code>")
@@ -480,7 +501,10 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await asyncio.sleep(3)
     
     try:
-        await Message.send_img(chat.id, imagine, f"» <i>{prompt}</i>\n<b>Req by</b>: {user.mention_html()}")
+        msg = f"» <i>{prompt}</i>"
+        if chat.type != "private":
+            msg += f"\n<b>Req by</b>: {user.mention_html()}"
+        await Message.send_img(chat.id, imagine, msg)
         await Message.del_msg(chat.id, sent_msg)
     except Exception as e:
         logger.error(e)
@@ -488,8 +512,31 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    chat = update.effective_chat
+    e_msg = update.effective_message
     prompt = " ".join(context.args)
 
+    if chat.type != "private":
+        try:
+            find_group = context.chat_data["db_group_data"]
+        except Exception as e:
+            logger.error(e)
+            find_group = None
+        
+        if not find_group:
+            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+            if find_group:
+                context.chat_data["db_group_data"] = find_group
+            else:
+                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                return
+        
+        ai_status = find_group.get("ai_status")
+        if not ai_status:
+            await Message.del_msg(chat.id, e_msg)
+            return
+    
     if not prompt:
         await Message.reply_msg(update, "Use <code>/gpt your_prompt</code>\nE.g. <code>/gpt What is AI?</code>")
         return
@@ -514,6 +561,8 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await asyncio.sleep(3)
     
     try:
+        if chat.type != "private":
+            g4f_gpt += f"\n\n*Req by*: {user.mention_markdown()}"
         await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)
     except Exception as e:
         logger.error(e)
@@ -801,10 +850,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
         
-        if not find_group:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-            return
-        
         title = find_group.get("title")
         lang = find_group.get("lang")
 
@@ -854,16 +899,20 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_name_row4 = ["Delete cmd", "Log channel"]
         btn_data_row4 = ["del_cmd", "log_channel"]
 
-        btn_name_row5 = ["Links", "Close"]
-        btn_data_row5 = ["links_behave", "close"]
+        btn_name_row5 = ["Links", "AI"]
+        btn_data_row5 = ["links_behave", "ai_status"]
+
+        btn_name_row6 = ["Close"]
+        btn_data_row6 = ["close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
         row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
         row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
         row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
+        row6 = await Button.cbutton(btn_name_row6, btn_data_row6)
 
-        btn = row1 + row2 + row3 + row4 + row5
+        btn = row1 + row2 + row3 + row4 + row5 + row6
 
         try:
             images = await MongoDB.get_data("bot_docs", "images")

@@ -1451,7 +1451,59 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             logger.error(e)
             await Message.send_msg(chat_id, f"Error: {e}")
+    
+    elif data == "ai_status":
+        access = await _check_whois()
+        if not access:
+            return
+        
+        edit_cname = context.chat_data.get("edit_cname")
+        if not edit_cname:
+            await popup("An error occurred! send command again then try...")
+            await query.message.delete()
+            return
 
+        find_data = context.chat_data.get("find_data")
+        match_data = context.chat_data.get("match_data")
+
+        try:
+            find_chat = context.chat_data[data_to_find]
+        except Exception as e:
+            logger.error(e)
+            find_chat = None
+        
+        if not find_chat:
+            find_chat = await MongoDB.find_one(edit_cname, find_data, match_data)
+            if find_chat:
+                context.chat_data[data_to_find] = find_chat
+            else:
+                await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                await query.message.delete()
+                return
+        
+        ai_status = find_chat.get("ai_status")
+
+        context.chat_data["edit_data_name"] = "ai_status"
+
+        msg = (
+            "<u><b>Chat Settings</b></u>\n\n"
+            f"AI status: <code>{ai_status}</code>\n\n"
+            "<i><b>Note</b>: Enable / Disbale AI functions in chat!</i>"
+        )
+
+        btn_name_row1 = ["Enable", "Disable"]
+        btn_data_row1 = ["true", "false"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["c_setting_menu", "close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
+
+        await Message.edit_msg(update, msg, sent_msg, btn)
+    
     elif data == "c_setting_menu":
         access = await _check_whois()
         if not access:
@@ -1524,16 +1576,20 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn_name_row4 = ["Delete cmd", "Log channel"]
             btn_data_row4 = ["del_cmd", "log_channel"]
 
-            btn_name_row5 = ["Links", "Close"]
-            btn_data_row5 = ["links_behave", "close"]
+            btn_name_row5 = ["Links", "AI"]
+            btn_data_row5 = ["links_behave", "ai_status"]
+
+            btn_name_row6 = ["Close"]
+            btn_data_row6 = ["close"]
 
             row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
             row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
             row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
             row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
             row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
+            row6 = await Button.cbutton(btn_name_row6, btn_data_row6)
 
-            btn = row1 + row2 + row3 + row4 + row5
+            btn = row1 + row2 + row3 + row4 + row5 + row6
 
         elif data_to_find == "db_user_data":
             user_mention = find_chat.get("mention")
