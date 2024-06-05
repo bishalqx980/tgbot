@@ -569,7 +569,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg, parse_mode=ParseMode.MARKDOWN)
 
 
-async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     e_msg = update.effective_message
@@ -586,6 +586,12 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not url:
         await Message.reply_msg(update, "Use <code>/ytdl youtube_url</code> to download a video!")
+        return
+    
+    youtube_domains = ["youtube.com", "youtu.be"]
+    domain = await RE_LINK.get_domain(url)
+    if domain not in youtube_domains:
+        await Message.reply_msg(update, "Please send a valid youtube video link!")
         return
     
     context.chat_data["user_id"] = user.id
@@ -620,15 +626,21 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Timeout!")
         return
     
-    sent_msg = await Message.reply_msg(update, "Please Wait...")
-    await Message.edit_msg(update, "📥 Downloading...", sent_msg)
+    asyncio.create_task(_func_ytdl(update, url, content_format))
 
+
+async def _func_ytdl(update: Update, url, content_format):
+    user = update.effective_user
+    chat = update.effective_chat
+    e_msg = update.effective_message
+
+    sent_msg = await Message.reply_msg(update, "📥 Downloading...")
     res = await YouTubeDownload.ytdl(url, content_format)
-    
+
     if res[0] == 0:
         await Message.edit_msg(update, res[1], sent_msg)
         return
-
+    
     await Message.edit_msg(update, "📤 Uploading...", sent_msg)
 
     try:
@@ -652,7 +664,7 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.info(f"{rem} Removed...")
         await Message.del_msg(chat.id, sent_msg)
     except Exception as e:
-        logger.error(e) 
+        logger.error(e)
 
 
 async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -858,6 +870,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         welcome_msg = find_group.get("welcome_msg")
         goodbye_msg = find_group.get("goodbye_msg")
         antibot = find_group.get("antibot")
+        ai_status = find_group.get("ai_status")
         del_cmd = find_group.get("del_cmd")
         all_links = find_group.get("all_links")
         allowed_links = find_group.get("allowed_links")
@@ -881,6 +894,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Welcome user: <code>{welcome_msg}</code>\n"
             f"• Goodbye user: <code>{goodbye_msg}</code>\n"
             f"• Antibot: <code>{antibot}</code>\n"
+            f"• AI status: <code>{ai_status}</code>\n"
             f"• Delete cmd: <code>{del_cmd}</code>\n"
             f"• All links: <code>{all_links}</code>\n"
             f"• Allowed links: <code>{allowed_links}</code>\n"
@@ -1575,7 +1589,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     clean_msg = msg
                     allowed_links_count = 0
                     for link in links_list:
-                        domain = await RE_LINK.match_domain(link)
+                        domain = await RE_LINK.get_domain(link)
                         if domain in allowed_links:
                             allowed_links_count += 1
                         else:
@@ -1688,7 +1702,7 @@ def main():
     application.add_handler(CommandHandler("weather", func_weather, block=False))
     application.add_handler(CommandHandler("imagine", func_imagine, block=False))
     application.add_handler(CommandHandler("gpt", func_chatgpt, block=False))
-    application.add_handler(CommandHandler("ytdl", func_ytdl, block=False))
+    application.add_handler(CommandHandler("ytdl", func_add_download_ytdl, block=False))
     application.add_handler(CommandHandler("yts", func_yts, block=False))
     application.add_handler(CommandHandler("qr", func_gen_qr, block=False))
     application.add_handler(CommandHandler("itl", func_img_to_link, block=False))

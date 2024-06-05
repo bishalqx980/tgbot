@@ -12,7 +12,7 @@ class RE_LINK:
         return links_list
     
 
-    async def match_domain(link):
+    async def get_domain(link):
         """
         google.com, bing.com
         """

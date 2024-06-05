@@ -1542,6 +1542,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             welcome_msg = find_chat.get("welcome_msg")
             goodbye_msg = find_chat.get("goodbye_msg")
             antibot = find_chat.get("antibot")
+            ai_status = find_group.get("ai_status")
             del_cmd = find_chat.get("del_cmd")
             all_links = find_chat.get("all_links")
             allowed_links = find_chat.get("allowed_links")
@@ -1558,6 +1559,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"• Welcome user: <code>{welcome_msg}</code>\n"
                 f"• Goodbye user: <code>{goodbye_msg}</code>\n"
                 f"• Antibot: <code>{antibot}</code>\n"
+                f"• AI status: <code>{ai_status}</code>\n"
                 f"• Delete cmd: <code>{del_cmd}</code>\n"
                 f"• All links: <code>{all_links}</code>\n"
                 f"• Allowed links: <code>{allowed_links}</code>\n"
