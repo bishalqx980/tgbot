@@ -1,6 +1,5 @@
 import re
 import time
-import asyncio
 from telegram import Update, ChatMember, ChatMemberUpdated
 from telegram.ext import ContextTypes
 from bot import bot, logger
@@ -37,10 +36,7 @@ async def _check_permission(update: Update, victim=None, user=None, checking_msg
     victim_permission = await chat.get_member(victim.id) if victim else None
     
     if checking_msg:
-        try:
-            await Message.del_msg(chat.id, del_msg)
-        except Exception as e:
-            logger.error(e)
+        await Message.del_msg(chat.id, del_msg)
 
     return _bot_info, bot_permission, user_permission, admin_rights, victim_permission
 
@@ -51,26 +47,29 @@ async def _chat_member_status(c_mem_update: ChatMemberUpdated):
 
     if not status:
         return
+    
+    user_exist = None
+    cause = None
 
     old_status, new_status = status
-
-    was_logic = [ChatMember.LEFT, ChatMember.BANNED] #ChatMember.RESTRICTED
+    
     exist_logic = [ChatMember.MEMBER, ChatMember.ADMINISTRATOR, ChatMember.OWNER]
-    if old_status in was_logic and new_status in exist_logic:
-        user_exist = True
-        reason = None
-    elif old_status in exist_logic and new_status in was_logic:
-        user_exist = False
-        if new_status == ChatMember.LEFT:
-            reason = "left"
-        elif new_status == ChatMember.RESTRICTED:
-            reason = "restricted"
-        elif new_status == ChatMember.BANNED:
-            reason = "banned"
-    else:
-        user_exist = None
-        reason = None
-    return user_exist, reason
+
+    user_exist = True if new_status in exist_logic else False
+    
+    if new_status == ChatMember.LEFT:
+        cause = "LEFT"
+    elif new_status == ChatMember.RESTRICTED:
+        cause = "RESTRICTED"
+    elif new_status == ChatMember.BANNED:
+        cause = "BANNED"
+    
+    if old_status == ChatMember.BANNED and new_status in exist_logic or new_status == ChatMember.LEFT:
+        cause = "UNBANNED"
+    elif old_status in [ChatMember.LEFT, ChatMember.RESTRICTED, ChatMember.BANNED] and new_status in exist_logic:
+        cause = "JOINED"
+
+    return user_exist, cause
 
 
 async def _check_del_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -195,7 +194,7 @@ async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT
     if not _chk_stat:
         return
     
-    bot_exist, reason = _chk_stat
+    bot_exist, cause = _chk_stat
 
     if chat.type == "private":
         find_user = await MongoDB.find_one("users", "user_id", user.id)
@@ -281,7 +280,9 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
     if not _chk_stat:
         return
     
-    user_exist, reason = _chk_stat
+    user_exist, cause = _chk_stat
+
+    await _log_channel(context, chat, user, victim, action=cause)
 
     if user_exist == True:
         if victim.is_bot and antibot:
@@ -296,6 +297,10 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
                 await Message.send_msg(chat.id, "<b>Antibot:</b> I'm not an admin in this chat!")
                 return
             
+            if not bot_permission.can_restrict_members:
+                await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
+                return
+            
             if victim_permission.status == ChatMember.ADMINISTRATOR:
                 await Message.send_msg(chat.id, f"<b>Antibot:</b> {victim.mention_html()} has been added as an admin. I can't ban an admin!")
                 return
@@ -303,7 +308,6 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
             try:
                 await bot.ban_chat_member(chat.id, victim.id)
                 await Message.send_msg(chat.id, f"Antibot has banned {victim.mention_html()} from this chat!")
-                await _log_channel(context, chat, user, victim, action="ANITBOT")
             except Exception as e:
                 logger.error(e)
                 await Message.send_msg(chat.id, f"Error: {e}")
@@ -324,13 +328,11 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
                         value = ""
                     custom_welcome_msg = custom_welcome_msg.replace(key, str(value))
 
-                sent_msg = await Message.send_msg(chat.id, custom_welcome_msg)
+                await Message.send_msg(chat.id, custom_welcome_msg)
             else:
-                sent_msg = await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
-            await _log_channel(context, chat, user, victim, action="JOIN")
-    elif user_exist == False and reason == "left" and goodbye_msg:
-        sent_msg = await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")
-        await _log_channel(context, chat, user, victim, action="LEFT")
+                await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
+    elif user_exist == False and cause == "LEFT" and goodbye_msg:
+        await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")
 
 
 async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -356,6 +358,10 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if not bot_permission.can_invite_users:
+        await Message.reply_msg(update, "I don't have enough rights to invite users in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -415,6 +421,10 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if not bot_permission.can_promote_members:
+        await Message.reply_msg(update, "I don't have enough rights to promote/demote chat member!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -481,6 +491,10 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
+    if not bot_permission.can_promote_members:
+        await Message.reply_msg(update, "I don't have enough rights to promote/demote chat member!")
+        return
+    
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not admin_rights.get("can_promote_members"):
             await Message.reply_msg(update, "You don't have enough rights to promote/demote chat member!")
@@ -524,6 +538,10 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if not bot_permission.can_pin_messages:
+        await Message.reply_msg(update, "I don't have enough rights to pin/unpin messages!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -575,6 +593,10 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if not bot_permission.can_pin_messages:
+        await Message.reply_msg(update, "I don't have enough rights to pin/unpin messages!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -647,6 +669,10 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
+    if not bot_permission.can_restrict_members:
+        await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
+        return
+    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -673,15 +699,14 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         await bot.ban_chat_member(chat.id, victim.id)
-        msg = f"{user.mention_html()} has banned user {victim.mention_html()} from this chat!"
+        msg = f"{victim.mention_html()} has been banned in this chat!\n<b>Admin</b>: {user.first_name}"
         if reason:
-            msg = f"{msg}\nReason: {reason}"
+            msg = f"{msg}\n<b>Reason</b>: {reason}"
         await Message.reply_msg(update, msg)
-        await _log_channel(context, chat, user, victim, action="BAN", reason=reason)
         try:
-            msg = f"{user.mention_html()} has banned you from {chat.title}!"
+            msg = f"{user.mention_html()} has banned you in {chat.title}!"
             if reason:
-                msg = f"{msg}\nReason: {reason}"
+                msg = f"{msg}\n<b>Reason</b>: {reason}"
             await Message.send_msg(victim.id, msg)
         except Exception as e:
             logger.error(e)
@@ -718,6 +743,10 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
+    if not bot_permission.can_restrict_members:
+        await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
+        return
+    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -744,16 +773,15 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         await bot.unban_chat_member(chat.id, victim.id)
-        msg = f"{user.mention_html()} has unbanned user {victim.mention_html()}!"
+        msg = f"{victim.mention_html()} has been unbanned in this chat!\n<b>Admin</b>: {user.first_name}"
         if reason:
-            msg = f"{msg}\nReason: {reason}"
+            msg = f"{msg}\n<b>Reason</b>: {reason}"
         await Message.reply_msg(update, msg)
-        await _log_channel(context, chat, user, victim, action="UNBAN", reason=reason)
         try:
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
             msg = f"{user.mention_html()} has unbanned you in {chat.title}!\nInvite Link: {invite_link.invite_link}"
             if reason:
-                msg = f"{msg}\nReason: {reason}"
+                msg = f"{msg}\n<b>Reason</b>: {reason}"
             await Message.send_msg(victim.id, msg)
         except Exception as e:
             logger.error(e)
@@ -790,6 +818,10 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
+    if not bot_permission.can_restrict_members:
+        await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
+        return
+    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -817,17 +849,16 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await bot.ban_chat_member(chat.id, victim.id)
         await bot.unban_chat_member(chat.id, victim.id)
-        msg = f"{user.mention_html()} has kicked user {victim.mention_html()} from this chat!"
+        msg = f"{victim.mention_html()} has been kicked out from this chat!\n<b>Admin</b>: {user.first_name}"
         if reason:
-            msg = f"{msg}\nReason: {reason}"
+            msg = f"{msg}\n<b>Reason</b>: {reason}"
         await Message.reply_msg(update, msg)
         try:
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
             msg = f"{user.mention_html()} has kicked you from {chat.title}!\nInvite Link: {invite_link.invite_link}"
             if reason:
-                msg = f"{msg}\nReason: {reason}"
+                msg = f"{msg}\n<b>Reason</b>: {reason}"
             await Message.send_msg(victim.id, msg)
-            await _log_channel(context, chat, user, victim, action="KICK", reason=reason)
         except Exception as e:
             logger.error(e)
     except Exception as e:
@@ -857,6 +888,10 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
+    if not bot_permission.can_restrict_members:
+        await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
+        return
+    
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, f"I'm not going to kick you! You must be joking!")
         return
@@ -865,7 +900,6 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await bot.ban_chat_member(chat.id, victim.id)
         await Message.reply_msg(update, f"Nice Choice! Get out of my sight!\n{victim.mention_html()} has choosed the easy way to out!")
         await bot.unban_chat_member(chat.id, victim.id)
-        await _log_channel(context, chat, user, victim, action="KICKME")
         try:
             invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
             await Message.send_msg(victim.id, f"You kicked yourself from {chat.title}!\nInvite Link: {invite_link.invite_link}")
@@ -902,6 +936,10 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if not bot_permission.can_restrict_members:
+        await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
         return
         
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -945,7 +983,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "can_send_voice_notes": False
     }
 
-    msg = f"{user.mention_html()} has muted user {victim.mention_html()}!\n"
+    msg = f"Shh... {victim.mention_html()} has been muted in this chat!\n<b>Admin</b>: {user.first_name}\n"
     until_date = None
     time = None
 
@@ -960,7 +998,6 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await bot.restrict_chat_member(chat.id, victim.id, permissions, until_date)
         await Message.reply_msg(update, msg)
-        await _log_channel(context, chat, user, victim, action="MUTE", reason=reason)
     except Exception as e:
         logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -992,6 +1029,10 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if not bot_permission.can_restrict_members:
+        await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -1037,11 +1078,10 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         await bot.restrict_chat_member(chat.id, victim.id, permissions)
-        msg = f"{user.mention_html()} has unmuted user {victim.mention_html()}!"
+        msg = f"{victim.mention_html()} has been unmuted in this chat!\n<b>Admin</b>: {user.first_name}"
         if reason:
-            msg = f"{msg}\nReason: {reason}"
+            msg = f"{msg}\n<b>Reason</b>: {reason}"
         await Message.reply_msg(update, msg)
-        await _log_channel(context, chat, user, victim, action="UNMUTE", reason=reason)
     except Exception as e:
         logger.error(e)
         await Message.send_msg(chat.id, f"Error: {e}")
@@ -1076,6 +1116,10 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
+    if not bot_permission.can_delete_messages:
+        await Message.reply_msg(update, "I don't have enough rights to delete chat messages!")
+        return
+    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -1092,13 +1136,10 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         message_to_del = [e_msg, reply]
         for delete_msg in message_to_del:
-            try:
-                await Message.del_msg(chat.id, delete_msg)
-            except:
-                pass
-        msg = f"{victim.mention_html()}, your message is deleted by {user.mention_html()}!"
+            await Message.del_msg(chat.id, delete_msg)
+        msg = f"{victim.mention_html()}, your message is deleted!\n<b>Admin</b>: {user.first_name}"
         if reason:
-            msg = f"{msg}\nReason: {reason}"
+            msg = f"{msg}\n<b>Reason</b>: {reason}"
         await Message.send_msg(chat.id, msg)
         await _log_channel(context, chat, user, victim, action="MSG_DEL", reason=reason)
     except Exception as e:
@@ -1131,6 +1172,10 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if not bot_permission.can_delete_messages:
+        await Message.reply_msg(update, "I don't have enough rights to delete chat messages!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -1183,6 +1228,10 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if not bot_permission.can_change_info:
+        await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -1239,6 +1288,10 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if not bot_permission.can_change_info:
+        await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -1299,6 +1352,10 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
+        return
+    
+    if not bot_permission.can_change_info:
+        await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -1386,6 +1443,10 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
+    if not bot_permission.can_change_info:
+        await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
+        return
+    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -1471,9 +1532,18 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
+    if not bot_permission.can_change_info:
+        await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
+        return
+    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
+    
+    if user_permission.status == ChatMember.ADMINISTRATOR:
+        if not admin_rights.get("can_change_info"):
+            await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
+            return
     
     try:
         find_group = context.chat_data["db_group_data"]
@@ -1499,9 +1569,8 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg += "- No filters\n"
     
     msg += (
-        "\n<b><u>Instruction</u></b>:\n"
-        "/filter » To add filter\n"
-        "/remove » To remove exist filter\n"
+        "\n<code>/filter</code> » To add filter\n"
+        "<code>/remove</code> » To remove exist filter\n"
     )
     
     context.chat_data["user_id"] = user.id
@@ -1518,7 +1587,6 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    _bot_info = await bot.get_me()
 
     if chat.type not in ["group", "supergroup"]:
         await _pm_error(chat.id)

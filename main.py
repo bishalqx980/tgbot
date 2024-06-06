@@ -533,7 +533,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
         
         ai_status = find_group.get("ai_status")
-        if not ai_status:
+        if not ai_status and ai_status != None:
             await Message.del_msg(chat.id, e_msg)
             return
     
@@ -838,6 +838,10 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if bot_permission.status != ChatMember.ADMINISTRATOR:
             await Message.reply_msg(update, "I'm not an admin in this chat!")
             return
+    
+        if not bot_permission.can_change_info:
+            await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
+            return
         
         if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
             await Message.reply_msg(update, "You aren't an admin in this chat!")
@@ -874,6 +878,16 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         del_cmd = find_group.get("del_cmd")
         all_links = find_group.get("all_links")
         allowed_links = find_group.get("allowed_links")
+        if allowed_links:
+            storage, counter = "", 0
+            for i in allowed_links:
+                counter += 1
+                if counter == len(allowed_links):
+                    storage += f"{i}"
+                else:
+                    storage += f"{i}, "
+            allowed_links = storage
+        
         log_channel = find_group.get("log_channel")
 
         context.chat_data["edit_cname"] = "groups"
@@ -1213,6 +1227,16 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             del_cmd = find_group.get("del_cmd")
             all_links = find_group.get("all_links")
             allowed_links = find_group.get("allowed_links")
+            if allowed_links:
+                storage, counter = "", 0
+                for i in allowed_links:
+                    counter += 1
+                    if counter == len(allowed_links):
+                        storage += f"{i}"
+                    else:
+                        storage += f"{i}, "
+                allowed_links = storage
+
             log_channel = find_group.get("log_channel")
             filters = find_group.get("filters")
             if filters:

@@ -366,15 +366,24 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if images:
             if len(images) > 20:
-                storage, count_image = "", 0
+                storage, counter = "", 0
                 for image in images:
                     storage += f"{image},"
-                    count_image += 1
-                    if count_image == 20:
+                    counter += 1
+                    if counter == 20:
                         await Message.send_msg(user.id, f"{storage}")
-                        storage, count_image = "", 0
+                        storage, counter = "", 0
                 await Message.send_msg(user.id, f"{storage}")
                 images = "Value sent below!"
+            else:
+                storage, counter = "", 0
+                for i in images:
+                    counter += 1
+                    if counter == len(images):
+                        storage += f"{i}"
+                    else:
+                        storage += f"{i}, "
+                images = storage
         
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
@@ -459,6 +468,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         find_data = "_id"
         match_data = await MongoDB.find(edit_cname, find_data)
         sudo_users = await MongoDB.get_data(edit_cname, "sudo_users")
+        if sudo_users:
+            storage, counter = "", 0
+            for i in sudo_users:
+                counter += 1
+                if counter == len(sudo_users):
+                    storage += f"{i}"
+                else:
+                    storage += f"{i}, "
+            sudo_users = storage
 
         context.chat_data["edit_cname"] = edit_cname
         context.chat_data["find_data"] = find_data
@@ -1216,6 +1234,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         all_links = find_chat.get("all_links")
         allowed_links = find_chat.get("allowed_links")
+        if allowed_links:
+            storage, counter = "", 0
+            for i in allowed_links:
+                counter += 1
+                if counter == len(allowed_links):
+                    storage += f"{i}"
+                else:
+                    storage += f"{i}, "
+            allowed_links = storage
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
@@ -1324,6 +1351,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
         
         allowed_links = find_chat.get("allowed_links")
+        if allowed_links:
+            storage, counter = "", 0
+            for i in allowed_links:
+                counter += 1
+                if counter == len(allowed_links):
+                    storage += f"{i}"
+                else:
+                    storage += f"{i}, "
+            allowed_links = storage
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
@@ -1542,10 +1578,20 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             welcome_msg = find_chat.get("welcome_msg")
             goodbye_msg = find_chat.get("goodbye_msg")
             antibot = find_chat.get("antibot")
-            ai_status = find_group.get("ai_status")
+            ai_status = find_chat.get("ai_status")
             del_cmd = find_chat.get("del_cmd")
             all_links = find_chat.get("all_links")
             allowed_links = find_chat.get("allowed_links")
+            if allowed_links:
+                storage, counter = "", 0
+                for i in allowed_links:
+                    counter += 1
+                    if counter == len(allowed_links):
+                        storage += f"{i}"
+                    else:
+                        storage += f"{i}, "
+                allowed_links = storage
+
             log_channel = find_chat.get("log_channel")
 
             msg = (
