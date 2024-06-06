@@ -1274,7 +1274,6 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             lang = find_user.get("lang")
             echo = find_user.get("echo")
             active_status = find_user.get("active_status")
-            last_used = find_user.get("last_used")
 
             msg = (
                 f"<code>Name     :</code> {Name}\n"
@@ -1284,7 +1283,6 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"<code>Lang     :</code> {lang}\n"
                 f"<code>Echo     :</code> {echo}\n"
                 f"<code>A. status:</code> {active_status}\n"
-                f"<code>Last used:</code> {last_used}\n"
             )
             await Message.reply_msg(update, f"<b>{msg}</b>")
         return
@@ -1407,7 +1405,10 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 shell = shell_file.read()
             await Message.send_doc(chat.id, shell, "shell.txt", command, e_msg.id)
     else:
-        await Message.reply_msg(update, result.stderr)
+        response = await Message.reply_msg(update, result.stderr)
+        if not response:
+            logger.info(f"Shell: {result.stderr}")
+            await Message.reply_msg(update, "Check log...")
 
 
 async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
