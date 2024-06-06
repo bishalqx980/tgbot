@@ -44,15 +44,12 @@ else:
 <summary><b>Setup 📦</b></summary>
 
 - Rename `sample_config.env` to `config.env` then fillup `config.env` file value's
-- `bot_token` Get from https://t.me/BotFather E.g. 123456:abcdefGHIJK...
-- `owner_id` Get from bot by /id command E.g. 2134776547
-- `owner_username` Your Username E.g. paste like bishalqx980 not @bishalqx980
-- `mongodb_uri` Get from https://www.mongodb.com/
-- `db_name` anything E.g. MissCiri_db
-- `server_url` E.g. for render it will be https://your_app_name.onrender.com/
-- ❗ OPTIONAL | `shrinkme_api` Get from https://shrinkme.io/
-- ❗ OPTIONAL | `omdb_api` Get from https://www.omdbapi.com/
-- ❗ OPTIONAL | `weather_api` Get from https://www.weatherapi.com/
+- `BOT_TOKEN` Get from https://t.me/BotFather E.g. 123456:abcdefGHIJK...
+- `OWNER_ID` Get from bot by /id command E.g. 2134776547
+- `OWNER_USERNAME` Your Username E.g. paste like bishalqx980 not @bishalqx980
+- `MONGODB_URI` Get from https://www.mongodb.com/
+- `DB_NAME` anything E.g. MissCiri_db
+- **_After deployment complete, don't forget to visit /bsetting_**
     <hr>
     <details>
     <summary><b>Local Deploy 🚀</b></summary>
@@ -80,7 +77,8 @@ else:
     - Goto dashboard & create a New `Web Service`
     - Select `Build and deploy from a Git repository` > `Public Git repository` https://github.com/bishalqx980/tgbot
 
-    ```
+    <br>
+
     `Branch` main
 
     `Runtime` Python 3
@@ -93,9 +91,34 @@ else:
 
     ⚠ Advanced option > `Add secret file` filename: `config.env` - file content: paste all content from `sample_config.env` (make sure you filled up everything)
 
+    **_[ If you face anyproblem accessing `Advanced option` then just click on `Create Web Service` then from `Environment` > `Secret Files` add the config.env calues... Then restart/redeploy the web service ]_**
+
     **Finally click on Create Web Service & wait few sec for deployment & Done | Enjoy 🎉**
-    ```
+
     </details>
+
+    <details>
+    <summary><b>Heroku Deploy 🚀</b></summary>
+
+    - Signin/Signup on http://heroku.com/
+    - Give a star ⭐ and fork this repo https://github.com/bishalqx980/tgbot
+    - Goto your forked repo `settings` > `General` > Check ✅ `Template repository`
+    - Come back and on the right top corner you will see a green button name `Use this template`, click on that and create a new private repo with these files
+    - On that private repo upload your `config.env` file and make sure required all values are filled up
+    - Then goto the private repo `settings` > `secrets and variables` > `Actions`
+    - Click on `New respository secret`
+        - **_Name_**: `HEROKU_EMAIL`
+        - **_Secret_**: `your_heroku_email`
+        - Repeat the step and add `HEROKU_APP_NAME` - unique name eg. tgbot007oc-bishalqx980
+        - Add `HEROKU_API_KEY` - get from https://dashboard.heroku.com/account scroll down `API Key` click on `Reveal` button then copy the value and paste it...
+    - Finally click on `Actions` tab from the top, select `Deploy to heroku`, on right side click on `Run workflow` > green button `Run workflow`
+    - Now wait for deployment complete... (you can check log here https://dashboard.heroku.com/apps/HEROKU_APP_NAME/logs)
+    - ⚠️ Add `Server url` from /bsetting before bot heroku shutdown... then restart dyno (heroku)
+
+    **Enjoy 🍾**
+
+    </details>
+
 </details>
 
 ## License
