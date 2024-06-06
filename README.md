@@ -113,7 +113,7 @@ else:
         - Add `HEROKU_API_KEY` - get from https://dashboard.heroku.com/account scroll down `API Key` click on `Reveal` button then copy the value and paste it...
     - Finally click on `Actions` tab from the top, select `Deploy to heroku`, on right side click on `Run workflow` > green button `Run workflow`
     - Now wait for deployment complete... (you can check log here https://dashboard.heroku.com/apps/HEROKU_APP_NAME/logs)
-    - ⚠️ Add `Server url` from /bsetting before bot heroku shutdown... then restart dyno (heroku)
+    - ⚠️ Add `Server url` from /bsetting before heroku shutdown... then restart dyno (heroku)
 
     **Enjoy 🍾**
 
