@@ -16,9 +16,3 @@ jobs:
           docker_heroku_process_type: web
           stack: "container"
           region: "us"
-        env:
-          BOT_TOKEN: ${{secrets.BOT_TOKEN}}
-          OWNER_ID: ${{secrets.OWNER_ID}}
-          OWNER_USERNAME: ${{secrets.OWNER_USERNAME}}
-          MONGODB_URI: ${{secrets.MONGODB_URI}}
-          DB_NAME: ${{secrets.DB_NAME}}
