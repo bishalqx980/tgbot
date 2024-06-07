@@ -230,28 +230,29 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 parse_url = urlparse(github_repo)
                 split_all = parse_url.path.strip("/").split("/")
                 username, repo_name = split_all
-
                 bot_repo_commit = await GitHub.get_latest_commit(username, repo_name)
+                if latest_commit:
+                    b_r_sha = bot_repo_commit.get("sha")
+                    b_r_commit = bot_repo_commit.get("commit") # not for use
+                    b_r_message = b_r_commit.get("message")
+                    b_r_author = b_r_commit.get("author") # not for use
+                    b_r_aname = b_r_author.get("name")
+                    b_r_date = b_r_author.get("date")
+                    b_r_link = f"https://github.com/{username}/{repo_name}/commit/{b_r_sha}"
+                    
+                    msg = (
+                        msg + f"\n<b>» Bot repo [ <a href='{b_r_link}'>commit</a> ]</b>\n"
+                        f"<b>Last update:</b> <code>{b_r_date}</code>\n"
+                        f"<b>Commit:</b> <code>{b_r_message}</code>\n"
+                        f"<b>Committed by:</b> <code>{b_r_aname}</code>\n"
+                    )
 
-                b_r_sha = bot_repo_commit.get("sha")
-                b_r_commit = bot_repo_commit.get("commit") # not for use
-                b_r_message = b_r_commit.get("message")
-                b_r_author = b_r_commit.get("author") # not for use
-                b_r_aname = b_r_author.get("name")
-                b_r_date = b_r_author.get("date")
-                b_r_link = f"https://github.com/{username}/{repo_name}/commit/{b_r_sha}"
-                
-                msg = (
-                    msg + f"\n<b>» Bot repo [ <a href='{b_r_link}'>commit</a> ]</b>\n"
-                    f"<b>Last update:</b> <code>{b_r_date}</code>\n"
-                    f"<b>Commit:</b> <code>{b_r_message}</code>\n"
-                    f"<b>Committed by:</b> <code>{b_r_aname}</code>\n"
-                )
-
-                if l_c_sha != b_r_sha:
-                    msg += "\n<i>The bot repo isn't updated to the latest commit! ⚠</i>"
+                    if l_c_sha != b_r_sha:
+                        msg += "\n<i>The bot repo isn't updated to the latest commit! ⚠</i>"
+                    else:
+                        msg += "\n<i>The bot repo is updated to the latest commit...</i>"
                 else:
-                    msg += "\n<i>The bot repo is updated to the latest commit...</i>"
+                    msg = "Error..."
             except Exception as e:
                 logger.error(e)
         

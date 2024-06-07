@@ -1,5 +1,4 @@
 FROM python:3.11-slim
-# FROM anasty17/mltb-oracle:latest
 
 WORKDIR /usr/src/app
 RUN chmod 777 /usr/src/app
