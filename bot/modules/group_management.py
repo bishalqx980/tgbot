@@ -5,6 +5,7 @@ from telegram.ext import ContextTypes
 from bot import bot, logger
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.mongodb import MongoDB
+from bot.modules.local_database import LOCAL_DATABASE
 
 
 async def _check_permission(update: Update, victim=None, user=None, checking_msg=True):
@@ -82,16 +83,11 @@ async def _check_del_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type == "private":
         return
     
-    try:
-        find_group = context.chat_data["db_group_data"]
-    except Exception as e:
-        logger.error(e)
-        find_group = None
-        
+    find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
     if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
-            context.chat_data["db_group_data"] = find_group
+            await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
         else:
             await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
@@ -105,16 +101,11 @@ async def _log_channel(context: ContextTypes.DEFAULT_TYPE, chat, user, victim=No
     """
     sends chat actions to log channel
     """
-    try:
-        find_group = context.chat_data["db_group_data"]
-    except Exception as e:
-        logger.error(e)
-        find_group = None
-        
+    find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
     if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
-            context.chat_data["db_group_data"] = find_group
+            await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
         else:
             return
     
@@ -257,16 +248,11 @@ async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TY
     user = chat_member.from_user # cause user
     victim = chat_member.new_chat_member.user
 
-    try:
-        find_group = context.chat_data["db_group_data"]
-    except Exception as e:
-        logger.error(e)
-        find_group = None
-        
+    find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
     if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
-            context.chat_data["db_group_data"] = find_group
+            await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
         else:
             return
 
@@ -1388,16 +1374,11 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg, btn)
         return
 
-    try:
-        find_group = context.chat_data["db_group_data"]
-    except Exception as e:
-        logger.error(e)
-        find_group = None
-    
+    find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
     if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
-            context.chat_data["db_group_data"] = find_group
+            await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
         else:
             await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
@@ -1412,8 +1393,8 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         filters[keyword] = value
         await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
 
-    db_group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
-    context.chat_data["db_group_data"] = db_group_data
+    group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
+    await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
     await Message.reply_msg(update, f"{user.mention_html()} has added filter <code>{keyword}</code>!")
 
 
@@ -1464,16 +1445,11 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg)
         return
 
-    try:
-        find_group = context.chat_data["db_group_data"]
-    except Exception as e:
-        logger.error(e)
-        find_group = None
-        
+    find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
     if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
-            context.chat_data["db_group_data"] = find_group
+            await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
         else:
             await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return
@@ -1485,8 +1461,8 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
             await Message.reply_msg(update, f"{user.mention_html()} has removed all filters of this chat!")
 
-            db_group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
-            context.chat_data["db_group_data"] = db_group_data
+            group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
+            await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
             return
         
         try:
@@ -1498,8 +1474,8 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "There are no such filter available for this chat to delete!\nCheckout /filters")
                 return
             
-            db_group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
-            context.chat_data["db_group_data"] = db_group_data
+            group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
+            await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
         except Exception as e:
             logger.error(e)
             await Message.reply_msg(update, f"Error: {e}")
@@ -1545,16 +1521,11 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
             return
     
-    try:
-        find_group = context.chat_data["db_group_data"]
-    except Exception as e:
-        logger.error(e)
-        find_group = None
-        
+    find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
     if not find_group:
         find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
         if find_group:
-            context.chat_data["db_group_data"] = find_group
+            await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
         else:
             await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
             return

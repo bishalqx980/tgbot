@@ -61,6 +61,9 @@ class MongoDB:
     
 
     async def find(collection_name, search):
+        """
+        returns >> only searched data value
+        """
         collection = db[collection_name]
         try:
             logger.info(f"Finding Data in {collection_name} MongoDB...")

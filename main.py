@@ -53,6 +53,7 @@ from bot.update_db import update_database
 from bot.modules.qr import QR
 from bot.modules.telegraph import TELEGRAPH
 from bot.modules.re_link_domain import RE_LINK
+from bot.modules.local_database import LOCAL_DATABASE
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -66,14 +67,11 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         _bot_info = await bot.get_me()
-
-        try:
-            _bot = context.bot_data["db_bot_data"]
-        except Exception as e:
-            logger.error(e)
+        _bot = await LOCAL_DATABASE.find("bot_docs")
+        if not _bot:
             find = await MongoDB.find("bot_docs", "_id")
             _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
-            context.bot_data["db_bot_data"] = _bot
+            await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
 
         bot_pic = _bot.get("bot_pic")
         welcome_img = _bot.get("welcome_img")
@@ -243,32 +241,22 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not lang_code:
         if chat.type == "private":
-            try:
-                find_user = context.chat_data["db_user_data"]
-            except Exception as e:
-                logger.error(e)
-                find_user = None
-            
+            find_user = await LOCAL_DATABASE.find_one("users", user.id)
             if not find_user:
                 find_user = await MongoDB.find_one("users", "user_id", user.id)
                 if find_user:
-                    context.chat_data["db_user_data"] = find_user
+                    await LOCAL_DATABASE.insert_data("users", user.id, find_user)
                 else:
                     await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                     return
             
             lang_code = find_user.get("lang")
         else:
-            try:
-                find_group = context.chat_data["db_group_data"]
-            except Exception as e:
-                logger.error(e)
-                find_group = None
-            
+            find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
             if not find_group:
                 find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
                 if find_group:
-                    context.chat_data["db_group_data"] = find_group
+                    await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
                 else:
                     await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                     return
@@ -277,16 +265,16 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     tr_msg = await translate(to_translate, lang_code)
     if tr_msg:
-        await Message.reply_msg(update, tr_msg)
+        sent_msg = await Message.reply_msg(update, tr_msg)
+        if not sent_msg:
+            await Message.reply_msg(update, "Oops, internal problem occurred...")
 
     if not tr_msg:
-        try:
-            _bot = context.bot_data["db_bot_data"]
-        except Exception as e:
-            logger.error(e)
+        _bot = await LOCAL_DATABASE.find("bot_docs")
+        if not _bot:
             find = await MongoDB.find("bot_docs", "_id")
             _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
-            context.bot_data["db_bot_data"] = _bot
+            await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
         
         btn_name = ["Language code's"]
         btn_url = ["https://telegra.ph/Language-Code-12-24"]
@@ -480,16 +468,11 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = " ".join(context.args)
 
     if chat.type != "private":
-        try:
-            find_group = context.chat_data["db_group_data"]
-        except Exception as e:
-            logger.error(e)
-            find_group = None
-        
+        find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
         if not find_group:
             find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
-                context.chat_data["db_group_data"] = find_group
+                await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
             else:
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
@@ -535,16 +518,11 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = " ".join(context.args)
 
     if chat.type != "private":
-        try:
-            find_group = context.chat_data["db_group_data"]
-        except Exception as e:
-            logger.error(e)
-            find_group = None
-        
+        find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
         if not find_group:
             find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
-                context.chat_data["db_group_data"] = find_group
+                await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
             else:
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
@@ -610,9 +588,6 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
     if domain not in youtube_domains:
         await Message.reply_msg(update, "Please send a valid youtube video link!")
         return
-    
-    context.chat_data["user_id"] = user.id
-    context.chat_data["del_msg_pointer"] = e_msg
     
     btn_name_row1 = ["Video (mp4)", "Audio (mp3)"]
     btn_data_row1 = ["mp4", "mp3"]
@@ -766,25 +741,18 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
 
-    try:
-        _bot = context.bot_data["db_bot_data"]
-    except Exception as e:
-        logger.error(e)
+    _bot = await LOCAL_DATABASE.find("bot_docs")
+    if not _bot:
         find = await MongoDB.find("bot_docs", "_id")
         _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
-        context.bot_data["db_bot_data"] = _bot
+        await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
 
     if chat.type == "private":
-        try:
-            find_user = context.chat_data["db_user_data"]
-        except Exception as e:
-            logger.error(e)
-            find_user = None
-        
+        find_user = await LOCAL_DATABASE.find_one("users", user.id)
         if not find_user:
             find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
-                context.chat_data["db_user_data"] = find_user
+                await LOCAL_DATABASE.insert_data("users", user.id, find_user)
             else:
                 await Message.reply_msg(update, "User data not found! Block me then start me again! (no need to delete chat)")
                 return
@@ -793,13 +761,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lang = find_user.get("lang")
         echo = find_user.get("echo")
         auto_tr = find_user.get("auto_tr")
-
-        context.chat_data["edit_cname"] = "users"
-        context.chat_data["find_data"] = "user_id"
-        context.chat_data["match_data"] = user.id
-        context.chat_data["chat_id"] = chat.id
-        context.chat_data["user_id"] = user.id
-        context.chat_data["del_msg_pointer"] = e_msg
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
@@ -869,16 +830,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
                 return
 
-        try:
-            find_group = context.chat_data["db_group_data"]
-        except Exception as e:
-            logger.error(e)
-            find_group = None
         
+        find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
         if not find_group:
             find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
-                context.chat_data["db_group_data"] = find_group
+                await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
             else:
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
@@ -906,13 +863,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             allowed_links = storage
         
         log_channel = find_group.get("log_channel")
-
-        context.chat_data["edit_cname"] = "groups"
-        context.chat_data["find_data"] = "chat_id"
-        context.chat_data["match_data"] = chat.id
-        context.chat_data["chat_id"] = chat.id
-        context.chat_data["user_id"] = user.id
-        context.chat_data["del_msg_pointer"] = e_msg
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
@@ -1047,9 +997,6 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"A.users: {active_users} | "
             f"Inactive: {inactive_users}"
         )
-
-        context.chat_data["user_id"] = user.id
-        context.chat_data["del_msg_pointer"] = e_msg
 
         btn_name_row1 = ["Group Management", "Artificial intelligence"]
         btn_data_row1 = ["group_management", "ai"]
@@ -1337,15 +1284,6 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
     
-    welcome_img = await MongoDB.get_data("bot_docs", "welcome_img")
-    
-    context.chat_data["edit_cname"] = "bot_docs"
-    context.chat_data["find_data"] = "welcome_img"
-    context.chat_data["match_data"] = welcome_img
-    context.chat_data["chat_id"] = chat.id
-    context.chat_data["user_id"] = user.id
-    context.chat_data["del_msg_pointer"] = e_msg
-    
     btn_name_row1 = ["Bot pic", "Welcome img"]
     btn_data_row1 = ["bot_pic", "welcome_img"]
 
@@ -1541,30 +1479,38 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     msg = update.message.text_html or update.message.caption_html if update.message else None
 
-    if user.id == 777000:
+    if user.id == 777000: # Telegram channel
         return
+    
+    if chat.type == "private":
+        collection_name = "users"
+        db_find = user.id
+    elif chat.type in ["group", "supergroup"]:
+        collection_name = "groups"
+        db_find = chat.id
+    else:
+        collection_name = None
+        db_find = None
 
-    if context.chat_data.get("status") == "editing":
-        try:
-            msg = int(msg)
-        except:
-            msg = msg
-        context.chat_data["new_value"] = msg
-        context.chat_data["edit_value_del_msg_pointer"] = e_msg
-        context.chat_data["status"] = None
-        return
+    find_chat = await LOCAL_DATABASE.find_one(collection_name, db_find)
+    if find_chat:
+        is_editing = find_chat.get("is_editing") # bool
+        if is_editing:
+            try:
+                msg = int(msg)
+            except:
+                msg = msg
+            
+            for key, value in zip(["new_value", "edit_value_del_msg_pointer", "is_editing"], [msg, e_msg, False]):
+                await LOCAL_DATABASE.insert_data(collection_name, db_find, {key: value})
+            return
 
     if chat.type == "private" and msg:
-        try:
-            find_user = context.chat_data["db_user_data"]
-        except Exception as e:
-            logger.error(e)
-            find_user = None
-        
+        find_user = await LOCAL_DATABASE.find_one("users", user.id)
         if not find_user:
             find_user = await MongoDB.find_one("users", "user_id", user.id)
             if find_user:
-                context.chat_data["db_user_data"] = find_user
+                await LOCAL_DATABASE.insert_data("users", user.id, find_user)
             else:
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return
@@ -1599,16 +1545,11 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.send_msg(chat.id, "I'm not an admin in this chat!")
             return
         
-        try:
-            find_group = context.chat_data["db_group_data"]
-        except Exception as e:
-            logger.error(e)
-            find_group = None
-        
+        find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
         if not find_group:
             find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
             if find_group:
-                context.chat_data["db_group_data"] = find_group
+                await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
             else:
                 await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
                 return

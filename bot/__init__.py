@@ -3,7 +3,6 @@ import logging
 from telegram import Bot
 from dotenv import load_dotenv
 from bot.alive import alive
-from SafoneAPI import SafoneAPI
 
 with open('log.txt', 'w'):
     pass
@@ -52,8 +51,10 @@ for variable in variables:
     else:
         pass
 
-#safone api
-safone_api = SafoneAPI()
+check_local_db = os.path.isfile("database.json")
+if check_local_db:
+    with open("database.json", "w") as f:
+        f.write("{}")
 
 bot = Bot(bot_token)
 
