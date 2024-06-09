@@ -1,12 +1,15 @@
 import requests
 from bot import logger
 from bot.modules.mongodb import MongoDB
+from bot.modules.local_database import LOCAL_DATABASE
 
 async def weather_info(location):
-    weather_api = await MongoDB.get_data("bot_docs", "weather_api")
+    weather_api = await LOCAL_DATABASE.get_data("bot_docs", "weather_api")
     if not weather_api:
-        logger.error("weather_api not found!")
-        return 0
+        weather_api = await MongoDB.get_data("bot_docs", "weather_api")
+        if not weather_api:
+            logger.error("weather_api not found!")
+            return 0
     
     try:
         post_url = f"https://api.weatherapi.com/v1/current.json?key={weather_api}&q={location}&aqi=no"

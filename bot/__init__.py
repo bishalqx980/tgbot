@@ -1,4 +1,5 @@
 import os
+import json
 import logging
 from telegram import Bot
 from dotenv import load_dotenv
@@ -51,10 +52,22 @@ for variable in variables:
     else:
         pass
 
-check_local_db = os.path.isfile("database.json")
-if check_local_db:
-    with open("database.json", "w") as f:
-        f.write("{}")
+LOCAL_DB = "database.json"
+
+check_local_db = os.path.isfile(LOCAL_DB)
+if not check_local_db:
+    logger.info("localdb not found...")
+    with open(LOCAL_DB, "w") as f:
+        json.dump({}, f)
+    logger.info("localdb created...")
+
+try:
+    with open(LOCAL_DB, "w") as f:
+        data = {"bot_docs": {}, "users": {}, "groups": {}}
+        json.dump(data, f, indent=4)
+        logger.info("localdb updated...")
+except Exception as e:
+    logger.error(e)
 
 bot = Bot(bot_token)
 
@@ -68,6 +81,5 @@ __________.__       .__           .__
         \/        \/     \/     \/      
                         Library python-telegram-bot'''
 )
-
 
 alive()

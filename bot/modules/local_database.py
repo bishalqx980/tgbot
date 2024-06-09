@@ -1,31 +1,5 @@
-import os
 import json
-from bot import logger
-
-LOCAL_DB = "database.json"
-
-check_path = os.path.isfile(LOCAL_DB)
-if check_path:
-    try:
-        with open(LOCAL_DB, "r") as f:
-            localdb_data = json.load(f)
-
-        if not all(key in localdb_data for key in ("bot_docs", "users", "groups")):
-            check_path = None
-    except Exception as e:
-        check_path = None
-        logger.error(e)
-
-if not check_path:
-    logger.info(f"Local Database: {LOCAL_DB} not found...")
-    try:
-        with open(LOCAL_DB, "w") as f:
-            data = {"bot_docs": {}, "users": {}, "groups": {}}
-            json.dump(data, f, indent=4)
-            logger.info(f"Local Database: {LOCAL_DB} created...")
-    except Exception as e:
-        logger.error(e)
-
+from bot import logger, LOCAL_DB
 
 class LOCAL_DATABASE:
     async def create_collection(collection):
@@ -62,14 +36,15 @@ class LOCAL_DATABASE:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)
             
-            data["_id"] = str(data["_id"]) # mongodb _id >> make it str
+            if data["_id"]:
+                data["_id"] = str(data["_id"]) # mongodb _id >> make it str
             load_collection = load_db.get(collection)
             load_collection.update(data)
 
             with open(LOCAL_DB, "w") as f:
                 json.dump(load_db, f, indent=4)
             
-            logger.info(f"Database: {collection} updated!")
+            logger.info(f"{collection} updated in localdb...")
         except Exception as e:
             logger.error(e)
 
@@ -85,7 +60,8 @@ class LOCAL_DATABASE:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)
             
-            data["_id"] = str(data["_id"]) # mongodb _id >> make it str
+            if data["_id"]:
+                data["_id"] = str(data["_id"]) # mongodb _id >> make it str
             load_collection = load_db.get(collection)
             check_db = load_collection.get(str(identifier))
             load_collection[str(identifier)] = data
@@ -94,9 +70,9 @@ class LOCAL_DATABASE:
                 json.dump(load_db, f, indent=4)
             
             if check_db:
-                logger.info(f"Database: {identifier} updated!")
+                logger.info(f"{identifier} updated in collection {collection} in localdb...")
             else:
-                logger.info(f"Entry: {identifier} created...")
+                logger.info(f"{identifier} created in collection {collection} in localdb...")
         except Exception as e:
             logger.error(e)
     
@@ -127,5 +103,21 @@ class LOCAL_DATABASE:
             load_collection = load_db.get(collection)
             data = load_collection.get(str(find))
             return data
+        except Exception as e:
+            logger.error(e)
+    
+
+    async def get_data(collection, data):
+        """
+        collection = db_collection_name eg. (users or docs)
+        data = which data you want from specified collection
+        """
+        try:
+            with open(LOCAL_DB, "r") as f:
+                load_db = json.load(f)
+            
+            load_collection = load_db.get(collection)
+            db_data = load_collection[data]
+            return db_data
         except Exception as e:
             logger.error(e)

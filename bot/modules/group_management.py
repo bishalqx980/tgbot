@@ -188,19 +188,19 @@ async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT
     bot_exist, cause = _chk_stat
 
     if chat.type == "private":
-        find_user = await MongoDB.find_one("users", "user_id", user.id)
+        find_user = await LOCAL_DATABASE.find_one("users", user.id)
         if not find_user:
-            data = {
-                "user_id": user.id,
-                "Name": user.full_name,
-                "username": user.username,
-                "mention": user.mention_html(),
-                "lang": user.language_code
-            }
-            try:
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
+            if not find_user:
+                data = {
+                    "user_id": user.id,
+                    "Name": user.full_name,
+                    "username": user.username,
+                    "mention": user.mention_html(),
+                    "lang": user.language_code
+                }
                 await MongoDB.insert_single_data("users", data)
-            except Exception as e:
-                logger.error(e)
+                await LOCAL_DATABASE.insert_data("users", user.id, data)
         
         if bot_exist:
             await MongoDB.update_db("users", "user_id", user.id, "active_status", True)
@@ -208,34 +208,26 @@ async def track_my_chat_activities(update: Update, context: ContextTypes.DEFAULT
             await MongoDB.update_db("users", "user_id", user.id, "active_status", False)
 
     elif chat.type in ["group", "supergroup"]:
-        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+        find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
         if not find_group:
-            try:
+            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+            if not find_group:
                 data = {
                     "chat_id": chat.id,
                     "title": chat.title
                 }
                 await MongoDB.insert_single_data("groups", data)
-            except Exception as e:
-                logger.error(e)
-                await Message.send_msg(chat.id, f"⚠ Group has not registered! Error: {e}")
-                return
+                await LOCAL_DATABASE.insert_data("groups", chat.id, data)
         if bot_exist:
-            try:
-                msg = (
-                    "Thanks for adding me in this nice chat!\n\n"
-                    "Please make me admin in chat, so I can help you managing this chat effectively!\n/help for bot help..."
-                )
-                await Message.send_msg(chat.id, msg)
-                await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
-            except Exception as e:
-                logger.error(e)
+            msg = (
+                "Thanks for adding me in this nice chat!\n\n"
+                "Please make me admin in chat, so I can help you managing this chat effectively!\n/help for bot help..."
+            )
+            await Message.send_msg(chat.id, msg)
+            await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
     else:
         if bot_exist:
-            try:
-                await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
-            except Exception as e:
-                logger.error(e)
+            await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
 
 
 async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1392,10 +1384,10 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         filters[keyword] = value
         await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
-
+    
     group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
     await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
-    await Message.reply_msg(update, f"{user.mention_html()} has added filter <code>{keyword}</code>!")
+    await Message.reply_msg(update, f"<code>{keyword}</code> has been added as filter!\n<b>Admin</b>: {user.full_name}")
 
 
 async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1459,7 +1451,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if filters and keyword:
         if keyword == "clear_all":
             await MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
-            await Message.reply_msg(update, f"{user.mention_html()} has removed all filters of this chat!")
+            await Message.reply_msg(update, f"All filters of this chat has been removed!\n<b>Admin</b>: {user.full_name}")
 
             group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
             await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
@@ -1469,7 +1461,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if keyword.lower() in filters:
                 del filters[keyword]
                 await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
-                await Message.reply_msg(update, f"{user.mention_html()} has removed filter <code>{keyword}</code>!")
+                await Message.reply_msg(update, f"<code>{keyword}</code> filter has been removed!\n<b>Admin</b>: {user.full_name}")
             else:
                 await Message.reply_msg(update, "There are no such filter available for this chat to delete!\nCheckout /filters")
                 return
@@ -1552,7 +1544,6 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_data = ["text_formats", "close"]
 
     btn = await Button.cbutton(btn_name, btn_data, True)
-
     await Message.reply_msg(update, msg, btn)
 
 

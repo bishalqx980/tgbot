@@ -56,6 +56,18 @@ from bot.modules.re_link_domain import RE_LINK
 from bot.modules.local_database import LOCAL_DATABASE
 
 
+async def _power_users():
+    """
+    retuns [] of sudo & owner id
+    """
+    sudo_users = await LOCAL_DATABASE.find("bot_docs")
+    if not sudo_users:
+        sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
+    power_users = sudo_users if sudo_users else []
+    power_users.append(int(owner_id))
+    return power_users
+
+
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
@@ -122,7 +134,10 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await Message.send_msg(user.id, msg, btn)
         
-        find_user = await MongoDB.find_one("users", "user_id", user.id)
+        find_user = await LOCAL_DATABASE.find_one("users", user.id)
+        if not find_user:
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
+        
         if not find_user:
             data = {
                 "user_id": user.id,
@@ -132,15 +147,12 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "lang": user.language_code,
                 "active_status": True
             }
-
-            try:
-                await MongoDB.insert_single_data("users", data)
-            except Exception as e:
-                logger.error(e)
+            await MongoDB.insert_single_data("users", data)
+            await LOCAL_DATABASE.insert_data("users", user.id, data)
         
         if chat.type != "private":
             _bot_info = await bot.get_me()
-            await Message.reply_msg(update, f"Sent in your pm! <a href='http://t.me/{_bot_info.username}'>Check</a>")
+            await Message.reply_msg(update, f"Sent in your <a href='http://t.me/{_bot_info.username}'>pm</a>!")
     
     except Forbidden:
         _bot_info = await bot.get_me()
@@ -784,16 +796,23 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2
 
         try:
-            images = await MongoDB.get_data("bot_docs", "images")
+            images = LOCAL_DATABASE.get_data("bot_docs", "images")
+            if not images:
+                images = await MongoDB.get_data("bot_docs", "images")
+            
             if images:
                 image = random.choice(images).strip()
             else:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
+                if not image:
+                    image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
             logger.error(e)
             try:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
+                if not image:
+                    image = await MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(chat.id, image, msg, btn)
             except Exception as e:
                 logger.error(e)
@@ -910,16 +929,23 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2 + row3 + row4 + row5 + row6
 
         try:
-            images = await MongoDB.get_data("bot_docs", "images")
+            images = LOCAL_DATABASE.get_data("bot_docs", "images")
+            if not images:
+                images = await MongoDB.get_data("bot_docs", "images")
+            
             if images:
                 image = random.choice(images).strip()
             else:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
+                if not image:
+                    image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, msg, btn)
         except Exception as e:
             logger.error(e)
             try:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
+                if not image:
+                    image = await MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(chat.id, image, msg, btn)
             except Exception as e:
                 logger.error(e)
@@ -1014,22 +1040,32 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = row1 + row2 + row3
 
         try:
-            images = await MongoDB.get_data("bot_docs", "images")
+            images = LOCAL_DATABASE.get_data("bot_docs", "images")
+            if not images:
+                images = await MongoDB.get_data("bot_docs", "images")
+            
             if images:
                 image = random.choice(images).strip()
             else:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
+                if not image:
+                    image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(user.id, image, msg, btn)
         except Exception as e:
             logger.error(e)
             try:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+                image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
+                if not image:
+                    image = await MongoDB.get_data("bot_docs", "bot_pic")
                 await Message.send_img(user.id, image, msg, btn)
             except Exception as e:
                 logger.error(e)
                 await Message.send_msg(user.id, msg, btn)
         
-        find_user = await MongoDB.find_one("users", "user_id", user.id)
+        find_user = await LOCAL_DATABASE.find_one("users", user.id)
+        if not find_user:
+            find_user = await MongoDB.find_one("users", "user_id", user.id)
+        
         if not find_user:
             data = {
                 "user_id": user.id,
@@ -1040,10 +1076,8 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "active_status": True
             }
 
-            try:
-                await MongoDB.insert_single_data("users", data)
-            except Exception as e:
-                logger.error(e)
+            await MongoDB.insert_single_data("users", data)
+            await LOCAL_DATABASE.insert_data("users", user.id, data)
         
         if chat.type != "private":
             _bot_info = await bot.get_me()
@@ -1063,10 +1097,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     replied_msg = update.message.reply_to_message
     inline_text = " ".join(context.args)
 
-    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
-    power_users = sudo_users if sudo_users else []
-    power_users.append(int(owner_id))
-
+    power_users = await _power_users()
     if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
@@ -1160,10 +1191,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     chat_id = " ".join(context.args)
 
-    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
-    power_users = sudo_users if sudo_users else []
-    power_users.append(int(owner_id))
-
+    power_users = await _power_users()
     if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
@@ -1272,10 +1300,7 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
 
-    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
-    power_users = sudo_users if sudo_users else []
-    power_users.append(int(owner_id))
-
+    power_users = await _power_users()
     if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
@@ -1308,16 +1333,23 @@ async def func_bsetting(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn = row1 + row2 + row3 + row4 + row5
 
     try:
-        images = await MongoDB.get_data("bot_docs", "images")
+        images = LOCAL_DATABASE.get_data("bot_docs", "images")
+        if not images:
+            images = await MongoDB.get_data("bot_docs", "images")
+        
         if images:
             image = random.choice(images).strip()
         else:
-            image = await MongoDB.get_data("bot_docs", "bot_pic")
+            image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
+            if not image:
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
         await Message.send_img(chat.id, image, "<u><b>Bot Settings</b></u>", btn)
     except Exception as e:
         logger.error(e)
         try:
-            image = await MongoDB.get_data("bot_docs", "bot_pic")
+            image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
+            if not image:
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
             await Message.send_img(chat.id, image, "<u><b>Bot Settings</b></u>", btn)
         except Exception as e:
             logger.error(e)
@@ -1331,10 +1363,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     command = " ".join(context.args)
     command = command.replace("'", "")
 
-    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
-    power_users = sudo_users if sudo_users else []
-    power_users.append(int(owner_id))
-
+    power_users = await _power_users()
     if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
@@ -1379,10 +1408,7 @@ async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
 
-    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
-    power_users = sudo_users if sudo_users else []
-    power_users.append(int(owner_id))
-
+    power_users = await _power_users()
     if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
@@ -1400,10 +1426,7 @@ async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
 
-    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
-    power_users = sudo_users if sudo_users else []
-    power_users.append(int(owner_id))
-
+    power_users = await _power_users()
     if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
@@ -1427,10 +1450,7 @@ async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
 
-    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
-    power_users = sudo_users if sudo_users else []
-    power_users.append(int(owner_id))
-
+    power_users = await _power_users()
     if user.id not in power_users:
         await Message.reply_msg(update, "❗ This command is only for bot owner!")
         return
@@ -1636,9 +1656,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def server_alive():
     server_url = await MongoDB.get_data("bot_docs", "server_url")
     bot_status = await MongoDB.get_data("bot_docs", "bot_status")
-    sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
-    power_users = sudo_users if sudo_users else []
-    power_users.append(int(owner_id))
+    power_users = await _power_users()
     
     try:
         if not bot_status or bot_status == "alive":
@@ -1737,8 +1755,6 @@ def main():
 
 
 if __name__ == "__main__":
-    #Thread(target=start_up_work).start()
-
     async def start_up_work():
         await update_database()
         await server_alive()
