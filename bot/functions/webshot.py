@@ -1,3 +1,9 @@
+from telegram import Update
+from telegram.ext import ContextTypes
+from bot import logger
+from bot.helper.telegram_helper import Message
+from bot.modules.safone import Safone
+
 async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     url = " ".join(context.args)
@@ -16,4 +22,4 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_img(chat.id, webshot, f"✨ {url}")
     except Exception as e:
         logger.error(e)
-        await Message.reply_msg(update, f"Error: {e}")   
+        await Message.reply_msg(update, f"Error: {e}")

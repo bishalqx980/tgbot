@@ -1,3 +1,14 @@
+import asyncio
+from telegram import Update
+from telegram.ext import ContextTypes
+from telegram.constants import ParseMode
+from bot import logger
+from bot.helper.telegram_helper import Message
+from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.g4f import G4F
+
+
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat

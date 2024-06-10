@@ -1,62 +1,62 @@
-import os
-import sys
-import time
-import psutil
-import random
 import asyncio
 import requests
-import subprocess
-from threading import Thread
-from telegram.constants import ParseMode
-from telegram.error import Forbidden
-from telegram import Update, ChatMember
-from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ChatMemberHandler
-from bot import logger, bot_token, bot, owner_id
-from bot.modules.database.mongodb import MongoDB
-from bot.helper.telegram_helper import Message, Button
-from bot.modules.ping_url import ping_url
-from bot.modules.shrinkme import shortener_url
-from bot.modules.translator import translate, LANG_CODE_LIST
-from bot.modules.base64 import BASE64
-from bot.modules.omdb_movie_info import get_movie_info
-from bot.modules.utils import calc
-from bot.modules.safone import Safone
-from bot.modules.group_management.group_management import (
-    _check_permission,
-    track_my_chat_activities,
-    track_chat_activities,
-    _check_del_cmd,
-    func_invite_link,
-    func_promote,
-    func_demote,
-    func_pin_msg,
-    func_unpin_msg,
-    func_ban,
-    func_unban,
-    func_kick,
-    func_kickme,
-    func_mute,
-    func_unmute,
-    func_del,
-    func_purge,
-    func_lockchat,
-    func_unlockchat,
-    func_filter,
-    func_remove,
-    func_filters,
-    func_adminlist)
-from bot.modules.ytdl import YouTubeDownload
-from bot.helper.callbackbtn_helper import func_callbackbtn
-from bot.modules.weather import weather_info
-from bot.modules.ai.g4f import G4F
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ChatMemberHandler
+from bot import bot_token, logger, owner_id
 from bot.update_db import update_database
-from bot.modules.qr import QR
-from bot.modules.telegraph import TELEGRAPH
-from bot.modules.re_link_domain import RE_LINK
-from bot.modules.database.local_database import LOCAL_DATABASE
-
-
-
+from bot.helper.telegram_helper import Message
+from bot.modules.database.mongodb import MongoDB
+from bot.functions.power_users import _power_users
+from bot.functions.start import func_start
+from bot.functions.movieinfo import func_movieinfo
+from bot.functions.translator import func_translator
+from bot.functions.b64decode import func_b64decode
+from bot.functions.b64encode import func_b64encode
+from bot.functions.shortener import func_shortener
+from bot.functions.ping import func_ping
+from bot.functions.calc import func_calc
+from bot.functions.webshot import func_webshot
+from bot.functions.weather import func_weather
+from bot.functions.imagine import func_imagine
+from bot.functions.chatgpt import func_chatgpt
+from bot.functions.youtube_dl import func_add_download_ytdl
+from bot.functions.youtube_search import func_yts
+from bot.functions.gen_qr import func_gen_qr
+from bot.functions.img_to_link import func_img_to_link
+from bot.functions.settings import func_settings
+from bot.functions.id import func_id
+from bot.functions.help import func_help
+from bot.functions.broadcast import func_broadcast
+from bot.functions.database import func_database
+from bot.functions.bsettings import func_bsettings
+from bot.functions.shell import func_shell
+from bot.functions.log import func_log
+from bot.functions.restart import func_restart
+from bot.functions.sys import func_sys
+from bot.functions.filter_service_msg import func_filter_services
+from bot.functions.filter_all import func_filter_all
+from bot.modules.group_management.invite_link import func_invite_link
+from bot.modules.group_management.promote import func_promote
+from bot.modules.group_management.demote import func_demote
+from bot.modules.group_management.pin_msg import func_pin_msg
+from bot.modules.group_management.unpin_msg import func_unpin_msg
+from bot.modules.group_management.ban import func_ban
+from bot.modules.group_management.unban import func_unban
+from bot.modules.group_management.kick import func_kick
+from bot.modules.group_management.kickme import func_kickme
+from bot.modules.group_management.mute import func_mute
+from bot.modules.group_management.unmute import func_unmute
+from bot.modules.group_management.del_msg import func_del
+from bot.modules.group_management.purge import func_purge
+from bot.modules.group_management.lock_chat import func_lockchat
+from bot.modules.group_management.unlock_chat import func_unlockchat
+from bot.modules.group_management.add_filter import func_filter
+from bot.modules.group_management.remove_filter import func_remove
+from bot.modules.group_management.filters import func_filters
+from bot.modules.group_management.adminlist import func_adminlist
+from bot.modules.group_management.track_bot_chat import track_bot_chat_act
+from bot.modules.group_management.track_other_chat import track_other_chat_act
+from bot.helper.callbackbtn_helper import func_callbackbtn
 
 
 async def server_alive():
@@ -101,7 +101,7 @@ async def server_alive():
 
 def main():
     application = ApplicationBuilder().token(bot_token).build()
-
+    # functions
     application.add_handler(CommandHandler("start", func_start, block=False))
     application.add_handler(CommandHandler("movie", func_movieinfo, block=False))
     application.add_handler(CommandHandler("tr", func_translator, block=False))
@@ -143,7 +143,7 @@ def main():
     # owner
     application.add_handler(CommandHandler("broadcast", func_broadcast, block=False))
     application.add_handler(CommandHandler("db", func_database, block=False))
-    application.add_handler(CommandHandler("bsetting", func_bsetting, block=False))
+    application.add_handler(CommandHandler("bsetting", func_bsettings, block=False))
     application.add_handler(CommandHandler("shell", func_shell, block=False))
     application.add_handler(CommandHandler("log", func_log, block=False))
     application.add_handler(CommandHandler("restart", func_restart, block=False))
@@ -152,8 +152,8 @@ def main():
     application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services, block=False))
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
     # Chat Member Handler
-    application.add_handler(ChatMemberHandler(track_my_chat_activities, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking bot/private chat
-    application.add_handler(ChatMemberHandler(track_chat_activities, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup
+    application.add_handler(ChatMemberHandler(track_bot_chat_act, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking bot/private chat
+    application.add_handler(ChatMemberHandler(track_other_chat_act, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup
     # Callback button
     application.add_handler(CallbackQueryHandler(func_callbackbtn, block=False))
     # Check Updates

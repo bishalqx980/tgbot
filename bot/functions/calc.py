@@ -1,3 +1,9 @@
+from telegram import Update
+from telegram.ext import ContextTypes
+from bot import logger
+from bot.helper.telegram_helper import Message
+from bot.modules.utils import calc
+
 async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = update.message.reply_to_message
     msg = re_msg.text or re_msg.caption if re_msg else " ".join(context.args)
@@ -10,4 +16,4 @@ async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, f"Calculation result: <code>{await calc(msg):.2f}</code>")
     except Exception as e:
         logger.error(e)
-        await Message.reply_msg(update, f"Can't calc: {e}")  
+        await Message.reply_msg(update, f"Can't calc: {e}")

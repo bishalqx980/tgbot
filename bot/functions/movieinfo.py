@@ -1,3 +1,9 @@
+from telegram import Update
+from telegram.ext import ContextTypes
+from bot.helper.telegram_helper import Message, Button
+from bot.modules.omdb_movie_info import get_movie_info
+
+
 async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     msg = " ".join(context.args)

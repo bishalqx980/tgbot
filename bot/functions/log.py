@@ -1,3 +1,8 @@
+from telegram import Update
+from telegram.ext import ContextTypes
+from bot.helper.telegram_helper import Message
+from bot.functions.power_users import _power_users
+
 async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user

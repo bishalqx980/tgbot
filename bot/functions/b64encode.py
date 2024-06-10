@@ -1,3 +1,8 @@
+from telegram import Update
+from telegram.ext import ContextTypes
+from bot.helper.telegram_helper import Message
+from bot.modules.base64 import BASE64
+
 async def func_b64encode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = update.message.reply_to_message
     msg = " ".join(context.args)

@@ -1,3 +1,12 @@
+import os
+import requests
+from telegram import Update
+from telegram.ext import ContextTypes
+from bot import bot, logger
+from bot.helper.telegram_helper import Message
+from bot.modules.telegraph import TELEGRAPH
+
+
 async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = update.message.reply_to_message
     if re_msg:

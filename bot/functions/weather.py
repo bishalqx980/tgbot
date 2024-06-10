@@ -1,3 +1,9 @@
+from telegram import Update
+from telegram.ext import ContextTypes
+from bot.helper.telegram_helper import Message
+from bot.modules.weather import weather_info
+
+
 async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     location = " ".join(context.args)
 
@@ -7,7 +13,7 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     info = await weather_info(location)
 
-    if not info:
+    if info == 0:
         await Message.reply_msg(update, "weather_api not found!")
         return
     
@@ -15,22 +21,8 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Something went wrong!")
         return
     
-    loc_name = info[0]
-    country = info[1]
-    zone = info[2]
-    localtime = info[3]
-    lastupdate = info[4] # last weather update time
-    temp_c = info[5]
-    f_temp_c = info[6]
-    temp_f = info[7]
-    f_temp_f = info[8]
-    wind_mph = info[9]
-    wind_kph = info[10]
-    wind_deg = info[11]
-    humidity = info[12]
-    uv = info[13]
-    condition = info[14]
-    condition_icon = info[15]
+    loc_name, country, zone, localtime, lastupdate, temp_c, f_temp_c, temp_f, f_temp_f , wind_mph , wind_kph, wind_deg, humidity, uv, condition, condition_icon = info
+
     msg = (
         f"<b>|———LOCATION INFO———|</b>\n\n"
         f"City: <code>{loc_name}</code>\n"
@@ -47,4 +39,5 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Wind `Angle`: <code>{wind_deg}</code>\n"
         f"UV Ray: <code>{uv}</code>\n\n<pre>⚠ 8 or higher is harmful for skin!</pre>"
     )
-    await Message.reply_msg(update, msg)  
+
+    await Message.reply_msg(update, msg)

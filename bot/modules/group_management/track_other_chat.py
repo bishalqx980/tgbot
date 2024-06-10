@@ -9,7 +9,7 @@ from bot.modules.group_management.check_permission import _check_permission
 from bot.modules.group_management.chat_member_status import _chat_member_status
 
 
-async def track_chat_activities(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     this will check chat status (if any user joined or left etc.)
     """

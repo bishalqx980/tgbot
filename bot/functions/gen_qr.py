@@ -1,3 +1,10 @@
+import os
+from telegram import Update
+from telegram.ext import ContextTypes
+from bot import logger
+from bot.helper.telegram_helper import Message
+from bot.modules.qr import QR
+
 async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     data = " ".join(context.args)

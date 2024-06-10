@@ -1,3 +1,10 @@
+from telegram import Update
+from telegram.ext import ContextTypes
+from bot import logger
+from bot.helper.telegram_helper import Message
+from bot.modules.ping_url import ping_url
+
+
 async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = " ".join(context.args)
 

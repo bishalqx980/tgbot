@@ -1,3 +1,10 @@
+import psutil
+from telegram import Update
+from telegram.ext import ContextTypes
+from bot.helper.telegram_helper import Message
+from bot.functions.power_users import _power_users
+
+
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
 
@@ -31,4 +38,5 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Disk Usage Free: <code>{psutil.disk_usage('/')[2]/(1024**3):.2f} GB</code>\n"
         f"Disk Usage Percent: <code>{psutil.disk_usage('/')[3]} %</code>\n\n"
     )
+
     await Message.reply_msg(update, sys_info)
