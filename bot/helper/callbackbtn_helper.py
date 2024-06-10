@@ -4,18 +4,40 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot import bot, logger
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.mongodb import MongoDB
+from bot.modules.database.mongodb import MongoDB
 from bot.update_db import update_database
 from bot.modules.github import GitHub
-from bot.modules.local_database import LOCAL_DATABASE
+from bot.modules.database.local_database import LOCAL_DATABASE
 
 
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    data = query.data
-    user = query.from_user
+    query = update.callback_query # always updates whenever clicked a button
+    user = update.effective_user
     chat = update.effective_chat
-    sent_msg = query.message
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     if chat.type == "private":
         collection_name = "users"
@@ -112,29 +134,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Group management ----------------------------------------------------------------- help starts
     elif data == "group_management":
-        msg = (
-            "Group Moderation Commands -\n\n"
-            "/id » Show chat/user id\n"
-            "/invite » Generate/Get invite link\n"
-            "/promote » Promote a member\n"
-            "/demote » Demote a member\n"
-            "/pin » Pin message loudly\n"
-            "/unpin » Unpin a pinned message or all pinned messages\n"
-            "/ban » Ban a member\n"
-            "/unban » Unban a member\n"
-            "/kick » Kick a member\n"
-            "/kickme » The easy way to out\n"
-            "/mute » Mute a member (member will be unable to send messages etc.)\n"
-            "/unmute » Unmute a member (member will be able to send messages etc.)\n"
-            "/del » Delete replied message with notifying/telling something to the member!\n"
-            "/purge » Delete every messages from replied message to current message!\n"
-            "/lock » Lock the chat (no one can send messages etc.)\n"
-            "/unlock » Unlock the chat (back to normal)\n"
-            "/filters | /filter | /remove » To see/set/remove custom message/command\n"
-            "/adminlist » See chat admins list\n"
-            "/settings » Settings of chat (welcome, antibot, translate etc.)\n\n"
-            "<i><b>Note</b>: Type commands to get more details about the command function!</i>"
-        )
+        msg = ()
 
         btn_name = ["Back", "Close"]
         btn_data = ["help_menu", "close"]
@@ -144,10 +144,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif data == "ai":
         msg = (
-            "Artificial intelligence functions -\n\n"
-            "/imagine » Generate AI image\n"
-            "/gpt » Ask any question to ChatGPT\n\n"
-            "<i><b>Note</b>: Type commands to get more details about the command function!</i>"
+            
         )
 
         btn_name = ["Back", "Close"]
@@ -158,23 +155,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif data == "misc_func":
         msg = (
-            "Misc functions -\n\n"
-            "/movie » Get any movie info by name/imdb_id\n"
-            "/tr » Translate any language\n"
-            "/decode » Decode - base64 to text\n"
-            "/encode » Encode - text to base64\n"
-            "/short » Short any url\n"
-            "/ping » Ping any url\n"
-            "/calc » Calculate any math (supported syntex: +, -, *, /)\n"
-            "/webshot » Take Screenshot of any website\n"
-            "/weather » Get weather info of any city\n"
-            "/ytdl » Download youtube video\n"
-            "/yts » Search video on youtube\n"
-            "/qr » To generate a QR code\n"
-            "/itl » To convert image into link\n"
-            "/id » Show chat/user id\n"
-            "/settings » Settings of chat\n\n"
-            "<i><b>Note</b>: Type commands to get more details about the command function!</i>"
+            
         )
 
         btn_name = ["Back", "Close"]
@@ -185,78 +166,9 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif data == "owner_func":
         msg = (
-            "Bot owner functions -\n\n"
-            "/broadcast » Broadcast message to bot users\n"
-            "/db » Get bot database\n"
-            "/bsetting » Get bot settings\n"
-            "/shell » Use system shell\n"
-            "/log » Get log file (for error handling)\n"
-            "/restart » Restart the bot\n"
-            "/sys » Get system info\n\n"
-            "<i><b>Note</b>: Type commands to get more details about the command function!</i>"
+            
         )
 
-        btn_name = ["Back", "Close"]
-        btn_data = ["help_menu", "close"]
-        btn = await Button.cbutton(btn_name, btn_data, True)
-
-        await Message.edit_msg(update, msg, sent_msg, btn)
-    
-    elif data == "github_stats":
-        github_repo = await MongoDB.get_data("bot_docs", "github_repo")
-        latest_commit = await GitHub.get_latest_commit("bishalqx980", "tgbot")
-        if latest_commit:
-            try:
-                l_c_sha = latest_commit.get("sha")
-                l_c_commit = latest_commit.get("commit") # not for use
-                l_c_message = l_c_commit.get("message")
-                l_c_author = l_c_commit.get("author") # not for use
-                l_c_aname = l_c_author.get("name")
-                l_c_date = l_c_author.get("date")
-                l_c_link = f"https://github.com/bishalqx980/tgbot/commit/{l_c_sha}"
-
-                msg = (
-                    f"<b>» Original repo [ <a href='{l_c_link}'>latest commit</a> ]</b>\n"
-                    f"<b>Last update:</b> <code>{l_c_date}</code>\n"
-                    f"<b>Commit:</b> <code>{l_c_message}</code>\n"
-                    f"<b>Committed by:</b> <code>{l_c_aname}</code>\n"
-                )
-            except:
-                msg = latest_commit
-        else:
-            msg = "Error..."
-
-        if github_repo:
-            try:
-                parse_url = urlparse(github_repo)
-                split_all = parse_url.path.strip("/").split("/")
-                username, repo_name = split_all
-                bot_repo_commit = await GitHub.get_latest_commit(username, repo_name)
-                if latest_commit:
-                    b_r_sha = bot_repo_commit.get("sha")
-                    b_r_commit = bot_repo_commit.get("commit") # not for use
-                    b_r_message = b_r_commit.get("message")
-                    b_r_author = b_r_commit.get("author") # not for use
-                    b_r_aname = b_r_author.get("name")
-                    b_r_date = b_r_author.get("date")
-                    b_r_link = f"https://github.com/{username}/{repo_name}/commit/{b_r_sha}"
-                    
-                    msg = (
-                        msg + f"\n<b>» Bot repo [ <a href='{b_r_link}'>commit</a> ]</b>\n"
-                        f"<b>Last update:</b> <code>{b_r_date}</code>\n"
-                        f"<b>Commit:</b> <code>{b_r_message}</code>\n"
-                        f"<b>Committed by:</b> <code>{b_r_aname}</code>\n"
-                    )
-
-                    if l_c_sha != b_r_sha:
-                        msg += "\n<i>The bot repo isn't updated to the latest commit! ⚠</i>"
-                    else:
-                        msg += "\n<i>The bot repo is updated to the latest commit...</i>"
-                else:
-                    msg = "Error..."
-            except Exception as e:
-                logger.error(e)
-        
         btn_name = ["Back", "Close"]
         btn_data = ["help_menu", "close"]
         btn = await Button.cbutton(btn_name, btn_data, True)
@@ -277,13 +189,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         inactive_users = active_status.count(False)
 
         msg = (
-            f"Hi {user.mention_html()}! Welcome to the bot help section...\n"
-            f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
-            f"/start - to start the bot\n"
-            f"/help - to see this message\n\n"
-            f"T.users: {total_users} | "
-            f"A.users: {active_users} | "
-            f"Inactive: {inactive_users}"
+            f
         )
 
         btn_name_row1 = ["Group Management", "Artificial intelligence"]
@@ -316,9 +222,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "bot_pic"
 
         msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"Bot pic: <code>{bot_pic}</code>\n\n"
-            "<i><b>Note</b>: Send an image url/link to set bot pic!</i>"
+            
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -346,9 +250,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "welcome_img"
         
         msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"Welcome img: {welcome_img}\n\n"
-            "<i><b>Note</b>: Should bot show bot_pic on start?</i>"
+            
         )
 
         btn_name_row1 = ["Yes", "No"]
@@ -397,9 +299,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 images = storage
         
         msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"images: <code>{images}</code>\n\n"
-            "<i><b>Note</b>: Single image or Upload multiple image link separated by comma!</i>"
+            
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -427,8 +327,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "support_chat"
 
         msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"Support Chat (link): <code>{support_chat}</code>\n"
+            
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -456,9 +355,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "server_url"
 
         msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"Server url: <code>{server_url}</code>\n\n"
-            "<i><b>Note</b>: Bot will fall asleep if you deployed the bot on render (free) and don't set this value...</i>"
+            
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -495,9 +392,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "sudo_users"
 
         msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"$udo users: <code>{sudo_users}</code>\n\n"
-            "<i><b>Note</b>: The power user! Sudo users have owner function access!\nAdd user_id eg. <code>2134776547</code></i>"
+            
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -525,9 +420,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "shrinkme_api"
 
         msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"Shrinkme API: <code>{shrinkme_api}</code>\n\n"
-            "<i><b>Note</b>: This api for /short command!</i>"
+           
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -555,9 +448,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "omdb_api"
 
         msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"OMDB API: <code>{omdb_api}</code>\n\n"
-            "<i><b>Note</b>: This api for /movie command!</i>"
+            
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -585,9 +476,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "weather_api"
 
         msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"Weather API: <code>{weather_api}</code>\n\n"
-            "<i><b>Note</b>: This api for /weather command!</i>"
+            
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -603,44 +492,11 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await Message.edit_msg(update, msg, sent_msg, btn)
     
-    elif data == "github_repo":
-        collection_name = "bot_docs"
-        db_find = "_id"
-        db_vlaue = await MongoDB.find(collection_name, db_find)
-        github_repo = await MongoDB.get_data(collection_name, "github_repo")
 
-        context.chat_data["collection_name"] = collection_name
-        context.chat_data["db_find"] = db_find
-        context.chat_data["db_vlaue"] = db_vlaue[0]
-        context.chat_data["edit_data_name"] = "github_repo"
-
-        msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"GitHub repo: <code>{github_repo}</code>\n\n"
-            f"<i><b>Note</b>: Your bot github repo link, to keep track on updates on latest repo...</i>"
-        )
-
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["edit_value", "remove_value"]
-
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["b_setting_menu", "close"]
-
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-
-        btn = row1 + row2
-
-        await Message.edit_msg(update, msg, sent_msg, btn)
     
     elif data == "restore_db":
         msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            "Which data will be deleted? ⚠\n"
-            "- All bot setting\n\n"
-            "Which data won't be deleted?\n"
-            "- Bot users/groups data\n\n"
-            f"<i><b>Note</b>: This will erase all bot data/settings from database and restore data/settings from <code>config.env</code></i>"
+            
         )
 
         btn_name_row1 = ["⚠ Restore Database"]
@@ -728,9 +584,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "lang"
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Language code: <code>{lang}</code>\n\n"
-            "<i><b>Note</b>: Get your country language code from the below link!\neg. English language code is <code>en</code></i>"
+            
         )
 
         btn_name_row1 = ["Language code's"]
@@ -784,9 +638,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "auto_tr"
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Auto translate: <code>{auto_tr}</code>\n\n"
-            "<i><b>Note</b>: This will automatically translate chat conversation into chat default language!</i>"
+            
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -836,9 +688,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "echo"
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Echo: <code>{echo}</code>\n\n"
-            "<i><b>Note</b>: This will repeat user message!</i>"
+            
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -888,9 +738,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "welcome_msg"
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Welcome user: <code>{welcome_msg}</code>\n\n"
-            "<i><b>Note</b>: This will welcome the new chat member!</i>"
+            
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -944,9 +792,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "custom_welcome_msg"
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Welcome message\n--------------------\n<code>{custom_welcome_msg}</code>\n\n"
-            "<i><b>Note</b>: This message will be send as greeting message in the chat when a user join!</i>"
+            
         )
 
         btn_name_row1 = ["Set default message", "Set custom message"]
@@ -978,15 +824,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         msg = (
-            "<blockquote>Formatting</blockquote>\n"
-            "<code>{first}</code>: The user's firstname\n"
-            "<code>{last}</code>: The user's lastname\n"
-            "<code>{fullname}</code>: The user's fullname\n"
-            "<code>{username}</code>: The user's username\n"
-            "<code>{mention}</code>: To mention the user\n"
-            "<code>{id}</code>: The user's ID\n"
-            "<code>{chatname}</code>: Chat title\n\n"
-            "Example: <code>Hi {mention}, welcome to {chatname}</code>\n"
+            
         )
 
         btn_name = ["Close"]
@@ -1030,9 +868,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "goodbye_msg"
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Goodbye user: <code>{goodbye_msg}</code>\n\n"
-            "<i><b>Note</b>: This will send a farewell message to chat when a user left!\n</i>"
+            
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -1082,9 +918,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "antibot"
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Antibot: <code>{antibot}</code>\n\n"
-            "<i><b>Note</b>: This will prevent other bot from joining in chat!</i>"
+            
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -1134,9 +968,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "del_cmd"
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Delete cmd: <code>{del_cmd}</code>\n\n"
-            "<i><b>Note</b>: This will delete bot commands when you will send a command in chat!</i>"
+            
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -1186,9 +1018,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log_channel = find_chat.get("log_channel")
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Log channel: <code>{log_channel}</code>\n\n"
-            "<i><b>Note</b>: This will log every actions occurred in your chat (ban, kick, mute, etc.) using bot!\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
+            
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -1246,13 +1076,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             allowed_links = storage
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"All links: <code>{all_links}</code>\n"
-            f"Allowed links: <code>{allowed_links}</code>\n\n"
-            "<i><b>Note</b>: Select whether it will delete or convert the links into base64 or do nothing if links in message!</i>\n\n"
-            "<i>Allowed links » these links won't be deleted!</i>\n"
-            "<i>Delete links » replace the links with `forbidden link`</i>\n\n"
-            "<i>Echo/Auto translate won't work if message contains link!</i>"
+            
         )
 
         btn_name_row1 = ["All links", "Allowed links"]
@@ -1302,9 +1126,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         all_links = find_chat.get("all_links")
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"All links: <code>{all_links}</code>\n\n"
-            "<i><b>Note</b>: Select whether bot will delete the message or convert link into base64 or do nothing!</i>"
+            
         )
 
         btn_name_row1 = ["Delete", "Convert", "Nothing"]
@@ -1363,9 +1185,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             allowed_links = storage
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Allowed links: <code>{allowed_links}</code>\n\n"
-            "<i><b>Note</b>: Send domain name of allowed links eg. <code>google.com</code> multiple domain will be separated by comma!</i>"
+            
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -1517,9 +1337,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.chat_data["edit_data_name"] = "ai_status"
 
         msg = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"AI status: <code>{ai_status}</code>\n\n"
-            "<i><b>Note</b>: Enable / Disbale AI functions in chat!</i>"
+            
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -1590,21 +1408,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             log_channel = find_chat.get("log_channel")
 
             msg = (
-                f"<u><b>Chat Settings</b></u>\n\n"
-                f"• Title: {title}\n"
-                f"• ID: <code>{chat.id}</code>\n\n"
-
-                f"• Lang: <code>{lang}</code>\n"
-                f"• Echo: <code>{echo}</code>\n"
-                f"• Auto tr: <code>{auto_tr}</code>\n"
-                f"• Welcome user: <code>{welcome_msg}</code>\n"
-                f"• Goodbye user: <code>{goodbye_msg}</code>\n"
-                f"• Antibot: <code>{antibot}</code>\n"
-                f"• AI status: <code>{ai_status}</code>\n"
-                f"• Delete cmd: <code>{del_cmd}</code>\n"
-                f"• All links: <code>{all_links}</code>\n"
-                f"• Allowed links: <code>{allowed_links}</code>\n"
-                f"• Log channel: <code>{log_channel}</code>\n"
+                
             )
 
             btn_name_row1 = ["Language", "Auto translate"]
@@ -1641,13 +1445,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             auto_tr = find_chat.get("auto_tr")
 
             msg = (
-                f"<u><b>Chat Settings</b></u>\n\n"
-                f"• User: {user_mention}\n"
-                f"• ID: <code>{user.id}</code>\n\n"
-
-                f"• Lang: <code>{lang}</code>\n"
-                f"• Echo: <code>{echo}</code>\n"
-                f"• Auto tr: <code>{auto_tr}</code>\n\n"
+                f
             )
 
             btn_name_row1 = ["Language", "Auto translate"]

@@ -46,7 +46,7 @@ class MongoDB:
         """
         collection = db[collection_name]
         try:
-            logger.info(f"Finding {collection_name} in  db...")
+            logger.info(f"Finding {collection_name} in db...")
             document = collection.find_one({search: match})
             if document:
                 logger.info("Data found...")

@@ -1,7 +1,7 @@
 import requests
 from bot import logger
-from bot.modules.mongodb import MongoDB
-from bot.modules.local_database import LOCAL_DATABASE
+from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.local_database import LOCAL_DATABASE
 
 async def weather_info(location):
     weather_api = await LOCAL_DATABASE.get_data("bot_docs", "weather_api")

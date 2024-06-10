@@ -1,5 +1,5 @@
-from bot.modules.mongodb import MongoDB
-from bot.modules.local_database import LOCAL_DATABASE
+from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.local_database import LOCAL_DATABASE
 from bot import (
     logger,
     bot_token,
