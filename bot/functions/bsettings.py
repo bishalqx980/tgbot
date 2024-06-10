@@ -22,6 +22,26 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
     
+    _bot = await LOCAL_DATABASE.find("bot_docs")
+    if not _bot:
+        find = await MongoDB.find("bot_docs", "_id")
+        _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+        await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
+    
+    data = {
+        "user_id": user.id,
+        "chat_id": chat.id,
+        "collection_name": "bot_docs",
+        "db_find ": "_id",
+        "db_vlaue": _bot.get("_id"),
+        "edit_data_key": None,
+        "edit_data_value": None,
+        "del_msg_pointer_id": e_msg.id,
+        "edit_data_value_msg_pointer": None
+    }
+
+    await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+    
     btn_name_row1 = ["Bot pic", "Welcome img"]
     btn_data_row1 = ["bot_pic", "welcome_img"]
 

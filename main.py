@@ -1,7 +1,14 @@
 import asyncio
 import requests
 from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ChatMemberHandler
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    MessageHandler,
+    filters,
+    CallbackQueryHandler,
+    ChatMemberHandler
+)
 from bot import bot_token, logger, owner_id
 from bot.update_db import update_database
 from bot.helper.telegram_helper import Message
@@ -96,7 +103,7 @@ async def server_alive():
             await asyncio.sleep(180) # 3 min
     else:
         logger.warning("Server URL not provided !!")
-        await Message.send_msg(owner_id, "Warning! Server URL not provided!\nGoto /bsetting and setup server url then restart bot...")
+        await Message.send_msg(owner_id, "Warning! Server URL not provided!\nGoto /bsettings and setup server url then restart bot...")
 
 
 def main():
@@ -143,7 +150,7 @@ def main():
     # owner
     application.add_handler(CommandHandler("broadcast", func_broadcast, block=False))
     application.add_handler(CommandHandler("db", func_database, block=False))
-    application.add_handler(CommandHandler("bsetting", func_bsettings, block=False))
+    application.add_handler(CommandHandler("bsettings", func_bsettings, block=False))
     application.add_handler(CommandHandler("shell", func_shell, block=False))
     application.add_handler(CommandHandler("log", func_log, block=False))
     application.add_handler(CommandHandler("restart", func_restart, block=False))
@@ -153,7 +160,7 @@ def main():
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
     # Chat Member Handler
     application.add_handler(ChatMemberHandler(track_bot_chat_act, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking bot/private chat
-    application.add_handler(ChatMemberHandler(track_other_chat_act, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup
+    application.add_handler(ChatMemberHandler(track_other_chat_act, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup/channel
     # Callback button
     application.add_handler(CallbackQueryHandler(func_callbackbtn, block=False))
     # Check Updates

@@ -6,8 +6,10 @@ async def _power_users():
     """
     retuns [] of sudo & owner id
     """
-    sudo_users = await LOCAL_DATABASE.find("bot_docs")
-    if not sudo_users:
+    bot_docs = await LOCAL_DATABASE.find("bot_docs")
+    if bot_docs:
+        sudo_users = bot_docs.get("sudo_users")
+    else:
         sudo_users = await MongoDB.get_data("bot_docs", "sudo_users")
     power_users = sudo_users if sudo_users else []
     power_users.append(int(owner_id))

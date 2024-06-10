@@ -49,7 +49,7 @@ else:
 - `OWNER_USERNAME` Your Username E.g. paste like bishalqx980 not @bishalqx980
 - `MONGODB_URI` Get from https://www.mongodb.com/
 - `DB_NAME` anything E.g. MissCiri_db
-- **_After deployment complete, don't forget to visit /bsetting_**
+- **_After deployment complete, don't forget to visit /bsettings_**
     <hr>
     <details>
     <summary><b>Local Deploy 🚀</b></summary>
@@ -113,7 +113,7 @@ else:
         - Add `HEROKU_API_KEY` - get from https://dashboard.heroku.com/account scroll down `API Key` click on `Reveal` button then copy the value and paste it...
     - Finally click on `Actions` tab from the top, select `Deploy to heroku`, on right side click on `Run workflow` > green button `Run workflow`
     - Now wait for deployment complete... (you can check log here https://dashboard.heroku.com/apps/HEROKU_APP_NAME/logs)
-    - ⚠️ Add `Server url` from /bsetting before heroku shutdown... then restart dyno (heroku)
+    - ⚠️ Add `Server url` from /bsettings before heroku shutdown... then restart dyno (heroku)
 
     **Enjoy 🍾**
 

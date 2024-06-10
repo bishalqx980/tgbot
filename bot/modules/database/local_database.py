@@ -36,7 +36,7 @@ class LOCAL_DATABASE:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)
             
-            if data["_id"]:
+            if data.get("_id"):
                 data["_id"] = str(data["_id"]) # mongodb _id >> make it str
             load_collection = load_db.get(collection)
             load_collection.update(data)
@@ -60,7 +60,7 @@ class LOCAL_DATABASE:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)
             
-            if data["_id"]:
+            if data.get("_id"):
                 data["_id"] = str(data["_id"]) # mongodb _id >> make it str
             load_collection = load_db.get(collection)
             check_db = load_collection.get(str(identifier))
@@ -111,6 +111,7 @@ class LOCAL_DATABASE:
         """
         collection = db_collection_name eg. (users or docs)
         data = which data you want from specified collection
+        only works for which doesn't have sub collection
         """
         try:
             with open(LOCAL_DB, "r") as f:

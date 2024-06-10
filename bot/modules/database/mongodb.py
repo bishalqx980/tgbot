@@ -96,12 +96,12 @@ class MongoDB:
             logger.error(e)
 
 
-    async def update_db(collection_name, search, match, update_data_name, update_data_value):
+    async def update_db(collection_name, search, match, update_data_key, update_data_value):
         collection = db[collection_name]
         try:
             collection.update_one(
                 {search: match},
-                {"$set": {update_data_name: update_data_value}}
+                {"$set": {update_data_key: update_data_value}}
             )
             logger.info(f"{collection_name} data updated in db...")
         except Exception as e:

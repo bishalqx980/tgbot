@@ -63,7 +63,7 @@ if not check_local_db:
 
 try:
     with open(LOCAL_DB, "w") as f:
-        data = {"bot_docs": {}, "users": {}, "groups": {}}
+        data = {"bot_docs": {}, "users": {}, "groups": {}, "data_center": {}}
         json.dump(data, f, indent=4)
         logger.info("localdb updated...")
 except Exception as e:
