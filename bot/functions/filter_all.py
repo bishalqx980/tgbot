@@ -16,22 +16,15 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     msg = update.message.text_html or update.message.caption_html if update.message else None
 
+    if not msg:
+        return
+
     if user.id == 777000: # Telegram channel
         return
     
-    if chat.type == "private":
-        collection_name = "users"
-        db_find = user.id
-    elif chat.type in ["group", "supergroup"]:
-        collection_name = "groups"
-        db_find = chat.id
-    else:
-        collection_name = None
-        db_find = None
-
-    find_chat = await LOCAL_DATABASE.find_one(collection_name, db_find)
-    if find_chat:
-        is_editing = find_chat.get("is_editing") # bool
+    data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
+    if data_center:
+        is_editing = data_center.get("is_editing") # bool
         if is_editing:
             try:
                 msg = int(msg)
@@ -39,10 +32,10 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 msg = msg
             
             for key, value in zip(["new_value", "edit_value_del_msg_pointer", "is_editing"], [msg, e_msg, False]):
-                await LOCAL_DATABASE.insert_data(collection_name, db_find, {key: value})
+                await LOCAL_DATABASE.insert_data("data_center", chat.id, {key: value})
             return
 
-    if chat.type == "private" and msg:
+    if chat.type == "private":
         find_user = await LOCAL_DATABASE.find_one("users", user.id)
         if not find_user:
             find_user = await MongoDB.find_one("users", "user_id", user.id)
@@ -70,8 +63,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
                 return   
 
-    # group's
-    elif chat.type in ["group", "supergroup"] and msg:
+    elif chat.type in ["group", "supergroup"]:
         _chk_per = await _check_permission(update, user=user, checking_msg=False)
         if not _chk_per:
             return
@@ -137,9 +129,12 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if echo_status and not msg_contains_link:
             await Message.reply_msg(update, msg)
         
-        if auto_tr_status and not msg_contains_link:
-            tr_msg = await translate(msg, lang_code)
-            if tr_msg != msg:
+        if auto_tr_status:
+            to_translate = msg
+            if msg_contains_link:
+                to_translate = clean_msg
+            tr_msg = await translate(to_translate, lang_code)
+            if tr_msg != to_translate:
                 await Message.reply_msg(update, tr_msg)
             elif not tr_msg:
                 logger.error(e)

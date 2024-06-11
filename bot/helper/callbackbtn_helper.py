@@ -7,6 +7,7 @@ from bot.update_db import update_database
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.misc.message_storage import MessageStorage
 
 
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -188,6 +189,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif query.data == "mp3":
             data_center["youtube_content_format"] = query.data
+        
+        elif query.data == "group_management":
+            msg = await MessageStorage.get_msg("callback_messages", "group_management")
+
+            btn_name = ["Back", "Close"]
+            btn_data = ["help_menu", "query_close"]
+            btn = await Button.cbutton(btn_name, btn_data, True)
+
+            await Message.edit_msg(update, msg, query.message, btn)
     
     elif chat.type in ["group", "supergroup"]:
         chat_id = data_center.get("chat_id")
@@ -204,14 +214,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception as e:
                 logger.error(e)
         
-        elif query.data == "group_management":
-            msg = ()
-
-            btn_name = ["Back", "Close"]
-            btn_data = ["help_menu", "query_close"]
-            btn = await Button.cbutton(btn_name, btn_data, True)
-
-            await Message.edit_msg(update, msg, query.message, btn)
+        
         
         elif query.data == "ai":
             msg = (

@@ -1,5 +1,6 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.constants import ParseMode
+from telegram.error import Forbidden
 from bot import bot, logger
 
 class Message:
@@ -15,6 +16,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         else:
@@ -26,6 +29,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
 
@@ -42,6 +47,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         else:
@@ -53,6 +60,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
 
@@ -74,6 +83,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         else:
@@ -90,6 +101,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
 
@@ -104,6 +117,8 @@ class Message:
                 reply_to_message_id=reply_msg_id
             )
             return response
+        except Forbidden:
+            return Forbidden
         except Exception as e:
             logger.error(e)
 
@@ -118,6 +133,8 @@ class Message:
                 reply_to_message_id=reply_msg_id
             )
             return response
+        except Forbidden:
+            return Forbidden
         except Exception as e:
             logger.error(e)
 
@@ -139,6 +156,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
                 try:
@@ -151,6 +170,8 @@ class Message:
                         parse_mode=parse_mode
                     )
                     return response
+                except Forbidden:
+                    return Forbidden
                 except Exception as e:
                     logger.error(e)
         else:
@@ -162,6 +183,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
                 try:
@@ -172,6 +195,8 @@ class Message:
                         parse_mode=parse_mode
                     )
                     return response
+                except Forbidden:
+                    return Forbidden
                 except Exception as e:
                     logger.error(e)
 
@@ -189,6 +214,8 @@ class Message:
                 message_id=msg_id
             )
             return response
+        except Forbidden:
+            return Forbidden
         except Exception as e:
             logger.error(e)
 
@@ -209,6 +236,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         elif caption_msg and not btn:
@@ -220,6 +249,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         elif not caption_msg and btn:
@@ -234,6 +265,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         elif not caption_msg and not btn:
@@ -246,6 +279,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
 
@@ -259,6 +294,8 @@ class Message:
         try:
             response = await bot.delete_message(chat_id=chat_id, message_id=msg_id)
             return response
+        except Forbidden:
+            return Forbidden
         except Exception as e:
             logger.error(e)
 

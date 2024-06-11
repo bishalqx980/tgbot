@@ -29,7 +29,7 @@ class LOCAL_DATABASE:
         """
         collection = db_collection_name eg. (users or docs)\n
         data = json data {"name": "bishal", "age": 20}\n\n
-        It will add or replace/modify existing data...
+        It will add or replace/modify existing data...\n
         use >> insert_data instead if you want sub_entry/identifier
         """
         try:
@@ -109,8 +109,8 @@ class LOCAL_DATABASE:
 
     async def get_data(collection, data):
         """
-        collection = db_collection_name eg. (users or docs)
-        data = which data you want from specified collection
+        collection = db_collection_name eg. (users or docs)\n
+        data = which data you want from specified collection\n
         only works for which doesn't have sub collection
         """
         try:

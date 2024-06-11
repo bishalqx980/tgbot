@@ -26,89 +26,82 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "Chat not found!")
                 return
             
-            title = find_group.get("title")
-            chat_id = find_group.get("chat_id")
-            lang = find_group.get("lang")
-            echo = find_group.get("echo")
-            auto_tr = find_group.get("auto_tr")
-            welcome_msg = find_group.get("welcome_msg")
-            custom_welcome_msg = find_group.get("custom_welcome_msg")
-            goodbye_msg = find_group.get("goodbye_msg")
-            antibot = find_group.get("antibot")
-            del_cmd = find_group.get("del_cmd")
-            all_links = find_group.get("all_links")
-            allowed_links = find_group.get("allowed_links")
-            if allowed_links:
-                storage, counter = "", 0
-                for i in allowed_links:
-                    counter += 1
-                    if counter == len(allowed_links):
-                        storage += f"{i}"
-                    else:
-                        storage += f"{i}, "
-                allowed_links = storage
+            entries = [
+                "title",
+                "chat_id",
+                "lang",
+                "echo",
+                "auto_tr",
+                "welcome_msg",
+                "custom_welcome_msg",
+                "goodbye_msg",
+                "antibot",
+                "del_cmd",
+                "all_links",
+                "allowed_links",
+                "log_channel",
+                "filters"
+            ]
 
-            log_channel = find_group.get("log_channel")
-            filters = find_group.get("filters")
-            if filters:
-                storage = ""
-                for key in filters:
-                    storage += f"» {key}: {filters[key]}\n"
+            msg = ""
+            
+            for key in entries:
+                data = find_group.get(key)
 
-            msg = (
-                f"<code>Title         :</code> {title}\n"
-                f"<code>ID            :</code> <code>{chat_id}</code>\n"
-                f"<code>Lang          :</code> {lang}\n"
-                f"<code>Echo          :</code> {echo}\n"
-                f"<code>Auto tr       :</code> {auto_tr}\n"
-                f"<code>Welcome       :</code> {welcome_msg}\n"
-                f"<blockquote>{custom_welcome_msg}</blockquote>\n"
-                f"<code>Farewell      :</code> {goodbye_msg}\n"
-                f"<code>Antibot       :</code> {antibot}\n"
-                f"<code>Delete cmd    :</code> {del_cmd}\n"
-                f"<code>All links     :</code> {all_links}\n"
-                f"<code>Allowed links:</code> {allowed_links}\n"
-                f"<code>Log channel   :</code> <code>{log_channel}</code>\n"
-                f"<code>Filters       :</code> <blockquote>{storage}</blockquote>\n"
-            )
-            await Message.reply_msg(update, f"<b>{msg}</b>")
+                if key == "allowed_links":
+                    storage, counter = "", 0
+                    for i in data:
+                        counter += 1
+                        if counter == len(data):
+                            storage += f"{i}"
+                        else:
+                            storage += f"{i}, "
+                    data = storage
+
+                if key == "filters":
+                    storage = ""
+                    for i in data:
+                        storage += f"» {i}\n"
+                    data = storage
+                
+                msg += f"<b>{key}</b>: {data}\n"
+
+            await Message.reply_msg(update, msg)
         else:
             find_user = await MongoDB.find_one("users", "user_id", int(chat_id))
             if not find_user:
                 await Message.reply_msg(update, "User not found!")
                 return
             
-            Name = find_user.get("Name")
-            user_id = find_user.get("user_id")
-            username = find_user.get("username")
-            mention = find_user.get("mention")
-            lang = find_user.get("lang")
-            echo = find_user.get("echo")
-            active_status = find_user.get("active_status")
+            entries = [
+                "Name",
+                "user_id",
+                "username",
+                "mention",
+                "lang",
+                "echo",
+                "active_status"
+            ]
 
-            msg = (
-                f"<code>Name     :</code> {Name}\n"
-                f"<code>Mention  :</code> {mention}\n"
-                f"<code>ID       :</code> <code>{user_id}</code>\n"
-                f"<code>Username :</code> @{username}\n"
-                f"<code>Lang     :</code> {lang}\n"
-                f"<code>Echo     :</code> {echo}\n"
-                f"<code>A. status:</code> {active_status}\n"
+            msg = ""
+            
+            for key in entries:
+                data = find_group.get(key)
+                msg += f"<b>{key}</b>: {data}\n"
+            
+            await Message.reply_msg(update, msg)
+    else:
+        db = await MongoDB.info_db()
+        msg = "<b>⋰⋰⋰⋰⋰⋰⋰⋰⋰⋰</b>\n"
+        for info in db:
+            msg += (
+                f"<b>Name</b>: <code>{info[0]}</code>\n"
+                f"<b>Count</b>: <code>{info[1]}</code>\n"
+                f"<b>Size</b>: <code>{info[2]}</code>\n"
+                f"<b>A. size</b>: <code>{info[3]}</code>\n"
+                f"<b>⋰⋰⋰⋰⋰⋰⋰⋰⋰⋰</b>\n"
             )
-            await Message.reply_msg(update, f"<b>{msg}</b>")
-        return
-    
-    db = await MongoDB.info_db()
-    msg = "▬▬▬▬▬▬▬▬▬▬\n"
-    for info in db:
-        msg += (
-            f"<code>Doc name   :</code> {info[0]}\n"
-            f"<code>Doc count  :</code> {info[1]}\n"
-            f"<code>Doc size   :</code> {info[2]}\n"
-            f"<code>Actual size:</code> {info[3]}\n"
-            f"▬▬▬▬▬▬▬▬▬▬\n"
-        )
-    active_status = await MongoDB.find("users", "active_status")
-    active_users = active_status.count(True)
-    inactive_users = active_status.count(False)
-    await Message.reply_msg(update, f"<b>{msg}Active users: {active_users}\nInactive users: {inactive_users}</b>")
+        active_status = await MongoDB.find("users", "active_status")
+        active_users = active_status.count(True)
+        inactive_users = active_status.count(False)
+        await Message.reply_msg(update, f"{msg}<b>Active users</b>: <code>{active_users}</code>\n<b>Inactive users</b>: <code>{inactive_users}</code>")

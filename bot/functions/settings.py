@@ -18,6 +18,9 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not _bot:
         find = await MongoDB.find("bot_docs", "_id")
         _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+        if not _bot:
+            logger.error("_bot not found in db...")
+            return
         await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
 
     if chat.type == "private":
@@ -56,28 +59,21 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn = row1 + row2
 
-        try:
-            images = LOCAL_DATABASE.get_data("bot_docs", "images")
-            if not images:
-                images = await MongoDB.get_data("bot_docs", "images")
-            
-            if images:
-                image = random.choice(images).strip()
-            else:
-                image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
-                if not image:
-                    image = await MongoDB.get_data("bot_docs", "bot_pic")
+        images = await LOCAL_DATABASE.get_data("bot_docs", "images")
+        if not images:
+            images = await MongoDB.get_data("bot_docs", "images")
+        
+        if images:
+            image = random.choice(images).strip()
+        else:
+            image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
+            if not image:
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
+
+        if image:
             await Message.send_img(chat.id, image, msg, btn)
-        except Exception as e:
-            logger.error(e)
-            try:
-                image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
-                if not image:
-                    image = await MongoDB.get_data("bot_docs", "bot_pic")
-                await Message.send_img(chat.id, image, msg, btn)
-            except Exception as e:
-                logger.error(e)
-                await Message.send_msg(chat.id, msg, btn)
+        else:
+            await Message.send_msg(chat.id, msg, btn)
 
     elif chat.type in ["group", "supergroup"]:
         await _check_del_cmd(update, context)
@@ -189,25 +185,18 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn = row1 + row2 + row3 + row4 + row5 + row6
 
-        try:
-            images = LOCAL_DATABASE.get_data("bot_docs", "images")
-            if not images:
-                images = await MongoDB.get_data("bot_docs", "images")
-            
-            if images:
-                image = random.choice(images).strip()
-            else:
-                image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
-                if not image:
-                    image = await MongoDB.get_data("bot_docs", "bot_pic")
+        images = await LOCAL_DATABASE.get_data("bot_docs", "images")
+        if not images:
+            images = await MongoDB.get_data("bot_docs", "images")
+        
+        if images:
+            image = random.choice(images).strip()
+        else:
+            image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
+            if not image:
+                image = await MongoDB.get_data("bot_docs", "bot_pic")
+        
+        if image:
             await Message.send_img(chat.id, image, msg, btn)
-        except Exception as e:
-            logger.error(e)
-            try:
-                image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
-                if not image:
-                    image = await MongoDB.get_data("bot_docs", "bot_pic")
-                await Message.send_img(chat.id, image, msg, btn)
-            except Exception as e:
-                logger.error(e)
-                await Message.send_msg(chat.id, msg, btn)
+        else:
+            await Message.send_msg(chat.id, msg, btn)

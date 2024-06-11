@@ -1,9 +1,9 @@
 from bot import logger
 
-async def calc(math):
+async def calculator(math):
     try:
-        return eval(math)
+        solved_math = eval(math)
+        return True, solved_math
     except Exception as e:
-        error_msg = f"Error Math: {e}"
-        logger.error(error_msg)
-        return error_msg
+        logger.error(e)
+        return False, e

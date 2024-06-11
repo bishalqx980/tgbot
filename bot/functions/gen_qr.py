@@ -26,4 +26,3 @@ async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.del_msg(chat.id, sent_msg)
     except Exception as e:
         logger.error(e)
-        await Message.edit_msg(update, f"Error: {e}", sent_msg)

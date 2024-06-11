@@ -2,7 +2,6 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
-from bot import logger
 from bot.helper.telegram_helper import Message
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
@@ -31,7 +30,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not prompt:
-        await Message.reply_msg(update, "Use <code>/gpt your_prompt</code>\nE.g. <code>/gpt What is AI?</code>")
+        await Message.reply_msg(update, "Use <code>/gpt your_prompt</code>\nE.g. <code>/gpt what you can do?</code>")
         return
     
     common_words = ["hi", "hello"]
@@ -41,22 +40,19 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sent_msg = await Message.reply_msg(update, "Processing...")
     retry = 0
-
-    while retry != 3:
+    attempt = 3
+    while retry != attempt:
         g4f_gpt = await G4F.chatgpt(f"{prompt}, explain in few sentences and in English.")
-        if g4f_gpt and "流量异常, 请尝试更换网络环境, 如果你觉得ip被误封了, 可尝试邮件联系我们, 当前" not in g4f_gpt:
+        if g4f_gpt:
             break
-        elif retry == 3:
+        elif retry == attempt:
             await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
             return
         retry += 1
-        await Message.edit_msg(update, f"Please wait, ChatGPT is busy!\nAttempt: {retry}", sent_msg)
+        await Message.edit_msg(update, f"Please wait, ChatGPT is busy!\nAttempt: {retry}/{attempt}", sent_msg)
         await asyncio.sleep(3)
     
-    try:
-        if chat.type != "private":
-            g4f_gpt += f"\n\n*Req by*: {user.mention_markdown()}"
-        await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)
-    except Exception as e:
-        logger.error(e)
-        await Message.edit_msg(update, f"Error ChatGPT: {e}", sent_msg)
+    if chat.type != "private":
+        g4f_gpt += f"\n\n*Req by*: {user.mention_markdown()}"
+    
+    await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)

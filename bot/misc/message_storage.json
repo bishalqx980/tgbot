@@ -1,5 +1,8 @@
 {
-    "formatting": "{first} > first_name\n{last} > last_name\n{fullname} > full_name\n{username} > username\n{mention} > mention_html\n{chat_id} > chat.id\n{user_id} > user.id\n{chatname} > chat_title",
+    "formatting": "{first} > first name\n{last} > last_name\n{fullname} > full_name\n{username} > username\n{mention} > mention_html\n{chat_id} > chat.id\n{user_id} > user.id\n{chatname} > chat title\n{bot_username}\n{bot_firstname}",
+    "messages": {
+        "func_start": ""
+    },
     "callback_messages": {
         "text_formats": "<blockquote>Formatting</blockquote>\n<code>{first}</code>: The user's firstname\n<code></code>: The user's lastname\n<code></code>: The user's fullname\n<code>{username}</code>: The user's username\n<code></code>: To mention the user\n<code>{id}</code>: The user's ID\n<code>{chatname}</code>: Chat title\n\nExample: <code>Hi {mention}, welcome to {chatname}</code>\n",
         "group_management": "Group Moderation Commands -\n\n/id » Show chat/user id\n/invite » Generate/Get invite link\n/promote » Promote a member\n/demote » Demote a member\n/pin » Pin message loudly\n/unpin » Unpin a pinned message or all pinned messages\n/ban » Ban a member\n/unban » Unban a member\n/kick » Kick a member\n/kickme » The easy way to out\n/mute » Mute a member (member will be unable to send messages etc.)\n/unmute » Unmute a member (member will be able to send messages etc.)\n/del » Delete replied message with notifying/telling something to the member!\n/purge » Delete every messages from replied message to current message!\n/lock » Lock the chat (no one can send messages etc.)\n/unlock » Unlock the chat (back to normal)\n/filters | /filter | /remove » To see/set/remove custom message/command\n/adminlist » See chat admins list\n/settings » Settings of chat (welcome, antibot, translate etc.)\n\n<i><b>Note</b>: Type commands to get more details about the command function!</i>",

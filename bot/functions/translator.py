@@ -1,5 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+from bot import logger
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
@@ -71,6 +72,9 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not _bot:
             find = await MongoDB.find("bot_docs", "_id")
             _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
+            if not _bot:
+                logger.error("_bot not found in db...")
+                return
             await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
         
         btn_name = ["Language code's"]
