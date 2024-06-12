@@ -18,9 +18,9 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sent_msg = await Message.reply_msg(update, f"Generating public link...")
     photo = await bot.get_file(photo.file_id)
-    dir_name = "download/telegraph/"
+    dir_name = "download"
     os.makedirs(dir_name, exist_ok=True)
-    f_name = f"{dir_name}image.png"
+    f_name = f"{dir_name}/image.png"
     req = requests.get(photo.file_path)
     with open(f_name, "wb") as f:
         f.write(req.content)
@@ -29,10 +29,10 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not itl:
         await Message.edit_msg(update, "Something went wrong!", sent_msg)
         return
+    
+    await Message.edit_msg(update, itl, sent_msg)
 
     try:
-        await Message.edit_msg(update, itl, sent_msg)
         os.remove(f_name)
     except Exception as e:
         logger.error(e)
-        await Message.edit_msg(update, f"Error: {e}", sent_msg)

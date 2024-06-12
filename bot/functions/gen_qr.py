@@ -19,10 +19,10 @@ async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not gen_qr:
         await Message.edit_msg(update, "Something went wrong!", sent_msg)
         return
-
+    
+    await Message.send_img(chat.id, gen_qr, data)
     try:
-        await Message.send_img(chat.id, gen_qr, data)
         os.remove(gen_qr)
-        await Message.del_msg(chat.id, sent_msg)
     except Exception as e:
         logger.error(e)
+    await Message.del_msg(chat.id, sent_msg)

@@ -33,14 +33,14 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "echo",
                 "auto_tr",
                 "welcome_msg",
-                "custom_welcome_msg",
                 "goodbye_msg",
                 "antibot",
                 "del_cmd",
                 "all_links",
                 "allowed_links",
                 "log_channel",
-                "filters"
+                "filters",
+                "custom_welcome_msg"
             ]
 
             msg = ""
@@ -64,7 +64,10 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         storage += f"» {i}\n"
                     data = storage
                 
-                msg += f"<b>{key}</b>: {data}\n"
+                if key in ["filters", "custom_welcome_msg"]:
+                    msg += f"<b>{key}</b>:\n<pre>{data}</pre>\n"
+                else: 
+                    msg += f"<b>{key}</b>: <code>{data}</code>\n"
 
             await Message.reply_msg(update, msg)
         else:
@@ -86,8 +89,14 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             msg = ""
             
             for key in entries:
-                data = find_group.get(key)
-                msg += f"<b>{key}</b>: {data}\n"
+                data = find_user.get(key)
+                if key in ["username", "mention"]:
+                    if key == "username":
+                        msg += f"<b>{key}</b>: @{data}\n"
+                    else:
+                        msg += f"<b>{key}</b>: {data}\n"
+                else:
+                    msg += f"<b>{key}</b>: <code>{data}</code>\n"
             
             await Message.reply_msg(update, msg)
     else:
@@ -101,6 +110,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"<b>A. size</b>: <code>{info[3]}</code>\n"
                 f"<b>⋰⋰⋰⋰⋰⋰⋰⋰⋰⋰</b>\n"
             )
+        
         active_status = await MongoDB.find("users", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)

@@ -18,24 +18,20 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_msg = await Message.reply_msg(update, f"Pinging {url}\nPlease wait...")
     ping = await ping_url(url)
 
-    if not ping:
-        await Message.edit_msg(update, "Something went wrong!", sent_msg)
+    if ping[0] == None:
+        await Message.edit_msg(update, ping[1], sent_msg)
         return
 
-    try:
-        ping_time, status_code = ping
-        if status_code == 200:
-            site_status = "online"
-        else:
-            site_status = "offline"
+    res, ping_time, status_code = ping
+    site_status = "offline"
+    if status_code == 200:
+        site_status = "online"
 
-        msg = (
-            f"Site: {url}\n"
-            f"R.time(ms): <code>{ping_time}</code>\n"
-            f"R.code: <code>{status_code}</code>\n"
-            f"Status: {site_status}"
-        )
-        await Message.edit_msg(update, msg, sent_msg)
-    except Exception as e:
-        logger.error(e)
-        await Message.edit_msg(update, f"Error: {e}", sent_msg)
+    msg = (
+        f"Site: {url}\n"
+        f"R.time(ms): <code>{ping_time}</code>\n"
+        f"R.code: <code>{status_code}</code>\n"
+        f"Status: {site_status}"
+    )
+
+    await Message.edit_msg(update, msg, sent_msg)

@@ -39,8 +39,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     sent_msg = await Message.reply_msg(update, "Processing...")
-    retry = 0
-    attempt = 3
+    retry, attempt = 0, 3
     while retry != attempt:
         g4f_gpt = await G4F.chatgpt(f"{prompt}, explain in few sentences and in English.")
         if g4f_gpt:

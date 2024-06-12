@@ -22,6 +22,20 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.error("_bot not found in db...")
             return
         await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
+    
+    data = {
+        "user_id": user.id,
+        "chat_id": chat.id,
+        "collection_name": None,
+        "db_find ": None,
+        "db_vlaue": None,
+        "edit_data_key": None,
+        "edit_data_value": None,
+        "del_msg_pointer_id": e_msg.id,
+        "edit_data_value_msg_pointer": None
+    }
+
+    await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
 
     if chat.type == "private":
         find_user = await LOCAL_DATABASE.find_one("users", user.id)
@@ -105,7 +119,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if not admin_rights.get("can_change_info"):
                 await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
                 return
-
         
         find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
         if not find_group:
@@ -118,7 +131,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         title = find_group.get("title")
         lang = find_group.get("lang")
-
         echo = find_group.get("echo")
         auto_tr = find_group.get("auto_tr")
         welcome_msg = find_group.get("welcome_msg")
@@ -128,6 +140,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         del_cmd = find_group.get("del_cmd")
         all_links = find_group.get("all_links")
         allowed_links = find_group.get("allowed_links")
+        log_channel = find_group.get("log_channel")
+        
         if allowed_links:
             storage, counter = "", 0
             for i in allowed_links:
@@ -137,8 +151,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 else:
                     storage += f"{i}, "
             allowed_links = storage
-        
-        log_channel = find_group.get("log_channel")
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"

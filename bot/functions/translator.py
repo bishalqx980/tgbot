@@ -39,33 +39,31 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not lang_code:
         if chat.type == "private":
-            find_user = await LOCAL_DATABASE.find_one("users", user.id)
-            if not find_user:
-                find_user = await MongoDB.find_one("users", "user_id", user.id)
-                if find_user:
-                    await LOCAL_DATABASE.insert_data("users", user.id, find_user)
-                else:
-                    await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-                    return
-            
-            lang_code = find_user.get("lang")
+            collection_name = "users"
+            to_find = "user_id"
+            to_match = user.id
         else:
-            find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
-            if not find_group:
-                find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-                if find_group:
-                    await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
-                else:
-                    await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-                    return
-            
-            lang_code = find_group.get("lang")
+            collection_name = "groups"
+            to_find = "chat_id"
+            to_match = chat.id
+
+        find_chat = await LOCAL_DATABASE.find_one(collection_name, to_match)
+        if not find_chat:
+            find_chat = await MongoDB.find_one(collection_name, to_find, to_match)
+            if find_chat:
+                await LOCAL_DATABASE.insert_data(collection_name, to_match, find_chat)
+            else:
+                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                return
+        
+        lang_code = find_chat.get("lang")
 
     tr_msg = await translate(to_translate, lang_code)
     if tr_msg:
         sent_msg = await Message.reply_msg(update, tr_msg)
         if not sent_msg:
             await Message.reply_msg(update, "Oops, internal problem occurred...")
+        return
 
     if not tr_msg:
         _bot = await LOCAL_DATABASE.find("bot_docs")
@@ -81,4 +79,3 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_url = ["https://telegra.ph/Language-Code-12-24"]
         btn = await Button.ubutton(btn_name, btn_url)
         await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
-        return

@@ -43,7 +43,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     inactive_users = active_status.count(False)
 
     msg = (
-        f"Hi {user.mention_html()}! Welcome to the bot help section...\n"
+        f"Hey, {user.first_name}! Welcome to the bot help section...\n"
         f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
         f"/start - to start the bot\n"
         f"/help - to see this message\n\n"

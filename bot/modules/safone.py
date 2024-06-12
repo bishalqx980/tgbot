@@ -38,5 +38,3 @@ class Safone:
             return res
         except Exception as e:
             logger.error(e)
-
-            

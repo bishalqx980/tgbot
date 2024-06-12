@@ -12,6 +12,10 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/movie movie_name</code>\nE.g. <code>/movie animal</code>\nor\n<code>/movie -i tt13751694</code> [IMDB ID]\nor\n<code>/movie bodyguard -y 2011</code>")
         return
     
+    if "-i" and "-y" in msg:
+        await Message.reply_msg(update, "⚠ You can't use both statement in same message!\n/movie for details.")
+        return
+    
     imdb_id = None
     year = None
     
@@ -23,8 +27,6 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         index_y = msg.index("-y")
         year = msg[index_y + len("-y"):].strip()
         msg = msg[0:index_y].strip()
-    elif "-i" and "-y" in msg:
-        await Message.reply_msg(update, "⚠ You can't use both statement in same message!\n/movie for details.")
 
     movie_info = await get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
     
@@ -37,6 +39,7 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     poster, content_type, title, released, runtime, genre, director, writer, actors, plot, language, country, awards, meta_score, imdb_rating, imdb_votes, imdb_id, box_office = movie_info
+    
     msg = (
         f"<b>🎥 Content Type:</b> {content_type}\n"
         f"<b>📄 Title:</b> {title}\n"
@@ -55,9 +58,11 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>🏷 IMDB ID:</b> <code>{imdb_id}</code>\n"
         f"<b>💰 BoxOffice:</b> {box_office}\n\n" # break
         f"<b>📝 **Plot:</b>\n"
-        f"<pre>{plot}</pre>\n"
+        f"<blockquote>{plot}</blockquote>\n"
     )
-    btn_name = [f"✨ IMDB - {title}"]
+
+    btn_name = [f"IMDB - {title}"]
     btn_url = [f"https://www.imdb.com/title/{imdb_id}"]
     btn = await Button.ubutton(btn_name, btn_url)
+
     await Message.send_img(chat.id, poster, msg, btn)

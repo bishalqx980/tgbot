@@ -12,7 +12,6 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     info = await weather_info(location)
-
     if info == 0:
         await Message.reply_msg(update, "weather_api not found!")
         return
@@ -37,7 +36,7 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Humidity: <code>{humidity}</code>\n\n"
         f"Wind: <code>{wind_mph}</code> | <code>{wind_kph}</code>\n"
         f"Wind `Angle`: <code>{wind_deg}</code>\n"
-        f"UV Ray: <code>{uv}</code>\n\n<pre>⚠ 8 or higher is harmful for skin!</pre>"
+        f"UV Ray: <code>{uv}</code>\n\nNote: <i>⚠ 8 or higher is harmful for skin!</i>"
     )
 
     await Message.reply_msg(update, msg)

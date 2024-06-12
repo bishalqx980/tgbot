@@ -25,7 +25,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
         
         ai_status = find_group.get("ai_status")
-        if not ai_status:
+        if not ai_status and ai_status != None:
             await Message.del_msg(chat.id, e_msg)
             return
 
@@ -34,25 +34,22 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     sent_msg = await Message.reply_msg(update, "Processing...")
-    retry = 0
-
-    while retry != 2:
+    retry, attempt = 0, 2
+    while retry != attempt:
         imagine = await Safone.imagine(prompt)
         if imagine:
             break
-        elif retry == 2:
+        elif retry == attempt:
             await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
             return
         retry += 1
-        await Message.edit_msg(update, f"Please wait, Imagine is busy!\nAttempt: {retry}", sent_msg)
+        await Message.edit_msg(update, f"Please wait, Imagine is busy!\nAttempt: {retry}/{attempt}", sent_msg)
         await asyncio.sleep(3)
     
-    try:
-        msg = f"» <i>{prompt}</i>"
-        if chat.type != "private":
-            msg += f"\n<b>Req by</b>: {user.mention_html()}"
-        await Message.send_img(chat.id, imagine, msg)
-        await Message.del_msg(chat.id, sent_msg)
-    except Exception as e:
-        logger.error(e)
-        await Message.edit_msg(update, f"Error Imagine: {e}", sent_msg)
+    await Message.del_msg(chat.id, sent_msg)
+    
+    msg = f"» <i>{prompt}</i>"
+    if chat.type != "private":
+        msg += f"\n<b>Req by</b>: {user.mention_html()}"
+    
+    await Message.send_img(chat.id, imagine, msg)

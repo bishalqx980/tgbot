@@ -16,10 +16,6 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         url = f"http://{url}"
 
     sent_msg = await Message.reply_msg(update, "Taking webshot please wait...")
-    try:
-        webshot = await Safone.webshot(url)
-        await Message.del_msg(chat.id, sent_msg)
-        await Message.send_img(chat.id, webshot, f"✨ {url}")
-    except Exception as e:
-        logger.error(e)
-        await Message.reply_msg(update, f"Error: {e}")
+    webshot = await Safone.webshot(url)
+    await Message.del_msg(chat.id, sent_msg)
+    await Message.send_img(chat.id, webshot, f"⇾ {url}")

@@ -42,32 +42,18 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     support_chat = _bot.get("support_chat")
 
     msg = (
-        f"Hi {user.mention_html()}! I'm <a href='https://t.me/{_bot_info.username}'>{_bot_info.first_name}</a>, your all-in-one bot!\n\n"
-        "<blockquote>Here's a short summary of what I can do:\n\n"
-        "• Get response from ChatGPT\n"
-        "• Generate image from your prompt\n"
-        "• Download/Search videos from YouTube\n"
-        "• Provide movie information\n"
-        "• Translate languages\n"
-        "• Encode/decode base64\n"
-        "• Shorten URLs\n"
-        "• Ping any URL\n"
-        "• Be your calculator\n"
-        "• Echo your message for fun\n"
-        "• Take website screenshot\n"
-        "• Provide weather information\n"
-        "• <b>Group management</b>\n"
-        "• & Much more...</blockquote>\n\n"
-        "• /help for bot help\n"
-        "<i>More Feature coming soon...</i>"
+        f"Hey, {user.first_name}! I'm {_bot_info.first_name}!\n"
+        "I can help you to manage your group with lots of useful features!\n"
+        "Feel free to add me to your group.\n\n"
+        "<b>/help - for bot help</b>"
     )
 
     if _bot_info.username != "MissCiri_bot":
         msg += "\n\nCloned bot of @MissCiri_bot"
 
-    btn_name_1 = ["Add in Group"]
+    btn_name_1 = ["Add me to your Group"]
     btn_url_1 = [f"http://t.me/{_bot_info.username}?startgroup=start"]
-    btn_name_2 = ["Developer", "Source Code"]
+    btn_name_2 = ["Developer", "Source code"]
     btn_url_2 = [f"https://t.me/bishalqx980", "https://github.com/bishalqx980/tgbot"]
     btn_name_3 = ["Support Chat"]
     btn_url_3 = [support_chat]
