@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from bot import bot
 from bot.helper.telegram_helper import Message
 from bot.modules.group_management.pm_error import _pm_error
-from bot.modules.group_management.check_del_cmd import _check_del_cmd
+from bot.functions.del_command import func_del_command
 
 
 async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -13,7 +13,7 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _pm_error(chat.id)
         return
 
-    await _check_del_cmd(update, context)
+    await func_del_command(update, context)
 
     owner_storage = "<b>Owner:</b>\n"
     admins_storage = ""

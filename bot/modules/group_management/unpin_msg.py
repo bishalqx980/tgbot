@@ -4,7 +4,7 @@ from bot import bot, logger
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.group_management.pm_error import _pm_error
 from bot.modules.group_management.log_channel import _log_channel
-from bot.modules.group_management.check_del_cmd import _check_del_cmd
+from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
@@ -20,7 +20,7 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _pm_error(chat.id)
         return
 
-    await _check_del_cmd(update, context)
+    await func_del_command(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -64,20 +64,22 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = await Button.cbutton(btn_name, btn_data, True)
         try:
             await Message.reply_msg(update, f"Do you really want to unpin all messages of this chat?", btn)
-            await _log_channel(context, chat, user, action="UNPIN_ALL")
+            await _log_channel(update, chat, user, action="UNPIN_ALL")
         except Exception as e:
             logger.error(e)
             await Message.send_msg(chat.id, f"Error: {e}")
         return
 
     if not reply:
-        await Message.reply_msg(update, "This command will unpin replied message!\nUse <code>/unpin all</code> to unpin all pinned messages of chat!")
+        await Message.reply_msg(update, "This command will unpin replied message (which is already pinned)!")
         return
     
     try:
         await bot.unpin_chat_message(chat.id, msg_id)
-        await Message.reply_msg(update, f"Message unpinned!")
-        await _log_channel(context, chat, user, action="UNPIN")
     except Exception as e:
         logger.error(e)
-        await Message.send_msg(chat.id, f"Error: {e}")
+        await Message.reply_msg(update, e)
+        return
+    
+    await Message.reply_msg(update, f"Message unpinned!")
+    await _log_channel(update, chat, user, action="UNPIN")

@@ -4,7 +4,7 @@ from bot import bot, logger
 from bot.helper.telegram_helper import Message
 from bot.modules.group_management.pm_error import _pm_error
 from bot.modules.group_management.log_channel import _log_channel
-from bot.modules.group_management.check_del_cmd import _check_del_cmd
+from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
@@ -16,7 +16,7 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _pm_error(chat.id)
         return
 
-    await _check_del_cmd(update, context)
+    await func_del_command(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -45,7 +45,7 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not admin_rights.get("can_change_info"):
             await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
             return
-                    
+    
     permissions = {
         "can_send_messages": True,
         "can_send_other_messages": True,
@@ -61,8 +61,10 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         await bot.set_chat_permissions(chat.id, permissions)
-        await Message.send_msg(chat.id, f"This chat has been Unlocked!\nEffective admin: {user.mention_html()}")
-        await _log_channel(context, chat, user, action="CHAT_UNLOCK")
     except Exception as e:
         logger.error(e)
-        await Message.send_msg(chat.id, f"Error: {e}")
+        await Message.reply_msg(update, e)
+        return
+
+    await Message.send_msg(chat.id, f"This chat has been unlocked!\n<b>Admin</b>: {user.first_name}")
+    await _log_channel(update, chat, user, action="CHAT_UNLOCK")

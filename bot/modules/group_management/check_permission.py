@@ -2,7 +2,6 @@ from telegram import Update, ChatMember
 from bot import bot
 from bot.helper.telegram_helper import Message
 
-
 async def _check_permission(update: Update, victim=None, user=None, checking_msg=True):
     chat = update.effective_chat
 

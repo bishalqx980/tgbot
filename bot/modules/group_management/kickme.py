@@ -1,9 +1,10 @@
+import asyncio
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import bot, logger
 from bot.helper.telegram_helper import Message
 from bot.modules.group_management.pm_error import _pm_error
-from bot.modules.group_management.check_del_cmd import _check_del_cmd
+from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
@@ -16,7 +17,7 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _pm_error(chat.id)
         return
 
-    await _check_del_cmd(update, context)
+    await func_del_command(update, context)
 
     _chk_per = await _check_permission(update, victim, user)
 
@@ -39,13 +40,23 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     try:
         await bot.ban_chat_member(chat.id, victim.id)
-        await Message.reply_msg(update, f"Nice Choice! Get out of my sight!\n{victim.mention_html()} has choosed the easy way to out!")
+        await asyncio.sleep(0.5)
         await bot.unban_chat_member(chat.id, victim.id)
-        try:
-            invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
-            await Message.send_msg(victim.id, f"You kicked yourself from {chat.title}!\nInvite Link: {invite_link.invite_link}")
-        except Exception as e:
-            logger.error(e)
     except Exception as e:
         logger.error(e)
-        await Message.send_msg(chat.id, f"Error: {e}")
+        await Message.reply_msg(update, e)
+        return
+
+    await Message.reply_msg(update, f"Nice Choice! Get out of my sight!\n{victim.mention_html()} has chosen the easy way to out!")
+
+    if chat.link:
+        invite_link = chat.link
+    else:
+        try:
+            create_invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
+            invite_link = create_invite_link.invite_link
+        except Exception as e:
+            logger.error(e)
+            return
+    
+    await Message.send_msg(victim.id, f"You kicked yourself from {chat.title}!\nYou can join again using this invite link!\nInvite Link: {invite_link}")

@@ -13,7 +13,7 @@ async def func_shortener(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     shorted_url = await shortener_url(msg)
-    if shorted_url == 0:
+    if shorted_url == False:
         msg = "shrinkme_api not found!"
     elif shorted_url:
         msg = shorted_url

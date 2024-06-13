@@ -5,9 +5,7 @@ from telegram.ext import ContextTypes
 from bot import bot, logger
 from bot.update_db import update_database
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
-from bot.misc.message_storage import MessageStorage
+from bot.modules.database.all_db_search import all_db_search
 
 
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -191,7 +189,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             data_center["youtube_content_format"] = query.data
         
         elif query.data == "group_management":
-            msg = await MessageStorage.get_msg("callback_messages", "group_management")
+            msg = ()
 
             btn_name = ["Back", "Close"]
             btn_data = ["help_menu", "query_close"]
@@ -598,7 +596,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             bot_docs = await MongoDB.find_one("bot_docs", "_id", _id[0])
             await LOCAL_DATABASE.insert_data_direct("bot_docs", bot_docs)
 
-            msg = "Database data has been restored successfully from <code>config.env</code>!" if res else "Something went wrong!"
+            msg = "Database data has been restored successfully from <code>config.env</code>!" if res else "Oops, something went wrong..."
             await Message.send_msg(chat_id, msg)
 
         elif query.data == "b_setting_menu":

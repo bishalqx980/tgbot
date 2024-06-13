@@ -42,6 +42,7 @@ from bot.functions.restart import func_restart
 from bot.functions.sys import func_sys
 from bot.functions.filter_service_msg import func_filter_services
 from bot.functions.filter_all import func_filter_all
+from bot.functions.del_command import func_del_command
 from bot.modules.group_management.invite_link import func_invite_link
 from bot.modules.group_management.promote import func_promote
 from bot.modules.group_management.demote import func_demote
@@ -157,6 +158,7 @@ def main():
     application.add_handler(CommandHandler("sys", func_sys, block=False))
     # filters
     application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services, block=False))
+    application.add_handler(MessageHandler(filters.COMMAND, func_del_command, block=False))
     application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
     # Chat Member Handler
     application.add_handler(ChatMemberHandler(track_bot_chat_act, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking bot/private chat

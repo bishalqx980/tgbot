@@ -1,6 +1,5 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import logger
 from bot.helper.telegram_helper import Message
 from bot.modules.safone import Safone
 
@@ -17,5 +16,8 @@ async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     sent_msg = await Message.reply_msg(update, "Taking webshot please wait...")
     webshot = await Safone.webshot(url)
-    await Message.del_msg(chat.id, sent_msg)
-    await Message.send_img(chat.id, webshot, f"⇾ {url}")
+    if webshot:
+        await Message.del_msg(chat.id, sent_msg)
+        await Message.send_img(chat.id, webshot, f"⇾ {url}")
+    else:
+        await Message.edit_msg(update, "Oops, something went wrong...", sent_msg)

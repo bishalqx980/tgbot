@@ -2,6 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message, Button
+from bot.modules.database.all_db_search import all_db_search
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.translator import LANG_CODE_LIST, translate
@@ -47,14 +48,12 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             to_find = "chat_id"
             to_match = chat.id
 
-        find_chat = await LOCAL_DATABASE.find_one(collection_name, to_match)
-        if not find_chat:
-            find_chat = await MongoDB.find_one(collection_name, to_find, to_match)
-            if find_chat:
-                await LOCAL_DATABASE.insert_data(collection_name, to_match, find_chat)
-            else:
-                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-                return
+        db = await all_db_search(collection_name, to_find, to_match)
+        if db[0] == False:
+            await Message.reply_msg(update, db[1])
+            return
+        
+        find_chat = db[1]
         
         lang_code = find_chat.get("lang")
 
@@ -62,7 +61,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if tr_msg:
         sent_msg = await Message.reply_msg(update, tr_msg)
         if not sent_msg:
-            await Message.reply_msg(update, "Oops, internal problem occurred...")
+            await Message.reply_msg(update, "Oops, something went wrong...")
         return
 
     if not tr_msg:

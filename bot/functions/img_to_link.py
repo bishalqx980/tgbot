@@ -27,7 +27,7 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     itl = await TELEGRAPH.upload_img(f_name)
     if not itl:
-        await Message.edit_msg(update, "Something went wrong!", sent_msg)
+        await Message.edit_msg(update, "Oops, something went wrong...", sent_msg)
         return
     
     await Message.edit_msg(update, itl, sent_msg)

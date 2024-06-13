@@ -1,10 +1,11 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message, Button
+from bot.modules.database.all_db_search import all_db_search
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.group_management.pm_error import _pm_error
-from bot.modules.group_management.check_del_cmd import _check_del_cmd
+from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
@@ -20,7 +21,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _pm_error(chat.id)
         return
     
-    await _check_del_cmd(update, context)
+    await func_del_command(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -37,10 +38,6 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
-    if not bot_permission.can_change_info:
-        await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
-        return
-    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -51,6 +48,20 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not value or not keyword:
+        data = {
+            "user_id": user.id,
+            "chat_id": chat.id,
+            "collection_name": None,
+            "db_find ": None,
+            "db_vlaue": None,
+            "edit_data_key": None,
+            "edit_data_value": None,
+            "del_msg_pointer_id": e_msg.id,
+            "edit_data_value_msg_pointer": None
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         msg = (
             "To set filters for this chat follow the instruction below...\n"
             "<blockquote>Reply the message with /filter which one you want to set as value for your keyword!</blockquote>"
@@ -58,10 +69,6 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Next time if you say <code>Hi</code> in chat, the bot will reply with <code>Hi, How are you!</code>\n\n"
             "Ques: How to remove a filter?\n Ans: /remove for instruction..."
         )
-
-        context.chat_data["user_id"] = user.id
-        context.chat_data["chat_id"] = chat.id
-        context.chat_data["del_msg_pointer"] = e_msg
 
         btn_name = ["Text formatting", "Close"]
         btn_data = ["text_formats", "close"]
@@ -71,14 +78,12 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg, btn)
         return
 
-    find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
-    if not find_group:
-        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-        if find_group:
-            await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
-        else:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-            return
+    db = await all_db_search("groups", "chat_id", chat.id)
+    if db[0] == False:
+        await Message.reply_msg(update, db[1])
+        return
+    
+    find_group = db[1]
     
     filters = find_group.get("filters")
     if not filters:
@@ -92,4 +97,4 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
     await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
-    await Message.reply_msg(update, f"<code>{keyword}</code> has been added as filter!\n<b>Admin</b>: {user.full_name}")
+    await Message.reply_msg(update, f"<code>{keyword}</code> has been added as filter!\n<b>Admin</b>: {user.first_name}")

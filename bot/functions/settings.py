@@ -3,9 +3,10 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message, Button
+from bot.modules.database.all_db_search import all_db_search
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
-from bot.modules.group_management.check_del_cmd import _check_del_cmd
+from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
@@ -38,14 +39,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
 
     if chat.type == "private":
-        find_user = await LOCAL_DATABASE.find_one("users", user.id)
-        if not find_user:
-            find_user = await MongoDB.find_one("users", "user_id", user.id)
-            if find_user:
-                await LOCAL_DATABASE.insert_data("users", user.id, find_user)
-            else:
-                await Message.reply_msg(update, "User data not found! Block me then start me again! (no need to delete chat)")
-                return
+        db = await all_db_search("users", "user_id", user.id)
+        if db[0] == False:
+            await Message.reply_msg(update, db[1])
+            return
+        
+        find_user = db[1]
         
         user_mention = find_user.get("mention")
         lang = find_user.get("lang")
@@ -90,7 +89,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.send_msg(chat.id, msg, btn)
 
     elif chat.type in ["group", "supergroup"]:
-        await _check_del_cmd(update, context)
+        await func_del_command(update, context)
 
         if user.is_bot:
             await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -106,10 +105,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if bot_permission.status != ChatMember.ADMINISTRATOR:
             await Message.reply_msg(update, "I'm not an admin in this chat!")
             return
-    
-        if not bot_permission.can_change_info:
-            await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
-            return
         
         if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
             await Message.reply_msg(update, "You aren't an admin in this chat!")
@@ -120,14 +115,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
                 return
         
-        find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
-        if not find_group:
-            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-            if find_group:
-                await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
-            else:
-                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-                return
+        db = await all_db_search("groups", "chat_id", chat.id)
+        if db[0] == False:
+            await Message.reply_msg(update, db[1])
+            return
+        
+        find_group = db[1]
         
         title = find_group.get("title")
         lang = find_group.get("lang")

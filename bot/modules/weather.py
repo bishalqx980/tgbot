@@ -9,7 +9,7 @@ async def weather_info(location):
         weather_api = await MongoDB.get_data("bot_docs", "weather_api")
         if not weather_api:
             logger.error("weather_api not found!")
-            return 0
+            return False
     
     try:
         post_url = f"https://api.weatherapi.com/v1/current.json?key={weather_api}&q={location}&aqi=no"

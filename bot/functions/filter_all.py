@@ -2,7 +2,7 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.all_db_search import all_db_search
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.translator import translate
 from bot.modules.group_management.check_permission import _check_permission
@@ -36,14 +36,12 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
     if chat.type == "private":
-        find_user = await LOCAL_DATABASE.find_one("users", user.id)
-        if not find_user:
-            find_user = await MongoDB.find_one("users", "user_id", user.id)
-            if find_user:
-                await LOCAL_DATABASE.insert_data("users", user.id, find_user)
-            else:
-                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-                return
+        db = await all_db_search("users", "user_id", user.id)
+        if db[0] == False:
+            await Message.reply_msg(update, db[1])
+            return
+        
+        find_user = db[1]
         
         echo_status = find_user.get("echo")
         auto_tr_status = find_user.get("auto_tr")
@@ -74,14 +72,12 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.send_msg(chat.id, "I'm not an admin in this chat!")
             return
         
-        find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
-        if not find_group:
-            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-            if find_group:
-                await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
-            else:
-                await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-                return
+        db = await all_db_search("groups", "chat_id", chat.id)
+        if db[0] == False:
+            await Message.reply_msg(update, db[1])
+            return
+        
+        find_group = db[1]
         
         all_links = find_group.get("all_links")
         allowed_links = find_group.get("allowed_links")

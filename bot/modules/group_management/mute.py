@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from bot import bot, logger
 from bot.helper.telegram_helper import Message
 from bot.modules.group_management.pm_error import _pm_error
-from bot.modules.group_management.check_del_cmd import _check_del_cmd
+from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 from bot.modules.group_management.extract_time_reason import _extract_time_reason
 
@@ -13,13 +13,13 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
-    reason = " ".join(context.args)
+    inline_text = " ".join(context.args)
     
     if chat.type not in ["group", "supergroup"]:
         await _pm_error(chat.id)
         return
 
-    await _check_del_cmd(update, context)
+    await func_del_command(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -60,10 +60,6 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"I'm not going to mute an admin! You must be joking!")
         return
     
-    if victim_permission.status == ChatMember.RESTRICTED:
-        await Message.reply_msg(update, "The user is already muted in this chat!")
-        return
-    
     permissions = {
         "can_send_other_messages": False,
         "can_invite_users": False,
@@ -81,21 +77,26 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "can_send_voice_notes": False
     }
 
-    msg = f"Shh... {victim.mention_html()} has been muted in this chat!\n<b>Admin</b>: {user.first_name}\n"
-    until_date = None
-    time = None
+    until_date = logical_time = reason = None
 
-    if reason:
+    if inline_text:
         time, logical_time, reason = await _extract_time_reason(reason)
         if time:
-            msg = f"{msg}<b>Duration</b>: {logical_time}\n"
             until_date = time
-        if reason:
-            msg = f"{msg}<b>Reason</b>: {reason}"
     
     try:
         await bot.restrict_chat_member(chat.id, victim.id, permissions, until_date)
-        await Message.reply_msg(update, msg)
     except Exception as e:
         logger.error(e)
-        await Message.send_msg(chat.id, f"Error: {e}")
+        await Message.reply_msg(update, e)
+        return
+
+    msg = f"Shh... {victim.mention_html()} has been muted in this chat!\n<b>Admin</b>: {user.first_name}\n"
+    
+    if logical_time:
+        msg = f"{msg}<b>Duration</b>: {logical_time}\n"
+
+    if reason:
+        msg = f"{msg}<b>Reason</b>: {reason}"
+    
+    await Message.reply_msg(update, msg)

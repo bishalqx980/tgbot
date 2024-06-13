@@ -1,10 +1,9 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
-from bot import logger
 from bot.helper.telegram_helper import Message
 from bot.modules.group_management.pm_error import _pm_error
 from bot.modules.group_management.log_channel import _log_channel
-from bot.modules.group_management.check_del_cmd import _check_del_cmd
+from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
@@ -18,7 +17,7 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _pm_error(chat.id)
         return
 
-    await _check_del_cmd(update, context)
+    await func_del_command(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -49,18 +48,12 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know which message to delete from! Reply the message that you want to start delete from!\n\n<i><b>Note</b>: Telegram limitation for bots, bots can't delete 48h old messages...</i>")
+        await Message.reply_msg(update, "I don't know which message to delete from! Reply the message that you want to start delete from!\n\n<i><b>Note</b>: bots are unable to delete 48h old messages due to Telegram limitation/restriction...</i>")
         return
-
-    try:
-        sent_msg = await Message.send_msg(chat.id, f"Purge started...\nFrom: <a href='{reply.link}'>{reply.id}</a>\nTo: <a href='{e_msg.link}'>{e_msg.id}</a>")
-        for msg_id in range(reply.id, e_msg.id+1):
-            try:
-                await Message.del_msg(chat.id, msg_id=msg_id)
-            except Exception as e:
-                logger.error(e)
-        await Message.edit_msg(update, f"Purge completed!", sent_msg)
-        await _log_channel(context, chat, user, action="MSG_PURGE")
-    except Exception as e:
-        logger.error(e)
-        await Message.send_msg(chat.id, f"Error: {e}")
+    
+    sent_msg = await Message.send_msg(chat.id, f"Purge started...")
+    for msg_id in range(reply.id, e_msg.id + 1):
+        await Message.del_msg(chat.id, msg_id=msg_id)
+    
+    await Message.edit_msg(update, f"Purge completed!", sent_msg)
+    await _log_channel(update, chat, user, action="MSG_PURGE")

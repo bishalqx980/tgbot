@@ -1,10 +1,9 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
-from bot import logger
 from bot.helper.telegram_helper import Message
 from bot.modules.group_management.pm_error import _pm_error
 from bot.modules.group_management.log_channel import _log_channel
-from bot.modules.group_management.check_del_cmd import _check_del_cmd
+from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
@@ -20,7 +19,7 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _pm_error(chat.id)
         return
 
-    await _check_del_cmd(update, context)
+    await func_del_command(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -54,15 +53,13 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I don't know which message to delete! Reply the message that you want to delete!\nTo mention with reason eg. <code>/del reason</code>")
         return
 
-    try:
-        message_to_del = [e_msg, reply]
-        for delete_msg in message_to_del:
-            await Message.del_msg(chat.id, delete_msg)
-        msg = f"{victim.mention_html()}, your message is deleted!\n<b>Admin</b>: {user.first_name}"
-        if reason:
-            msg = f"{msg}\n<b>Reason</b>: {reason}"
-        await Message.send_msg(chat.id, msg)
-        await _log_channel(context, chat, user, victim, action="MSG_DEL", reason=reason)
-    except Exception as e:
-        logger.error(e)
-        await Message.send_msg(chat.id, f"Error: {e}")
+    message_to_del = [e_msg, reply]
+    for delete_msg in message_to_del:
+        await Message.del_msg(chat.id, delete_msg)
+    
+    msg = f"Lookout... {victim.mention_html()}, your message has been deleted!\n<b>Admin</b>: {user.first_name}"
+    if reason:
+        msg = f"{msg}\n<b>Reason</b>: {reason}"
+    
+    await Message.send_msg(chat.id, msg)
+    await _log_channel(update, chat, user, victim, action="MSG_DEL", reason=reason)

@@ -5,7 +5,6 @@ from bot import bot, logger, owner_id
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
-from bot.misc.message_storage import MessageStorage
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -22,7 +21,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != "private":
         sent_msg = await Message.send_msg(user.id, ".")
         if sent_msg == Forbidden:
-            await Message.reply_msg(update, f"Hola, {user.mention_html()}!\n<a href='http://t.me/{_bot_info.username}'>Start me</a> in pm to chat with me!")
+            await Message.reply_msg(update, f"Hey, {user.mention_html()}!\n<a href='http://t.me/{_bot_info.username}'>Start me</a> in pm to chat with me!")
             return
         elif sent_msg:
             await Message.reply_msg(update, f"Sent in your pm! <a href='http://t.me/{_bot_info.username}'>Check</a>")

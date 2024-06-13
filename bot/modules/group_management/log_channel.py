@@ -1,21 +1,17 @@
-from telegram.ext import ContextTypes
-from bot import logger
+from telegram import Update
 from bot.helper.telegram_helper import Message
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database.all_db_search import all_db_search
 
-
-async def _log_channel(context: ContextTypes.DEFAULT_TYPE, chat, user, victim=None, action=None, reason=None):
+async def _log_channel(update: Update, chat, user, victim=None, action=None, reason=None):
     """
     sends chat actions to log channel
     """
-    find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
-    if not find_group:
-        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-        if find_group:
-            await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
-        else:
-            return
+    db = await all_db_search("groups", "chat_id", chat.id)
+    if db[0] == False:
+        await Message.reply_msg(update, db[1])
+        return
+    
+    find_group = db[1]
     
     log_channel = find_group.get("log_channel")
     if not log_channel:
@@ -36,13 +32,7 @@ async def _log_channel(context: ContextTypes.DEFAULT_TYPE, chat, user, victim=No
 
         msg = f"{msg}\n<b>Victim:</b> {victim_mention}\n<b>ID:</b> <code>{victim_id}</code>"
 
-    if action:
-        msg = f"{msg}\n<b>Action:</b> {action}"
-
     if reason:
         msg = f"{msg}\n<b>Reason:</b> {reason}"
 
-    try:
-        await Message.send_msg(log_channel, msg)
-    except Exception as e:
-        logger.error(e)
+    await Message.send_msg(log_channel, msg)

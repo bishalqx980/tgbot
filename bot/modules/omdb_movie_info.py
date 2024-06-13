@@ -9,7 +9,7 @@ async def get_movie_info(movie_name=None, imdb_id=None, year=None):
     omdb_api = await MongoDB.get_data("bot_docs", "omdb_api")
     if not omdb_api:
       logger.error("omdb_api not found!")
-      return 0
+      return False
   
   if movie_name:
     url = f"https://omdbapi.com/?apikey={omdb_api}&t={movie_name}&y={year}"

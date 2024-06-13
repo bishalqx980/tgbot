@@ -2,10 +2,11 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message
+from bot.modules.database.all_db_search import all_db_search
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.group_management.pm_error import _pm_error
-from bot.modules.group_management.check_del_cmd import _check_del_cmd
+from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
@@ -18,7 +19,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _pm_error(chat.id)
         return
 
-    await _check_del_cmd(update, context)
+    await func_del_command(update, context)
 
     if user.is_bot:
         await Message.reply_msg(update, "I don't take permission from anonymous admins!")
@@ -33,10 +34,6 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
-        return
-    
-    if not bot_permission.can_change_info:
-        await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -56,21 +53,19 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg)
         return
 
-    find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
-    if not find_group:
-        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-        if find_group:
-            await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
-        else:
-            await Message.reply_msg(update, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-            return
+    db = await all_db_search("groups", "chat_id", chat.id)
+    if db[0] == False:
+        await Message.reply_msg(update, db[1])
+        return
+    
+    find_group = db[1]
     
     filters = find_group.get("filters")
 
     if filters and keyword:
         if keyword == "clear_all":
             await MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
-            await Message.reply_msg(update, f"All filters of this chat has been removed!\n<b>Admin</b>: {user.full_name}")
+            await Message.reply_msg(update, f"All filters of this chat has been removed!\n<b>Admin</b>: {user.first_name}")
 
             group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
             await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
@@ -80,7 +75,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if keyword.lower() in filters:
                 del filters[keyword]
                 await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
-                await Message.reply_msg(update, f"<code>{keyword}</code> filter has been removed!\n<b>Admin</b>: {user.full_name}")
+                await Message.reply_msg(update, f"<code>{keyword}</code> filter has been removed!\n<b>Admin</b>: {user.first_name}")
             else:
                 await Message.reply_msg(update, "There are no such filter available for this chat to delete!\nCheckout /filters")
                 return

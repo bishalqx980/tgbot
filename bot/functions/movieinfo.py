@@ -34,7 +34,7 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.send_msg(chat.id, "Movie name invalid!")
         return
     
-    if movie_info == 0:
+    if movie_info == False:
         await Message.send_msg(chat.id, "omdb_api not found!")
         return
 

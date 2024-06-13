@@ -17,7 +17,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != "private":
         sent_msg = await Message.send_msg(user.id, ".")
         if sent_msg == Forbidden:
-            await Message.reply_msg(update, f"Hola, {user.mention_html()}!\n<a href='http://t.me/{_bot_info.username}'>Start me</a> in pm to chat with me!")
+            await Message.reply_msg(update, f"Hey, {user.mention_html()}!\n<a href='http://t.me/{_bot_info.username}'>Start me</a> in pm to chat with me!")
             return
         elif sent_msg:
             await Message.reply_msg(update, f"Sent in your pm! <a href='http://t.me/{_bot_info.username}'>Check</a>")

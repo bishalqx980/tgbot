@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
-from bot.modules.ytdl import YouTubeDownload
+from bot.modules.ytdl import PYTUBE
 
 
 async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -11,9 +11,9 @@ async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/yts keyword</code>\nE.g. <code>/yts google keynote</code>")
         return
     
-    result = await YouTubeDownload.yts(keyword)
+    result = await PYTUBE.yts(keyword)
     if not result:
-        await Message.reply_msg(update, "Something Went Wrong...")  
+        await Message.reply_msg(update, "Oops, something went wrong...")  
         return
     
     urls = [

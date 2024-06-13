@@ -17,7 +17,7 @@ async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     gen_qr = await QR.gen_qr(data)
 
     if not gen_qr:
-        await Message.edit_msg(update, "Something went wrong!", sent_msg)
+        await Message.edit_msg(update, "Oops, something went wrong...", sent_msg)
         return
     
     await Message.send_img(chat.id, gen_qr, data)

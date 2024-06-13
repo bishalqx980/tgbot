@@ -7,6 +7,7 @@ venv
 config.env
 log.txt
 shell.txt
+update.txt
 database.json
 /.vscode
 /download

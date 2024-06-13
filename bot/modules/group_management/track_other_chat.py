@@ -39,7 +39,7 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
     
     user_exist, cause = _chk_stat
 
-    await _log_channel(context, chat, user, victim, action=cause)
+    await _log_channel(update, chat, user, victim, action=cause)
 
     if user_exist == True:
         if victim.is_bot and antibot:

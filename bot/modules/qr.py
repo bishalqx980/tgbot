@@ -5,9 +5,9 @@ from bot import logger
 class QR:
     async def gen_qr(data):
         url = f"https://api.qrserver.com/v1/create-qr-code/?size=1024x1024&data={data}"
-        dir_name = "download/"
+        dir_name = "download"
         os.makedirs(dir_name, exist_ok=True)
-        f_name = f"{dir_name}qr_code.png"
+        f_name = f"{dir_name}/qr_code.png"
         try:
             req = requests.get(url)
             with open(f_name, "wb") as f:

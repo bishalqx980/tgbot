@@ -9,7 +9,7 @@ async def shortener_url(url):
         shrinkme_api = await MongoDB.get_data("bot_docs", "shrinkme_api")
         if not shrinkme_api:
             logger.error("shrinkme_api not found!")
-            return 0
+            return False
     
     try:
         post_url = f"https://shrinkme.io/api?api={shrinkme_api}&url={url}"

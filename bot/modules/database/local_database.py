@@ -22,7 +22,7 @@ class LOCAL_DATABASE:
             
             logger.info(f"Collection {collection} created...")
         except Exception as e:
-            logger.error(e)
+            logger.error(f"Localdb: {e}")
     
 
     async def insert_data_direct(collection, data):
@@ -46,7 +46,7 @@ class LOCAL_DATABASE:
             
             logger.info(f"{collection} updated in localdb...")
         except Exception as e:
-            logger.error(e)
+            logger.error(f"Localdb: {e}")
 
 
     async def insert_data(collection, identifier, data):
@@ -74,7 +74,7 @@ class LOCAL_DATABASE:
             else:
                 logger.info(f"{identifier} created in collection {collection} in localdb...")
         except Exception as e:
-            logger.error(e)
+            logger.error(f"Localdb: {e}")
     
 
     async def find(collection):
@@ -88,7 +88,7 @@ class LOCAL_DATABASE:
             load_collection = load_db.get(collection)
             return load_collection
         except Exception as e:
-            logger.error(e)
+            logger.error(f"Localdb: {e}")
     
 
     async def find_one(collection, find):
@@ -104,7 +104,7 @@ class LOCAL_DATABASE:
             data = load_collection.get(str(find))
             return data
         except Exception as e:
-            logger.error(e)
+            logger.error(f"Localdb: {e}")
     
 
     async def get_data(collection, data):
@@ -121,4 +121,4 @@ class LOCAL_DATABASE:
             db_data = load_collection[data]
             return db_data
         except Exception as e:
-            logger.error(e)
+            logger.error(f"Localdb: {e}")

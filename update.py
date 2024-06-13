@@ -29,7 +29,16 @@ commands = [
 
 for command in commands:
     process = srun(command, capture_output=True, text=True, shell=True)
-    #print(process.stdout or process.stderr)
+    if process.stdout:
+        print_out = process.stdout
+    elif process.stderr:
+        print_out = process.stderr
+    else:
+        print_out = None
+    print(print_out)
+    
+    with open("update.txt", "a") as f:
+        f.write(print_out)
 
 if process.returncode == 0:
     print(f"Successfully updated with latest commit from {UPSTREAM_REPO}")
