@@ -134,6 +134,7 @@ def main():
         "demote": func_demote,
         "pin": func_pin_msg,
         "unpin": func_unpin_msg,
+        "unpinall": func_unpinall_msg,
         "ban": func_ban,
         "unban": func_unban,
         "kick": func_kick,

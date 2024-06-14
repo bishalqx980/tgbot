@@ -19,7 +19,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     async def query_del():
         try:
-            await query_del()
+            await query.delete_message()
         except Exception as e:
             logger.error(e)
     
@@ -44,7 +44,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await popup("Access Denied!")
             return
 
-
+    # --------------------------------------------------------- COMMOM --------------------------------------------------------- #
     if query.data in ["query_edit_value", "query_rm_value", "bool_true", "bool_false", "query_close"]:
         chat_id = data_center.get("chat_id")
         collection_name = data_center.get("collection_name")
@@ -181,7 +181,173 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             await query_del()
             await Message.del_msg(chat_id, del_msg_pointer)
+    # --------------------------------------------------------- Help menus --------------------------------------------------------- #
+    if query.data in ["query_back_help_menu", "query_back_chat_settings_menu", "query_back_bot_settings_menu"]:
+        if query.data == "query_back_help_menu":
+                db = await MongoDB.info_db()
+                for i in db:
+                    if i[0] == "users":
+                        total_users = i[1]
+                        break
+                    else:
+                        total_users = "~"
+                
+                active_status = await MongoDB.find("users", "active_status")
+                active_users = active_status.count(True)
+                inactive_users = active_status.count(False)
 
+                msg = ()
+
+                btn_name_row1 = ["Group Management", "AI"]
+                btn_data_row1 = ["query_group_manage", "query_ai"]
+
+                btn_name_row2 = ["misc", "Bot owner"]
+                btn_data_row2 = ["query_misc", "query_owner"]
+
+                btn_name_row3 = ["Close"]
+                btn_data_row3 = ["query_close"]
+
+                row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+                row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+                row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+
+                btn = row1 + row2 + row3
+
+                await Message.edit_msg(update, msg, query.message, btn)
+
+        elif query.data == "query_back_chat_settings_menu":
+
+                collection_name = data_center.get("collection_name")
+                if not collection_name:
+                    await popup("An error occurred! send command again then try...")
+                    await query_del()
+                    return
+                
+                db_find = data_center.get("db_find")
+                db_vlaue = data_center.get("db_vlaue")
+                
+                try:
+                    find_chat = data_center[collection_name]
+                except Exception as e:
+                    logger.error(e)
+                    find_chat = None
+                
+                if not find_chat:
+                    find_chat = await MongoDB.find_one(collection_name, db_find, db_vlaue)
+                    if find_chat:
+                        data_center[collection_name] = find_chat
+                    else:
+                        await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
+                        await query_del()
+                        return
+                
+                if collection_name == "db_group_data":
+                    title = find_chat.get("title")
+                    lang = find_chat.get("lang")
+
+                    echo = find_chat.get("echo")
+                    auto_tr = find_chat.get("auto_tr")
+                    welcome_msg = find_chat.get("welcome_msg")
+                    goodbye_msg = find_chat.get("goodbye_msg")
+                    antibot = find_chat.get("antibot")
+                    ai_status = find_chat.get("ai_status")
+                    del_cmd = find_chat.get("del_cmd")
+                    all_links = find_chat.get("all_links")
+                    allowed_links = find_chat.get("allowed_links")
+                    if allowed_links:
+                        storage, counter = "", 0
+                        for i in allowed_links:
+                            counter += 1
+                            if counter == len(allowed_links):
+                                storage += f"{i}"
+                            else:
+                                storage += f"{i}, "
+                        allowed_links = storage
+
+                    log_channel = find_chat.get("log_channel")
+
+                    msg = (
+                        
+                    )
+
+                    btn_name_row1 = ["Language", "Auto translate"]
+                    btn_data_row1 = ["lang", "auto_tr"]
+
+                    btn_name_row2 = ["Echo", "Anti bot"]
+                    btn_data_row2 = ["set_echo", "antibot"]
+
+                    btn_name_row3 = ["Welcome", "Goodbye"]
+                    btn_data_row3 = ["welcome_msg", "goodbye_msg"]
+
+                    btn_name_row4 = ["Delete cmd", "Log channel"]
+                    btn_data_row4 = ["del_cmd", "log_channel"]
+
+                    btn_name_row5 = ["Links", "AI"]
+                    btn_data_row5 = ["links_behave", "ai_status"]
+
+                    btn_name_row6 = ["Close"]
+                    btn_data_row6 = ["close"]
+
+                    row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+                    row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+                    row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+                    row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
+                    row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
+                    row6 = await Button.cbutton(btn_name_row6, btn_data_row6)
+
+                    btn = row1 + row2 + row3 + row4 + row5 + row6
+
+                elif collection_name == "db_user_data":
+                    user_mention = find_chat.get("mention")
+                    lang = find_chat.get("lang")
+                    echo = find_chat.get("echo")
+                    auto_tr = find_chat.get("auto_tr")
+
+                    msg = ()
+
+                    btn_name_row1 = ["Language", "Auto translate"]
+                    btn_data_row1 = ["lang", "auto_tr"]
+
+                    btn_name_row2 = ["Echo", "Close"]
+                    btn_data_row2 = ["set_echo", "close"]
+
+                    row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+                    row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+                    btn = row1 + row2
+
+                else:
+                    await query_del()
+                    return
+                
+                await Message.edit_msg(update, msg, query.message, btn)
+        
+        elif query.data == "query_back_bot_settings_menu":
+                btn_name_row1 = ["Bot pic", "Welcome img"]
+                btn_data_row1 = ["bot_pic", "welcome_img"]
+
+                btn_name_row2 = ["Images", "Support chat"]
+                btn_data_row2 = ["images", "support_chat"]
+
+                btn_name_row3 = ["GitHub", "Server url", "Sudo"]
+                btn_data_row3 = ["github_repo", "server_url", "sudo_users"]
+
+                btn_name_row4 = ["Shrinkme API", "OMDB API", "Weather API"]
+                btn_data_row4 = ["shrinkme_api", "omdb_api", "weather_api"]
+
+                btn_name_row5 = ["⚠ Restore Settings", "Close"]
+                btn_data_row5 = ["restore_db", "close"]
+
+                row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+                row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+                row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+                row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
+                row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
+
+                btn = row1 + row2 + row3 + row4 + row5
+                
+                await Message.edit_msg(update, "<u><b>Bot Settings</b></u>", query.message, btn)
+    # --------------------------------------------------------- PRIVATE --------------------------------------------------------- #
     elif chat.type == "private":
         if query.data == "mp4":
             data_center["youtube_content_format"] = query.data
@@ -189,15 +355,97 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif query.data == "mp3":
             data_center["youtube_content_format"] = query.data
         
-        elif query.data == "group_management":
-            msg = ()
+        elif query.data == "query_group_manage":
+            msg = (
+                "<b><u>Group Moderation</u></b>\n\n"
+                "/id » Show chat/user id\n"
+                "/invite » Generate/Get invite link\n"
+                "/promote » Promote a member\n"
+                "/demote » Demote a member\n"
+                "/pin » Pin message loudly\n"
+                "/unpin » Unpin pinned message\n"
+                "/ban » Ban a member\n"
+                "/unban » Unban a member\n"
+                "/kick » Kick a member\n"
+                "/kickme » The easy way to out\n"
+                "/mute » Mute a member (member will be unable to send messages etc.)\n"
+                "/unmute » Unmute a member (member will be able to send messages etc.)\n"
+                "/del » Delete replied message with notifying/telling something to the member!\n"
+                "/purge » Delete every messages from replied message to current message!\n"
+                "/lock » Lock the chat (no one can send messages etc.)\n"
+                "/unlock » Unlock the chat (back to normal)\n"
+                "/filters | /filter | /remove » To see/set/remove custom message/command\n"
+                "/adminlist » See chat admins list\n"
+                "/settings » Settings of chat...\n\n"
+                "<i><b>Note</b>: Type commands to get more details about the command functionalityality!</i>"
+            )
 
             btn_name = ["Back", "Close"]
-            btn_data = ["help_menu", "query_close"]
+            btn_data = ["query_back_help_menu", "query_close"]
             btn = await Button.cbutton(btn_name, btn_data, True)
 
             await Message.edit_msg(update, msg, query.message, btn)
-    
+
+        elif query.data == "query_ai":
+            msg = (
+                "<b><u>Artificial intelligence</u></b>\n\n"
+                "/imagine » Generate AI image\n"
+                "/gpt » Ask any question to ChatGPT\n\n"
+                "<i><b>Note</b>: Type commands to get more details about the command functionalityality!</i>"              
+            )
+
+            btn_name = ["Back", "Close"]
+            btn_data = ["query_back_help_menu", "query_close"]
+            btn = await Button.cbutton(btn_name, btn_data, True)
+
+            await Message.edit_msg(update, msg, query.message, btn)
+        
+        elif query.data == "query_misc":
+            msg = (
+                "<b><u>Misc functions</u></b>\n\n"
+                "/movie » Get any movie info by name/imdb_id\n"
+                "/tr » Translate any language\n"
+                "/decode » Decode - base64 to text\n"
+                "/encode » Encode - text to base64\n"
+                "/short » Short any url\n"
+                "/ping » Ping any url\n"
+                "/calc » Calculate any math (supported syntex: +, -, *, /)\n"
+                "/webshot » Take Screenshot of any website\n"
+                "/weather » Get weather info of any city\n"
+                "/ytdl » Download youtube video\n"
+                "/yts » Search video on youtube\n"
+                "/qr » To generate a QR code\n"
+                "/itl » To convert image into link\n"
+                "/id » Show chat/user id\n"
+                "/settings » Settings of chat\n\n"
+                "<i><b>Note</b>: Type commands to get more details about the command functionality!</i>"
+            )
+
+            btn_name = ["Back", "Close"]
+            btn_data = ["query_back_help_menu", "query_close"]
+            btn = await Button.cbutton(btn_name, btn_data, True)
+
+            await Message.edit_msg(update, msg, query.message, btn)
+        
+        elif query.data == "query_owner":
+            msg = (
+                "<b><u>Bot owner functions</u></b>\n\n"
+                "/broadcast » Broadcast message to bot users\n"
+                "/db » Get bot database\n"
+                "/bsettings » Get bot settings\n"
+                "/shell » Use system shell\n"
+                "/log » Get log file (for error handling)\n"
+                "/restart » Restart the bot\n"
+                "/sys » Get system info\n\n"
+                "<i><b>Note</b>: Type commands to get more details about the command function!</i>"
+            )
+
+            btn_name = ["Back", "Close"]
+            btn_data = ["query_back_help_menu", "query_close"]
+            btn = await Button.cbutton(btn_name, btn_data, True)
+
+            await Message.edit_msg(update, msg, query.message, btn)
+    # --------------------------------------------------------- GROUP --------------------------------------------------------- #
     elif chat.type in ["group", "supergroup"]:
         chat_id = data_center.get("chat_id")
         if not chat_id:
@@ -205,80 +453,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query_del()
             return
         
-        if query.data == "unpin_all":
-            try:
-                await bot.unpin_all_chat_messages(chat_id)
-                await Message.send_msg(chat_id, "All pinned messages has been unpinned successfully!")
-                await query_del()
-            except Exception as e:
-                logger.error(e)
-        
-        
-        
-        elif query.data == "ai":
-            msg = (
-                
-            )
-
-            btn_name = ["Back", "Close"]
-            btn_data = ["help_menu", "close"]
-            btn = await Button.cbutton(btn_name, btn_data, True)
-
-            await Message.edit_msg(update, msg, query.message, btn)
-        
-        elif query.data == "misc_func":
-            msg = (
-                
-            )
-
-            btn_name = ["Back", "Close"]
-            btn_data = ["help_menu", "close"]
-            btn = await Button.cbutton(btn_name, btn_data, True)
-
-            await Message.edit_msg(update, msg, query.message, btn)
-        
-        elif query.data == "owner_func":
-            msg = (
-                
-            )
-
-            btn_name = ["Back", "Close"]
-            btn_data = ["help_menu", "close"]
-            btn = await Button.cbutton(btn_name, btn_data, True)
-
-            await Message.edit_msg(update, msg, query.message, btn)
-
-        elif query.data == "help_menu":
-            db = await MongoDB.info_db()
-            for i in db:
-                if i[0] == "users":
-                    total_users = i[1]
-                    break
-                else:
-                    total_users = "❓"
-            
-            active_status = await MongoDB.find("users", "active_status")
-            active_users = active_status.count(True)
-            inactive_users = active_status.count(False)
-
-            msg = ()
-
-            btn_name_row1 = ["Group Management", "Artificial intelligence"]
-            btn_data_row1 = ["group_management", "ai"]
-
-            btn_name_row2 = ["misc", "Bot owner"]
-            btn_data_row2 = ["misc_func", "owner_func"]
-
-            btn_name_row3 = ["GitHub", "Close"]
-            btn_data_row3 = ["github_stats", "close"]
-
-            row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-            row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-            row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
-
-            btn = row1 + row2 + row3
-
-            await Message.edit_msg(update, msg, query.message, btn)
         # ---------------------------------------------------------------------------- help ends
         # bot settings ------------------------------------------------------------- bsettings starts
         elif query.data == "bot_pic":
@@ -600,31 +774,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             msg = "Database data has been restored successfully from <code>config.env</code>!" if res else "Oops, something went wrong..."
             await Message.send_msg(chat_id, msg)
 
-        elif query.data == "b_setting_menu":
-            btn_name_row1 = ["Bot pic", "Welcome img"]
-            btn_data_row1 = ["bot_pic", "welcome_img"]
+        
 
-            btn_name_row2 = ["Images", "Support chat"]
-            btn_data_row2 = ["images", "support_chat"]
 
-            btn_name_row3 = ["GitHub", "Server url", "Sudo"]
-            btn_data_row3 = ["github_repo", "server_url", "sudo_users"]
 
-            btn_name_row4 = ["Shrinkme API", "OMDB API", "Weather API"]
-            btn_data_row4 = ["shrinkme_api", "omdb_api", "weather_api"]
-
-            btn_name_row5 = ["⚠ Restore Settings", "Close"]
-            btn_data_row5 = ["restore_db", "close"]
-
-            row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-            row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-            row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
-            row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
-            row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
-
-            btn = row1 + row2 + row3 + row4 + row5
-            
-            await Message.edit_msg(update, "<u><b>Bot Settings</b></u>", query.message, btn)
         # ---------------------------------------------------------------------------- bsettings ends
         # chat setting -------------------------------------------------------------- Chat settings starts
         elif query.data == "lang":
@@ -1360,109 +1513,4 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             await Message.edit_msg(update, msg, query.message, btn)
         
-        elif query.data == "c_setting_menu":
-
-            collection_name = data_center.get("collection_name")
-            if not collection_name:
-                await popup("An error occurred! send command again then try...")
-                await query_del()
-                return
-            
-            db_find = data_center.get("db_find")
-            db_vlaue = data_center.get("db_vlaue")
-            
-            try:
-                find_chat = data_center[collection_name]
-            except Exception as e:
-                logger.error(e)
-                find_chat = None
-            
-            if not find_chat:
-                find_chat = await MongoDB.find_one(collection_name, db_find, db_vlaue)
-                if find_chat:
-                    data_center[collection_name] = find_chat
-                else:
-                    await popup("⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!")
-                    await query_del()
-                    return
-            
-            if collection_name == "db_group_data":
-                title = find_chat.get("title")
-                lang = find_chat.get("lang")
-
-                echo = find_chat.get("echo")
-                auto_tr = find_chat.get("auto_tr")
-                welcome_msg = find_chat.get("welcome_msg")
-                goodbye_msg = find_chat.get("goodbye_msg")
-                antibot = find_chat.get("antibot")
-                ai_status = find_chat.get("ai_status")
-                del_cmd = find_chat.get("del_cmd")
-                all_links = find_chat.get("all_links")
-                allowed_links = find_chat.get("allowed_links")
-                if allowed_links:
-                    storage, counter = "", 0
-                    for i in allowed_links:
-                        counter += 1
-                        if counter == len(allowed_links):
-                            storage += f"{i}"
-                        else:
-                            storage += f"{i}, "
-                    allowed_links = storage
-
-                log_channel = find_chat.get("log_channel")
-
-                msg = (
-                    
-                )
-
-                btn_name_row1 = ["Language", "Auto translate"]
-                btn_data_row1 = ["lang", "auto_tr"]
-
-                btn_name_row2 = ["Echo", "Anti bot"]
-                btn_data_row2 = ["set_echo", "antibot"]
-
-                btn_name_row3 = ["Welcome", "Goodbye"]
-                btn_data_row3 = ["welcome_msg", "goodbye_msg"]
-
-                btn_name_row4 = ["Delete cmd", "Log channel"]
-                btn_data_row4 = ["del_cmd", "log_channel"]
-
-                btn_name_row5 = ["Links", "AI"]
-                btn_data_row5 = ["links_behave", "ai_status"]
-
-                btn_name_row6 = ["Close"]
-                btn_data_row6 = ["close"]
-
-                row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-                row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-                row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
-                row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
-                row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
-                row6 = await Button.cbutton(btn_name_row6, btn_data_row6)
-
-                btn = row1 + row2 + row3 + row4 + row5 + row6
-
-            elif collection_name == "db_user_data":
-                user_mention = find_chat.get("mention")
-                lang = find_chat.get("lang")
-                echo = find_chat.get("echo")
-                auto_tr = find_chat.get("auto_tr")
-
-                msg = ()
-
-                btn_name_row1 = ["Language", "Auto translate"]
-                btn_data_row1 = ["lang", "auto_tr"]
-
-                btn_name_row2 = ["Echo", "Close"]
-                btn_data_row2 = ["set_echo", "close"]
-
-                row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-                row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-
-                btn = row1 + row2
-
-            else:
-                await query_del()
-                return
-            
-            await Message.edit_msg(update, msg, query.message, btn)
+        

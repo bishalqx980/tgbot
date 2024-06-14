@@ -52,14 +52,14 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Inactive: {inactive_users}"
     )
 
-    btn_name_row1 = ["Group Management", "Artificial intelligence"]
-    btn_data_row1 = ["group_management", "ai"]
+    btn_name_row1 = ["Group Management", "AI"]
+    btn_data_row1 = ["query_group_manage", "query_ai"]
 
     btn_name_row2 = ["misc", "Bot owner"]
-    btn_data_row2 = ["misc_func", "owner_func"]
+    btn_data_row2 = ["query_misc", "query_owner"]
 
-    btn_name_row3 = ["GitHub", "Close"]
-    btn_data_row3 = ["github_stats", "close"]
+    btn_name_row3 = ["Close"]
+    btn_data_row3 = ["query_close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)

@@ -65,11 +65,11 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
     localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
     
     while timeout < 15:
-        content_format = localdb.get("content_format")
+        content_format = localdb.get("youtube_content_format")
         timeout += 1
         await asyncio.sleep(1)
         if content_format:
-            localdb["content_format"] = None
+            localdb["youtube_content_format"] = None
             break
     
     await Message.del_msg(chat.id, del_msg)
