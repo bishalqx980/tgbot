@@ -2,7 +2,7 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
-from bot.modules.database.all_db_search import all_db_search
+from bot.modules.database.combined_db import global_search
 from bot.modules.safone import Safone
 
 
@@ -13,7 +13,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     prompt = " ".join(context.args)
 
     if chat.type != "private":
-        db = await all_db_search("groups", "chat_id", chat.id)
+        db = await global_search("groups", "chat_id", chat.id)
         if db[0] == False:
             await Message.reply_msg(update, db[1])
             return

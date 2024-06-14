@@ -1,10 +1,8 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import logger
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.database.all_db_search import all_db_search
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database.combined_db import global_search
+from bot.modules.database.combined_db import find_bot_docs
 from bot.modules.translator import LANG_CODE_LIST, translate
 
 
@@ -48,7 +46,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             to_find = "chat_id"
             to_match = chat.id
 
-        db = await all_db_search(collection_name, to_find, to_match)
+        db = await global_search(collection_name, to_find, to_match)
         if db[0] == False:
             await Message.reply_msg(update, db[1])
             return
@@ -65,14 +63,9 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if not tr_msg:
-        _bot = await LOCAL_DATABASE.find("bot_docs")
+        _bot = await find_bot_docs()
         if not _bot:
-            find = await MongoDB.find("bot_docs", "_id")
-            _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
-            if not _bot:
-                logger.error("_bot not found in db...")
-                return
-            await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
+            return
         
         btn_name = ["Language code's"]
         btn_url = ["https://telegra.ph/Language-Code-12-24"]

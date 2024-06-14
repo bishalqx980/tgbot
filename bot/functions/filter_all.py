@@ -2,7 +2,7 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.database.all_db_search import all_db_search
+from bot.modules.database.combined_db import global_search
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.translator import translate
 from bot.modules.group_management.check_permission import _check_permission
@@ -36,7 +36,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
     if chat.type == "private":
-        db = await all_db_search("users", "user_id", user.id)
+        db = await global_search("users", "user_id", user.id)
         if db[0] == False:
             await Message.reply_msg(update, db[1])
             return
@@ -72,7 +72,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.send_msg(chat.id, "I'm not an admin in this chat!")
             return
         
-        db = await all_db_search("groups", "chat_id", chat.id)
+        db = await global_search("groups", "chat_id", chat.id)
         if db[0] == False:
             await Message.reply_msg(update, db[1])
             return

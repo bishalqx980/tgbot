@@ -1,9 +1,8 @@
 import random
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import logger
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.combined_db import find_bot_docs
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.power_users import _power_users
 
@@ -22,14 +21,9 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "⚠ Boss you are in public!")
         return
     
-    _bot = await LOCAL_DATABASE.find("bot_docs")
+    _bot = await find_bot_docs()
     if not _bot:
-        find = await MongoDB.find("bot_docs", "_id")
-        _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
-        if not _bot:
-            logger.error("_bot not found in db...")
-            return
-        await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
+        return
     
     data = {
         "user_id": user.id,
@@ -68,16 +62,15 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn = row1 + row2 + row3 + row4 + row5
 
-    images = await LOCAL_DATABASE.get_data("bot_docs", "images")
-    if not images:
-        images = await MongoDB.get_data("bot_docs", "images")
+    _bot = await find_bot_docs()
+    if not _bot:
+        return
     
+    images = _bot.get("images")
     if images:
         image = random.choice(images).strip()
     else:
-        image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
-        if not image:
-            image = await MongoDB.get_data("bot_docs", "bot_pic")
+        image = _bot.get("bot_pic")
     
     if image:
         await Message.send_img(chat.id, image, "<u><b>Bot Settings</b></u>", btn)

@@ -4,6 +4,7 @@ from telegram.ext import ContextTypes
 from telegram.error import Forbidden
 from bot import bot
 from bot.helper.telegram_helper import Message, Button
+from bot.modules.database.combined_db import find_bot_docs, check_add_user_db
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
 
@@ -12,9 +13,8 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
 
-    _bot_info = await bot.get_me()
-
     if chat.type != "private":
+        _bot_info = await bot.get_me()
         sent_msg = await Message.send_msg(user.id, ".")
         if sent_msg == Forbidden:
             await Message.reply_msg(update, f"Hey, {user.mention_html()}!\n<a href='http://t.me/{_bot_info.username}'>Start me</a> in pm to chat with me!")
@@ -36,7 +36,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
             total_users = i[1]
             break
         else:
-            total_users = "❓"
+            total_users = "~"
         
     active_status = await MongoDB.find("users", "active_status")
     active_users = active_status.count(True)
@@ -67,34 +67,19 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn = row1 + row2 + row3
 
-    images = await LOCAL_DATABASE.get_data("bot_docs", "images")
-    if not images:
-        images = await MongoDB.get_data("bot_docs", "images")
+    _bot = await find_bot_docs()
+    if not _bot:
+        return
     
+    images = _bot.get("images")
     if images:
         image = random.choice(images).strip()
     else:
-        image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
-        if not image:
-            image = await MongoDB.get_data("bot_docs", "bot_pic")
+        image = _bot.get("bot_pic")
 
     if image:
         await Message.send_img(user.id, image, msg, btn)
     else:
         await Message.send_msg(user.id, msg, btn)
     
-    find_user = await LOCAL_DATABASE.find_one("users", user.id)
-    if not find_user:
-        find_user = await MongoDB.find_one("users", "user_id", user.id)
-        if not find_user:
-            data = {
-                "user_id": user.id,
-                "Name": user.full_name,
-                "username": user.username,
-                "mention": user.mention_html(),
-                "lang": user.language_code,
-                "active_status": True
-            }
-
-            await MongoDB.insert_single_data("users", data)
-            await LOCAL_DATABASE.insert_data("users", user.id, data)
+    await check_add_user_db(user)

@@ -110,52 +110,58 @@ async def server_alive():
 def main():
     application = ApplicationBuilder().token(bot_token).build()
     # functions
-    application.add_handler(CommandHandler("start", func_start, block=False))
-    application.add_handler(CommandHandler("movie", func_movieinfo, block=False))
-    application.add_handler(CommandHandler("tr", func_translator, block=False))
-    application.add_handler(CommandHandler("decode", func_b64decode, block=False))
-    application.add_handler(CommandHandler("encode", func_b64encode, block=False))
-    application.add_handler(CommandHandler("short", func_shortener, block=False))
-    application.add_handler(CommandHandler("ping", func_ping, block=False))
-    application.add_handler(CommandHandler("calc", func_calc, block=False))
-    application.add_handler(CommandHandler("webshot", func_webshot, block=False))
-    application.add_handler(CommandHandler("weather", func_weather, block=False))
-    application.add_handler(CommandHandler("imagine", func_imagine, block=False))
-    application.add_handler(CommandHandler("gpt", func_chatgpt, block=False))
-    application.add_handler(CommandHandler("ytdl", func_add_download_ytdl, block=False))
-    application.add_handler(CommandHandler("yts", func_yts, block=False))
-    application.add_handler(CommandHandler("qr", func_gen_qr, block=False))
-    application.add_handler(CommandHandler("itl", func_img_to_link, block=False))
-    application.add_handler(CommandHandler("settings", func_settings, block=False))
-    application.add_handler(CommandHandler("id", func_id, block=False))
-    application.add_handler(CommandHandler("invite", func_invite_link, block=False))
-    application.add_handler(CommandHandler("promote", func_promote, block=False))
-    application.add_handler(CommandHandler("demote", func_demote, block=False))
-    application.add_handler(CommandHandler("pin", func_pin_msg, block=False))
-    application.add_handler(CommandHandler("unpin", func_unpin_msg, block=False))
-    application.add_handler(CommandHandler("ban", func_ban, block=False))
-    application.add_handler(CommandHandler("unban", func_unban, block=False))
-    application.add_handler(CommandHandler("kick", func_kick, block=False))
-    application.add_handler(CommandHandler("kickme", func_kickme, block=False))
-    application.add_handler(CommandHandler("mute", func_mute, block=False))
-    application.add_handler(CommandHandler("unmute", func_unmute, block=False))
-    application.add_handler(CommandHandler("del", func_del, block=False))
-    application.add_handler(CommandHandler("purge", func_purge, block=False))
-    application.add_handler(CommandHandler("lock", func_lockchat, block=False))
-    application.add_handler(CommandHandler("unlock", func_unlockchat, block=False))
-    application.add_handler(CommandHandler("filter", func_filter, block=False))
-    application.add_handler(CommandHandler("remove", func_remove, block=False))
-    application.add_handler(CommandHandler("filters", func_filters, block=False))
-    application.add_handler(CommandHandler("adminlist", func_adminlist, block=False))
-    application.add_handler(CommandHandler("help", func_help, block=False))
-    # owner
-    application.add_handler(CommandHandler("broadcast", func_broadcast, block=False))
-    application.add_handler(CommandHandler("db", func_database, block=False))
-    application.add_handler(CommandHandler("bsettings", func_bsettings, block=False))
-    application.add_handler(CommandHandler("shell", func_shell, block=False))
-    application.add_handler(CommandHandler("log", func_log, block=False))
-    application.add_handler(CommandHandler("restart", func_restart, block=False))
-    application.add_handler(CommandHandler("sys", func_sys, block=False))
+    commands = {
+        "start": func_start,
+        "movie": func_movieinfo,
+        "tr": func_translator,
+        "decode": func_b64decode,
+        "encode": func_b64encode,
+        "short": func_shortener,
+        "ping": func_ping,
+        "calc": func_calc,
+        "webshot": func_webshot,
+        "weather": func_weather,
+        "imagine": func_imagine,
+        "gpt": func_chatgpt,
+        "ytdl": func_add_download_ytdl,
+        "yts": func_yts,
+        "qr": func_gen_qr,
+        "itl": func_img_to_link,
+        "settings": func_settings,
+        "id": func_id,
+        "invite": func_invite_link,
+        "promote": func_promote,
+        "demote": func_demote,
+        "pin": func_pin_msg,
+        "unpin": func_unpin_msg,
+        "ban": func_ban,
+        "unban": func_unban,
+        "kick": func_kick,
+        "kickme": func_kickme,
+        "mute": func_mute,
+        "unmute": func_unmute,
+        "del": func_del,
+        "purge": func_purge,
+        "lock": func_lockchat,
+        "unlock": func_unlockchat,
+        "filter": func_filter,
+        "remove": func_remove,
+        "filters": func_filters,
+        "adminlist": func_adminlist,
+        "help": func_help,
+        # owner commands...
+        "broadcast": func_broadcast,
+        "db": func_database,
+        "bsettings": func_bsettings,
+        "shell": func_shell,
+        "log": func_log,
+        "restart": func_restart,
+        "sys": func_sys
+    }
+
+    for command, handler in commands.items():
+        application.add_handler(CommandHandler(command, handler, block=False))
+    
     # filters
     application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services, block=False))
     application.add_handler(MessageHandler(filters.COMMAND, func_del_command, block=False))

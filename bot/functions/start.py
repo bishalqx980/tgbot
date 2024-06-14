@@ -1,10 +1,9 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import Forbidden
-from bot import bot, logger, owner_id
+from bot import bot, owner_id
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database.combined_db import find_bot_docs, check_add_user_db
 
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -27,14 +26,9 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"Sent in your pm! <a href='http://t.me/{_bot_info.username}'>Check</a>")
             await Message.del_msg(user.id, sent_msg)
     
-    _bot = await LOCAL_DATABASE.find("bot_docs")
+    _bot = await find_bot_docs()
     if not _bot:
-        find = await MongoDB.find("bot_docs", "_id")
-        _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
-        if not _bot:
-            logger.error("_bot not found in db...")
-            return
-        await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
+        return
     
     bot_pic = _bot.get("bot_pic")
     welcome_img = _bot.get("welcome_img")
@@ -70,18 +64,4 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await Message.send_msg(user.id, msg, btn)
     
-    find_user = await LOCAL_DATABASE.find_one("users", user.id)
-    if not find_user:
-        find_user = await MongoDB.find_one("users", "user_id", user.id)
-        if not find_user:
-            data = {
-                "user_id": user.id,
-                "Name": user.full_name,
-                "username": user.username,
-                "mention": user.mention_html(),
-                "lang": user.language_code,
-                "active_status": True
-            }
-
-            await MongoDB.insert_single_data("users", data)
-            await LOCAL_DATABASE.insert_data("users", user.id, data)
+    await check_add_user_db(user)

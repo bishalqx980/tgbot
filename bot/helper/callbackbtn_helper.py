@@ -5,7 +5,8 @@ from telegram.ext import ContextTypes
 from bot import bot, logger
 from bot.update_db import update_database
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.database.all_db_search import all_db_search
+from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.local_database import LOCAL_DATABASE
 
 
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):

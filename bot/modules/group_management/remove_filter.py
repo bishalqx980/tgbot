@@ -2,7 +2,7 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message
-from bot.modules.database.all_db_search import all_db_search
+from bot.modules.database.combined_db import global_search
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.group_management.pm_error import _pm_error
@@ -53,7 +53,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg)
         return
 
-    db = await all_db_search("groups", "chat_id", chat.id)
+    db = await global_search("groups", "chat_id", chat.id)
     if db[0] == False:
         await Message.reply_msg(update, db[1])
         return

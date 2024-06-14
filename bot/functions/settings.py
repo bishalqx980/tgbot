@@ -1,10 +1,9 @@
 import random
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
-from bot import logger
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.database.all_db_search import all_db_search
-from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.combined_db import global_search
+from bot.modules.database.combined_db import find_bot_docs
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
@@ -15,14 +14,9 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
 
-    _bot = await LOCAL_DATABASE.find("bot_docs")
+    _bot = await find_bot_docs()
     if not _bot:
-        find = await MongoDB.find("bot_docs", "_id")
-        _bot = await MongoDB.find_one("bot_docs", "_id", find[0])
-        if not _bot:
-            logger.error("_bot not found in db...")
-            return
-        await LOCAL_DATABASE.insert_data_direct("bot_docs", _bot)
+        return
     
     data = {
         "user_id": user.id,
@@ -39,7 +33,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
 
     if chat.type == "private":
-        db = await all_db_search("users", "user_id", user.id)
+        db = await global_search("users", "user_id", user.id)
         if db[0] == False:
             await Message.reply_msg(update, db[1])
             return
@@ -72,16 +66,15 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn = row1 + row2
 
-        images = await LOCAL_DATABASE.get_data("bot_docs", "images")
-        if not images:
-            images = await MongoDB.get_data("bot_docs", "images")
+        _bot = await find_bot_docs()
+        if not _bot:
+            return
         
+        images = _bot.get("images")
         if images:
             image = random.choice(images).strip()
         else:
-            image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
-            if not image:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+            image = _bot.get("bot_pic")
 
         if image:
             await Message.send_img(chat.id, image, msg, btn)
@@ -115,7 +108,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
                 return
         
-        db = await all_db_search("groups", "chat_id", chat.id)
+        db = await global_search("groups", "chat_id", chat.id)
         if db[0] == False:
             await Message.reply_msg(update, db[1])
             return
@@ -190,16 +183,15 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn = row1 + row2 + row3 + row4 + row5 + row6
 
-        images = await LOCAL_DATABASE.get_data("bot_docs", "images")
-        if not images:
-            images = await MongoDB.get_data("bot_docs", "images")
+        _bot = await find_bot_docs()
+        if not _bot:
+            return
         
+        images = _bot.get("images")
         if images:
             image = random.choice(images).strip()
         else:
-            image = await LOCAL_DATABASE.get_data("bot_docs", "bot_pic")
-            if not image:
-                image = await MongoDB.get_data("bot_docs", "bot_pic")
+            image = _bot.get("bot_pic")
         
         if image:
             await Message.send_img(chat.id, image, msg, btn)
