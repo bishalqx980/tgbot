@@ -8,7 +8,7 @@ from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
-async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_unpinall_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     

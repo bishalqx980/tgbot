@@ -48,6 +48,7 @@ from bot.modules.group_management.promote import func_promote
 from bot.modules.group_management.demote import func_demote
 from bot.modules.group_management.pin_msg import func_pin_msg
 from bot.modules.group_management.unpin_msg import func_unpin_msg
+from bot.modules.group_management.unpinall_msg import func_unpinall_msg
 from bot.modules.group_management.ban import func_ban
 from bot.modules.group_management.unban import func_unban
 from bot.modules.group_management.kick import func_kick

@@ -40,19 +40,19 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
     
     btn_name_row1 = ["Bot pic", "Welcome img"]
-    btn_data_row1 = ["bot_pic", "welcome_img"]
+    btn_data_row1 = ["query_bot_pic", "query_welcome_img"]
 
     btn_name_row2 = ["Images", "Support chat"]
-    btn_data_row2 = ["images", "support_chat"]
+    btn_data_row2 = ["query_images", "query_support_chat"]
 
-    btn_name_row3 = ["GitHub", "Server url", "Sudo"]
-    btn_data_row3 = ["github_repo", "server_url", "sudo_users"]
+    btn_name_row3 = ["Server url", "Sudo"]
+    btn_data_row3 = ["query_server_url", "query_sudo"]
 
     btn_name_row4 = ["Shrinkme API", "OMDB API", "Weather API"]
-    btn_data_row4 = ["shrinkme_api", "omdb_api", "weather_api"]
+    btn_data_row4 = ["query_shrinkme_api", "query_omdb_api", "query_weather_api"]
 
     btn_name_row5 = ["⚠ Restore Settings", "Close"]
-    btn_data_row5 = ["restore_db", "close"]
+    btn_data_row5 = ["query_restore_db", "query_close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)

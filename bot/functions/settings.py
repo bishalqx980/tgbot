@@ -56,10 +56,10 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         btn_name_row1 = ["Language", "Auto translate"]
-        btn_data_row1 = ["lang", "auto_tr"]
+        btn_data_row1 = ["query_chat_lang", "query_auto_tr"]
 
         btn_name_row2 = ["Echo", "Close"]
-        btn_data_row2 = ["set_echo", "close"]
+        btn_data_row2 = ["query_echo", "query_close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
@@ -157,22 +157,22 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         btn_name_row1 = ["Language", "Auto translate"]
-        btn_data_row1 = ["lang", "auto_tr"]
+        btn_data_row1 = ["query_chat_lang", "query_auto_tr"]
 
         btn_name_row2 = ["Echo", "Anti bot"]
-        btn_data_row2 = ["set_echo", "antibot"]
+        btn_data_row2 = ["query_echo", "query_antibot"]
 
-        btn_name_row3 = ["Welcome", "Goodbye"]
-        btn_data_row3 = ["welcome_msg", "goodbye_msg"]
+        btn_name_row3 = ["Greeting", "Farewell"]
+        btn_data_row3 = ["query_chat_greeting", "query_chat_farewell"]
 
         btn_name_row4 = ["Delete cmd", "Log channel"]
-        btn_data_row4 = ["del_cmd", "log_channel"]
+        btn_data_row4 = ["query_command_delete", "query_log_channel"]
 
         btn_name_row5 = ["Links", "AI"]
-        btn_data_row5 = ["links_behave", "ai_status"]
+        btn_data_row5 = ["query_chat_links", "query_chat_ai"]
 
         btn_name_row6 = ["Close"]
-        btn_data_row6 = ["close"]
+        btn_data_row6 = ["query_close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
