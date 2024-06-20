@@ -1,3 +1,4 @@
+import os
 import random
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -29,7 +30,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "user_id": user.id,
         "chat_id": chat.id,
         "collection_name": "bot_docs",
-        "db_find ": "_id",
+        "db_find": "_id",
         "db_vlaue": _bot.get("_id"),
         "edit_data_key": None,
         "edit_data_value": None,
@@ -51,7 +52,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_name_row4 = ["Shrinkme API", "OMDB API", "Weather API"]
     btn_data_row4 = ["query_shrinkme_api", "query_omdb_api", "query_weather_api"]
 
-    btn_name_row5 = ["⚠ Restore Settings", "Close"]
+    btn_name_row5 = ["> Restore DB?", "Close"]
     btn_data_row5 = ["query_restore_db", "query_close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
@@ -61,6 +62,10 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
 
     btn = row1 + row2 + row3 + row4 + row5
+    
+    os.makedirs("back_btn", exist_ok=True)
+    with open(f"back_btn/{chat.id}.txt", "wb") as f:
+        f.write(btn)
 
     _bot = await find_bot_docs()
     if not _bot:

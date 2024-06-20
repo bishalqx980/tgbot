@@ -22,7 +22,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "user_id": user.id,
         "chat_id": chat.id,
         "collection_name": None,
-        "db_find ": None,
+        "db_find": None,
         "db_vlaue": None,
         "edit_data_key": None,
         "edit_data_value": None,

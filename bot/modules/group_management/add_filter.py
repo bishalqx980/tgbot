@@ -52,7 +52,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "user_id": user.id,
             "chat_id": chat.id,
             "collection_name": None,
-            "db_find ": None,
+            "db_find": None,
             "db_vlaue": None,
             "edit_data_key": None,
             "edit_data_value": None,
@@ -71,7 +71,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         btn_name = ["Text formatting", "Close"]
-        btn_data = ["text_formats", "close"]
+        btn_data = ["text_formats", "query_close"]
 
         btn = await Button.cbutton(btn_name, btn_data, True)
 
