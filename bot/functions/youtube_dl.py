@@ -38,7 +38,7 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
         "user_id": user.id,
         "chat_id": chat.id,
         "collection_name": None,
-        "db_find ": None,
+        "db_find": None,
         "db_vlaue": None,
         "edit_data_key": None,
         "edit_data_value": None,
@@ -52,7 +52,7 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
     btn_data_row1 = ["mp4", "mp3"]
 
     btn_name_row2 = ["Cancel"]
-    btn_data_row2 = ["close"]
+    btn_data_row2 = ["query_close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2)

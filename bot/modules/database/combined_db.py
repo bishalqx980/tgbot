@@ -7,13 +7,19 @@ async def global_search(collection, search, match):
     collection: collection_name\n
     search: eg user_id, chat_id\n
     match: eg. user.id, chat.id\n
-    uses > find_one
+    workflow > search on local_db > if not found > search on mongodb > return bool or find_user/find_group = [1]
     """
-    find_db = await LOCAL_DATABASE.find_one(collection, match)
-    if not find_db:
-        find_db = await MongoDB.find_one(collection, search, match)
-        if find_db:
-            await LOCAL_DATABASE.insert_data(collection, match, find_db)
+    if collection == "bot_docs":
+        find_db = await LOCAL_DATABASE.find(collection)
+        if not find_db:
+            find = await MongoDB.find("bot_docs", "_id")
+            find_db = await MongoDB.find_one("bot_docs", "_id", find[0])
+    else:
+        find_db = await LOCAL_DATABASE.find_one(collection, match)
+        if not find_db:
+            find_db = await MongoDB.find_one(collection, search, match)
+            if find_db:
+                await LOCAL_DATABASE.insert_data(collection, match, find_db)
     
     if not find_db:
         return False, "⚠ Chat isn't registered! Ban/Block me from this chat then add me again, then try!"

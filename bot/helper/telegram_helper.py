@@ -124,6 +124,9 @@ class Message:
 
 
     async def send_doc(chat_id, doc, filename, caption=None, reply_msg_id=None):
+        """
+        doc = send as file > with open()
+        """
         try:
             response = await bot.send_document(
                 chat_id=chat_id,
