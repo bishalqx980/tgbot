@@ -1,4 +1,3 @@
-import os
 import random
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -40,6 +39,8 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
     
+    msg = "<u><b>Bot Settings</b></u>"
+
     btn_name_row1 = ["Bot pic", "Welcome img"]
     btn_data_row1 = ["query_bot_pic", "query_welcome_img"]
 
@@ -62,10 +63,6 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
 
     btn = row1 + row2 + row3 + row4 + row5
-    
-    os.makedirs("back_btn", exist_ok=True)
-    with open(f"back_btn/{chat.id}.txt", "wb") as f:
-        f.write(btn)
 
     _bot = await find_bot_docs()
     if not _bot:
@@ -78,6 +75,6 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         image = _bot.get("bot_pic")
     
     if image:
-        await Message.send_img(chat.id, image, "<u><b>Bot Settings</b></u>", btn)
+        await Message.send_img(chat.id, image, msg, btn)
     else:
-        await Message.send_msg(chat.id, "<u><b>Bot Settings</b></u>", btn)
+        await Message.send_msg(chat.id, msg, btn)

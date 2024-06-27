@@ -53,17 +53,17 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     btn_name_row1 = ["Group Management", "AI"]
-    btn_data_row1 = ["query_group_manage", "query_ai"]
+    btn_data_row1 = ["query_help_group_management", "query_help_ai"]
 
     btn_name_row2 = ["misc", "Bot owner"]
-    btn_data_row2 = ["query_misc", "query_owner"]
+    btn_data_row2 = ["query_help_misc_functions", "query_help_owner_functions"]
 
     btn_name_row3 = ["Close"]
     btn_data_row3 = ["query_close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-    row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+    row3 = await Button.cbutton(btn_name_row3, btn_data_row3)
 
     btn = row1 + row2 + row3
 
