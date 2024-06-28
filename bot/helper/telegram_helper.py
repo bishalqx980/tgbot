@@ -107,14 +107,15 @@ class Message:
                 logger.error(e)
 
 
-    async def send_audio(chat_id, audio, title, caption=None, reply_msg_id=None):
+    async def send_audio(chat_id, audio, title, caption=None, reply_msg_id=None, parse_mode=ParseMode.HTML):
         try:
             response = await bot.send_audio(
                 chat_id=chat_id,
                 audio=audio,
                 title=title,
                 caption=caption,
-                reply_to_message_id=reply_msg_id
+                reply_to_message_id=reply_msg_id,
+                parse_mode=parse_mode
             )
             return response
         except Forbidden:
@@ -123,7 +124,7 @@ class Message:
             logger.error(e)
 
 
-    async def send_doc(chat_id, doc, filename, caption=None, reply_msg_id=None):
+    async def send_doc(chat_id, doc, filename, caption=None, reply_msg_id=None, parse_mode=ParseMode.HTML):
         """
         doc = send as file > with open()
         """
@@ -133,7 +134,8 @@ class Message:
                 document=doc,
                 filename=filename,
                 caption=caption,
-                reply_to_message_id=reply_msg_id
+                reply_to_message_id=reply_msg_id,
+                parse_mode=parse_mode
             )
             return response
         except Forbidden:

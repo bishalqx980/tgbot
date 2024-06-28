@@ -59,7 +59,7 @@ class QueryBotSettings:
         images = find_chat.get("images")
 
         if images:
-            if len(str(images)) > 4096:
+            if len(str(images)) > 4000:
                 storage, counter = "", 0
                 for image in images:
                     counter += 1

@@ -38,26 +38,25 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Hey, {user.first_name}! I'm {_bot_info.first_name}!\n"
         "I can help you to manage your group with lots of useful features!\n"
         "Feel free to add me to your group.\n\n"
-        "<b>/help - for bot help</b>"
+        "<b>/help - for bot help</b>\n\n"
+        "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>\n"
+        "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>"
     )
 
     if _bot_info.username != "MissCiri_bot":
-        msg += "\n\nCloned bot of @MissCiri_bot"
+        msg += "\n\n<i>Cloned bot of @MissCiri_bot</i>"
 
     btn_name_1 = ["Add me to your Group"]
     btn_url_1 = [f"http://t.me/{_bot_info.username}?startgroup=start"]
-    btn_name_2 = ["Developer", "Source code"]
-    btn_url_2 = [f"https://t.me/bishalqx980", "https://github.com/bishalqx980/tgbot"]
-    btn_name_3 = ["Support Chat"]
-    btn_url_3 = [support_chat]
+    btn_name_2 = ["Support Chat"]
+    btn_url_2 = [support_chat]
 
     row_1 = await Button.ubutton(btn_name_1, btn_url_1)
-    row_2 = await Button.ubutton(btn_name_2, btn_url_2, True)
-    btn = row_1 + row_2
+    btn = row_1
 
     if support_chat:
-        row_3 = await Button.ubutton(btn_name_3, btn_url_3)
-        btn = row_1 + row_2 + row_3
+        row_2 = await Button.ubutton(btn_name_2, btn_url_2)
+        btn = row_1 + row_2
     
     if welcome_img and bot_pic:
         await Message.send_img(user.id, bot_pic, msg, btn)

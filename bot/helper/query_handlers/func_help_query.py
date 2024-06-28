@@ -83,7 +83,7 @@ class QueryBotHelp:
             "Bot owner functions -\n\n"
             "/broadcast » Broadcast message to bot users\n"
             "/db » Get bot database\n"
-            "/bsetting » Get bot settings\n"
+            "/bsettings » Get bot settings\n"
             "/shell » Use system shell\n"
             "/log » Get log file (for error handling)\n"
             "/restart » Restart the bot\n"

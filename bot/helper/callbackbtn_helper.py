@@ -74,7 +74,17 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "query_close"
     ]:
         if query.data == "query_edit_value":
-            await QueryFunctions.query_edit_value(chat.id, query, chat)
+            is_list, is_int = False, False
+            data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
+            edit_data_key = data_center.get("edit_data_key")
+            
+            if edit_data_key in ["images", "allowed_links"]:
+                is_list = True
+            elif edit_data_key in ["sudo_users"]:
+                is_list = True
+                is_int = True
+            
+            await QueryFunctions.query_edit_value(chat.id, query, chat, is_list=is_list, is_int=is_int)
         elif query.data == "query_rm_value":
             await QueryFunctions.query_rm_value(chat.id, query)
         elif query.data == "query_true":
