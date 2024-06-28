@@ -12,6 +12,7 @@ from bot.modules.database.local_database import LOCAL_DATABASE
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
+    e_msg = update.effective_message
 
     if chat.type != "private":
         _bot_info = await bot.get_me()
@@ -25,7 +26,14 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     data = {
         "user_id": user.id,
-        "chat_id": chat.id
+        "chat_id": chat.id,
+        "collection_name": "users",
+        "db_find": "user_id",
+        "db_vlaue": user.id,
+        "edit_data_key": None,
+        "edit_data_value": None,
+        "del_msg_pointer_id": e_msg.id,
+        "edit_data_value_msg_pointer": None
     }
 
     await LOCAL_DATABASE.insert_data("data_center", chat.id, data)

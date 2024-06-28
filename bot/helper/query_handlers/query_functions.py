@@ -6,7 +6,7 @@ from bot.modules.database.local_database import LOCAL_DATABASE
 
 
 class QueryFunctions:
-    async def query_edit_value(identifier, query, new_value="default", is_list=bool(False), is_int=bool(False)):
+    async def query_edit_value(identifier, query, chat, new_value="default", is_list=bool(False), is_int=bool(False)):
         """
         identifier > user.id or chat.id (data center identifier)\n
         query > query indicator\n
@@ -22,7 +22,10 @@ class QueryFunctions:
         for i in ["collection_name", "db_find", "db_vlaue", "edit_data_key"]: # edit_data_value will be added below
             data = data_center.get(i)
             if not data:
-                await query.answer(f"Error: {i} wasn't found in data center! Try to send command again!", True)
+                try:
+                    await query.answer(f"Error: {i} wasn't found in data center! Try to send command again!", True)
+                except Exception as e:
+                    logger.error(e)
                 return
         
         chat_id = data_center.get("chat_id")
@@ -35,8 +38,20 @@ class QueryFunctions:
         if new_value != "default":
             edit_data_value = new_value
         else:
+            if chat.type == "private":
+                collection = "users"
+                identifier = "user_id"
+            else:
+                collection = "groups"
+                identifier = "chat_id"
+            
             sent_msg = await Message.send_msg(chat_id, "Now send a value:")
-            data_center["status"] = "editing"
+
+            data = {
+                "status": "editing"
+            }
+
+            await LOCAL_DATABASE.insert_data(collection, identifier, data)
 
             for i in range(20):
                 edit_data_value = data_center.get("edit_data_value")
@@ -45,7 +60,11 @@ class QueryFunctions:
 
                 await asyncio.sleep(0.5)
 
-            data_center["status"] = None
+            data = {
+                "status": None
+            }
+
+            await LOCAL_DATABASE.insert_data(collection, identifier, data)
 
             del_msg = [edit_data_value_msg_pointer, sent_msg]
             for delete in del_msg:
@@ -98,7 +117,10 @@ class QueryFunctions:
         for i in ["collection_name", "db_find", "db_vlaue", "edit_data_key"]: # edit_data_value will be added below
             data = data_center.get(i)
             if not data:
-                await query.answer(f"Error: {i} wasn't found in data center! Try to send command again!", True)
+                try:
+                    await query.answer(f"Error: {i} wasn't found in data center! Try to send command again!", True)
+                except Exception as e:
+                    logger.error(e)
                 return
         
         chat_id = data_center.get("chat_id")
@@ -129,7 +151,10 @@ class QueryFunctions:
         for i in ["collection_name", "db_find", "db_vlaue", "edit_data_key"]: # edit_data_value will be added below
             data = data_center.get(i)
             if not data:
-                await query.answer(f"Error: {i} wasn't found in data center! Try to send command again!", True)
+                try:
+                    await query.answer(f"Error: {i} wasn't found in data center! Try to send command again!", True)
+                except Exception as e:
+                    logger.error(e)
                 return
         
         chat_id = data_center.get("chat_id")
@@ -160,7 +185,10 @@ class QueryFunctions:
         for i in ["collection_name", "db_find", "db_vlaue", "edit_data_key"]: # edit_data_value will be added below
             data = data_center.get(i)
             if not data:
-                await query.answer(f"Error: {i} wasn't found in data center! Try to send command again!", True)
+                try:
+                    await query.answer(f"Error: {i} wasn't found in data center! Try to send command again!", True)
+                except Exception as e:
+                    logger.error(e)
                 return
         
         chat_id = data_center.get("chat_id")
