@@ -18,7 +18,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
 
     async def popup(msg):
-        await query.answer(msg, True)
+        try:
+            await query.answer(msg, True)
+        except Exception as e:
+            logger.error(e)
     
     async def del_query():
         try:
@@ -61,11 +64,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Youtube download ...
     if  query.data in ["mp4", "mp3"]:
-        data = {
-            "edit_data_key": query.data
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": query.data})
     # Database editing query ...
     elif query.data in [
         "query_edit_value",
@@ -177,7 +176,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             elif query.data == "query_welcome_img":
                 await QueryBotSettings._query_welcome_img(update, query, chat, find_chat)
             elif query.data == "query_images":
-                await QueryBotSettings._query_images(update, query, chat, find_chat, chat)
+                await QueryBotSettings._query_images(update, query, chat, find_chat)
             elif query.data == "query_support_chat":
                 await QueryBotSettings._query_support_chat(update, query, chat, find_chat)
             elif query.data == "query_server_url":

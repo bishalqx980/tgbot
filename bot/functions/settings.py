@@ -28,7 +28,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "edit_data_key": None,
             "edit_data_value": None,
             "del_msg_pointer_id": e_msg.id,
-            "edit_data_value_msg_pointer": None
+            "edit_data_value_msg_pointer_id": None
         }
 
         await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
@@ -117,7 +117,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "edit_data_key": None,
             "edit_data_value": None,
             "del_msg_pointer_id": e_msg.id,
-            "edit_data_value_msg_pointer": None
+            "edit_data_value_msg_pointer_id": None
         }
         
         await LOCAL_DATABASE.insert_data("data_center", chat.id, data)

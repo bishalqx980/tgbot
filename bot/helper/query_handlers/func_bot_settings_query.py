@@ -7,12 +7,7 @@ from bot.modules.database.local_database import LOCAL_DATABASE
 
 class QueryBotSettings:
     async def _query_bot_pic(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "bot_pic"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "bot_pic"})
         bot_pic = find_chat.get("bot_pic")
 
         msg = (
@@ -36,12 +31,7 @@ class QueryBotSettings:
 
 
     async def _query_welcome_img(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "welcome_img"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "welcome_img"})
         welcome_img = find_chat.get("welcome_img")
 
         msg = (
@@ -65,12 +55,7 @@ class QueryBotSettings:
 
 
     async def _query_images(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "images"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "images"})
         images = find_chat.get("images")
 
         if images:
@@ -120,12 +105,7 @@ class QueryBotSettings:
 
 
     async def _query_support_chat(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "support_chat"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "support_chat"})
         support_chat = find_chat.get("support_chat")
 
         msg = (
@@ -148,12 +128,7 @@ class QueryBotSettings:
 
 
     async def _query_server_url(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "server_url"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "server_url"})
         server_url = find_chat.get("server_url")
 
         msg = (
@@ -177,12 +152,7 @@ class QueryBotSettings:
 
 
     async def _query_sudo(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "sudo_users"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "sudo_users"})
         sudo_users = find_chat.get("sudo_users")
 
         if sudo_users:
@@ -216,12 +186,7 @@ class QueryBotSettings:
 
 
     async def _query_shrinkme_api(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "shrinkme_api"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "shrinkme_api"})
         shrinkme_api = find_chat.get("shrinkme_api")
 
         msg = (
@@ -245,12 +210,7 @@ class QueryBotSettings:
 
 
     async def _query_omdb_api(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "omdb_api"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "omdb_api"})
         omdb_api = find_chat.get("omdb_api")
 
         msg = (
@@ -274,12 +234,7 @@ class QueryBotSettings:
 
 
     async def _query_weather_api(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "weather_api"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "weather_api"})
         weather_api = find_chat.get("weather_api")
 
         msg = (

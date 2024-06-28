@@ -43,7 +43,7 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
         "edit_data_key": None,
         "edit_data_value": None,
         "del_msg_pointer_id": e_msg.id,
-        "edit_data_value_msg_pointer": None
+        "edit_data_value_msg_pointer_id": None
     }
 
     await LOCAL_DATABASE.insert_data("data_center", user.id, data)

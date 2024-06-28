@@ -31,7 +31,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except:
                 msg = msg
             
-            for key, value in zip(["edit_data_value", "edit_data_value_msg_pointer", "is_editing"], [msg, e_msg, False]):
+            for key, value in zip(["edit_data_value", "edit_data_value_msg_pointer_id", "is_editing"], [msg, e_msg.id, False]):
                 await LOCAL_DATABASE.insert_data("data_center", chat.id, {key: value})
             return
 

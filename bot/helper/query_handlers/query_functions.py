@@ -16,7 +16,10 @@ class QueryFunctions:
         """
         data_center = await LOCAL_DATABASE.find_one("data_center", identifier)
         if not data_center:
-            await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
+            try:
+                await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
+            except Exception as e:
+                logger.error(e)
             return
         
         for i in ["collection_name", "db_find", "db_vlaue", "edit_data_key"]: # edit_data_value will be added below
@@ -33,45 +36,32 @@ class QueryFunctions:
         db_find = data_center.get("db_find")
         db_vlaue = data_center.get("db_vlaue")
         edit_data_key = data_center.get("edit_data_key")
-        edit_data_value_msg_pointer = data_center.get("edit_data_value_msg_pointer")
         
         if new_value != "default":
             edit_data_value = new_value
         else:
-            if chat.type == "private":
-                collection = "users"
-                identifier = "user_id"
-            else:
-                collection = "groups"
-                identifier = "chat_id"
-            
             sent_msg = await Message.send_msg(chat_id, "Now send a value:")
 
-            data = {
-                "status": "editing"
-            }
-
-            await LOCAL_DATABASE.insert_data(collection, identifier, data)
+            await LOCAL_DATABASE.insert_data("data_center", identifier, {"is_editing": True})
 
             for i in range(20):
+                data_center = await LOCAL_DATABASE.find_one("data_center", identifier)
                 edit_data_value = data_center.get("edit_data_value")
+                edit_data_value_msg_pointer_id = data_center.get("edit_data_value_msg_pointer_id")
                 if edit_data_value:
                     break
 
                 await asyncio.sleep(0.5)
-
-            data = {
-                "status": None
-            }
-
-            await LOCAL_DATABASE.insert_data(collection, identifier, data)
-
-            del_msg = [edit_data_value_msg_pointer, sent_msg]
-            for delete in del_msg:
-                await Message.del_msg(chat_id, delete)
+            
+            await LOCAL_DATABASE.insert_data("data_center", identifier, {"edit_data_value": None, "is_editing": False})
+            await Message.del_msg(chat_id, msg_id=edit_data_value_msg_pointer_id)
+            await Message.del_msg(chat_id, sent_msg)
             
             if not edit_data_value:
-                await query.answer("Oops, Timeout...", True)
+                try:
+                    await query.answer("Oops, Timeout...", True)
+                except Exception as e:
+                    logger.error(e)
                 return
             
             if is_list:
@@ -88,20 +78,31 @@ class QueryFunctions:
                         edit_data_value = [int(edit_data_value)]
                     else:
                         edit_data_value = [edit_data_value]
-
+        
+        # bot_docs exception ...
+        if db_find == "_id":
+            db_vlaue = await MongoDB.find("bot_docs", "_id")
+            db_vlaue = db_vlaue[0]
+        
         await MongoDB.update_db(collection_name, db_find, db_vlaue, edit_data_key, edit_data_value)
 
         data = await MongoDB.find_one(collection_name, db_find, db_vlaue)
-        await LOCAL_DATABASE.insert_data(collection_name, chat_id, data)
+        if db_find == "_id":
+            await LOCAL_DATABASE.insert_data_direct(collection_name, data)
+        else:
+            await LOCAL_DATABASE.insert_data(collection_name, chat_id, data)
 
         if is_list and len(edit_data_value) > 5:
             msg = f"{len(edit_data_value)} items"
-        elif len(edit_data_value) > 30:
+        elif len(edit_data_value) > 100:
             msg = "Data is too long, can't show! Check on message..."
         else:
             msg = f"Database updated!\n\nData: {edit_data_key}\nValue: {edit_data_value}"
         
-        await query.answer(msg, True)
+        try:
+            await query.answer(msg, True)
+        except Exception as e:
+            logger.error(e)
 
 
     async def query_rm_value(identifier, query):
@@ -111,7 +112,10 @@ class QueryFunctions:
         """
         data_center = await LOCAL_DATABASE.find_one("data_center", identifier)
         if not data_center:
-            await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
+            try:
+                await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
+            except Exception as e:
+                logger.error(e)
             return
         
         for i in ["collection_name", "db_find", "db_vlaue", "edit_data_key"]: # edit_data_value will be added below
@@ -130,12 +134,23 @@ class QueryFunctions:
         edit_data_key = data_center.get("edit_data_key")
         edit_data_value = None
 
+        # bot_docs exception ...
+        if db_find == "_id":
+            db_vlaue = await MongoDB.find("bot_docs", "_id")
+            db_vlaue = db_vlaue[0]
+        
         await MongoDB.update_db(collection_name, db_find, db_vlaue, edit_data_key, edit_data_value)
 
         data = await MongoDB.find_one(collection_name, db_find, db_vlaue)
-        await LOCAL_DATABASE.insert_data(collection_name, chat_id, data)
-
-        await query.answer(f"Database updated!\n\nData: {edit_data_key}\nValue: {edit_data_value}", True)
+        if db_find == "_id":
+            await LOCAL_DATABASE.insert_data_direct(collection_name, data)
+        else:
+            await LOCAL_DATABASE.insert_data(collection_name, chat_id, data)
+        
+        try:
+            await query.answer(f"Database updated!\n\nData: {edit_data_key}\nValue: {edit_data_value}", True)
+        except Exception as e:
+            logger.error(e)
 
 
     async def query_true(identifier, query):
@@ -145,7 +160,10 @@ class QueryFunctions:
         """
         data_center = await LOCAL_DATABASE.find_one("data_center", identifier)
         if not data_center:
-            await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
+            try:
+                await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
+            except Exception as e:
+                logger.error(e)
             return
         
         for i in ["collection_name", "db_find", "db_vlaue", "edit_data_key"]: # edit_data_value will be added below
@@ -164,12 +182,23 @@ class QueryFunctions:
         edit_data_key = data_center.get("edit_data_key")
         edit_data_value = True
 
+        # bot_docs exception ...
+        if db_find == "_id":
+            db_vlaue = await MongoDB.find("bot_docs", "_id")
+            db_vlaue = db_vlaue[0]
+
         await MongoDB.update_db(collection_name, db_find, db_vlaue, edit_data_key, edit_data_value)
 
         data = await MongoDB.find_one(collection_name, db_find, db_vlaue)
-        await LOCAL_DATABASE.insert_data(collection_name, chat_id, data)
+        if db_find == "_id":
+            await LOCAL_DATABASE.insert_data_direct(collection_name, data)
+        else:
+            await LOCAL_DATABASE.insert_data(collection_name, chat_id, data)
 
-        await query.answer(f"Database updated!\n\nData: {edit_data_key}\nValue: {edit_data_value}", True)
+        try:
+            await query.answer(f"Database updated!\n\nData: {edit_data_key}\nValue: {edit_data_value}", True)
+        except Exception as e:
+            logger.error(e)
 
 
     async def query_false(identifier, query):
@@ -179,7 +208,10 @@ class QueryFunctions:
         """
         data_center = await LOCAL_DATABASE.find_one("data_center", identifier)
         if not data_center:
-            await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
+            try:
+                await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
+            except Exception as e:
+                logger.error(e)
             return
         
         for i in ["collection_name", "db_find", "db_vlaue", "edit_data_key"]: # edit_data_value will be added below
@@ -198,12 +230,23 @@ class QueryFunctions:
         edit_data_key = data_center.get("edit_data_key")
         edit_data_value = False
 
+        # bot_docs exception ...
+        if db_find == "_id":
+            db_vlaue = await MongoDB.find("bot_docs", "_id")
+            db_vlaue = db_vlaue[0]
+
         await MongoDB.update_db(collection_name, db_find, db_vlaue, edit_data_key, edit_data_value)
 
         data = await MongoDB.find_one(collection_name, db_find, db_vlaue)
-        await LOCAL_DATABASE.insert_data(collection_name, chat_id, data)
+        if db_find == "_id":
+            await LOCAL_DATABASE.insert_data_direct(collection_name, data)
+        else:
+            await LOCAL_DATABASE.insert_data(collection_name, chat_id, data)
 
-        await query.answer(f"Database updated!\n\nData: {edit_data_key}\nValue: {edit_data_value}", True)
+        try:
+            await query.answer(f"Database updated!\n\nData: {edit_data_key}\nValue: {edit_data_value}", True)
+        except Exception as e:
+            logger.error(e)
 
 
     async def query_close(identifier, query):
@@ -213,7 +256,10 @@ class QueryFunctions:
         """
         data_center = await LOCAL_DATABASE.find_one("data_center", identifier)
         if not data_center:
-            await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
+            try:
+                await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
+            except Exception as e:
+                logger.error(e)
             return
         
         chat_id = data_center.get("chat_id")

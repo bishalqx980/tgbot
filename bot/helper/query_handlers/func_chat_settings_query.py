@@ -6,12 +6,7 @@ from bot.modules.database.local_database import LOCAL_DATABASE
 
 class QueryChatSettings:
     async def _query_chat_lang(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "lang"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "lang"})
         lang = find_chat.get("lang")
 
         msg = (
@@ -39,12 +34,7 @@ class QueryChatSettings:
 
 
     async def _query_chat_auto_tr(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "auto_tr"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "auto_tr"})
         auto_tr = find_chat.get("auto_tr")
 
         msg = (
@@ -68,12 +58,7 @@ class QueryChatSettings:
 
 
     async def _query_chat_set_echo(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "echo"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "echo"})
         echo = find_chat.get("echo")
 
         msg = (
@@ -97,12 +82,7 @@ class QueryChatSettings:
 
 
     async def _query_chat_welcome_msg(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "welcome_msg"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "welcome_msg"})
         welcome_msg = find_chat.get("welcome_msg")
 
         msg = (
@@ -130,12 +110,7 @@ class QueryChatSettings:
 
 
     async def _query_set_custom_welcome_msg(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "custom_welcome_msg"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "custom_welcome_msg"})
         custom_welcome_msg = find_chat.get("custom_welcome_msg")
 
         msg = (
@@ -159,12 +134,7 @@ class QueryChatSettings:
 
 
     async def _query_chat_farewell_msg(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "farewell_msg"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "farewell_msg"})
         farewell_msg = find_chat.get("farewell_msg")
 
         msg = (
@@ -188,12 +158,7 @@ class QueryChatSettings:
 
 
     async def _query_chat_antibot(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "antibot"
-        }
-        
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "antibot"})
         antibot = find_chat.get("antibot")
 
         msg = (
@@ -217,12 +182,7 @@ class QueryChatSettings:
     
 
     async def _query_chat_del_cmd(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "del_cmd"
-        }
-
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "del_cmd"})
         del_cmd = find_chat.get("del_cmd")
 
         msg = (
@@ -246,12 +206,7 @@ class QueryChatSettings:
     
 
     async def _query_chat_log_channel(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "log_channel"
-        }
-        
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "log_channel"})
         log_channel = find_chat.get("log_channel")
 
         msg = (
@@ -275,12 +230,7 @@ class QueryChatSettings:
     
 
     async def _query_chat_links_behave(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "links_behave"
-        }
-        
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
         all_links = find_chat.get("all_links")
         allowed_links = find_chat.get("allowed_links")
 
@@ -319,12 +269,7 @@ class QueryChatSettings:
 
 
     async def _query_chat_all_links(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "links_behave"
-        }
-        
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
         all_links = find_chat.get("all_links")
 
         msg = (
@@ -348,12 +293,7 @@ class QueryChatSettings:
     
 
     async def _query_chat_allowed_links(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "allowed_links"
-        }
-        
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "allowed_links"})
         allowed_links = find_chat.get("allowed_links")
         
         if allowed_links:
@@ -387,42 +327,22 @@ class QueryChatSettings:
     
 
     async def _query_d_links(query, chat):
-        data = {
-            "edit_data_key": "links_behave"
-        }
-        
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
         await QueryFunctions.query_edit_value(chat.id, query, "delete")
 
 
     async def _query_c_links(query, chat):
-        data = {
-            "edit_data_key": "links_behave"
-        }
-        
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
         await QueryFunctions.query_edit_value(chat.id, query, "convert")
     
 
     async def _query_none_links(query, chat):
-        data = {
-            "edit_data_key": "links_behave"
-        }
-        
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
         await QueryFunctions.query_edit_value(chat.id, query, None)
     
 
     async def _query_chat_ai_status(update: Update, query, chat, find_chat):
-        data = {
-            "edit_data_key": "ai_status"
-        }
-        
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "ai_status"})
         ai_status = find_chat.get("ai_status")
 
         msg = (
