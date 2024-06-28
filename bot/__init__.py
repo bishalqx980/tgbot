@@ -10,7 +10,7 @@ with open('log.txt', 'w'):
 
 #Enable logging
 logging.basicConfig(
-    filename="log.txt", format="%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s", level=logging.INFO
+    filename="log.txt", format="%(asctime)s - %(name)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s", level=logging.INFO
 )
 #set higher logging level for httpx to avoid all GET and POST requests being logged
 logging.getLogger("httpx").setLevel(logging.WARNING)
