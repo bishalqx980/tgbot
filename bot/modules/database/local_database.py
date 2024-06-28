@@ -61,6 +61,10 @@ class LOCAL_DATABASE:
         try:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)
+
+            # exception ...
+            if data.get("_id"):
+                data["_id"] = str(data["_id"]) # mongodb _id >> make it str
             
             load_collection = load_db.get(collection)
             check_db = load_collection.get(str(identifier))
