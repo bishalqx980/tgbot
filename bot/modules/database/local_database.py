@@ -64,7 +64,11 @@ class LOCAL_DATABASE:
                 data["_id"] = str(data["_id"]) # mongodb _id >> make it str
             load_collection = load_db.get(collection)
             check_db = load_collection.get(str(identifier))
-            load_collection[str(identifier)] = data
+            if load_collection:
+                load_identifier = load_collection.get(str(identifier))
+                load_identifier.update(data)
+            else:
+                load_collection[str(identifier)] = data
 
             with open(LOCAL_DB, "w") as f:
                 json.dump(load_db, f, indent=4)

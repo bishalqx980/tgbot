@@ -17,22 +17,22 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     _bot = await find_bot_docs()
     if not _bot:
         return
-    
-    data = {
-        "user_id": user.id,
-        "chat_id": chat.id,
-        "collection_name": None,
-        "db_find": None,
-        "db_vlaue": None,
-        "edit_data_key": None,
-        "edit_data_value": None,
-        "del_msg_pointer_id": e_msg.id,
-        "edit_data_value_msg_pointer": None
-    }
-
-    await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
 
     if chat.type == "private":
+        data = {
+            "user_id": user.id,
+            "chat_id": chat.id,
+            "collection_name": "users",
+            "db_find": "user_id",
+            "db_vlaue": user.id,
+            "edit_data_key": None,
+            "edit_data_value": None,
+            "del_msg_pointer_id": e_msg.id,
+            "edit_data_value_msg_pointer": None
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         db = await global_search("users", "user_id", user.id)
         if db[0] == False:
             await Message.reply_msg(update, db[1])
@@ -108,6 +108,20 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
                 return
         
+        data = {
+            "user_id": user.id,
+            "chat_id": chat.id,
+            "collection_name": "groups",
+            "db_find": "chat_id",
+            "db_vlaue": chat.id,
+            "edit_data_key": None,
+            "edit_data_value": None,
+            "del_msg_pointer_id": e_msg.id,
+            "edit_data_value_msg_pointer": None
+        }
+        
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         db = await global_search("groups", "chat_id", chat.id)
         if db[0] == False:
             await Message.reply_msg(update, db[1])

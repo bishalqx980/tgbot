@@ -29,11 +29,15 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sent_msg = await Message.reply_msg(update, "<b>⌊ please wait... ⌉</b>")
     
+    time_executing = time.time()
+
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
     except Exception as e:
         logger.error(e)
         return
+    
+    time_executed = time.time()
     
     if not result.stdout and not result.stderr:
         await Message.edit_msg(update, "<b>⌊ None ⌉</b>", sent_msg)
@@ -54,5 +58,5 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.edit_msg(update, e, sent_msg)
             return
         
-        await Message.send_doc(chat.id, shell, "shell.txt", f"Command: {command}\nExecute time: {time.time()}", e_msg.id)
+        await Message.send_doc(chat.id, shell, "shell.txt", f"<b>Command</b>: {command}\n<b>Execute time</b>: {(time_executed - time_executing):.2f}s", e_msg.id)
         await Message.del_msg(chat.id, sent_msg)

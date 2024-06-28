@@ -2,11 +2,17 @@ from telegram import Update
 from bot.update_db import update_database
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.local_database import LOCAL_DATABASE
 
 
 class QueryBotSettings:
-    async def _query_bot_pic(update: Update, query, data_center, find_chat):
-        data_center["edit_data_key"] = "bot_pic"
+    async def _query_bot_pic(update: Update, query, chat, find_chat):
+        data = {
+            "edit_data_key": "bot_pic"
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         bot_pic = find_chat.get("bot_pic")
 
         msg = (
@@ -29,8 +35,13 @@ class QueryBotSettings:
         await Message.edit_msg(update, msg, query.message, btn)
 
 
-    async def _query_welcome_img(update: Update, query, data_center, find_chat):
-        data_center["edit_data_key"] = "welcome_img"
+    async def _query_welcome_img(update: Update, query, chat, find_chat):
+        data = {
+            "edit_data_key": "welcome_img"
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         welcome_img = find_chat.get("welcome_img")
 
         msg = (
@@ -53,8 +64,13 @@ class QueryBotSettings:
         await Message.edit_msg(update, msg, query.message, btn)
 
 
-    async def _query_images(update: Update, query, data_center, find_chat, chat):
-        data_center["edit_data_key"] = "images"
+    async def _query_images(update: Update, query, chat, find_chat):
+        data = {
+            "edit_data_key": "images"
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         images = find_chat.get("images")
 
         if images:
@@ -103,8 +119,13 @@ class QueryBotSettings:
         await Message.edit_msg(update, msg, query.message, btn)
 
 
-    async def _query_support_chat(update: Update, query, data_center, find_chat):
-        data_center["edit_data_key"] = "support_chat"
+    async def _query_support_chat(update: Update, query, chat, find_chat):
+        data = {
+            "edit_data_key": "support_chat"
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         support_chat = find_chat.get("support_chat")
 
         msg = (
@@ -126,8 +147,13 @@ class QueryBotSettings:
         await Message.edit_msg(update, msg, query.message, btn)    
 
 
-    async def _query_server_url(update: Update, query, data_center, find_chat):
-        data_center["edit_data_key"] = "server_url"
+    async def _query_server_url(update: Update, query, chat, find_chat):
+        data = {
+            "edit_data_key": "server_url"
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         server_url = find_chat.get("server_url")
 
         msg = (
@@ -150,8 +176,13 @@ class QueryBotSettings:
         await Message.edit_msg(update, msg, query.message, btn)
 
 
-    async def _query_sudo(update: Update, query, data_center, find_chat):
-        data_center["edit_data_key"] = "sudo_users"
+    async def _query_sudo(update: Update, query, chat, find_chat):
+        data = {
+            "edit_data_key": "sudo_users"
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         sudo_users = find_chat.get("sudo_users")
 
         if sudo_users:
@@ -184,8 +215,13 @@ class QueryBotSettings:
         await Message.edit_msg(update, msg, query.message, btn)
 
 
-    async def _query_shrinkme_api(update: Update, query, data_center, find_chat):
-        data_center["edit_data_key"] = "shrinkme_api"
+    async def _query_shrinkme_api(update: Update, query, chat, find_chat):
+        data = {
+            "edit_data_key": "shrinkme_api"
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         shrinkme_api = find_chat.get("shrinkme_api")
 
         msg = (
@@ -208,8 +244,13 @@ class QueryBotSettings:
         await Message.edit_msg(update, msg, query.message, btn)
 
 
-    async def _query_omdb_api(update: Update, query, data_center, find_chat):
-        data_center["edit_data_key"] = "omdb_api"
+    async def _query_omdb_api(update: Update, query, chat, find_chat):
+        data = {
+            "edit_data_key": "omdb_api"
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         omdb_api = find_chat.get("omdb_api")
 
         msg = (
@@ -232,8 +273,13 @@ class QueryBotSettings:
         await Message.edit_msg(update, msg, query.message, btn)
 
 
-    async def _query_weather_api(update: Update, query, data_center, find_chat):
-        data_center["edit_data_key"] = "weather_api"
+    async def _query_weather_api(update: Update, query, chat, find_chat):
+        data = {
+            "edit_data_key": "weather_api"
+        }
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
         weather_api = find_chat.get("weather_api")
 
         msg = (

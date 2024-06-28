@@ -1,4 +1,4 @@
-import time
+from datetime import datetime
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import bot
@@ -21,4 +21,6 @@ async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with open("log.txt", "rb") as log_file:
         log = log_file.read()
     
-    await Message.send_doc(user.id, log, "log.txt", time.time())
+    date_time = datetime.now()
+
+    await Message.send_doc(user.id, log, "log.txt", date_time.strftime("%d-%m-%Y %H:%M:%S"))
