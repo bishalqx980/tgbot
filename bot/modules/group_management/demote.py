@@ -56,7 +56,9 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sil
         await bot.promote_chat_member(chat.id, victim.id)
     except Exception as e:
         logger.error(e)
-        await Message.reply_msg(update, e)
+        error_msg = await Message.reply_msg(update, e)
+        if not error_msg:
+            await Message.reply_msg(update, e.message)
         return
     
     if not is_silent:

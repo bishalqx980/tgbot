@@ -63,7 +63,9 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await bot.set_chat_permissions(chat.id, permissions)
     except Exception as e:
         logger.error(e)
-        await Message.reply_msg(update, e)
+        error_msg = await Message.reply_msg(update, e)
+        if not error_msg:
+            await Message.reply_msg(update, e.message)
         return
 
     await Message.send_msg(chat.id, f"This chat has been locked!\n<b>Admin</b>: {user.first_name}")

@@ -56,6 +56,9 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         if _bot_info.id == victim.id:
             await Message.reply_msg(update, "I'm not going to kick myself!")
+        # Super power for chat owner
+        elif victim_permission.status == ChatMember.ADMINISTRATOR and user_permission.status == ChatMember.OWNER:
+            pass
         else:
             await Message.reply_msg(update, f"I'm not going to kick an admin! You must be joking!")
         return
@@ -70,7 +73,9 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
         await bot.unban_chat_member(chat.id, victim.id)
     except Exception as e:
         logger.error(e)
-        await Message.reply_msg(update, e)
+        error_msg = await Message.reply_msg(update, e)
+        if not error_msg:
+            await Message.reply_msg(update, e.message)
         return
     
     if not is_silent:

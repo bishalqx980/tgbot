@@ -55,9 +55,13 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         if _bot_info.id == victim.id:
             await Message.reply_msg(update, "I'm not going to ban myself!")
+            return
+        # Super power for chat owner
+        elif victim_permission.status == ChatMember.ADMINISTRATOR and user_permission.status == ChatMember.OWNER:
+            pass
         else:
             await Message.reply_msg(update, "I'm not going to ban an admin! You must be joking!")
-        return
+            return
     
     if victim_permission.status == ChatMember.BANNED:
         await Message.reply_msg(update, "The user is already banned in this chat!")
@@ -67,7 +71,9 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
         await bot.ban_chat_member(chat.id, victim.id)
     except Exception as e:
         logger.error(e)
-        await Message.reply_msg(update, e)
+        error_msg = await Message.reply_msg(update, e)
+        if not error_msg:
+            await Message.reply_msg(update, e.message)
         return
     
     if not is_silent:

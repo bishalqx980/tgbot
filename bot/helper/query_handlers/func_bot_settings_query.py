@@ -66,7 +66,7 @@ class QueryBotSettings:
                     storage += f"{i}"
                 else:
                     storage += f"{i}, "
-            images = storage  
+            images = storage
         
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"

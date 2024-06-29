@@ -64,19 +64,23 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
         await bot.promote_chat_member(chat.id, victim.id, can_manage_video_chats=True)
     except Exception as e:
         logger.error(e)
-        await Message.reply_msg(update, e)
+        error_msg = await Message.reply_msg(update, e)
+        if not error_msg:
+            await Message.reply_msg(update, e.message)
         return
     
+    msg = f"{victim.mention_html()} has been promoted!\n<b>Admin</b>: {user.first_name}"
+    if admin_title:
+        try:
+            await bot.set_chat_administrator_custom_title(chat.id, victim.id, admin_title)
+            msg = f"{msg}\nNew admin title: {admin_title}"
+        except Exception as e:
+            logger.error(e)
+            error_msg = await Message.reply_msg(update, e)
+            if not error_msg:
+                await Message.reply_msg(update, e.message)
+    
     if not is_silent:
-        msg = f"{victim.mention_html()} has been promoted!\n<b>Admin</b>: {user.first_name}"
-        if admin_title:
-            try:
-                await bot.set_chat_administrator_custom_title(chat.id, victim.id, admin_title)
-                msg = f"{msg}\nAdmin title: {admin_title}"
-            except Exception as e:
-                logger.error(e)
-                await Message.reply_msg(update, e)
-        
         await Message.reply_msg(update, msg)
     await _log_channel(update, chat, user, victim, action="PROMOTE")
 
