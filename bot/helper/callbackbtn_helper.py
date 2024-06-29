@@ -80,6 +80,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             if edit_data_key in ["images", "allowed_links"]:
                 is_list = True
+            elif edit_data_key in ["log_channel"]:
+                is_int = True
             elif edit_data_key in ["sudo_users"]:
                 is_list = True
                 is_int = True
