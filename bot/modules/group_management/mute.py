@@ -56,12 +56,13 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         if _bot_info.id == victim.id:
             await Message.reply_msg(update, "I'm not going to mute myself!")
+            return
         # Super power for chat owner
         elif victim_permission.status == ChatMember.ADMINISTRATOR and user_permission.status == ChatMember.OWNER:
             pass
         else:
             await Message.reply_msg(update, f"I'm not going to mute an admin! You must be joking!")
-        return
+            return
     
     permissions = {
         "can_send_other_messages": False,
