@@ -92,15 +92,15 @@ class QueryFunctions:
         else:
             await LOCAL_DATABASE.insert_data(collection_name, chat_id, data)
         
+        msg = f"Database updated!\n\nData: {edit_data_key}\nValue: {edit_data_value}"
         
         if is_list:
             if len([edit_data_value]) > 5:
                 msg = f"{len([edit_data_value])} items"
-        elif not is_int:
+                
+        if not is_int:
             if len(edit_data_value) > 100:
                 msg = "Data is too long, can't show! Check on message..."
-        else:
-            msg = f"Database updated!\n\nData: {edit_data_key}\nValue: {edit_data_value}"
         
         try:
             await query.answer(msg, True)
