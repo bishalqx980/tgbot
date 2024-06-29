@@ -8,7 +8,7 @@ from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
-async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
     chat = update.effective_chat
     user = update.effective_user
     reply = update.message.reply_to_message
@@ -58,6 +58,15 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(e)
         await Message.reply_msg(update, e)
         return
-
-    await Message.reply_msg(update, f"Message pinned & notified everyone!")
+    
+    if not is_silent:
+        await Message.reply_msg(update, f"Message has been pinned and notified everyone!")
     await _log_channel(update, chat, user, action="PIN")
+
+
+async def func_spin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
+    
+    await Message.del_msg(chat.id, e_msg)
+    await func_pin_msg(update, context, is_silent=True)

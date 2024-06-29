@@ -7,7 +7,7 @@ from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
-async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
     chat = update.effective_chat
     user = update.effective_user
     reply = update.message.reply_to_message
@@ -87,8 +87,17 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, e)
         return
     
-    msg = f"{victim.mention_html()} has been unmuted in this chat!\n<b>Admin</b>: {user.first_name}"
-    if reason:
-        msg = f"{msg}\n<b>Reason</b>: {reason}"
+    if not is_silent:
+        msg = f"{victim.mention_html()} has been unmuted in this chat!\n<b>Admin</b>: {user.first_name}"
+        if reason:
+            msg = f"{msg}\n<b>Reason</b>: {reason}"
+        
+        await Message.reply_msg(update, msg)
+
+
+async def func_sunmute(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
     
-    await Message.reply_msg(update, msg)
+    await Message.del_msg(chat.id, e_msg)
+    await func_unmute(update, context, is_silent=True)

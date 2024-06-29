@@ -44,19 +44,19 @@ from bot.functions.filter_service_msg import func_filter_services
 from bot.functions.filter_all import func_filter_all
 from bot.functions.del_command import func_del_command
 from bot.modules.group_management.invite_link import func_invite_link
-from bot.modules.group_management.promote import func_promote
-from bot.modules.group_management.demote import func_demote
-from bot.modules.group_management.pin_msg import func_pin_msg
-from bot.modules.group_management.unpin_msg import func_unpin_msg
-from bot.modules.group_management.unpinall_msg import func_unpinall_msg
-from bot.modules.group_management.ban import func_ban
-from bot.modules.group_management.unban import func_unban
-from bot.modules.group_management.kick import func_kick
+from bot.modules.group_management.promote import func_promote, func_spromote
+from bot.modules.group_management.demote import func_demote, func_sdemote
+from bot.modules.group_management.pin_msg import func_pin_msg, func_spin_msg
+from bot.modules.group_management.unpin_msg import func_unpin_msg, func_sunpin_msg
+from bot.modules.group_management.unpinall_msg import func_unpinall_msg, func_sunpinall_msg
+from bot.modules.group_management.ban import func_ban, func_sban
+from bot.modules.group_management.unban import func_unban, func_sunban
+from bot.modules.group_management.kick import func_kick, func_skick
 from bot.modules.group_management.kickme import func_kickme
-from bot.modules.group_management.mute import func_mute
-from bot.modules.group_management.unmute import func_unmute
-from bot.modules.group_management.del_msg import func_del
-from bot.modules.group_management.purge import func_purge
+from bot.modules.group_management.mute import func_mute, func_smute
+from bot.modules.group_management.unmute import func_unmute, func_sunmute
+from bot.modules.group_management.del_msg import func_del, func_sdel
+from bot.modules.group_management.purge import func_purge, func_spurge
 from bot.modules.group_management.lock_chat import func_lockchat
 from bot.modules.group_management.unlock_chat import func_unlockchat
 from bot.modules.group_management.add_filter import func_filter
@@ -129,21 +129,34 @@ def main():
         "qr": func_gen_qr,
         "itl": func_img_to_link,
         "settings": func_settings,
+        # Group management
         "id": func_id,
         "invite": func_invite_link,
         "promote": func_promote,
+        "spromote": func_spromote,
         "demote": func_demote,
+        "sdemote": func_sdemote,
         "pin": func_pin_msg,
+        "spin": func_spin_msg,
         "unpin": func_unpin_msg,
+        "sunpin": func_sunpin_msg,
         "unpinall": func_unpinall_msg,
+        "sunpinall": func_sunpinall_msg,
         "ban": func_ban,
+        "sban": func_sban,
         "unban": func_unban,
+        "sunban": func_sunban,
         "kick": func_kick,
+        "skick": func_skick,
         "kickme": func_kickme,
         "mute": func_mute,
+        "smute": func_smute,
         "unmute": func_unmute,
+        "sunmute": func_sunmute,
         "del": func_del,
+        "sdel": func_sdel,
         "purge": func_purge,
+        "spurge": func_spurge,
         "lock": func_lockchat,
         "unlock": func_unlockchat,
         "filter": func_filter,

@@ -28,7 +28,8 @@ class QueryBotHelp:
             "/filters | /filter | /remove » To see/set/remove custom message/command\n"
             "/adminlist » See chat admins list\n"
             "/settings » Settings of chat\n\n"
-            "<i><b>Note:</b> Type commands to get more details about the command function!</i>"
+            "<i><b>Note:</b> Type commands to get more details about the command function!</i>\n"
+            "<i><b>Tips:</b>Some command has a silent function! eg. /sban or /smute etc. (this will silently perform the function)</i>"
         )
 
         btn_name = ["Back", "Close"]

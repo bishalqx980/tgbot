@@ -7,7 +7,7 @@ from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
-async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
     chat = update.effective_chat
     user = update.effective_user
     reply = update.message.reply_to_message
@@ -69,12 +69,13 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(e)
         await Message.reply_msg(update, e)
         return
-
-    msg = f"{victim.mention_html()} has been unbanned in this chat!\n<b>Admin</b>: {user.first_name}"
-    if reason:
-        msg = f"{msg}\n<b>Reason</b>: {reason}"
     
-    await Message.reply_msg(update, msg)
+    if not is_silent:
+        msg = f"{victim.mention_html()} has been unbanned in this chat!\n<b>Admin</b>: {user.first_name}"
+        if reason:
+            msg = f"{msg}\n<b>Reason</b>: {reason}"
+        
+        await Message.reply_msg(update, msg)
 
     if chat.link:
         invite_link = chat.link
@@ -86,8 +87,16 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.error(e)
             return
     
-    msg = f"{user.mention_html()} has unbanned you in {chat.title}!\nYou can join again using this invite link!\nInvite Link: {invite_link.invite_link}"
+    msg = f"{user.mention_html()} has unbanned you in {chat.title}!\nYou can join again using this invite link!\nInvite Link: {invite_link}"
     if reason:
         msg = f"{msg}\n<b>Reason</b>: {reason}"
     
     await Message.send_msg(victim.id, msg)
+
+
+async def func_sunban(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
+    
+    await Message.del_msg(chat.id, e_msg)
+    await func_unban(update, context, is_silent=True)

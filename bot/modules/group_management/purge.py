@@ -7,7 +7,7 @@ from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
-async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
     chat = update.effective_chat
     user = update.effective_user
     e_msg = update.effective_message
@@ -55,5 +55,16 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for msg_id in range(reply.id, e_msg.id + 1):
         await Message.del_msg(chat.id, msg_id=msg_id)
     
-    await Message.edit_msg(update, f"Purge completed!", sent_msg)
+    if is_silent:
+        await Message.del_msg(chat.id, sent_msg)
+    else:
+        await Message.edit_msg(update, f"Purge completed!", sent_msg)
     await _log_channel(update, chat, user, action="MSG_PURGE")
+
+
+async def func_spurge(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
+    
+    await Message.del_msg(chat.id, e_msg)
+    await func_purge(update, context, is_silent=True)

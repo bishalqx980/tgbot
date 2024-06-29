@@ -8,7 +8,7 @@ from bot.modules.group_management.check_permission import _check_permission
 from bot.modules.group_management.extract_time_reason import _extract_time_reason
 
 
-async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
     chat = update.effective_chat
     user = update.effective_user
     reply = update.message.reply_to_message
@@ -90,13 +90,22 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(e)
         await Message.reply_msg(update, e)
         return
-
-    msg = f"Shh... {victim.mention_html()} has been muted in this chat!\n<b>Admin</b>: {user.first_name}\n"
     
-    if logical_time:
-        msg = f"{msg}<b>Duration</b>: {logical_time}\n"
+    if not is_silent:
+        msg = f"Shh... {victim.mention_html()} has been muted in this chat!\n<b>Admin</b>: {user.first_name}\n"
+        
+        if logical_time:
+            msg = f"{msg}<b>Duration</b>: {logical_time}\n"
 
-    if reason:
-        msg = f"{msg}<b>Reason</b>: {reason}"
+        if reason:
+            msg = f"{msg}<b>Reason</b>: {reason}"
+        
+        await Message.reply_msg(update, msg)
+
+
+async def func_smute(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
     
-    await Message.reply_msg(update, msg)
+    await Message.del_msg(chat.id, e_msg)
+    await func_mute(update, context, is_silent=True)

@@ -8,7 +8,7 @@ from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
-async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
     chat = update.effective_chat
     user = update.effective_user
     reply = update.message.reply_to_message
@@ -66,15 +66,24 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(e)
         await Message.reply_msg(update, e)
         return
-
-    msg = f"{victim.mention_html()} has been promoted!\n<b>Admin</b>: {user.first_name}"
-    if admin_title:
-        try:
-            await bot.set_chat_administrator_custom_title(chat.id, victim.id, admin_title)
-            msg = f"{msg}\nAdmin title: {admin_title}"
-        except Exception as e:
-            logger.error(e)
-            await Message.reply_msg(update, e)
     
-    await Message.reply_msg(update, msg)
+    if not is_silent:
+        msg = f"{victim.mention_html()} has been promoted!\n<b>Admin</b>: {user.first_name}"
+        if admin_title:
+            try:
+                await bot.set_chat_administrator_custom_title(chat.id, victim.id, admin_title)
+                msg = f"{msg}\nAdmin title: {admin_title}"
+            except Exception as e:
+                logger.error(e)
+                await Message.reply_msg(update, e)
+        
+        await Message.reply_msg(update, msg)
     await _log_channel(update, chat, user, victim, action="PROMOTE")
+
+
+async def func_spromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
+    
+    await Message.del_msg(chat.id, e_msg)
+    await func_promote(update, context, is_silent=True)

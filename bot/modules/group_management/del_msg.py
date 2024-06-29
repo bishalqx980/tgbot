@@ -7,7 +7,7 @@ from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
-async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
     chat = update.effective_chat
     user = update.effective_user
     e_msg = update.effective_message
@@ -57,9 +57,19 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for delete_msg in message_to_del:
         await Message.del_msg(chat.id, delete_msg)
     
-    msg = f"Lookout... {victim.mention_html()}, your message has been deleted!\n<b>Admin</b>: {user.first_name}"
-    if reason:
-        msg = f"{msg}\n<b>Reason</b>: {reason}"
+    if not is_silent:
+        msg = f"Lookout... {victim.mention_html()}, your message has been deleted!\n<b>Admin</b>: {user.first_name}"
+        if reason:
+            msg = f"{msg}\n<b>Reason</b>: {reason}"
+        
+        await Message.send_msg(chat.id, msg)
     
-    await Message.send_msg(chat.id, msg)
     await _log_channel(update, chat, user, victim, action="MSG_DEL", reason=reason)
+
+
+async def func_sdel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
+    
+    await Message.del_msg(chat.id, e_msg)
+    await func_del(update, context, is_silent=True)

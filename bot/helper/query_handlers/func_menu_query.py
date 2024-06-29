@@ -40,7 +40,7 @@ class QueryMenus:
             f"/help - to see this message"
         )
 
-        btn_name_row1 = ["Group Management", "Artificial intelligence"]
+        btn_name_row1 = ["Group Management", "AI"]
         btn_data_row1 = ["query_help_group_management", "query_help_ai"]
 
         btn_name_row2 = ["misc", "Bot owner"]
