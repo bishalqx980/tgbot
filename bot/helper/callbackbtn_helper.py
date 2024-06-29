@@ -63,8 +63,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     find_chat = db[1]
     
     # Youtube download ...
-    if  query.data in ["mp4", "mp3"]:
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": query.data})
+    if query.data in ["mp4", "mp3"]:
+        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": query.data})
     # Database editing query ...
     elif query.data in [
         "query_edit_value",
@@ -93,16 +93,15 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await QueryFunctions.query_false(chat.id, query)
         elif query.data == "query_close":
             await QueryFunctions.query_close(chat.id, query)
-        else:
-            pass
     # Help section ...
     elif query.data in [
         "query_help_group_management",
         "query_help_ai",
         "query_help_misc_functions",
-        "query_help_owner_functions"
+        "query_help_owner_functions",
+        "query_help_bot_info"
     ]:
-        if  query.data == "query_help_group_management":
+        if query.data == "query_help_group_management":
             await QueryBotHelp._query_help_group_management(update, query)
         elif query.data == "query_help_ai":
             await QueryBotHelp._query_help_ai(update, query)
@@ -110,16 +109,16 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await QueryBotHelp._query_help_misc_functions(update, query)
         elif query.data == "query_help_owner_functions":
             await QueryBotHelp._query_help_owner_functions(update, query)
-        else:
-            pass
+        elif query.data == "query_help_bot_info":
+            await QueryBotHelp._query_help_bot_info(update, query)
     # Chat settings ...
     elif query.data in [
         "query_chat_lang",
         "query_chat_auto_tr",
         "query_chat_set_echo",
-        "query_chat_welcome_msg",
+        "query_chat_welcome_user",
         "query_set_custom_welcome_msg",
-        "query_chat_farewell_msg",
+        "query_chat_farewell_user",
         "query_chat_antibot",
         "query_chat_del_cmd",
         "query_chat_log_channel",
@@ -137,12 +136,12 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await QueryChatSettings._query_chat_auto_tr(update, query, chat, find_chat)
         elif query.data == "query_chat_set_echo":
             await QueryChatSettings._query_chat_set_echo(update, query, chat, find_chat)
-        elif query.data == "query_chat_welcome_msg":
-            await QueryChatSettings._query_chat_welcome_msg(update, query, chat, find_chat)
+        elif query.data == "query_chat_welcome_user":
+            await QueryChatSettings._query_chat_welcome_user(update, query, chat, find_chat)
         elif query.data == "query_set_custom_welcome_msg":
             await QueryChatSettings._query_set_custom_welcome_msg(update, query, chat, find_chat)
-        elif query.data == "query_chat_farewell_msg":
-            await QueryChatSettings._query_chat_farewell_msg(update, query, chat, find_chat)
+        elif query.data == "query_chat_farewell_user":
+            await QueryChatSettings._query_chat_farewell_user(update, query, chat, find_chat)
         elif query.data == "query_chat_antibot":
             await QueryChatSettings._query_chat_antibot(update, query, chat, find_chat)
         elif query.data == "query_chat_del_cmd":
@@ -163,8 +162,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await QueryChatSettings._query_none_links(query, chat)
         elif query.data == "query_chat_ai_status":
             await QueryChatSettings._query_chat_ai_status(update, query, chat, find_chat)
-        else:
-            pass
     # Bot settings ...
     elif query.data in [
         "query_bot_pic",
@@ -177,34 +174,32 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "query_omdb_api",
         "query_weather_api",
         "query_restore_db",
-        "confirm_restore_db"
+        "query_confirm_restore_db"
     ]:
         power_users = await _power_users()
         if user.id in power_users:
             if query.data == "query_bot_pic":
-                await QueryBotSettings._query_bot_pic(update, query, chat, find_chat)
+                await QueryBotSettings._query_bot_pic(update, query, user, find_chat)
             elif query.data == "query_welcome_img":
-                await QueryBotSettings._query_welcome_img(update, query, chat, find_chat)
+                await QueryBotSettings._query_welcome_img(update, query, user, find_chat)
             elif query.data == "query_images":
-                await QueryBotSettings._query_images(update, query, chat, find_chat)
+                await QueryBotSettings._query_images(update, query, user, find_chat)
             elif query.data == "query_support_chat":
-                await QueryBotSettings._query_support_chat(update, query, chat, find_chat)
+                await QueryBotSettings._query_support_chat(update, query, user, find_chat)
             elif query.data == "query_server_url":
-                await QueryBotSettings._query_server_url(update, query, chat, find_chat)
+                await QueryBotSettings._query_server_url(update, query, user, find_chat)
             elif query.data == "query_sudo":
-                await QueryBotSettings._query_sudo(update, query, chat, find_chat)
+                await QueryBotSettings._query_sudo(update, query, user, find_chat)
             elif query.data == "query_shrinkme_api":
-                await QueryBotSettings._query_shrinkme_api(update, query, chat, find_chat)
+                await QueryBotSettings._query_shrinkme_api(update, query, user, find_chat)
             elif query.data == "query_omdb_api":
-                await QueryBotSettings._query_omdb_api(update, query, chat, find_chat)
+                await QueryBotSettings._query_omdb_api(update, query, user, find_chat)
             elif query.data == "query_weather_api":
-                await QueryBotSettings._query_weather_api(update, query, chat, find_chat)
+                await QueryBotSettings._query_weather_api(update, query, user, find_chat)
             elif query.data == "query_restore_db":
                 await QueryBotSettings._query_restore_db(update, query)
-            elif query.data == "confirm_restore_db":
+            elif query.data == "query_confirm_restore_db":
                 await QueryBotSettings._query_confirm_restore_db(update, data_center)
-            else:
-                pass
     # Query menus ...
     elif query.data in [
         "query_help_menu",
@@ -217,5 +212,3 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await QueryMenus._query_chat_settings_menu(update, query, chat, find_chat)
         elif query.data == "query_bot_settings_menu":
             await QueryMenus._query_bot_settings_menu(update, query)
-        else:
-            pass

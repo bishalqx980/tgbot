@@ -67,17 +67,16 @@ class LOCAL_DATABASE:
                 data["_id"] = str(data["_id"]) # mongodb _id >> make it str
             
             load_collection = load_db.get(collection)
-            check_db = load_collection.get(str(identifier))
-            if load_collection:
-                load_identifier = load_collection.get(str(identifier))
-                load_identifier.update(data)
+            is_identifier = load_collection.get(str(identifier))
+            if is_identifier:
+                is_identifier.update(data)
             else:
                 load_collection[str(identifier)] = data
 
             with open(LOCAL_DB, "w") as f:
                 json.dump(load_db, f, indent=4)
             
-            if check_db:
+            if is_identifier:
                 logger.info(f"{identifier} updated in collection {collection} in localdb...")
             else:
                 logger.info(f"{identifier} created in collection {collection} in localdb...")

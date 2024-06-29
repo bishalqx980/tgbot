@@ -5,7 +5,6 @@ from telegram.error import Forbidden
 from bot import bot
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.combined_db import find_bot_docs, check_add_user_db
-from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
 
 
@@ -36,28 +35,13 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "edit_data_value_msg_pointer_id": None
     }
 
-    await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
-    info_db = await MongoDB.info_db()
-    for i in info_db:
-        if i[0] == "users":
-            total_users = i[1]
-            break
-        else:
-            total_users = "~"
-        
-    active_status = await MongoDB.find("users", "active_status")
-    active_users = active_status.count(True)
-    inactive_users = active_status.count(False)
+    await LOCAL_DATABASE.insert_data("data_center", user.id, data)
 
     msg = (
         f"Hey, {user.first_name}! Welcome to the bot help section...\n"
         f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
         f"/start - to start the bot\n"
-        f"/help - to see this message\n\n"
-        f"T.users: {total_users} | "
-        f"A.users: {active_users} | "
-        f"Inactive: {inactive_users}"
+        f"/help - to see this message"
     )
 
     btn_name_row1 = ["Group Management", "AI"]
@@ -66,12 +50,12 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_name_row2 = ["misc", "Bot owner"]
     btn_data_row2 = ["query_help_misc_functions", "query_help_owner_functions"]
 
-    btn_name_row3 = ["Close"]
-    btn_data_row3 = ["query_close"]
+    btn_name_row3 = ["» bot.info()", "Close"]
+    btn_data_row3 = ["query_help_bot_info", "query_close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-    row3 = await Button.cbutton(btn_name_row3, btn_data_row3)
+    row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
 
     btn = row1 + row2 + row3
 

@@ -271,4 +271,4 @@ class QueryFunctions:
         try:
             await query.message.delete()
         except Exception as e:
-            logger.error(e)  
+            logger.error(e)

@@ -39,8 +39,8 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "I can help you to manage your group with lots of useful features!\n"
         "Feel free to add me to your group.\n\n"
         "<b>/help - for bot help</b>\n\n"
-        "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>\n"
-        "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>"
+        "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
+        "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
     )
 
     if _bot_info.username != "MissCiri_bot":

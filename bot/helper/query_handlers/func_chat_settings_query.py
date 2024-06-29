@@ -81,20 +81,20 @@ class QueryChatSettings:
         await Message.edit_msg(update, msg, query.message, btn)
 
 
-    async def _query_chat_welcome_msg(update: Update, query, chat, find_chat):
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "welcome_msg"})
-        welcome_msg = find_chat.get("welcome_msg")
+    async def _query_chat_welcome_user(update: Update, query, chat, find_chat):
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "welcome_user"})
+        welcome_user = find_chat.get("welcome_user")
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
-            f"Welcome user: <code>{welcome_msg}</code>\n\n"
+            f"Welcome user: <code>{welcome_user}</code>\n\n"
             "<i><b>Note</b>: This will welcome the new chat member!</i>"
         )
 
         btn_name_row1 = ["Enable", "Disable"]
         btn_data_row1 = ["query_true", "query_false"]
 
-        btn_name_row2 = ["Set custom message"]
+        btn_name_row2 = ["Custom welcome message"]
         btn_data_row2 = ["query_set_custom_welcome_msg"]
 
         btn_name_row3 = ["Back", "Close"]
@@ -123,9 +123,9 @@ class QueryChatSettings:
         btn_data_row1 = ["query_rm_value", "query_edit_value"]
 
         btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_welcome_msg", "query_close"]
+        btn_data_row2 = ["query_chat_welcome_user", "query_close"]
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
 
         btn = row1 + row2
@@ -133,13 +133,13 @@ class QueryChatSettings:
         await Message.edit_msg(update, msg, query.message, btn)
 
 
-    async def _query_chat_farewell_msg(update: Update, query, chat, find_chat):
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "farewell_msg"})
-        farewell_msg = find_chat.get("farewell_msg")
+    async def _query_chat_farewell_user(update: Update, query, chat, find_chat):
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "farewell_user"})
+        farewell_user = find_chat.get("farewell_user")
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
-            f"Farewell message: <code>{farewell_msg}</code>\n\n"
+            f"Farewell user: <code>{farewell_user}</code>\n\n"
             "<i><b>Note</b>: This will send a farewell message to chat when a user left!\n</i>"
         )
 
@@ -187,7 +187,7 @@ class QueryChatSettings:
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
-            f"Delete cmd: <code>{del_cmd}</code>\n\n"
+            f"Delete CMD: <code>{del_cmd}</code>\n\n"
             "<i><b>Note</b>: This will delete bot commands when you will send a command in chat!</i>"
         )
 

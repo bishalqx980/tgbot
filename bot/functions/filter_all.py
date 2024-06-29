@@ -52,14 +52,15 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if auto_tr_status:
             lang_code = find_user.get("lang")
             tr_msg = await translate(msg, lang_code)
-            if tr_msg != msg:
-                await Message.reply_msg(update, tr_msg)
-            elif not tr_msg:
+            if not tr_msg:
                 btn_name = ["Language code's"]
                 btn_url = ["https://telegra.ph/Language-Code-12-24"]
                 btn = await Button.ubutton(btn_name, btn_url)
                 await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
-                return   
+                return
+            
+            if tr_msg != msg:
+                await Message.reply_msg(update, tr_msg)
 
     elif chat.type in ["group", "supergroup"]:
         _chk_per = await _check_permission(update, user=user, checking_msg=False)

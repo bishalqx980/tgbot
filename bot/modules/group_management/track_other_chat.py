@@ -27,9 +27,9 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
         else:
             return
 
-    welcome_msg = find_group.get("welcome_msg")
+    welcome_user = find_group.get("welcome_user")
     custom_welcome_msg = find_group.get("custom_welcome_msg")
-    goodbye_msg = find_group.get("goodbye_msg")
+    farewell_user = find_group.get("farewell_user")
     antibot = find_group.get("antibot")
 
     _chk_stat = await _chat_member_status(chat_member) #True means user exist and False is not exist
@@ -68,7 +68,7 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
             except Exception as e:
                 logger.error(e)
                 await Message.send_msg(chat.id, f"Error: {e}")
-        elif welcome_msg:
+        elif welcome_user:
             if custom_welcome_msg:
                 formattings = {
                     "{first}": victim.first_name,
@@ -88,5 +88,5 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
                 await Message.send_msg(chat.id, custom_welcome_msg)
             else:
                 await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
-    elif user_exist == False and cause == "LEFT" and goodbye_msg:
+    elif user_exist == False and cause == "LEFT" and farewell_user:
         await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")

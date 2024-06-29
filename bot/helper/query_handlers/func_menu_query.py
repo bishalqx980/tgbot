@@ -34,26 +34,11 @@ class QueryMenus:
 
 
     async def _query_help_menu(update: Update, query, user):
-        db = await MongoDB.info_db()
-        for i in db:
-            if i[0] == "users":
-                total_users = i[1]
-                break
-            else:
-                total_users = "❓"
-        
-        active_status = await MongoDB.find("users", "active_status")
-        active_users = active_status.count(True)
-        inactive_users = active_status.count(False)
-
         msg = (
             f"Hi {user.mention_html()}! Welcome to the bot help section...\n"
             f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
             f"/start - to start the bot\n"
-            f"/help - to see this message\n\n"
-            f"T.users: {total_users} | "
-            f"A.users: {active_users} | "
-            f"Inactive: {inactive_users}"
+            f"/help - to see this message"
         )
 
         btn_name_row1 = ["Group Management", "Artificial intelligence"]
@@ -62,12 +47,12 @@ class QueryMenus:
         btn_name_row2 = ["misc", "Bot owner"]
         btn_data_row2 = ["query_help_misc_functions", "query_help_owner_functions"]
 
-        btn_name_row3 = ["Close"]
-        btn_data_row3 = ["query_close"]
+        btn_name_row3 = ["» bot.info()", "Close"]
+        btn_data_row3 = ["query_help_bot_info", "query_close"]
 
         row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
         row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-        row3 = await Button.cbutton(btn_name_row3, btn_data_row3)
+        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
 
         btn = row1 + row2 + row3
 
@@ -87,8 +72,8 @@ class QueryMenus:
                 f"• ID: <code>{chat.id}</code>\n\n"
 
                 f"• Lang: <code>{lang}</code>\n"
+                f"• Auto tr: <code>{auto_tr}</code>\n"
                 f"• Echo: <code>{echo}</code>\n"
-                f"• Auto tr: <code>{auto_tr}</code>\n\n"
             )
 
             btn_name_row1 = ["Language", "Auto translate"]
@@ -106,8 +91,8 @@ class QueryMenus:
             lang = find_chat.get("lang")
             echo = find_chat.get("echo")
             auto_tr = find_chat.get("auto_tr")
-            welcome_msg = find_chat.get("welcome_msg")
-            goodbye_msg = find_chat.get("goodbye_msg")
+            welcome_user = find_chat.get("welcome_user")
+            farewell_user = find_chat.get("farewell_user")
             antibot = find_chat.get("antibot")
             ai_status = find_chat.get("ai_status")
             del_cmd = find_chat.get("del_cmd")
@@ -131,16 +116,16 @@ class QueryMenus:
                 f"• ID: <code>{chat.id}</code>\n\n"
 
                 f"• Lang: <code>{lang}</code>\n"
-                f"• Echo: <code>{echo}</code>\n"
                 f"• Auto tr: <code>{auto_tr}</code>\n"
-                f"• Welcome user: <code>{welcome_msg}</code>\n"
-                f"• Goodbye user: <code>{goodbye_msg}</code>\n"
+                f"• Echo: <code>{echo}</code>\n"
                 f"• Antibot: <code>{antibot}</code>\n"
-                f"• AI status: <code>{ai_status}</code>\n"
-                f"• Delete cmd: <code>{del_cmd}</code>\n"
+                f"• Welcome user: <code>{welcome_user}</code>\n"
+                f"• Farewell user: <code>{farewell_user}</code>\n"
+                f"• Delete CMD: <code>{del_cmd}</code>\n"
+                f"• Log channel: <code>{log_channel}</code>\n"
                 f"• All links: <code>{all_links}</code>\n"
                 f"• Allowed links: <code>{allowed_links}</code>\n"
-                f"• Log channel: <code>{log_channel}</code>\n"
+                f"• AI status: <code>{ai_status}</code>\n"
             )
 
             btn_name_row1 = ["Language", "Auto translate"]
@@ -150,7 +135,7 @@ class QueryMenus:
             btn_data_row2 = ["query_chat_set_echo", "query_chat_antibot"]
 
             btn_name_row3 = ["Welcome", "Farewell"]
-            btn_data_row3 = ["query_chat_welcome_msg", "query_chat_farewell_msg"]
+            btn_data_row3 = ["query_chat_welcome_user", "query_chat_farewell_user"]
 
             btn_name_row4 = ["Delete CMD", "Log channel"]
             btn_data_row4 = ["query_chat_del_cmd", "query_chat_log_channel"]

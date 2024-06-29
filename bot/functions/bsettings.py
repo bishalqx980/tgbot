@@ -37,7 +37,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "edit_data_value_msg_pointer_id": None
     }
 
-    await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+    await LOCAL_DATABASE.insert_data("data_center", user.id, data)
     
     msg = "<u><b>Bot Settings</b></u>"
 

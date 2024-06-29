@@ -133,8 +133,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lang = find_group.get("lang")
         echo = find_group.get("echo")
         auto_tr = find_group.get("auto_tr")
-        welcome_msg = find_group.get("welcome_msg")
-        goodbye_msg = find_group.get("goodbye_msg")
+        welcome_user = find_group.get("welcome_user")
+        farewell_user = find_group.get("farewell_user")
         antibot = find_group.get("antibot")
         ai_status = find_group.get("ai_status")
         del_cmd = find_group.get("del_cmd")
@@ -160,8 +160,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Lang: <code>{lang}</code>\n"
             f"• Echo: <code>{echo}</code>\n"
             f"• Auto tr: <code>{auto_tr}</code>\n"
-            f"• Welcome user: <code>{welcome_msg}</code>\n"
-            f"• Goodbye user: <code>{goodbye_msg}</code>\n"
+            f"• Welcome user: <code>{welcome_user}</code>\n"
+            f"• Farewell user: <code>{farewell_user}</code>\n"
             f"• Antibot: <code>{antibot}</code>\n"
             f"• AI status: <code>{ai_status}</code>\n"
             f"• Delete cmd: <code>{del_cmd}</code>\n"
@@ -177,7 +177,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_data_row2 = ["query_chat_set_echo", "query_chat_antibot"]
 
         btn_name_row3 = ["Welcome", "Farewell"]
-        btn_data_row3 = ["query_chat_welcome_msg", "query_chat_farewell_msg"]
+        btn_data_row3 = ["query_chat_welcome_user", "query_chat_farewell_user"]
 
         btn_name_row4 = ["Delete CMD", "Log channel"]
         btn_data_row4 = ["query_chat_del_cmd", "query_chat_log_channel"]

@@ -1,5 +1,7 @@
 from telegram import Update
+from bot import bot
 from bot.helper.telegram_helper import Message, Button
+from bot.modules.database.mongodb import MongoDB
 
 
 class QueryBotHelp:
@@ -89,6 +91,42 @@ class QueryBotHelp:
             "/restart » Restart the bot\n"
             "/sys » Get system info\n\n"
             "<i><b>Note</b>: Type commands to get more details about the command function!</i>"
+        )
+
+        btn_name = ["Back", "Close"]
+        btn_data = ["query_help_menu", "query_close"]
+        btn = await Button.cbutton(btn_name, btn_data, True)
+
+        await Message.edit_msg(update, msg, query.message, btn)
+    
+
+    async def _query_help_bot_info(update: Update, query):
+        _bot_info = await bot.get_me()
+        info_db = await MongoDB.info_db()
+        for i in info_db:
+            if i[0] == "users":
+                total_users = i[1]
+                break
+            else:
+                total_users = "~"
+        
+        active_status = await MongoDB.find("users", "active_status")
+        active_users = active_status.count(True)
+        inactive_users = active_status.count(False)
+
+        msg = (
+            "<b><code>» bot.info()</code></b>\n\n"
+
+            f"<b>• Name:</b> {_bot_info.full_name}\n"
+            f"<b>• ID:</b> <code>{_bot_info.id}</code>\n"
+            f"<b>• Username:</b> {_bot_info.name}\n\n"
+
+            f"<b>• Registered users:</b> <code>{total_users}</code>\n"
+            f"<b>• Active users:</b> <code>{active_users}</code>\n"
+            f"<b>• Inactive users:</b> <code>{inactive_users}</code>\n\n"
+
+            "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
+            "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
         )
 
         btn_name = ["Back", "Close"]
