@@ -21,6 +21,8 @@ async def update_database():
     find = await MongoDB.find("bot_docs", "_id")
 
     if find:
+        data = await MongoDB.find_one("bot_docs", "_id", find[0])
+        await LOCAL_DATABASE.insert_data_direct("bot_docs", data)
         logger.info("MongoDB database exist! Skiping update...")
         return
     
