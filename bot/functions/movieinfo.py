@@ -12,7 +12,7 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/movie movie_name</code>\nE.g. <code>/movie animal</code>\nor\n<code>/movie -i tt13751694</code> [IMDB ID]\nor\n<code>/movie bodyguard -y 2011</code>")
         return
     
-    if "-i" and "-y" in msg:
+    if "-i" in msg and "-y" in msg:
         await Message.reply_msg(update, "⚠ You can't use both statement in same message!\n/movie for details.")
         return
     
