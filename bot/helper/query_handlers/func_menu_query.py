@@ -1,6 +1,5 @@
 from telegram import Update
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.database.mongodb import MongoDB
 
 
 class QueryMenus:

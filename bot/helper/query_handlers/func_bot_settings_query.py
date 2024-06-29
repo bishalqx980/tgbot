@@ -12,8 +12,8 @@ class QueryBotSettings:
 
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
-            f"Bot pic: <code>{bot_pic}</code>\n\n"
-            "<i><b>Note</b>: Send an image url/link to set bot pic!</i>"
+            f"Bot pic (link): <code>{bot_pic}</code>\n\n"
+            "<i><b>Note:</b> Send an image url/link to set bot pic!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -37,7 +37,7 @@ class QueryBotSettings:
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Welcome img: {welcome_img}\n\n"
-            "<i><b>Note</b>: Should bot show image on start?</i>"
+            "<i><b>Note:</b> Should bot show image on start?</i>"
         )
 
         btn_name_row1 = ["Yes", "No"]
@@ -70,8 +70,8 @@ class QueryBotSettings:
         
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
-            f"images: <code>{images}</code>\n\n"
-            "<i><b>Note</b>: Single image or Upload multiple image link separated by comma!</i>"
+            f"Images (link): <code>{images}</code>\n\n"
+            "<i><b>Note:</b> Single image or send multiple image link separated by comma!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -97,8 +97,8 @@ class QueryBotSettings:
             
             msg = (
                 "<u><b>Bot Settings</b></u>\n\n"
-                f"images: <code>Text file sent below!</code>\n\n"
-                "<i><b>Note</b>: Single image or Upload multiple image link separated by comma!</i>"
+                f"Images (link): <code>Text file sent below!</code>\n\n"
+                "<i><b>Note:</b> Single image or send multiple image link separated by comma!</i>"
             )
 
             await Message.edit_msg(update, msg, query.message, btn)
@@ -134,7 +134,7 @@ class QueryBotSettings:
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Server url: <code>{server_url}</code>\n\n"
-            "<i><b>Note</b>: Bot will fall asleep if you deployed the bot on render (free) and don't set this value...</i>"
+            "<i><b>Note:</b> Bot will fall asleep if you deployed the bot on render (free) and don't set this value...</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -167,8 +167,8 @@ class QueryBotSettings:
 
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
-            f"$udo users: <code>{sudo_users}</code>\n\n"
-            "<i><b>Note</b>: The power user! Sudo users have owner function access!\nAdd user_id eg. <code>2134776547</code></i>"
+            f"Sudo users: <code>{sudo_users}</code>\n\n"
+            "<i><b>Note:</b> The power user! Sudo users have owner function access!\nAdd user_id eg. <code>2134776547</code></i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -192,7 +192,7 @@ class QueryBotSettings:
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Shrinkme API: <code>{shrinkme_api}</code>\n\n"
-            "<i><b>Note</b>: This api for /short command!</i>"
+            "<i><b>Note:</b> This api for /short command!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -216,7 +216,7 @@ class QueryBotSettings:
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"OMDB API: <code>{omdb_api}</code>\n\n"
-            "<i><b>Note</b>: This api for /movie command!</i>"
+            "<i><b>Note:</b> This api for /movie command!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -240,7 +240,7 @@ class QueryBotSettings:
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Weather API: <code>{weather_api}</code>\n\n"
-            "<i><b>Note</b>: This api for /weather command!</i>"
+            "<i><b>Note:</b> This api for /weather command!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -264,7 +264,7 @@ class QueryBotSettings:
             "- All bot setting\n\n"
             "Which data won't be deleted?\n"
             "- Bot users/groups data\n\n"
-            f"<i><b>Note</b>: This will erase all bot data/settings from database and restore data/settings from <code>config.env</code></i>"
+            f"<i><b>Note:</b> This will erase all bot data/settings from database and restore data/settings from <code>config.env</code></i>"
         )
 
         btn_name_row1 = ["⚠ Restore Database"]

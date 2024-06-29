@@ -48,7 +48,7 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know which message to delete from! Reply the message that you want to start delete from!\n\n<i><b>Note</b>: bots are unable to delete 48h old messages due to Telegram limitation/restriction...</i>")
+        await Message.reply_msg(update, "I don't know which message to delete from! Reply the message that you want to start delete from!\n\n<i><b>Note:</b> bots are unable to delete 48h old messages due to Telegram limitation/restriction...</i>")
         return
     
     sent_msg = await Message.send_msg(chat.id, f"Purge started...")

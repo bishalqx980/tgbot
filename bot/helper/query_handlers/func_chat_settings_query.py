@@ -12,7 +12,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Language code: <code>{lang}</code>\n\n"
-            "<i><b>Note</b>: Get your country language code from the below link!\neg. English language code is <code>en</code></i>"
+            "<i><b>Note:</b> Get your country language code from the below link!\neg. English language code is <code>en</code></i>"
         )
 
         btn_name_row1 = ["Language code's"]
@@ -40,7 +40,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Auto translate: <code>{auto_tr}</code>\n\n"
-            "<i><b>Note</b>: This will automatically translate chat conversation into chat default language!</i>"
+            "<i><b>Note:</b> This will automatically translate chat conversation into chat default language!</i>"
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -64,7 +64,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Echo: <code>{echo}</code>\n\n"
-            "<i><b>Note</b>: This will repeat user message!</i>"
+            "<i><b>Note:</b> This will repeat user message!</i>"
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -88,7 +88,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Welcome user: <code>{welcome_user}</code>\n\n"
-            "<i><b>Note</b>: This will welcome the new chat member!</i>"
+            "<i><b>Note:</b> This will welcome the new chat member!</i>"
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -116,7 +116,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Welcome message\n--------------------\n<code>{custom_welcome_msg}</code>\n\n"
-            "<i><b>Note</b>: This message will be send as greeting message in the chat when a user join! (supports telegram formatting)</i>"
+            "<i><b>Note:</b> This message will be send as greeting message in the chat when a user join! (supports telegram formatting)</i>"
         )
 
         btn_name_row1 = ["Set default message", "Set custom message"]
@@ -140,7 +140,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Farewell user: <code>{farewell_user}</code>\n\n"
-            "<i><b>Note</b>: This will send a farewell message to chat when a user left!\n</i>"
+            "<i><b>Note:</b> This will send a farewell message to chat when a user left!\n</i>"
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -164,7 +164,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Antibot: <code>{antibot}</code>\n\n"
-            "<i><b>Note</b>: This will prevent other bot from joining in chat!</i>"
+            "<i><b>Note:</b> This will prevent other bot from joining in chat!</i>"
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -188,7 +188,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Delete CMD: <code>{del_cmd}</code>\n\n"
-            "<i><b>Note</b>: This will delete bot commands when you will send a command in chat!</i>"
+            "<i><b>Note:</b> This will delete bot commands when you will send a command in chat!</i>"
         )
 
         btn_name_row1 = ["Enable", "Disable"]
@@ -212,7 +212,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Log channel: <code>{log_channel}</code>\n\n"
-            "<i><b>Note</b>: This will log every actions occurred in your chat (ban, kick, mute, etc.) using bot!\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
+            "<i><b>Note:</b> This will log every actions occurred in your chat (ban, kick, mute, etc.) using bot!\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -248,7 +248,7 @@ class QueryChatSettings:
             "<u><b>Chat Settings</b></u>\n\n"
             f"All links: <code>{all_links}</code>\n"
             f"Allowed links: <code>{allowed_links}</code>\n\n"
-            "<i><b>Note</b>: Select whether it will delete or convert the links into base64 or do nothing if links in message!</i>\n\n"
+            "<i><b>Note:</b> Select whether it will delete or convert the links into base64 or do nothing if links in message!</i>\n\n"
             "<i>Allowed links » these links won't be deleted!</i>\n"
             "<i>Delete links » replace the links with `forbidden link`</i>\n\n"
             "<i>Echo/Auto translate won't work if message contains link!</i>"
@@ -275,7 +275,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"All links: <code>{all_links}</code>\n\n"
-            "<i><b>Note</b>: Select whether bot will delete the message or convert link into base64 or do nothing!</i>"
+            "<i><b>Note:</b> Select whether bot will delete the message or convert link into base64 or do nothing!</i>"
         )
 
         btn_name_row1 = ["Delete", "Convert", "Nothing"]
@@ -309,7 +309,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Allowed links: <code>{allowed_links}</code>\n\n"
-            "<i><b>Note</b>: Send domain name of allowed links eg. <code>google.com</code> multiple domain will be separated by comma!</i>"
+            "<i><b>Note:</b> Send domain name of allowed links eg. <code>google.com</code> multiple domain will be separated by comma!</i>"
         )
 
         btn_name_row1 = ["Edit Value", "Remove Value"]
@@ -348,7 +348,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"AI status: <code>{ai_status}</code>\n\n"
-            "<i><b>Note</b>: Enable / Disbale AI functions in chat!</i>"
+            "<i><b>Note:</b> Enable / Disbale AI functions in chat!</i>"
         )
 
         btn_name_row1 = ["Enable", "Disable"]

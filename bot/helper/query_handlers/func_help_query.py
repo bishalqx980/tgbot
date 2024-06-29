@@ -7,27 +7,28 @@ from bot.modules.database.mongodb import MongoDB
 class QueryBotHelp:
     async def _query_help_group_management(update: Update, query):
         msg = (
-            "Group Moderation Commands -\n\n"
+            "<b>Group Moderation Commands</b>\n\n"
             "/id » Show chat/user id\n"
-            "/invite » Generate/Get invite link\n"
+            "/invite » Generate chat invite link\n"
             "/promote » Promote a member\n"
             "/demote » Demote a member\n"
-            "/pin » Pin message loudly\n"
-            "/unpin » Unpin a pinned message or all pinned messages\n"
+            "/pin » Pin replied message loudly\n"
+            "/unpin » Unpin a pinned message\n"
+            "/unpinall » Unpin all pinned messages"
             "/ban » Ban a member\n"
             "/unban » Unban a member\n"
             "/kick » Kick a member\n"
             "/kickme » The easy way to out\n"
-            "/mute » Mute a member (member will be unable to send messages etc.)\n"
-            "/unmute » Unmute a member (member will be able to send messages etc.)\n"
-            "/del » Delete replied message with notifying/telling something to the member!\n"
-            "/purge » Delete every messages from replied message to current message!\n"
+            "/mute » Restrict a member (member will be unable to send messages etc.)\n"
+            "/unmute » Unrestrict a restricted member\n"
+            "/del » Delete replied message with a warning!\n"
+            "/purge » Delete every messages between replied message and current message!\n"
             "/lock » Lock the chat (no one can send messages etc.)\n"
             "/unlock » Unlock the chat (back to normal)\n"
             "/filters | /filter | /remove » To see/set/remove custom message/command\n"
             "/adminlist » See chat admins list\n"
-            "/settings » Settings of chat (welcome, antibot, translate etc.)\n\n"
-            "<i><b>Note</b>: Type commands to get more details about the command function!</i>"
+            "/settings » Settings of chat\n\n"
+            "<i><b>Note:</b> Type commands to get more details about the command function!</i>"
         )
 
         btn_name = ["Back", "Close"]
@@ -39,10 +40,10 @@ class QueryBotHelp:
 
     async def _query_help_ai(update: Update, query):
         msg = (
-            "Artificial intelligence functions -\n\n"
+            "<b>Artificial intelligence</b>\n\n"
             "/imagine » Generate AI image\n"
             "/gpt » Ask any question to ChatGPT\n\n"
-            "<i><b>Note</b>: Type commands to get more details about the command function!</i>"
+            "<i><b>Note:</b> Type commands to get more details about the command function!</i>"
         )
 
         btn_name = ["Back", "Close"]
@@ -54,23 +55,23 @@ class QueryBotHelp:
 
     async def _query_help_misc_functions(update: Update, query):
         msg = (
-            "Misc functions -\n\n"
-            "/movie » Get any movie info by name/imdb_id\n"
+            "<b>Misc functions</b>\n\n"
+            "/movie » Get any movie info by name or imdb id\n"
             "/tr » Translate any language\n"
-            "/decode » Decode - base64 to text\n"
-            "/encode » Encode - text to base64\n"
+            "/decode » Convert base64 into text\n"
+            "/encode » Convert text into base64\n"
             "/short » Short any url\n"
             "/ping » Ping any url\n"
             "/calc » Calculate any math (supported syntex: +, -, *, /)\n"
-            "/webshot » Take Screenshot of any website\n"
+            "/webshot » Take screenshot of any website\n"
             "/weather » Get weather info of any city\n"
             "/ytdl » Download youtube video\n"
             "/yts » Search video on youtube\n"
-            "/qr » To generate a QR code\n"
-            "/itl » To convert image into link\n"
+            "/qr » Generate a QR code\n"
+            "/itl » Convert image into a public link\n"
             "/id » Show chat/user id\n"
             "/settings » Settings of chat\n\n"
-            "<i><b>Note</b>: Type commands to get more details about the command function!</i>"
+            "<i><b>Note:</b> Type commands to get more details about the command function!</i>"
         )
 
         btn_name = ["Back", "Close"]
@@ -82,15 +83,15 @@ class QueryBotHelp:
 
     async def _query_help_owner_functions(update: Update, query):
         msg = (
-            "Bot owner functions -\n\n"
-            "/broadcast » Broadcast message to bot users\n"
+            "<b>Bot owner functions</b>\n\n"
+            "/broadcast » Broadcast message to all active users\n"
             "/db » Get bot database\n"
             "/bsettings » Get bot settings\n"
             "/shell » Use system shell\n"
             "/log » Get log file (for error handling)\n"
-            "/restart » Restart the bot\n"
+            "/restart » Restart the bot (use with caution ⚠)\n"
             "/sys » Get system info\n\n"
-            "<i><b>Note</b>: Type commands to get more details about the command function!</i>"
+            "<i><b>Note:</b> Type commands to get more details about the command function!</i>"
         )
 
         btn_name = ["Back", "Close"]
