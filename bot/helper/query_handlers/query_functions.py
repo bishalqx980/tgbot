@@ -96,9 +96,8 @@ class QueryFunctions:
         
         if is_list:
             if len([edit_data_value]) > 5:
-                msg = f"{len([edit_data_value])} items"
-                
-        if not is_int and not is_list:
+                msg = f"{len([edit_data_value])} items"       
+        elif not is_int:
             if len(edit_data_value) > 100:
                 msg = "Data is too long, can't show! Check on message..."
         
