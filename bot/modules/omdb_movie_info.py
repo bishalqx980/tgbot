@@ -1,12 +1,15 @@
 import requests
 from bot import logger
-from bot.modules.mongodb import MongoDB
+from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.local_database import LOCAL_DATABASE
 
 async def get_movie_info(movie_name=None, imdb_id=None, year=None):
-  omdb_api = await MongoDB.get_data("bot_docs", "omdb_api")
+  omdb_api = await LOCAL_DATABASE.get_data("bot_docs", "omdb_api")
   if not omdb_api:
-    logger.error("omdb_api not found!")
-    return 0
+    omdb_api = await MongoDB.get_data("bot_docs", "omdb_api")
+    if not omdb_api:
+      logger.error("omdb_api not found!")
+      return False
   
   if movie_name:
     url = f"https://omdbapi.com/?apikey={omdb_api}&t={movie_name}&y={year}"

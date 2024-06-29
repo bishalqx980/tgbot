@@ -17,8 +17,10 @@ class BotCommandHelper:
 
 
     async def set_bot_command():
-        await bot.set_my_commands(command_help)
-        logger.info("Bot commands updated!")
-
+        try:
+            await bot.set_my_commands(command_help)
+            logger.info("Bot commands updated!")
+        except Exception as e:
+            logger.error(e)
 
 asyncio.get_event_loop().run_until_complete(BotCommandHelper.set_bot_command())

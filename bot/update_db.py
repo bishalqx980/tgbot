@@ -1,4 +1,5 @@
-from bot.modules.mongodb import MongoDB
+from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.local_database import LOCAL_DATABASE
 from bot import (
     logger,
     bot_token,
@@ -20,7 +21,7 @@ async def update_database():
     find = await MongoDB.find("bot_docs", "_id")
 
     if find:
-        logger.info("MongoDB Database Exist! Skiping update...")
+        logger.info("MongoDB database exist! Skiping update...")
         return
     
     data = {
@@ -43,6 +44,7 @@ async def update_database():
 
     try:
         await MongoDB.insert_single_data("bot_docs", data)
+        await LOCAL_DATABASE.insert_data_direct("bot_docs", data)
         logger.info("Database updated from config.env ...")
         return True
     except Exception as e:

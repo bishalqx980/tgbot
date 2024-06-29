@@ -2,7 +2,7 @@ import requests
 from bot import logger
 from pytube import YouTube, Search
 
-class YouTubeDownload:
+class PYTUBE:
     async def ytdl(url, extention):
         try:
             logger.info("Starting Download...")
@@ -17,8 +17,8 @@ class YouTubeDownload:
                 file_type = "audio"
                 progressive = False
             order_by = "abr" # bitrate
-            file_path = "ytdl/download/"
-            thumbnail = "ytdl/download/thumbnail.jpg"
+            file_path = "download/"
+            thumbnail = "download/thumbnail.jpg"
 
             stream = (
                 yt.streams
@@ -48,7 +48,7 @@ class YouTubeDownload:
                 logger.info("No stream found for this video")
         except Exception as e:
             logger.error(e)
-            return 0, f"{e}"
+            return False, f"{e}"
 
 
     async def yts(keyword):

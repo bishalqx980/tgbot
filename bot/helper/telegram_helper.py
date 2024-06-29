@@ -1,5 +1,6 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.constants import ParseMode
+from telegram.error import Forbidden
 from bot import bot, logger
 
 class Message:
@@ -15,6 +16,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         else:
@@ -26,6 +29,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
 
@@ -42,6 +47,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         else:
@@ -53,6 +60,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
 
@@ -74,6 +83,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         else:
@@ -90,34 +101,45 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
 
 
-    async def send_audio(chat_id, audio, title, caption=None, reply_msg_id=None):
+    async def send_audio(chat_id, audio, title, caption=None, reply_msg_id=None, parse_mode=ParseMode.HTML):
         try:
             response = await bot.send_audio(
                 chat_id=chat_id,
                 audio=audio,
                 title=title,
                 caption=caption,
-                reply_to_message_id=reply_msg_id
+                reply_to_message_id=reply_msg_id,
+                parse_mode=parse_mode
             )
             return response
+        except Forbidden:
+            return Forbidden
         except Exception as e:
             logger.error(e)
 
 
-    async def send_doc(chat_id, doc, filename, caption=None, reply_msg_id=None):
+    async def send_doc(chat_id, doc, filename, caption=None, reply_msg_id=None, parse_mode=ParseMode.HTML):
+        """
+        doc = send as file > with open()
+        """
         try:
             response = await bot.send_document(
                 chat_id=chat_id,
                 document=doc,
                 filename=filename,
                 caption=caption,
-                reply_to_message_id=reply_msg_id
+                reply_to_message_id=reply_msg_id,
+                parse_mode=parse_mode
             )
             return response
+        except Forbidden:
+            return Forbidden
         except Exception as e:
             logger.error(e)
 
@@ -139,6 +161,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
                 try:
@@ -151,6 +175,8 @@ class Message:
                         parse_mode=parse_mode
                     )
                     return response
+                except Forbidden:
+                    return Forbidden
                 except Exception as e:
                     logger.error(e)
         else:
@@ -162,6 +188,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
                 try:
@@ -172,6 +200,8 @@ class Message:
                         parse_mode=parse_mode
                     )
                     return response
+                except Forbidden:
+                    return Forbidden
                 except Exception as e:
                     logger.error(e)
 
@@ -189,6 +219,8 @@ class Message:
                 message_id=msg_id
             )
             return response
+        except Forbidden:
+            return Forbidden
         except Exception as e:
             logger.error(e)
 
@@ -209,6 +241,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         elif caption_msg and not btn:
@@ -220,6 +254,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         elif not caption_msg and btn:
@@ -234,6 +270,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
         elif not caption_msg and not btn:
@@ -246,6 +284,8 @@ class Message:
                     parse_mode=parse_mode
                 )
                 return response
+            except Forbidden:
+                return Forbidden
             except Exception as e:
                 logger.error(e)
 
@@ -259,6 +299,8 @@ class Message:
         try:
             response = await bot.delete_message(chat_id=chat_id, message_id=msg_id)
             return response
+        except Forbidden:
+            return Forbidden
         except Exception as e:
             logger.error(e)
 

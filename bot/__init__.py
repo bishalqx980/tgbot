@@ -1,23 +1,23 @@
 import os
+import json
 import logging
 from telegram import Bot
 from dotenv import load_dotenv
 from bot.alive import alive
-from SafoneAPI import SafoneAPI
 
 with open('log.txt', 'w'):
     pass
 
 #Enable logging
 logging.basicConfig(
-    filename="log.txt", format="%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s", level=logging.INFO
+    filename="log.txt", format="%(asctime)s - %(name)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s", level=logging.INFO
 )
 #set higher logging level for httpx to avoid all GET and POST requests being logged
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s")
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(filename)s - %(lineno)d - %(levelname)s - %(message)s")
 console.setFormatter(formatter)
 logging.getLogger("").addHandler(console)
 
@@ -52,8 +52,22 @@ for variable in variables:
     else:
         pass
 
-#safone api
-safone_api = SafoneAPI()
+LOCAL_DB = "database.json"
+
+check_local_db = os.path.isfile(LOCAL_DB)
+if not check_local_db:
+    logger.info("localdb not found...")
+    with open(LOCAL_DB, "w") as f:
+        json.dump({}, f)
+    logger.info("localdb created...")
+
+try:
+    with open(LOCAL_DB, "w") as f:
+        data = {"bot_docs": {}, "users": {}, "groups": {}, "data_center": {}}
+        json.dump(data, f, indent=4)
+        logger.info("localdb updated...")
+except Exception as e:
+    logger.error(e)
 
 bot = Bot(bot_token)
 
@@ -67,6 +81,5 @@ __________.__       .__           .__
         \/        \/     \/     \/      
                         Library python-telegram-bot'''
 )
-
 
 alive()

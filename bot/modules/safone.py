@@ -1,4 +1,7 @@
-from bot import logger, safone_api
+from bot import logger
+from SafoneAPI import SafoneAPI
+
+safone_api = SafoneAPI()
 
 class Safone:
     async def safone_ai(msg):
@@ -35,5 +38,3 @@ class Safone:
             return res
         except Exception as e:
             logger.error(e)
-
-            
