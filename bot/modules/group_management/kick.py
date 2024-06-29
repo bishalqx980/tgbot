@@ -64,7 +64,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
             await Message.reply_msg(update, f"I'm not going to kick an admin! You must be joking!")
             return
     
-    if victim_permission.status not in [ChatMember.MEMBER, ChatMember.RESTRICTED]:
+    if victim_permission.status == ChatMember.LEFT:
         await Message.reply_msg(update, "The user isn't a member in this chat!")
         return
     
