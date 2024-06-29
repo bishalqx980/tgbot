@@ -1,20 +1,18 @@
 from telegram import ChatMember, ChatMemberUpdated
 
-async def _chat_member_status(c_mem_update: ChatMemberUpdated):
-    dif = c_mem_update.difference()
+async def _chat_member_status(chat_member_update: ChatMemberUpdated):
+    dif = chat_member_update.difference()
     status = dif.get("status")
-
     if not status:
         return
     
-    user_exist = None
-    cause = None
-
+    user_exist, cause = None, None
     old_status, new_status = status
     
-    exist_logic = [ChatMember.MEMBER, ChatMember.ADMINISTRATOR, ChatMember.OWNER]
+    exist_logic = [ChatMember.MEMBER, ChatMember.RESTRICTED, ChatMember.ADMINISTRATOR, ChatMember.OWNER]
+    not_exist_logic = [ChatMember.LEFT, ChatMember.BANNED]
 
-    user_exist = True if new_status in exist_logic else False
+    user_exist = True if old_status in not_exist_logic and new_status in exist_logic else False
     
     if new_status == ChatMember.LEFT:
         cause = "LEFT"
@@ -22,10 +20,9 @@ async def _chat_member_status(c_mem_update: ChatMemberUpdated):
         cause = "RESTRICTED"
     elif new_status == ChatMember.BANNED:
         cause = "BANNED"
-    
-    if old_status == ChatMember.BANNED and new_status in exist_logic or new_status == ChatMember.LEFT:
+    elif old_status == ChatMember.BANNED and new_status in exist_logic or new_status == ChatMember.LEFT:
         cause = "UNBANNED"
-    elif old_status in [ChatMember.LEFT, ChatMember.RESTRICTED, ChatMember.BANNED] and new_status in exist_logic:
+    elif old_status in not_exist_logic and new_status in exist_logic:
         cause = "JOINED"
 
     return user_exist, cause
