@@ -64,7 +64,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Youtube download ...
     if query.data in ["mp4", "mp3"]:
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": query.data})
+        await LOCAL_DATABASE.insert_data("data_center", user.id, {"youtube_content_format": query.data})
     # Database editing query ...
     elif query.data in [
         "query_edit_value",

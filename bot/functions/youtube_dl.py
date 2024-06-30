@@ -37,9 +37,9 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
     data = {
         "user_id": user.id,
         "chat_id": chat.id,
-        "collection_name": None,
-        "db_find": None,
-        "db_vlaue": None,
+        "collection_name": "users",
+        "db_find": "user_id",
+        "db_vlaue": user.id,
         "edit_data_key": None,
         "edit_data_value": None,
         "del_msg_pointer_id": e_msg.id,
@@ -62,20 +62,20 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
     del_msg = await Message.reply_msg(update, f"\nSelect <a href='{url}'>Content</a> Quality/Format", btn, disable_web_preview=False)
 
     timeout = 0
-    localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
-    
-    while timeout < 15:
-        content_format = localdb.get("youtube_content_format")
+
+    while timeout < 20:
         timeout += 1
         await asyncio.sleep(1)
+        localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
+        content_format = localdb.get("youtube_content_format")
         if content_format:
-            localdb["youtube_content_format"] = None
             break
     
     await Message.del_msg(chat.id, del_msg)
+    await LOCAL_DATABASE.insert_data("data_center", user.id, {"youtube_content_format": None})
 
     if not content_format:
-        await Message.reply_msg(update, "Timeout!")
+        await Message.reply_msg(update, "Oops, Timeout!")
         return
     
     asyncio.create_task(_func_ytdl(update, url, content_format))
