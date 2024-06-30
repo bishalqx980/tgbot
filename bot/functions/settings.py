@@ -158,16 +158,16 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• ID: <code>{chat.id}</code>\n\n"
 
             f"• Lang: <code>{lang}</code>\n"
-            f"• Echo: <code>{echo}</code>\n"
             f"• Auto tr: <code>{auto_tr}</code>\n"
+            f"• Echo: <code>{echo}</code>\n"
+            f"• Antibot: <code>{antibot}</code>\n"
             f"• Welcome user: <code>{welcome_user}</code>\n"
             f"• Farewell user: <code>{farewell_user}</code>\n"
-            f"• Antibot: <code>{antibot}</code>\n"
-            f"• AI status: <code>{ai_status}</code>\n"
-            f"• Delete cmd: <code>{del_cmd}</code>\n"
+            f"• Delete CMD: <code>{del_cmd}</code>\n"
+            f"• Log channel: <code>{log_channel}</code>\n"
             f"• All links: <code>{all_links}</code>\n"
             f"• Allowed links: <code>{allowed_links}</code>\n"
-            f"• Log channel: <code>{log_channel}</code>\n"
+            f"• AI status: <code>{ai_status}</code>\n"
         )
 
         btn_name_row1 = ["Language", "Auto translate"]

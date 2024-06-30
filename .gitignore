@@ -10,6 +10,7 @@ shell.txt
 update.txt
 tmp.txt
 database.json
+tmp_bot_commands_list.json
 /.vscode
 /download
 /ytdl

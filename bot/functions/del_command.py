@@ -1,8 +1,9 @@
+import json
 from telegram import Update
 from telegram.ext import ContextTypes
+from bot.functions.filter_all import func_filter_all
 from bot.helper.telegram_helper import Message
 from bot.modules.database.combined_db import global_search
-
 
 async def func_del_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -24,3 +25,10 @@ async def func_del_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     del_cmd = find_group.get("del_cmd")
     if del_cmd:
         await Message.del_msg(chat.id, msg)
+    
+    with open("tmp_bot_commands_list.json", "r") as f:
+        tmp_bot_commands_list = json.load(f)
+        bot_commands = tmp_bot_commands_list.get("bot_commands")
+    
+    if msg.text not in bot_commands:
+        await func_filter_all(update, context)

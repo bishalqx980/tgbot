@@ -1,3 +1,4 @@
+import json
 import asyncio
 import requests
 from telegram import Update
@@ -13,6 +14,7 @@ from bot import bot_token, logger, owner_id
 from bot.update_db import update_database
 from bot.helper.telegram_helper import Message
 from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.power_users import _power_users
 from bot.functions.start import func_start
 from bot.functions.movieinfo import func_movieinfo
@@ -69,8 +71,9 @@ from bot.helper.callbackbtn_helper import func_callbackbtn
 
 
 async def server_alive():
-    server_url = await MongoDB.get_data("bot_docs", "server_url")
-    bot_status = await MongoDB.get_data("bot_docs", "bot_status")
+    # executing after updating db so getting data from localdb...
+    server_url = await LOCAL_DATABASE.get_data("bot_docs", "server_url")
+    bot_status = await LOCAL_DATABASE.get_data("bot_docs", "bot_status")
     power_users = await _power_users()
     
     try:
@@ -91,15 +94,18 @@ async def server_alive():
         logger.error(e)
 
     if server_url:
-        if server_url[0:4] != "http":
-            server_url = f"http://{server_url}"
         while True:
+            server_url = await LOCAL_DATABASE.get_data("bot_docs", "server_url")
+            if not server_url:
+                return
+            if server_url[0:4] != "http":
+                server_url = f"http://{server_url}"
             try:
                 response = requests.get(server_url)
                 if response.status_code == 200:
                     logger.info(f"{server_url} is up and running. ✅")
                 else:
-                    logger.warning(f"{server_url} is down or unreachable. ❌")
+                    logger.warning(f"{server_url} is down or unreachable. ❌ - code - {response.status_code}")
             except Exception as e:
                 logger.error(f"{server_url} > {e}")
             await asyncio.sleep(180) # 3 min
@@ -111,7 +117,7 @@ async def server_alive():
 def main():
     application = ApplicationBuilder().token(bot_token).build()
     # functions
-    commands = {
+    BOT_COMMANDS = {
         "start": func_start,
         "movie": func_movieinfo,
         "tr": func_translator,
@@ -174,8 +180,14 @@ def main():
         "sys": func_sys
     }
 
-    for command, handler in commands.items():
+    storage = []
+    for command, handler in BOT_COMMANDS.items():
+        storage.append(f"/{command}")
         application.add_handler(CommandHandler(command, handler, block=False))
+    
+    # For temporary storing bot commands
+    with open("tmp_bot_commands_list.json", "w") as f:
+        json.dump({"bot_commands": storage}, f)
     
     # filters
     application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services, block=False))
