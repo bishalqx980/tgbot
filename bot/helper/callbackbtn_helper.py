@@ -178,6 +178,11 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "query_restore_db",
         "query_confirm_restore_db"
     ]:
+        if collection_name != "bot_docs":
+            await popup("Session expired! Send command again...!")
+            await del_query()
+            return
+        
         power_users = await _power_users()
         if user.id in power_users:
             if query.data == "query_bot_pic":
