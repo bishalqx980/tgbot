@@ -22,6 +22,24 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await Message.del_msg(chat.id, e_msg)
 
+    if re_msg:
+        if re_msg.from_user.is_bot:
+            await Message.reply_msg(update, "Whisper isn't for bots...!")
+            return
+        whisper_user = re_msg.from_user.id
+    elif msg:
+        msg_split = msg.split()
+        whisper_user = msg_split[0]
+        msg = " ".join(msg_split[1:])
+
+        if not whisper_user.startswith("@"):
+            await Message.reply_msg(update, f"Give a valid username! <code>{whisper_user}</code> is an invalid username!\nor try to reply the user. /whisper for more details...")
+            return
+        
+        if whisper_user.endswith("bot"):
+            await Message.reply_msg(update, "Whisper isn't for bots...!")
+            return
+
     data = {
         "user_id": user.id,
         "chat_id": chat.id,
@@ -35,21 +53,10 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
 
     await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
-
-    if re_msg:
-        whisper_user = re_msg.from_user.id
-    elif msg:
-        msg_split = msg.split()
-        whisper_user = msg_split[0]
-        msg = " ".join(msg_split[1:])
-
-        if not whisper_user.startswith("@"):
-            await Message.reply_msg(update, f"Give a valid username! <code>{whisper_user}</code> is an invalid username!\nor try to reply the user. /whisper for more details...")
-            return
     
     data = {
         "whisper_user": whisper_user,
-        "whisper_msg": msg
+        "whisper_msg": f"{user.first_name}: {msg}"
     }
 
     await LOCAL_DATABASE.insert_data("data_center", whisper_user, data)
