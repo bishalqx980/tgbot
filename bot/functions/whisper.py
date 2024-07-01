@@ -44,7 +44,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = " ".join(msg_split[1:])
 
         if not whisper_user.startswith("@"):
-            await Message.reply_msg(update, f"Give a valid username! <code>{whisper_user}</code> is an invalid username!")
+            await Message.reply_msg(update, f"Give a valid username! <code>{whisper_user}</code> is an invalid username!\nor try to reply the user. /whisper for more details...")
             return
     
     data = {
