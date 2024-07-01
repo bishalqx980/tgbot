@@ -6,6 +6,10 @@ class LOCAL_DATABASE:
         """
         collection_name = db_collection_name eg. (users or docs)
         """
+        if not collection:
+            logger.error("collection was't given...")
+            return
+        
         try:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)
@@ -32,6 +36,12 @@ class LOCAL_DATABASE:
         It will add or replace/modify existing data...\n
         use >> insert_data instead if you want sub_entry/identifier
         """
+        params = [collection, data]
+        for i in params:
+            if not i:
+                logger.error(f"Some required parameter was't given...")
+                return
+        
         try:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)
@@ -54,10 +64,17 @@ class LOCAL_DATABASE:
     async def insert_data(collection, identifier, data):
         """
         collection = db_collection_name eg. (users or docs)\n
-        identifier = unique data name eg. user_1 or doc_1\n
+        sub_collection = db_sub_collection_name (collection > sub_collection)\n
+        identifier = unique data name eg. user.id or doc_1\n
         data = json data {"name": "bishal", "age": 20}\n\n
         It will add or replace/modify existing data...
         """
+        params = [collection, identifier, data]
+        for i in params:
+            if not i:
+                logger.error(f"Some required parameter was't given...")
+                return
+
         try:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)
@@ -88,6 +105,10 @@ class LOCAL_DATABASE:
         """
         collection = db_collection_name eg. (users or docs)
         """
+        if not collection:
+            logger.error("collection was't given...")
+            return
+        
         try:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)
@@ -103,6 +124,12 @@ class LOCAL_DATABASE:
         collection = db_collection_name eg. (users or docs)\n
         find = identifier >> unique data name eg. user_1 or doc_1
         """
+        params = [collection, find]
+        for i in params:
+            if not i:
+                logger.error(f"Some required parameter was't given...")
+                return
+        
         try:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)
@@ -120,6 +147,12 @@ class LOCAL_DATABASE:
         data = which data you want from specified collection\n
         only works for which doesn't have sub collection
         """
+        params = [collection, data]
+        for i in params:
+            if not i:
+                logger.error(f"Some required parameter was't given...")
+                return
+        
         try:
             with open(LOCAL_DB, "r") as f:
                 load_db = json.load(f)

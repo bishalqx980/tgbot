@@ -32,6 +32,7 @@ from bot.functions.youtube_dl import func_add_download_ytdl
 from bot.functions.youtube_search import func_yts
 from bot.functions.gen_qr import func_gen_qr
 from bot.functions.img_to_link import func_img_to_link
+from bot.functions.whisper import func_whisper
 from bot.functions.settings import func_settings
 from bot.functions.id import func_id
 from bot.functions.help import func_help
@@ -46,7 +47,16 @@ from bot.functions.filter_service_msg import func_filter_services
 from bot.functions.filter_all import func_filter_all
 from bot.functions.del_command import func_del_command
 from bot.modules.group_management.invite_link import func_invite_link
-from bot.modules.group_management.promote import func_promote, func_spromote
+from bot.modules.group_management.promote import (
+    func_promote,
+    func_apromote,
+    func_spromote,
+    func_sapromote,
+    func_fpromote,
+    func_fapromote,
+    func_sfpromote,
+    func_sfapromote
+)
 from bot.modules.group_management.demote import func_demote, func_sdemote
 from bot.modules.group_management.pin_msg import func_pin_msg, func_spin_msg
 from bot.modules.group_management.unpin_msg import func_unpin_msg, func_sunpin_msg
@@ -134,12 +144,19 @@ def main():
         "yts": func_yts,
         "qr": func_gen_qr,
         "itl": func_img_to_link,
+        "whisper": func_whisper,
         "settings": func_settings,
         # Group management
         "id": func_id,
         "invite": func_invite_link,
         "promote": func_promote,
+        "apromote": func_apromote,
         "spromote": func_spromote,
+        "sapromote": func_sapromote,
+        "fpromote": func_fpromote,
+        "fapromote": func_fapromote,
+        "sfpromote": func_sfpromote,
+        "sfapromote": func_sfapromote,
         "demote": func_demote,
         "sdemote": func_sdemote,
         "pin": func_pin_msg,

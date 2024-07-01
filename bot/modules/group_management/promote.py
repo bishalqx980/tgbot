@@ -8,7 +8,7 @@ from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
-async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
+async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=bool(None), full_promote=bool(None), is_anonymous=bool(None)):
     chat = update.effective_chat
     user = update.effective_user
     reply = update.message.reply_to_message
@@ -61,7 +61,27 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
         return
     
     try:
-        await bot.promote_chat_member(chat.id, victim.id, can_manage_video_chats=True)
+        if full_promote:
+            await bot.promote_chat_member(
+                chat.id,
+                victim.id,
+                can_change_info = True,
+                can_delete_messages = True,
+                can_invite_users = True,
+                can_restrict_members = True,
+                can_pin_messages = True,
+                can_promote_members = True,
+                is_anonymous = is_anonymous,
+                can_manage_chat = True,
+                can_manage_video_chats = True,
+                can_post_stories = True,
+                can_edit_stories = True,
+                can_delete_stories = True
+            )
+            msg = f"{victim.mention_html()} has been promoted (with full privilege)!\n<b>Admin</b>: {user.first_name}"
+        else:
+            await bot.promote_chat_member(chat.id, victim.id, can_manage_video_chats=True, is_anonymous=is_anonymous)
+            msg = f"{victim.mention_html()} has been promoted!\n<b>Admin</b>: {user.first_name}"
     except Exception as e:
         logger.error(e)
         error_msg = await Message.reply_msg(update, e)
@@ -69,7 +89,6 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
             await Message.reply_msg(update, e.message)
         return
     
-    msg = f"{victim.mention_html()} has been promoted!\n<b>Admin</b>: {user.first_name}"
     if admin_title:
         try:
             await bot.set_chat_administrator_custom_title(chat.id, victim.id, admin_title)
@@ -82,7 +101,10 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
     
     if not is_silent:
         await Message.reply_msg(update, msg)
-    await _log_channel(update, chat, user, victim, action="PROMOTE")
+
+
+async def func_apromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await func_promote(update, context, is_anonymous=True)
 
 
 async def func_spromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -91,3 +113,35 @@ async def func_spromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await Message.del_msg(chat.id, e_msg)
     await func_promote(update, context, is_silent=True)
+
+
+async def func_sapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
+    
+    await Message.del_msg(chat.id, e_msg)
+    await func_promote(update, context, is_silent=True, is_anonymous=True)
+
+
+async def func_fpromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await func_promote(update, context, full_promote=True)
+
+
+async def func_fapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await func_promote(update, context, full_promote=True, is_anonymous=True)
+
+
+async def func_sfpromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
+
+    await Message.del_msg(chat.id, e_msg)
+    await func_promote(update, context, is_silent=True, full_promote=True)
+
+
+async def func_sfapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
+
+    await Message.del_msg(chat.id, e_msg)
+    await func_promote(update, context, is_silent=True, full_promote=True, is_anonymous=True)

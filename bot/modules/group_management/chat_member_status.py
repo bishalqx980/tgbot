@@ -8,21 +8,24 @@ async def _chat_member_status(chat_member_update: ChatMemberUpdated):
     
     user_exist, cause = None, None
     old_status, new_status = status
-    
-    exist_logic = [ChatMember.MEMBER, ChatMember.RESTRICTED, ChatMember.ADMINISTRATOR, ChatMember.OWNER]
-    not_exist_logic = [ChatMember.LEFT, ChatMember.BANNED]
 
-    user_exist = True if old_status in not_exist_logic and new_status in exist_logic else False
+    user_exist = False if new_status in [ChatMember.LEFT, ChatMember.BANNED] else True
     
-    if new_status == ChatMember.LEFT:
-        cause = "LEFT"
-    elif new_status == ChatMember.RESTRICTED:
-        cause = "RESTRICTED"
-    elif new_status == ChatMember.BANNED:
-        cause = "BANNED"
-    elif old_status == ChatMember.BANNED and new_status in exist_logic or new_status == ChatMember.LEFT:
-        cause = "UNBANNED"
-    elif old_status in not_exist_logic and new_status in exist_logic:
+    if old_status in [ChatMember.LEFT, ChatMember.BANNED] and new_status in [ChatMember.MEMBER, ChatMember.ADMINISTRATOR]:
         cause = "JOINED"
+    elif old_status not in [ChatMember.RESTRICTED, ChatMember.LEFT, ChatMember.BANNED] and old_status and new_status == ChatMember.LEFT:
+        cause ="LEFT"
+    elif old_status != ChatMember.BANNED and new_status == ChatMember.BANNED:
+        cause ="BANNED"
+    elif old_status == ChatMember.BANNED and new_status != ChatMember.BANNED:
+        cause = "UNBANNED"
+    elif old_status != ChatMember.RESTRICTED and new_status == ChatMember.RESTRICTED:
+        cause = "RESTRICTED"
+    elif old_status == ChatMember.RESTRICTED and new_status != ChatMember.RESTRICTED:
+        cause = "UNRESTRICTED"
+    elif old_status != ChatMember.ADMINISTRATOR and new_status == ChatMember.ADMINISTRATOR:
+        cause = "PROMOTED"
+    elif old_status == ChatMember.ADMINISTRATOR and new_status != ChatMember.ADMINISTRATOR:
+        cause = "DEMOTED"
 
     return user_exist, cause

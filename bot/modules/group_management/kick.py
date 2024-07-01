@@ -65,7 +65,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
             return
     
     if victim_permission.status == ChatMember.LEFT:
-        await Message.reply_msg(update, "The user isn't a member in this chat!")
+        await Message.reply_msg(update, "The user isn't a member of this chat!")
         return
     
     try:

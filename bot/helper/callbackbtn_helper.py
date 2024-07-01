@@ -45,9 +45,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await del_query()
         return
     
-    if user.id != user_id:
-        await popup("Access Denied!")
-        return
+    if query.data != "query_whisper": # query_whisper exception ...
+        if user.id != user_id:
+            await popup("Access Denied!")
+            return
     
     # Get data from data center
     collection_name = data_center.get("collection_name")
@@ -62,8 +63,23 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     find_chat = db[1]
     
+    if query.data == "query_whisper":
+        data = await LOCAL_DATABASE.find_one("data_center", user.id)
+        if not data:
+            data = await LOCAL_DATABASE.find_one("data_center", f"@{user.username}")
+        
+        if not data:
+            await popup("Whisper expired... or this whisper isn't for you!")
+            return
+        
+        if data.get("whisper_user") != user.id:
+            if data.get("whisper_user") != f"@{user.username}":
+                await popup("This whisper isn't for you!")
+                return
+        
+        await popup(data.get("whisper_msg"))
     # Youtube download ...
-    if query.data in ["mp4", "mp3"]:
+    elif query.data in ["mp4", "mp3"]:
         await LOCAL_DATABASE.insert_data("data_center", user.id, {"youtube_content_format": query.data})
     # Database editing query ...
     elif query.data in [

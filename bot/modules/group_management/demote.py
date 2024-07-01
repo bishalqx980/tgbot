@@ -63,7 +63,6 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sil
     
     if not is_silent:
         await Message.reply_msg(update, f"{victim.mention_html()} has been demoted!\n<b>Admin</b>: {user.first_name}")
-    await _log_channel(update, chat, user, victim, action="DEMOTE")
 
 
 async def func_sdemote(update: Update, context: ContextTypes.DEFAULT_TYPE):

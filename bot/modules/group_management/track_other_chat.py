@@ -2,8 +2,7 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import bot, logger
 from bot.helper.telegram_helper import Message
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database.combined_db import global_search
 from bot.modules.group_management.log_channel import _log_channel
 from bot.modules.group_management.check_permission import _check_permission
 from bot.modules.group_management.chat_member_status import _chat_member_status
@@ -19,13 +18,12 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
     user = chat_member.from_user # cause user
     victim = chat_member.new_chat_member.user
 
-    find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
-    if not find_group:
-        find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
-        if find_group:
-            await LOCAL_DATABASE.insert_data("groups", chat.id, find_group)
-        else:
-            return
+    db = await global_search("groups", "chat_id", chat.id)
+    if db[0] == False:
+        # await Message.reply_msg(update, db[1])
+        return
+    
+    find_group = db[1]
 
     welcome_user = find_group.get("welcome_user")
     custom_welcome_msg = find_group.get("custom_welcome_msg")
@@ -41,7 +39,7 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
 
     await _log_channel(update, chat, user, victim, action=cause)
 
-    if user_exist == True:
+    if user_exist == True and cause == "JOINED":
         if victim.is_bot and antibot:
             _chk_per = await _check_permission(update, victim, user)
 
@@ -67,7 +65,9 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
                 await Message.send_msg(chat.id, f"Antibot has banned {victim.mention_html()} from this chat!")
             except Exception as e:
                 logger.error(e)
-                await Message.send_msg(chat.id, f"Error: {e}")
+                error_msg = await Message.reply_msg(update, e)
+                if not error_msg:
+                    await Message.reply_msg(update, e.message)
         elif welcome_user:
             if custom_welcome_msg:
                 formattings = {
