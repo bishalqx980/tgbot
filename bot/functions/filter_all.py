@@ -67,7 +67,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not _chk_per:
             return
         
-        _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+        _bot_info, bot_permission, user_permission, victim_permission = _chk_per
 
         if bot_permission.status != ChatMember.ADMINISTRATOR:
             await Message.send_msg(chat.id, "I'm not an admin in this chat!")

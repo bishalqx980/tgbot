@@ -41,12 +41,12 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
 
     if user_exist == True and cause == "JOINED":
         if victim.is_bot and antibot:
-            _chk_per = await _check_permission(update, victim, user)
+            _chk_per = await _check_permission(update, victim, user, False)
 
             if not _chk_per:
                 return
             
-            _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+            _bot_info, bot_permission, user_permission, victim_permission = _chk_per
 
             if bot_permission.status != ChatMember.ADMINISTRATOR:
                 await Message.send_msg(chat.id, "<b>Antibot:</b> I'm not an admin in this chat!")
@@ -56,13 +56,17 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
                 await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
                 return
             
+            if user_permission.status == ChatMember.ADMINISTRATOR:
+                if user_permission.can_invite_users:
+                    return
+            
             if victim_permission.status == ChatMember.ADMINISTRATOR:
-                await Message.send_msg(chat.id, f"<b>Antibot:</b> {victim.mention_html()} has been added as an admin. I can't ban an admin!")
+                await Message.send_msg(chat.id, f"<b>Antibot:</b> {victim.mention_html()} has been added as an admin. I can't kick an admin!")
                 return
             
             try:
-                await bot.ban_chat_member(chat.id, victim.id)
-                await Message.send_msg(chat.id, f"Antibot has banned {victim.mention_html()} from this chat!")
+                await bot.unban_chat_member(chat.id, victim.id)
+                await Message.send_msg(chat.id, f"Antibot has kicked {victim.mention_html()} from this chat!")
             except Exception as e:
                 logger.error(e)
                 error_msg = await Message.reply_msg(update, e)

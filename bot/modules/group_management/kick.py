@@ -1,4 +1,3 @@
-import asyncio
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import bot, logger
@@ -30,7 +29,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
     if not _chk_per:
         return
     
-    _bot_info, bot_permission, user_permission, admin_rights, victim_permission = _chk_per
+    _bot_info, bot_permission, user_permission, victim_permission = _chk_per
 
     if bot_permission.status != ChatMember.ADMINISTRATOR:
         await Message.reply_msg(update, "I'm not an admin in this chat!")
@@ -45,7 +44,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
-        if not admin_rights.get("can_restrict_members"):
+        if not user_permission.can_restrict_members:
             await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict chat member!")
             return
     
@@ -69,8 +68,6 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
         return
     
     try:
-        await bot.ban_chat_member(chat.id, victim.id)
-        await asyncio.sleep(0.5)
         await bot.unban_chat_member(chat.id, victim.id)
     except Exception as e:
         logger.error(e)
