@@ -33,6 +33,7 @@ from bot.functions.youtube_search import func_yts
 from bot.functions.gen_qr import func_gen_qr
 from bot.functions.img_to_link import func_img_to_link
 from bot.functions.whisper import func_whisper
+from bot.functions.info import func_info
 from bot.functions.settings import func_settings
 from bot.functions.id import func_id
 from bot.functions.help import func_help
@@ -145,6 +146,7 @@ def main():
         "qr": func_gen_qr,
         "itl": func_img_to_link,
         "whisper": func_whisper,
+        "info": func_info,
         "settings": func_settings,
         # Group management
         "id": func_id,

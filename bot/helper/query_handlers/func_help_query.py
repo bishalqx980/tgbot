@@ -72,6 +72,7 @@ class QueryBotHelp:
             "/itl » convert image into a public link\n"
             "/whisper » secretly tell something to someone in group chat\n"
             "/id » show chat/user id\n"
+            "/info » show user info\n"
             "/settings » settings of chat\n\n"
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )

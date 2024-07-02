@@ -9,38 +9,48 @@ async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if re_msg:
         if re_msg.forward_from:
-            from_user_id = re_msg.forward_from.id
+            from_user = re_msg.forward_from
         elif re_msg.from_user:
-            from_user_id = re_msg.from_user.id
+            from_user = re_msg.from_user
 
     if chat.type == "private":
         if re_msg:
-            if user.id == from_user_id:
+            if user.id == from_user.id:
                 msg = (
-                    f"• Your UserID: <code>{user.id}</code>\n"
-                    f"<i>Replied user account is hidden! Can't get user_id</i>"
+                    f"• {user.full_name}\n"
+                    f"  » <b>ID:</b> <code>{user.id}</code>\n"
+                    f"<i>Replied user account is hidden!</i>"
                 )
             else:
                 msg = (
-                    f"• Your UserID: <code>{user.id}</code>\n"
-                    f"• Replied UserID: <code>{from_user_id}</code>"
+                    f"• {user.full_name}\n"
+                    f"  » <b>ID:</b> <code>{user.id}</code>\n"
+                    f"• {from_user.full_name}\n"
+                    f"  » <b>ID:</b> <code>{from_user.id}</code>\n"
                 )
         else:
             msg = (
-                f"• UserID: <code>{user.id}</code>"
+                f"• {user.full_name}\n"
+                f"  » <b>ID:</b> <code>{user.id}</code>"
             )
+        
         await Message.reply_msg(update, msg)
 
     elif chat.type in ["group", "supergroup"]:
         if re_msg:
             msg = (
-                f"• Your UserID: <code>{user.id}</code>\n"
-                f"• Replied UserID: <code>{from_user_id}</code>\n"
-                f"• ChatID: <code>{chat.id}</code>"
-            ) 
-        else:
-            msg = (
-                f"• UserID: <code>{user.id}</code>\n"
+                f"• {user.full_name}\n"
+                f"  » <b>ID:</b> <code>{user.id}</code>\n"
+                f"• {from_user.full_name}\n"
+                f"  » <b>ID:</b> <code>{from_user.id}</code>\n"
                 f"• ChatID: <code>{chat.id}</code>"
             )
+        else:
+            msg = (
+                f"• {user.full_name}\n"
+                f"  » <b>ID:</b> <code>{user.id}</code>\n"
+                f"• {from_user.full_name}\n"
+                f"  » <b>ID:</b> <code>{from_user.id}</code>"
+            )
+        
         await Message.reply_msg(update, msg)
