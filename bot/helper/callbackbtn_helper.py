@@ -64,20 +64,24 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     find_chat = db[1]
     
     if query.data == "query_whisper":
-        data = await LOCAL_DATABASE.find_one("data_center", user.id)
+        data = await LOCAL_DATABASE.find_one("data_center", chat.id)
         if not data:
-            data = await LOCAL_DATABASE.find_one("data_center", f"@{user.username}")
-        
-        if not data:
-            await popup("Whisper expired... or this whisper isn't for you!")
+            await popup("Data wasn't found...")
+            await del_query()
             return
         
-        if data.get("whisper_user") != user.id:
-            if data.get("whisper_user") != f"@{user.username}":
-                await popup("This whisper isn't for you!")
-                return
+        whisper_data = data.get("whisper_data")
+
+        user_whisper_data = whisper_data.get(f"@{user.username}") or whisper_data.get(user.id)
+        if not user_whisper_data:
+            await popup("This whisper isn't for you or whisper expired...!")
+            return
         
-        await popup(data.get("whisper_msg"))
+        if user_whisper_data.get("whisper_user") not in {user.id, f"@{user.username}"}:
+            await popup("This whisper isn't for you!")
+            return
+        
+        await popup(user_whisper_data.get("whisper_msg"))
     # Youtube download ...
     elif query.data in ["mp4", "mp3"]:
         await LOCAL_DATABASE.insert_data("data_center", user.id, {"youtube_content_format": query.data})

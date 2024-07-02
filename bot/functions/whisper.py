@@ -36,6 +36,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"Give a valid username! <code>{whisper_user}</code> is an invalid username!\nor try to reply the user. /whisper for more details...")
             return
         
+        # there is a problem > anonymous admin cant read this ...
         if whisper_user.endswith("bot"):
             await Message.reply_msg(update, "Whisper isn't for bots...!")
             return
@@ -53,13 +54,24 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
 
     await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+
+    data = await LOCAL_DATABASE.find_one("data_center", chat.id)
+    if data:
+        whisper_data = data.get("whisper_data")
+        if whisper_data:
+            user_whisper_data = whisper_data.get(whisper_user)
+            if user_whisper_data:
+                await Message.del_msg(chat.id, msg_id=user_whisper_data.get("msg_id"))
     
     data = {
-        "whisper_user": whisper_user,
-        "whisper_msg": f"{user.first_name}: {msg}"
+        whisper_user: {
+            "whisper_user": whisper_user,
+            "whisper_msg": f"{user.first_name}: {msg}",
+            "msg_id": e_msg.id + 1
+        }
     }
 
-    await LOCAL_DATABASE.insert_data("data_center", whisper_user, data)
+    await LOCAL_DATABASE.insert_data("data_center", chat.id, data, "whisper_data")
 
     if re_msg:
         whisper_user = re_msg.from_user.mention_html()

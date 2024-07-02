@@ -61,12 +61,12 @@ class LOCAL_DATABASE:
             logger.error(f"Localdb: {e}")
 
 
-    async def insert_data(collection, identifier, data):
+    async def insert_data(collection, identifier, data, sub_collection=None):
         """
         collection = db_collection_name eg. (users or docs)\n
-        sub_collection = db_sub_collection_name (collection > sub_collection)\n
         identifier = unique data name eg. user.id or doc_1\n
-        data = json data {"name": "bishal", "age": 20}\n\n
+        data = json data {"name": "bishal", "age": 20}\n
+        sub_collection = db_sub_collection_name (collection > sub_collection)\n\n
         It will add or replace/modify existing data...
         """
         params = [collection, identifier, data]
@@ -83,20 +83,25 @@ class LOCAL_DATABASE:
             if data.get("_id"):
                 data["_id"] = str(data["_id"]) # mongodb _id >> make it str
             
-            load_collection = load_db.get(collection)
-            is_identifier = load_collection.get(str(identifier))
-            if is_identifier:
-                is_identifier.update(data)
+            load_collection = load_db.get(collection, {})
+            is_identifier = load_collection.setdefault(str(identifier), {})
+
+            # sub_collection is under identifier ...
+            if sub_collection:
+                is_sub_collection = is_identifier.setdefault(str(sub_collection), {})
+                is_sub_collection.update(data)
             else:
-                load_collection[str(identifier)] = data
+                is_identifier.update(data)
+            
+            load_db[collection] = load_collection
 
             with open(LOCAL_DB, "w") as f:
                 json.dump(load_db, f, indent=4)
             
-            if is_identifier:
-                logger.info(f"{identifier} updated in collection {collection} in localdb...")
+            if sub_collection:
+                logger.info(f"{sub_collection} has been updated in localdb...! Collection: {collection} Identifier: {identifier} ")
             else:
-                logger.info(f"{identifier} created in collection {collection} in localdb...")
+                logger.info(f"{identifier} has been updated in localdb...! Collection: {collection}")
         except Exception as e:
             logger.error(f"Localdb: {e}")
     
