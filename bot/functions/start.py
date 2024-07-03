@@ -23,7 +23,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, f"Hey, {user.mention_html()}!\n<a href='http://t.me/{_bot_info.username}'>Start me</a> in pm to chat with me!")
             return
         elif sent_msg:
-            await Message.reply_msg(update, f"Sent in your pm! <a href='http://t.me/{_bot_info.username}'>Check</a>")
+            await Message.reply_msg(update, f"<a href='http://t.me/{_bot_info.username}'>Sent in your pm!</a>")
             await Message.del_msg(user.id, sent_msg)
     
     _bot = await find_bot_docs()

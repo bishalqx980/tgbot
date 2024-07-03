@@ -1,4 +1,5 @@
 import time
+import asyncio
 import subprocess
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -16,11 +17,14 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     power_users = await _power_users()
     if user.id not in power_users:
-        await Message.reply_msg(update, "❗ This command is only for bot owner!")
+        await Message.reply_msg(update, "Access denied!")
         return
     
     if chat.type != "private":
-        await Message.reply_msg(update, "⚠ Boss you are in public!")
+        await Message.reply_msg(update, f"Boss you are in public chat!")
+        await asyncio.sleep(3)
+        del_msg_ids = [e_msg.id, e_msg.id + 1]
+        await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in del_msg_ids))
         return
     
     if not command:

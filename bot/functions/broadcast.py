@@ -12,16 +12,20 @@ from bot.functions.power_users import _power_users
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
+    e_msg = update.effective_message
     re_msg = update.message.reply_to_message
     inline_text = " ".join(context.args)
 
     power_users = await _power_users()
     if user.id not in power_users:
-        await Message.reply_msg(update, "❗ This command is only for bot owner!")
+        await Message.reply_msg(update, "Access denied!")
         return
     
     if chat.type != "private":
-        await Message.reply_msg(update, "⚠ Boss you are in public!")
+        await Message.reply_msg(update, f"Boss you are in public chat!")
+        await asyncio.sleep(3)
+        del_msg_ids = [e_msg.id, e_msg.id + 1]
+        await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in del_msg_ids))
         return
     
     if not re_msg:
@@ -87,7 +91,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if sent_msg:
                 sent_count += 1
                 progress = (sent_count + except_count) * 100 / len(active_users)
-                progress_bar = ("▮" * int(((sent_count + except_count) * 10) / len(active_users))) + ("▯" * int(10 - int(((sent_count + except_count) * 10) / len(active_users))))
+                progress_bar = ("▣" * int(((sent_count + except_count) * 10) / len(active_users))) + ("□" * int(10 - int(((sent_count + except_count) * 10) / len(active_users))))
                 await Message.edit_msg(update, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nProgress: {int(progress)}%\n» {progress_bar} «", notify)
                 # sleep for 0.5sec
                 await asyncio.sleep(0.5)

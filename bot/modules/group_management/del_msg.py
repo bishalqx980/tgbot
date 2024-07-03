@@ -1,3 +1,4 @@
+import asyncio
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
@@ -53,9 +54,8 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
         await Message.reply_msg(update, "I don't know which message to delete! Reply the message that you want to delete!\nTo mention with reason eg. <code>/del reason</code>")
         return
 
-    message_to_del = [e_msg, reply]
-    for delete_msg in message_to_del:
-        await Message.del_msg(chat.id, delete_msg)
+    del_msg_ids = [e_msg.id, reply.id]
+    await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in del_msg_ids))
     
     if not is_silent:
         msg = f"Lookout... {victim.mention_html()}, your message has been deleted!\n<b>Admin</b>: {user.first_name}"

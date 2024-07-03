@@ -87,22 +87,11 @@ async def server_alive():
     bot_status = await LOCAL_DATABASE.get_data("bot_docs", "bot_status")
     power_users = await _power_users()
     
-    try:
-        if not bot_status or bot_status == "alive":
-            for user_id in power_users:
-                try:
-                    await Message.send_msg(user_id, "Bot Started!")
-                except Exception as e:
-                    logger.error(e)
-        elif bot_status == "restart":
-            await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
-            for user_id in power_users:
-                try:
-                    await Message.send_msg(user_id, "Bot Restarted!")
-                except Exception as e:
-                    logger.error(e)
-    except Exception as e:
-        logger.error(e)
+    if not bot_status or bot_status == "alive":
+        await asyncio.gather(*(Message.send_msg(user_id, "Bot Started!") for user_id in power_users))
+    elif bot_status == "restart":
+        await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
+        await asyncio.gather(*(Message.send_msg(user_id, "Bot Restarted!") for user_id in power_users))
 
     if server_url:
         while True:

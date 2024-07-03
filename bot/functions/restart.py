@@ -14,7 +14,7 @@ async def func_restart(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     power_users = await _power_users()
     if user.id not in power_users:
-        await Message.reply_msg(update, "❗ This command is only for bot owner!")
+        await Message.reply_msg(update, "Access denied!")
         return
     
     if chat.type != "private":

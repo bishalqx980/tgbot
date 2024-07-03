@@ -1,3 +1,4 @@
+import asyncio
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
@@ -52,8 +53,7 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
         return
     
     sent_msg = await Message.send_msg(chat.id, f"Purge started...")
-    for msg_id in range(reply.id, e_msg.id + 1):
-        await Message.del_msg(chat.id, msg_id=msg_id)
+    await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in range(reply.id, e_msg.id + 1)))
     
     if is_silent:
         await Message.del_msg(chat.id, sent_msg)
