@@ -38,6 +38,7 @@ from bot.functions.settings import func_settings
 from bot.functions.id import func_id
 from bot.functions.help import func_help
 from bot.functions.broadcast import func_broadcast
+from bot.functions.send import func_send
 from bot.functions.database import func_database
 from bot.functions.bsettings import func_bsettings
 from bot.functions.shell import func_shell
@@ -180,6 +181,7 @@ def main():
         "help": func_help,
         # owner commands...
         "broadcast": func_broadcast,
+        "send": func_send,
         "db": func_database,
         "bsettings": func_bsettings,
         "shell": func_shell,

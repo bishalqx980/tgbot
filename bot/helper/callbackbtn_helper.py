@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
-from bot.helper.telegram_helper import Message
+from bot.helper.telegram_helper import Message, Button
 from bot.helper.query_handlers.query_functions import QueryFunctions
 from bot.helper.query_handlers.func_help_query import QueryBotHelp
 from bot.helper.query_handlers.func_chat_settings_query import QueryChatSettings
@@ -17,6 +17,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
 
+    # query_none return
+    if query.data == "query_none":
+        return
+    
     async def popup(msg):
         try:
             await query.answer(msg, True)
@@ -239,3 +243,49 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await QueryMenus._query_chat_settings_menu(update, query, chat, find_chat)
         elif query.data == "query_bot_settings_menu":
             await QueryMenus._query_bot_settings_menu(update, query)
+    # Query broadcast ...
+    elif query.data in [
+        "query_broadcast_forward_true",
+        "query_broadcast_forward_false",
+        "query_broadcast_pin_true",
+        "query_broadcast_pin_false",
+        "query_broadcast_done"
+    ]:
+        if query.data == "query_broadcast_forward_true":
+            await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_forward": True}, "broadcast")
+        elif query.data == "query_broadcast_forward_false":
+            await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_forward": False}, "broadcast")
+        elif query.data == "query_broadcast_pin_true":
+            await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_pin": True}, "broadcast")
+        elif query.data == "query_broadcast_pin_false":
+            await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_pin": False}, "broadcast")
+        elif query.data == "query_broadcast_done":
+            await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_done": True}, "broadcast")
+        
+        localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
+        db_broadcast = localdb.get("broadcast")
+        is_forward = db_broadcast.get("is_forward") or False
+        is_pin = db_broadcast.get("is_pin") or False
+        
+        msg = (
+            "<b><u>Broadcast</u></b>\n\n"
+            f"Forward: <code>{is_forward}</code>\n"
+            f"Pin message: <code>{is_pin}</code>"
+        )
+
+        btn_name_row1 = ["Forward?", "YES", "NO"]
+        btn_data_row1 = ["query_none", "query_broadcast_forward_true", "query_broadcast_forward_false"]
+
+        btn_name_row2 = ["Pin message?", "YES", "NO"]
+        btn_data_row2 = ["query_none", "query_broadcast_pin_true", "query_broadcast_pin_false"]
+
+        btn_name_row3 = ["Done", "Close"]
+        btn_data_row3 = ["query_broadcast_done", "query_close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+
+        btn = row1 + row2 + row3
+
+        await Message.edit_msg(update, msg, query.message, btn)

@@ -3,9 +3,10 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import Forbidden
-from bot import logger
-from bot.helper.telegram_helper import Message
+from bot import bot, logger
+from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.power_users import _power_users
 
 
@@ -14,7 +15,6 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     e_msg = update.effective_message
     re_msg = update.message.reply_to_message
-    inline_text = " ".join(context.args)
 
     power_users = await _power_users()
     if user.id not in power_users:
@@ -29,39 +29,78 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not re_msg:
-        await Message.reply_msg(update, "Reply a message to broadcast!\n<code>/broadcast f</code> to forwared message!")
+        await Message.reply_msg(update, "Reply a message to broadcast!")
         return
     
-    msg = re_msg.text_html or re_msg.caption_html if re_msg else None
+    data = {
+        "user_id": user.id,
+        "chat_id": chat.id,
+        "collection_name": "data_center",
+        "db_find": "user_id",
+        "db_vlaue": user.id,
+        "edit_data_key": None,
+        "edit_data_value": None,
+        "del_msg_pointer_id": e_msg.id,
+        "edit_data_value_msg_pointer_id": None,
+        "broadcast": {
+            "is_forward": None,
+            "is_pin": None,
+            "is_done": None
+        }
+    }
 
-    forward_confirm, to_whom = None, None
+    await LOCAL_DATABASE.insert_data("data_center", user.id, data)
 
-    if inline_text:
-        inline_text_split = inline_text.split()
-        if len(inline_text_split) == 2:
-            forward_confirm, to_whom = inline_text_split
-        elif len(inline_text_split) == 1:
-            if inline_text_split[0] == "f":
-                forward_confirm = True
-            else:
-                to_whom = inline_text_split[0]
+    localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
+    db_broadcast = localdb.get("broadcast")
+    is_forward = db_broadcast.get("is_forward") or False
+    is_pin = db_broadcast.get("is_pin") or False
     
-    if to_whom:
-        user_id = to_whom
-        if forward_confirm:
-            sent_msg = await Message.forward_msg(user_id, chat.id, re_msg.id)
-        else:
-            if re_msg.text_html:
-                sent_msg = await Message.send_msg(user_id, msg)
-            elif re_msg.caption:
-                sent_msg = await Message.send_img(user_id, re_msg.photo[-1].file_id, msg)
-        
-        if sent_msg == Forbidden:
-            await Message.reply_msg(update, f"Error Broadcast: Forbidden")
-        else:
-            await Message.reply_msg(update, "<i>Message Sent...!</i>")
+    msg = (
+        "<b><u>Broadcast</u></b>\n\n"
+        f"Forward: <code>{is_forward}</code>\n"
+        f"Pin message: <code>{is_pin}</code>"
+    )
+
+    btn_name_row1 = ["Forward?", "YES", "NO"]
+    btn_data_row1 = ["query_none", "query_broadcast_forward_true", "query_broadcast_forward_false"]
+
+    btn_name_row2 = ["Pin message?", "YES", "NO"]
+    btn_data_row2 = ["query_none", "query_broadcast_pin_true", "query_broadcast_pin_false"]
+
+    btn_name_row3 = ["Done", "Close"]
+    btn_data_row3 = ["query_broadcast_done", "query_close"]
+
+    row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+    row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+    row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+
+    btn = row1 + row2 + row3
+
+    sent_msg = await Message.reply_msg(update, msg, btn)
+
+    timeout = 0
+
+    while timeout < 30:
+        timeout += 1
+        await asyncio.sleep(1)
+        localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
+        db_broadcast = localdb.get("broadcast")
+        is_done = db_broadcast.get("is_done")
+        if is_done:
+            break
+    
+    await Message.del_msg(chat.id, sent_msg)
+
+    if not is_done:
+        await Message.reply_msg(update, "Oops, Timeout!")
         return
     
+    is_forward = db_broadcast.get("is_forward")
+    is_pin = db_broadcast.get("is_pin")
+    
+    broadcast_msg = re_msg.text_html or re_msg.caption_html
+
     users_id = await MongoDB.find("users", "user_id")
     active_status = await MongoDB.find("users", "active_status")
 
@@ -72,34 +111,42 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if filter_user_id[1] == True:
                 active_users.append(filter_user_id[0])
     else:
-        await Message.reply_msg(update, f"Error: Users {len(user_id)} not equal to active_status {len(active_status)}...!")
+        await Message.reply_msg(update, f"An error occured!\nuser_id: {len(user_id)} isn't equal to active_status: {len(active_status)} !!")
         return
-
+    
     sent_count, except_count = 0, 0
-    notify = await Message.send_msg(user.id, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}")
+    notify = await Message.send_msg(user.id, f"Total users: {len(users_id)}\nActive users: {len(active_users)}")
     start_time = time.time()
-    for user_id in active_users:
-        try:
-            if forward_confirm:
-                sent_msg = await Message.forward_msg(user_id, chat.id, re_msg.id)
-            else:
-                if re_msg.text_html:
-                    sent_msg = await Message.send_msg(user_id, msg)
-                elif re_msg.caption:
-                    sent_msg = await Message.send_img(user_id, re_msg.photo[-1].file_id, msg)
 
-            if sent_msg:
-                sent_count += 1
-                progress = (sent_count + except_count) * 100 / len(active_users)
-                progress_bar = ("▣" * int(((sent_count + except_count) * 10) / len(active_users))) + ("□" * int(10 - int(((sent_count + except_count) * 10) / len(active_users))))
-                await Message.edit_msg(update, f"Total Users: {len(users_id)}\nActive Users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nProgress: {int(progress)}%\n» {progress_bar} «", notify)
-                # sleep for 0.5sec
-                await asyncio.sleep(0.5)
-        except Exception as e:
+    for user_id in active_users:
+        if is_forward:
+            sent_msg = await Message.forward_msg(user_id, chat.id, re_msg.id)
+        else:
+            if re_msg.text_html:
+                sent_msg = await Message.send_msg(user_id, broadcast_msg)
+            elif re_msg.caption_html:
+                sent_msg = await Message.send_img(user_id, re_msg.photo[-1].file_id, broadcast_msg)
+
+        if not sent_msg or sent_msg == Forbidden:
             except_count += 1
-            logger.error(e)
+            return
+        
+        if is_pin:
+            try:
+                await bot.pin_chat_message(user_id, sent_msg.id)
+            except Exception as e:
+                logger.error(e)
+        
+        sent_count += 1
+        progress = (sent_count + except_count) * 100 / len(active_users)
+        progress_bar = ("▣" * int(((sent_count + except_count) * 10) / len(active_users))) + ("□" * int(10 - int(((sent_count + except_count) * 10) / len(active_users))))
+        await Message.edit_msg(update, f"Total users: {len(users_id)}\nActive users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nProgress: {(progress):.2f}%\n» {progress_bar} «", notify)
+        # sleep for 0.5sec
+        await asyncio.sleep(0.5)
+    
     end_time = time.time()
     time_took = f"{(end_time - start_time):.2f} sec"
     if (end_time - start_time) > 60:
         time_took = f"{((end_time - start_time) / 60):.2f} min"
+    
     await Message.reply_msg(update, f"<i>Broadcast Done...!\nTime took: {time_took}</i>")
