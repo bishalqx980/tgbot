@@ -114,7 +114,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, f"An error occured!\nuser_id: {len(user_id)} isn't equal to active_status: {len(active_status)} !!")
         return
     
-    sent_count, except_count = 0, 0
+    sent_count, except_count, pin_except_count = 0, 0, 0
     notify = await Message.send_msg(user.id, f"Total users: {len(users_id)}\nActive users: {len(active_users)}")
     start_time = time.time()
 
@@ -135,14 +135,12 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 await bot.pin_chat_message(user_id, sent_msg.id)
             except Exception as e:
+                pin_except_count += 1
                 logger.error(e)
         
         sent_count += 1
         progress = (sent_count + except_count) * 100 / len(active_users)
-        progress_bar = ("▣" * int(((sent_count + except_count) * 10) / len(active_users))) + ("□" * int(10 - int(((sent_count + except_count) * 10) / len(active_users))))
-        await Message.edit_msg(update, f"Total users: {len(users_id)}\nActive users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nProgress: {(progress):.2f}%\n» {progress_bar} «", notify)
-        # sleep for 0.5sec
-        await asyncio.sleep(0.5)
+        await Message.edit_msg(update, f"Total users: {len(users_id)}\nActive users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nPin exception: {pin_except_count}\nProgress: {(progress):.2f}%", notify)
     
     end_time = time.time()
     time_took = f"{(end_time - start_time):.2f} sec"
