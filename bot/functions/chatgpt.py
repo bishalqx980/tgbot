@@ -21,8 +21,8 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         find_group = db[1]
         
-        ai_status = find_group.get("ai_status")
-        if not ai_status and ai_status != None:
+        ai_status = find_group.get("ai_status") or True
+        if not ai_status:
             await Message.del_msg(chat.id, e_msg)
             return
     

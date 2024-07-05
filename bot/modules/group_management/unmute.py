@@ -90,7 +90,7 @@ async def func_unmute(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sil
         return
     
     if not is_silent:
-        msg = f"{victim.mention_html()} has been unmuted in this chat!\n<b>Admin</b>: {user.first_name}"
+        msg = f"{victim.mention_html()} has been unmuted in this chat!\n<b>Admin:</b> {user.first_name}"
         if reason:
             msg = f"{msg}\n<b>Reason</b>: {reason}"
         

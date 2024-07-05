@@ -4,11 +4,12 @@ from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
 from bot.modules.group_management.pm_error import _pm_error
 from bot.modules.group_management.log_channel import _log_channel
+from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
-async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
+async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None, purgefrom_id=None):
     chat = update.effective_chat
     user = update.effective_user
     e_msg = update.effective_message
@@ -53,7 +54,13 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
         return
     
     sent_msg = await Message.send_msg(chat.id, f"Purge started...")
-    await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in range(reply.id, e_msg.id + 1)))
+
+    if purgefrom_id:
+        while purgefrom_id <= reply.id:
+            await Message.del_msg(chat.id, msg_id=purgefrom_id)
+            purgefrom_id += 1
+    else:
+        await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in range(reply.id, e_msg.id + 1)))
     
     if is_silent:
         await Message.del_msg(chat.id, sent_msg)
@@ -68,3 +75,38 @@ async def func_spurge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await Message.del_msg(chat.id, e_msg)
     await func_purge(update, context, is_silent=True)
+
+
+async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    reply = update.message.reply_to_message
+    e_msg = update.effective_message
+
+    if not reply:
+        await Message.reply_msg(update, "Reply the message with /purgefrom which message you want to purge from! Then reply the message with /purgeto where to stop purge!")
+        return
+    
+    await LOCAL_DATABASE.insert_data("data_center", chat.id, {"purgefrom_id": reply.id})
+    sent_msg = await Message.reply_msg(update, "<code>purgefrom</code> added...")
+    await asyncio.sleep(5)
+    for del_msg in [e_msg, sent_msg]:
+        await Message.del_msg(chat.id, del_msg)
+
+
+async def func_purgeto(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    e_msg = update.effective_message
+
+    purgefrom_id = None
+    localdb = await LOCAL_DATABASE.find_one("data_center", chat.id)
+    if localdb:
+        purgefrom_id = localdb.get("purgefrom_id")
+    
+    if not purgefrom_id:
+        await Message.reply_msg(update, "Reply the message with /purgefrom which message you want to purge from! Then reply the message with /purgeto where to stop purge!")
+        return
+    
+    await LOCAL_DATABASE.insert_data("data_center", chat.id, {"purgefrom_id": None})
+    await func_purge(update, context, purgefrom_id=purgefrom_id)
+    await asyncio.sleep(5)
+    await Message.del_msg(chat.id, e_msg)

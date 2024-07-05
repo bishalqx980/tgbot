@@ -343,7 +343,7 @@ class QueryChatSettings:
 
     async def _query_chat_ai_status(update: Update, query, chat, find_chat):
         await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "ai_status"})
-        ai_status = find_chat.get("ai_status")
+        ai_status = find_chat.get("ai_status") or True
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"

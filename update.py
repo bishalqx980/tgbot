@@ -29,12 +29,7 @@ commands = [
 
 for command in commands:
     process = srun(command, capture_output=True, text=True, shell=True)
-    if process.stdout:
-        print_out = process.stdout
-    elif process.stderr:
-        print_out = process.stderr
-    else:
-        print_out = None
+    print_out = process.stdout or process.stderr or None
     print(print_out)
     
     with open("update.txt", "a") as f:

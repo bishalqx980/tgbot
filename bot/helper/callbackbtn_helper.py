@@ -121,14 +121,17 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await QueryFunctions.query_close(chat.id, query)
     # Help section ...
     elif query.data in [
-        "query_help_group_management",
+        "query_help_group_management_p1",
+        "query_help_group_management_p2",
         "query_help_ai",
         "query_help_misc_functions",
         "query_help_owner_functions",
         "query_help_bot_info"
     ]:
-        if query.data == "query_help_group_management":
-            await QueryBotHelp._query_help_group_management(update, query)
+        if query.data == "query_help_group_management_p1":
+            await QueryBotHelp._query_help_group_management_p1(update, query)
+        elif query.data == "query_help_group_management_p2":
+            await QueryBotHelp._query_help_group_management_p2(update, query)
         elif query.data == "query_help_ai":
             await QueryBotHelp._query_help_ai(update, query)
         elif query.data == "query_help_misc_functions":

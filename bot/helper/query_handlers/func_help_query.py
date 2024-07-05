@@ -5,13 +5,14 @@ from bot.modules.database.mongodb import MongoDB
 
 
 class QueryBotHelp:
-    async def _query_help_group_management(update: Update, query):
+    async def _query_help_group_management_p1(update: Update, query):
         msg = (
-            "<b>Group Moderation Commands</b>\n\n"
+            "<b>Group Moderation Commands | p:1</b>\n\n"
             "/id » Show chat/user id\n"
             "/invite » Generate chat invite link\n"
             "/promote | /fpromote » promote a member ('f' means with full privilege)\n"
             "/apromote | /fapromote » <code>anonymously</code> promote/fpromote a member\n"
+            "/admintitle » set admin custom title\n"
             "/demote » demote a member\n"
             "/pin » pin replied message loudly\n"
             "/unpin » unpin a pinned message\n"
@@ -21,20 +22,50 @@ class QueryBotHelp:
             "/kick » kick a member\n"
             "/kickme » The easy way to out\n"
             "/mute » restrict a member (member will be unable to send messages etc.)\n"
-            "/unmute » unrestrict a restricted member\n"
+            "/unmute » unrestrict a restricted member\n\n"
+            "<i><b>Note:</b> Send command to get more details about the command functions!\n"
+            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
+        )
+
+        btn_name_row1 = ["Next page >>"]
+        btn_data_row1 = ["query_help_group_management_p2"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["query_help_menu", "query_close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
+
+        await Message.edit_msg(update, msg, query.message, btn)
+
+
+    async def _query_help_group_management_p2(update: Update, query):
+        msg = (
+            "<b>Group Moderation Commands | p:2</b>\n\n"
             "/del » delete the replied message with a warning!\n"
             "/purge » delete every messages from replied to current message!\n"
+            "/purgefrom | /purgeto » delete every messages between <code>purgefrom</code> and <code>purgeto</code> replied message!\n"
             "/lock » lock the chat (member will be unable to send messages etc.)\n"
             "/unlock » unlock the chat (back to normal)\n"
             "/filters | /filter | /remove » to see/set/remove custom message/command\n"
             "/adminlist » to see chat admins list\n"
             "/settings » settings of chat\n\n"
-            "<i><b>Note:</b> Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>\n\n"
+            "<i><b>Note:</b> Send command to get more details about the command functions!\n"
+            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
         )
 
-        btn_name = ["Back", "Close"]
-        btn_data = ["query_help_menu", "query_close"]
-        btn = await Button.cbutton(btn_name, btn_data, True)
+        btn_name_row1 = ["<< Previous page"]
+        btn_data_row1 = ["query_help_group_management_p1"]
+
+        btn_name_row2 = ["Back", "Close"]
+        btn_data_row2 = ["query_help_menu", "query_close"]
+
+        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
+        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+
+        btn = row1 + row2
 
         await Message.edit_msg(update, msg, query.message, btn)
 

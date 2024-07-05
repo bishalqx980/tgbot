@@ -3,7 +3,6 @@ from telegram.ext import ContextTypes
 from bot import bot, logger
 from bot.helper.telegram_helper import Message
 from bot.modules.group_management.pm_error import _pm_error
-from bot.modules.group_management.log_channel import _log_channel
 from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
@@ -50,7 +49,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
             return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to promote!\nTo set admin_title eg. <code>/promote admin_title</code>")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to promote!\nTo set admin title eg. <code>/promote admin_title</code>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
@@ -78,10 +77,10 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
                 can_edit_stories = True,
                 can_delete_stories = True
             )
-            msg = f"{victim.mention_html()} has been promoted (with full privilege)!\n<b>Admin</b>: {user.first_name}"
+            msg = f"{victim.mention_html()} has been promoted (with full privilege)!\n<b>Admin:</b> {user.first_name}"
         else:
             await bot.promote_chat_member(chat.id, victim.id, can_manage_video_chats=True, is_anonymous=is_anonymous)
-            msg = f"{victim.mention_html()} has been promoted!\n<b>Admin</b>: {user.first_name}"
+            msg = f"{victim.mention_html()} has been promoted!\n<b>Admin:</b> {user.first_name}"
     except Exception as e:
         logger.error(e)
         error_msg = await Message.reply_msg(update, e)

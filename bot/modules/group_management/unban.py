@@ -73,7 +73,7 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
         return
     
     if not is_silent:
-        msg = f"{victim.mention_html()} has been unbanned in this chat!\n<b>Admin</b>: {user.first_name}"
+        msg = f"{victim.mention_html()} has been unbanned in this chat!\n<b>Admin:</b> {user.first_name}"
         if reason:
             msg = f"{msg}\n<b>Reason</b>: {reason}"
         

@@ -98,7 +98,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
         return
     
     if not is_silent:
-        msg = f"Shh... {victim.mention_html()} has been muted in this chat!\n<b>Admin</b>: {user.first_name}\n"
+        msg = f"Shh... {victim.mention_html()} has been muted in this chat!\n<b>Admin:</b> {user.first_name}\n"
         
         if logical_time:
             msg = f"{msg}<b>Duration</b>: {logical_time}\n"

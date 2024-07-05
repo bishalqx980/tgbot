@@ -136,7 +136,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         welcome_user = find_group.get("welcome_user")
         farewell_user = find_group.get("farewell_user")
         antibot = find_group.get("antibot")
-        ai_status = find_group.get("ai_status")
+        ai_status = find_group.get("ai_status") or True
         del_cmd = find_group.get("del_cmd")
         all_links = find_group.get("all_links")
         allowed_links = find_group.get("allowed_links")

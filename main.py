@@ -59,6 +59,7 @@ from bot.modules.group_management.promote import (
     func_sfpromote,
     func_sfapromote
 )
+from bot.modules.group_management.admin_title import func_admintitle, func_sadmintitle
 from bot.modules.group_management.demote import func_demote, func_sdemote
 from bot.modules.group_management.pin_msg import func_pin_msg, func_spin_msg
 from bot.modules.group_management.unpin_msg import func_unpin_msg, func_sunpin_msg
@@ -70,7 +71,7 @@ from bot.modules.group_management.kickme import func_kickme
 from bot.modules.group_management.mute import func_mute, func_smute
 from bot.modules.group_management.unmute import func_unmute, func_sunmute
 from bot.modules.group_management.del_msg import func_del, func_sdel
-from bot.modules.group_management.purge import func_purge, func_spurge
+from bot.modules.group_management.purge import func_purge, func_spurge, func_purgefrom, func_purgeto
 from bot.modules.group_management.lock_chat import func_lockchat
 from bot.modules.group_management.unlock_chat import func_unlockchat
 from bot.modules.group_management.add_filter import func_filter
@@ -94,25 +95,26 @@ async def server_alive():
         await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
         await asyncio.gather(*(Message.send_msg(user_id, "Bot Restarted!") for user_id in power_users))
 
-    if server_url:
-        while True:
-            server_url = await LOCAL_DATABASE.get_data("bot_docs", "server_url")
-            if not server_url:
-                return
-            if server_url[0:4] != "http":
-                server_url = f"http://{server_url}"
-            try:
-                response = requests.get(server_url)
-                if response.status_code == 200:
-                    logger.info(f"{server_url} is up and running. ✅")
-                else:
-                    logger.warning(f"{server_url} is down or unreachable. ❌ - code - {response.status_code}")
-            except Exception as e:
-                logger.error(f"{server_url} > {e}")
-            await asyncio.sleep(180) # 3 min
-    else:
+    if not server_url:
         logger.warning("Server URL not provided !!")
         await Message.send_msg(owner_id, "Warning! Server URL not provided!\nGoto /bsettings and setup server url then restart bot...")
+        return
+    
+    while True:
+        server_url = await LOCAL_DATABASE.get_data("bot_docs", "server_url")
+        if not server_url:
+            return
+        if server_url[0:4] != "http":
+            server_url = f"http://{server_url}"
+        try:
+            response = requests.get(server_url)
+            if response.status_code == 200:
+                logger.info(f"{server_url} is up and running. ✅")
+            else:
+                logger.warning(f"{server_url} is down or unreachable. ❌ - code - {response.status_code}")
+        except Exception as e:
+            logger.error(f"{server_url} > {e}")
+        await asyncio.sleep(180) # 3 min
 
 
 def main():
@@ -149,6 +151,8 @@ def main():
         "fapromote": func_fapromote,
         "sfpromote": func_sfpromote,
         "sfapromote": func_sfapromote,
+        "admintitle": func_admintitle,
+        "sadmintitle": func_sadmintitle,
         "demote": func_demote,
         "sdemote": func_sdemote,
         "pin": func_pin_msg,
@@ -172,6 +176,8 @@ def main():
         "sdel": func_sdel,
         "purge": func_purge,
         "spurge": func_spurge,
+        "purgefrom": func_purgefrom,
+        "purgeto": func_purgeto,
         "lock": func_lockchat,
         "unlock": func_unlockchat,
         "filter": func_filter,

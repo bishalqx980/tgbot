@@ -68,5 +68,5 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, e.message)
         return
 
-    await Message.send_msg(chat.id, f"This chat has been unlocked!\n<b>Admin</b>: {user.first_name}")
+    await Message.send_msg(chat.id, f"This chat has been unlocked!\n<b>Admin:</b> {user.first_name}")
     await _log_channel(update, chat, user, action="CHAT_UNLOCK")

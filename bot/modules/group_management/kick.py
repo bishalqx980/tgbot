@@ -77,7 +77,7 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
         return
     
     if not is_silent:
-        msg = f"{victim.mention_html()} has been kicked out from this chat!\n<b>Admin</b>: {user.first_name}"
+        msg = f"{victim.mention_html()} has been kicked out from this chat!\n<b>Admin:</b> {user.first_name}"
         if reason:
             msg = f"{msg}\n<b>Reason</b>: {reason}"
         

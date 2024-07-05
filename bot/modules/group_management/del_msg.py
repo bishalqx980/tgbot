@@ -58,7 +58,7 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
     await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in del_msg_ids))
     
     if not is_silent:
-        msg = f"Lookout... {victim.mention_html()}, your message has been deleted!\n<b>Admin</b>: {user.first_name}"
+        msg = f"Lookout... {victim.mention_html()}, your message has been deleted!\n<b>Admin:</b> {user.first_name}"
         if reason:
             msg = f"{msg}\n<b>Reason</b>: {reason}"
         

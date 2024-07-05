@@ -1,4 +1,3 @@
-import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
@@ -20,8 +19,8 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         find_group = db[1]
         
-        ai_status = find_group.get("ai_status")
-        if not ai_status and ai_status != None:
+        ai_status = find_group.get("ai_status") or True
+        if not ai_status:
             await Message.del_msg(chat.id, e_msg)
             return
 
@@ -30,17 +29,11 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     sent_msg = await Message.reply_msg(update, "Processing...")
-    retry, attempt = 0, 2
-    while retry != attempt:
-        imagine = await Safone.imagine(prompt)
-        if imagine:
-            break
-        elif retry == attempt:
-            await Message.edit_msg(update, "Too many requests! Please try after sometime!", sent_msg)
-            return
-        retry += 1
-        await Message.edit_msg(update, f"Please wait, Imagine is busy!\nAttempt: {retry}/{attempt}", sent_msg)
-        await asyncio.sleep(3)
+
+    imagine = await Safone.imagine(prompt)
+    if not imagine.name:
+        await Message.edit_msg(update, "An error occured, try again after sometime!", sent_msg)
+        return
     
     await Message.del_msg(chat.id, sent_msg)
     

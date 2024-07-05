@@ -65,7 +65,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if filters and keyword:
         if keyword == "clear_all":
             await MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
-            await Message.reply_msg(update, f"All filters of this chat has been removed!\n<b>Admin</b>: {user.first_name}")
+            await Message.reply_msg(update, f"All filters of this chat has been removed!\n<b>Admin:</b> {user.first_name}")
 
             group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
             await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
@@ -75,7 +75,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if keyword.lower() in filters:
                 del filters[keyword]
                 await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
-                await Message.reply_msg(update, f"<code>{keyword}</code> filter has been removed!\n<b>Admin</b>: {user.first_name}")
+                await Message.reply_msg(update, f"<code>{keyword}</code> filter has been removed!\n<b>Admin:</b> {user.first_name}")
             else:
                 await Message.reply_msg(update, "There are no such filter available for this chat to delete!\nCheckout /filters")
                 return

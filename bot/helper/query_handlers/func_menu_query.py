@@ -41,7 +41,7 @@ class QueryMenus:
         )
 
         btn_name_row1 = ["Group Management", "AI"]
-        btn_data_row1 = ["query_help_group_management", "query_help_ai"]
+        btn_data_row1 = ["query_help_group_management_p1", "query_help_ai"]
 
         btn_name_row2 = ["misc", "Bot owner"]
         btn_data_row2 = ["query_help_misc_functions", "query_help_owner_functions"]
@@ -93,7 +93,7 @@ class QueryMenus:
             welcome_user = find_chat.get("welcome_user")
             farewell_user = find_chat.get("farewell_user")
             antibot = find_chat.get("antibot")
-            ai_status = find_chat.get("ai_status")
+            ai_status = find_chat.get("ai_status") or True
             del_cmd = find_chat.get("del_cmd")
             all_links = find_chat.get("all_links")
             allowed_links = find_chat.get("allowed_links")

@@ -5,9 +5,7 @@ safone_api = SafoneAPI()
 
 class Safone:
     async def safone_ai(msg):
-        chatgpt_res = None
-        bard_res = None
-        chatbot_res = None
+        chatgpt_res, bard_res, chatbot_res = None, None, None
         try:
             chatgpt_res = await safone_api.chatgpt(msg)
         except Exception as e:
