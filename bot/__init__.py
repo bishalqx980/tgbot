@@ -43,6 +43,7 @@ server_url = os.getenv("SERVER_URL")
 shrinkme_api = os.getenv("SHRINKME_API")
 omdb_api = os.getenv("OMDB_API")
 weather_api = os.getenv("WEATHER_API")
+pastebin_api = os.getenv("PASTEBIN_API")
 
 variables = [bot_token, mongodb_uri, db_name]
 for variable in variables:

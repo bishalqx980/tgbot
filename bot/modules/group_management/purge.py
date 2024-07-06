@@ -82,6 +82,10 @@ async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     e_msg = update.effective_message
 
+    if chat.type not in ["group", "supergroup"]:
+        await _pm_error(chat.id)
+        return
+
     if not reply:
         await Message.reply_msg(update, "Reply the message with /purgefrom which message you want to purge from! Then reply the message with /purgeto where to stop purge!")
         return
@@ -96,6 +100,10 @@ async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_purgeto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     e_msg = update.effective_message
+
+    if chat.type not in ["group", "supergroup"]:
+        await _pm_error(chat.id)
+        return
 
     purgefrom_id = None
     localdb = await LOCAL_DATABASE.find_one("data_center", chat.id)

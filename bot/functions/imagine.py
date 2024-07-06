@@ -31,7 +31,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_msg = await Message.reply_msg(update, "Processing...")
 
     imagine = await Safone.imagine(prompt)
-    if not imagine.name:
+    if not imagine or not imagine.name:
         await Message.edit_msg(update, "An error occured, try again after sometime!", sent_msg)
         return
     

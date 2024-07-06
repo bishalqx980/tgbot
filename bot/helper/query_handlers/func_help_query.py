@@ -101,6 +101,7 @@ class QueryBotHelp:
             "/yts » search video on youtube\n"
             "/qr » generate a QR code\n"
             "/itl » convert image into a public link\n"
+            "/paste » paste your text in pastebin & get public link\n"
             "/whisper » secretly tell something to someone in group chat\n"
             "/id » show chat/user id\n"
             "/info » show user info\n"
