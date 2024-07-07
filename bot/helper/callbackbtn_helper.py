@@ -202,6 +202,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "query_shrinkme_api",
         "query_omdb_api",
         "query_weather_api",
+        "query_pastebin_api",
         "query_restore_db",
         "query_confirm_restore_db"
     ]:
@@ -230,6 +231,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await QueryBotSettings._query_omdb_api(update, query, user, find_chat)
             elif query.data == "query_weather_api":
                 await QueryBotSettings._query_weather_api(update, query, user, find_chat)
+            elif query.data == "query_pastebin_api":
+                await QueryBotSettings._query_pastebin_api(update, query, user, find_chat)
             elif query.data == "query_restore_db":
                 await QueryBotSettings._query_restore_db(update, query)
             elif query.data == "query_confirm_restore_db":

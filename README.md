@@ -9,6 +9,8 @@ if _check:
     print("Thanks you ❤️ for sharing love & giving me inspiration...")
 else:
     print("Please 🥺 give a star to this repo! ...And fork it if you want to work with this repo!")
+
+>> Don't be an ungrateful person...
 ```
 
 <sup>- *Fun fact: _check will always return True! [ becasue you (gave/will give) a star & fork the repo lol ] Thanks :)*</sup>

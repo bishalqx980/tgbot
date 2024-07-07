@@ -54,19 +54,23 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     btn_name_row3 = ["Server url", "Sudo"]
     btn_data_row3 = ["query_server_url", "query_sudo"]
 
-    btn_name_row4 = ["Shrinkme API", "OMDB API", "Weather API"]
-    btn_data_row4 = ["query_shrinkme_api", "query_omdb_api", "query_weather_api"]
+    btn_name_row4 = ["Shrinkme API", "OMDB API"]
+    btn_data_row4 = ["query_shrinkme_api", "query_omdb_api"]
 
-    btn_name_row5 = ["> Restore DB?", "Close"]
-    btn_data_row5 = ["query_restore_db", "query_close"]
+    btn_name_row5 = ["Weather API", "Pastebin API"]
+    btn_data_row5 = ["query_weather_api", "query_pastebin_api"]
+
+    btn_name_row6 = ["> Restore DB?", "Close"]
+    btn_data_row6 = ["query_restore_db", "query_close"]
 
     row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
     row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
     row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
     row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
     row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
+    row6 = await Button.cbutton(btn_name_row6, btn_data_row6, True)
 
-    btn = row1 + row2 + row3 + row4 + row5
+    btn = row1 + row2 + row3 + row4 + row5 + row6
 
     _bot = await find_bot_docs()
     if not _bot:

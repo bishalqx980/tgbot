@@ -67,11 +67,20 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<blockquote>Reply the message with /filter which one you want to set as value for your keyword!</blockquote>"
             "Example: <code>/filter hi</code> send this by replying any message! suppose the message is <code>Hi, How are you!</code>\n"
             "Next time if you say <code>Hi</code> in chat, the bot will reply with <code>Hi, How are you!</code>\n\n"
-            "Ques: How to remove a filter?\n Ans: /remove for instruction..."
+            "<i><b>Note:</b> Use comma for adding multiple filter. eg. <code>/filter hi, bye</code></i>\n\n"
+            "<i>Ques: How to remove a filter?\n Ans: /remove for instruction...</i>\n\n"
+            "<b><u>Text formatting</u></b>\n"
+            "<code>{first}</code> first name\n"
+            "<code>{last}</code> last name\n"
+            "<code>{fullname}</code> fullname\n"
+            "<code>{username}</code> username\n"
+            "<code>{mention}</code> mention\n"
+            "<code>{id}</code> id\n"
+            "<code>{chatname}</code> chat title\n"
         )
 
-        btn_name = ["Text formatting", "Close"]
-        btn_data = ["text_formats", "query_close"]
+        btn_name = ["Close"]
+        btn_data = ["query_close"]
 
         btn = await Button.cbutton(btn_name, btn_data, True)
 
@@ -86,15 +95,31 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     find_group = db[1]
     
     filters = find_group.get("filters")
+
+    modified_keyword = keyword.split(",")
+    keywords = []
+    for i in modified_keyword:
+        keywords.append(i.strip())
+
     if not filters:
-        data = {
-            keyword: value
-        }
+        data = {}
+        for keyword in keywords:
+            data.update({keyword: value})
         await MongoDB.update_db("groups", "chat_id", chat.id, "filters", data)
     else:
-        filters[keyword] = value
+        for keyword in keywords:
+            filters[keyword] = value
         await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
     
     group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
     await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
-    await Message.reply_msg(update, f"<code>{keyword}</code> has been added as filter!\n<b>Admin:</b> {user.first_name}")
+
+    msg_keywords, counter = "", 0
+    for i in keywords:
+        counter += 1
+        if counter == len(keywords):
+            msg_keywords += f"{i}"
+        else:
+            msg_keywords += f"{i}, "
+    
+    await Message.reply_msg(update, f"<code>{msg_keywords}</code> has been added as filter!\n<b>Admin:</b> {user.first_name}")

@@ -40,6 +40,10 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if whisper_user.endswith("bot"):
             await Message.reply_msg(update, "Whisper isn't for bots...!")
             return
+    
+    if len(msg) > 100:
+        await Message.reply_msg(update, "Whisper is too long... (max limit 100 character)")
+        return
 
     data = {
         "user_id": user.id,

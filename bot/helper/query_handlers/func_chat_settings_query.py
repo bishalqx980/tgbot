@@ -111,12 +111,24 @@ class QueryChatSettings:
 
     async def _query_set_custom_welcome_msg(update: Update, query, chat, find_chat):
         await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "custom_welcome_msg"})
-        custom_welcome_msg = find_chat.get("custom_welcome_msg")
+        custom_welcome_msg = find_chat.get("custom_welcome_msg") or "default message"
+        is_sent_below = None
+        if len(custom_welcome_msg) > 100:
+            custom_welcome_msg = "Sent below..."
+            is_sent_below = True
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
-            f"Welcome message\n--------------------\n<code>{custom_welcome_msg}</code>\n\n"
-            "<i><b>Note:</b> This message will be send as greeting message in the chat when a user join! (supports telegram formatting)</i>"
+            f"Welcome message:\n<code>{custom_welcome_msg}</code>\n\n"
+            "<i><b>Note:</b> This message will be send as greeting message in the chat when a user join! (supports telegram formatting)</i>\n\n"
+            "<b><u>Text formatting</u></b>\n"
+            "<code>{first}</code> first name\n"
+            "<code>{last}</code> last name\n"
+            "<code>{fullname}</code> fullname\n"
+            "<code>{username}</code> username\n"
+            "<code>{mention}</code> mention\n"
+            "<code>{id}</code> id\n"
+            "<code>{chatname}</code> chat title\n"
         )
 
         btn_name_row1 = ["Set default message", "Set custom message"]
@@ -131,6 +143,8 @@ class QueryChatSettings:
         btn = row1 + row2
 
         await Message.edit_msg(update, msg, query.message, btn)
+        if is_sent_below:
+            await Message.reply_msg(update, find_chat.get("custom_welcome_msg"))
 
 
     async def _query_chat_farewell_user(update: Update, query, chat, find_chat):
