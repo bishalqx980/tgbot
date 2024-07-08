@@ -49,8 +49,7 @@ async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
             msg = (
                 f"• {user.full_name}\n"
                 f"  » <b>ID:</b> <code>{user.id}</code>\n"
-                f"• {from_user.full_name}\n"
-                f"  » <b>ID:</b> <code>{from_user.id}</code>"
+                f"• ChatID: <code>{chat.id}</code>"
             )
         
         await Message.reply_msg(update, msg)
