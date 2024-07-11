@@ -141,6 +141,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sent_count += 1
         progress = (sent_count + except_count) * 100 / len(active_users)
         await Message.edit_msg(update, f"Total users: {len(users_id)}\nActive users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nPin exception: {pin_except_count}\nProgress: {(progress):.2f}%", notify)
+        # sleep for 0.5 sec
+        await asyncio.sleep(0.5)
     
     end_time = time.time()
     time_took = f"{(end_time - start_time):.2f} sec"

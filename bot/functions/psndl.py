@@ -45,11 +45,9 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     link = await TELEGRAPH.paste(msg, user.full_name)
     if not link:
-        await Message.edit_msg(update, "Oops, something went wrong...", sent_msg)
-        return
+        link = "Oops, something went wrong..."
     
-    await Message.reply_msg(update, link)
-    await Message.del_msg(chat.id, sent_msg)
+    await Message.edit_msg(update, link, sent_msg)
 
 
 async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):

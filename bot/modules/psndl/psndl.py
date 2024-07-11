@@ -1,3 +1,4 @@
+import os
 import json
 
 JSON_FILE = "bot/modules/psndl/psndl_db.json"
@@ -43,6 +44,7 @@ class PSNDL:
                     db_rap_data = game_data.get("rap_data")
                     if rap_data == db_rap_data:
                         rap_name = game_data.get("rap_name")
+                        os.makedirs("download", exist_ok=True)
                         rap_location = f"download/{rap_name}"
                         with open(rap_location, "wb") as f:
                             f.write(bytes.fromhex(db_rap_data))
