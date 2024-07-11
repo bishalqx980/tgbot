@@ -105,6 +105,8 @@ class QueryBotHelp:
             "/whisper » secretly tell something to someone in group chat\n"
             "/id » show chat/user id\n"
             "/info » show user info\n"
+            "/psndl » search ps3 & some other playstation games link (mostly ps3)\n"
+            "/rap » generate rap from <code>rap_data</code> (use /psndl to get rap data)\n"
             "/settings » settings of chat\n\n"
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )

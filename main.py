@@ -35,6 +35,8 @@ from bot.functions.img_to_link import func_img_to_link
 from bot.functions.paste import func_paste
 from bot.functions.whisper import func_whisper
 from bot.functions.info import func_info
+from bot.functions.psndl import func_psndl
+from bot.functions.psndl import func_rap
 from bot.functions.settings import func_settings
 from bot.functions.id import func_id
 from bot.functions.help import func_help
@@ -141,6 +143,8 @@ def main():
         "paste": func_paste,
         "whisper": func_whisper,
         "info": func_info,
+        "psndl": func_psndl,
+        "rap": func_rap,
         "settings": func_settings,
         # Group management
         "id": func_id,

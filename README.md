@@ -2,6 +2,7 @@
 This Telegram bot is built using the `python-telegram-bot` library **_version 20.7_** and performs various tasks within **Telegram**.
 
 - **This bot can be found as [𝕮𝖎𝖗𝖎 "希里"](https://t.me/MissCiri_bot) on Telegram.**
+- **Checkout [https://github.com/bishalqx980/python](https://github.com/bishalqx980/python)**
 
 ```Spread Love ❤️
 _check = "Does the user Starred & forked the repository?"
@@ -125,6 +126,6 @@ else:
 
 ## License
 
-GPL-3.0 © @bishalqx980
+GPL-3.0
 <br>
 Original Creator - [bishalqx980](https://t.me/bishalqx980)
