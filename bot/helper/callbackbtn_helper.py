@@ -268,30 +268,31 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif query.data == "query_broadcast_done":
             await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_done": True}, "broadcast")
         
-        localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
-        db_broadcast = localdb.get("broadcast")
-        is_forward = db_broadcast.get("is_forward") or False
-        is_pin = db_broadcast.get("is_pin") or False
-        
-        msg = (
-            "<b><u>Broadcast</u></b>\n\n"
-            f"Forward: <code>{is_forward}</code>\n"
-            f"Pin message: <code>{is_pin}</code>"
-        )
+        if query.data != "query_broadcast_done":
+            localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
+            db_broadcast = localdb.get("broadcast")
+            is_forward = db_broadcast.get("is_forward") or False
+            is_pin = db_broadcast.get("is_pin") or False
+            
+            msg = (
+                "<b><u>Broadcast</u></b>\n\n"
+                f"Forward: <code>{is_forward}</code>\n"
+                f"Pin message: <code>{is_pin}</code>"
+            )
 
-        btn_name_row1 = ["Forward?", "YES", "NO"]
-        btn_data_row1 = ["query_none", "query_broadcast_forward_true", "query_broadcast_forward_false"]
+            btn_name_row1 = ["Forward?", "YES", "NO"]
+            btn_data_row1 = ["query_none", "query_broadcast_forward_true", "query_broadcast_forward_false"]
 
-        btn_name_row2 = ["Pin message?", "YES", "NO"]
-        btn_data_row2 = ["query_none", "query_broadcast_pin_true", "query_broadcast_pin_false"]
+            btn_name_row2 = ["Pin message?", "YES", "NO"]
+            btn_data_row2 = ["query_none", "query_broadcast_pin_true", "query_broadcast_pin_false"]
 
-        btn_name_row3 = ["Done", "Close"]
-        btn_data_row3 = ["query_broadcast_done", "query_close"]
+            btn_name_row3 = ["Done", "Close"]
+            btn_data_row3 = ["query_broadcast_done", "query_close"]
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+            row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
+            row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+            row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
 
-        btn = row1 + row2 + row3
+            btn = row1 + row2 + row3
 
-        await Message.edit_msg(update, msg, query.message, btn)
+            await Message.edit_msg(update, msg, query.message, btn)

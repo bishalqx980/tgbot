@@ -2,7 +2,6 @@ import time
 import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
-from telegram.error import Forbidden
 from bot import bot, logger
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
@@ -126,19 +125,18 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 sent_msg = await Message.send_msg(user_id, broadcast_msg)
             elif re_msg.caption_html:
                 sent_msg = await Message.send_img(user_id, re_msg.photo[-1].file_id, broadcast_msg)
-
-        if not sent_msg or sent_msg == Forbidden:
+        
+        if not sent_msg:
             except_count += 1
-            return
-        
-        if is_pin:
-            try:
-                await bot.pin_chat_message(user_id, sent_msg.id)
-            except Exception as e:
-                pin_except_count += 1
-                logger.error(e)
-        
-        sent_count += 1
+        else:
+            sent_count += 1
+            if is_pin:
+                try:
+                    await bot.pin_chat_message(user_id, sent_msg.id)
+                except Exception as e:
+                    pin_except_count += 1
+                    logger.error(e)
+
         progress = (sent_count + except_count) * 100 / len(active_users)
         await Message.edit_msg(update, f"Total users: {len(users_id)}\nActive users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nPin exception: {pin_except_count}\nProgress: {(progress):.2f}%", notify)
         # sleep for 0.5 sec
@@ -149,4 +147,4 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if (end_time - start_time) > 60:
         time_took = f"{((end_time - start_time) / 60):.2f} min"
     
-    await Message.reply_msg(update, f"<i>Broadcast Done...!\nTime took: {time_took}</i>")
+    await Message.reply_msg(update, f"Broadcast Done!\nTime took: {time_took}")

@@ -45,8 +45,12 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif re_msg.caption_html:
             sent_msg = await Message.send_img(chat_id, re_msg.photo[-1].file_id, msg)
     
-    if not sent_msg or sent_msg == Forbidden:
-        await Message.reply_msg(update, f"An error occured!")
-        return
+    if not sent_msg:
+        msg = "An error occurred!"
+    else:
+        if sent_msg == Forbidden:
+            msg =  f"Forbidden!"
+        else:
+            msg = "Message Sent!"
 
-    await Message.reply_msg(update, "<i>Message Sent...!</i>")
+    await Message.reply_msg(update, msg)
