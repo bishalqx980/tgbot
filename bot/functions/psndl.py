@@ -23,13 +23,13 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, "Game not found! Check game name again!", sent_msg)
         return
 
-    msg, counter = "", 0
+    msg_list, counter = [], 0
     for game_type in search:
         collections = search.get(game_type)
         for game_id in collections:
             game_data = collections.get(game_id)
             counter += 1
-            msg += (
+            msg_list.append(
                 f"<b>No. {counter}</b><br>"
                 f"<b>• ID:</b> <code>{game_data.get('id')}</code><br>"
                 f"<b>• Name:</b> <code>{game_data.get('name')}</code><br>"
@@ -43,11 +43,23 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "<i><b>Note:</b> To get rap file send the rap data with command /rap</i><br><br>"
             )
     
-    link = await TELEGRAPH.paste(msg, user.full_name)
-    if not link:
-        link = "Oops, something went wrong..."
+    msg, counter, links = "", 0, []
+    for one_msg in msg_list:
+        msg += one_msg
+        counter += 1
+        if len(msg_list) > 50 and counter == 50:
+            link = await TELEGRAPH.paste(msg, user.full_name)
+            links.append(link)
+            msg, counter = "", 0
     
-    await Message.edit_msg(update, link, sent_msg)
+    if counter != 0:
+        link = await TELEGRAPH.paste(msg, user.full_name)
+        links.append(link)
+        msg, counter = "", 0
+    
+    for link in links:
+        msg += f"» {link}\n"
+    await Message.edit_msg(update, msg, sent_msg)
 
 
 async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
