@@ -16,6 +16,10 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "Use <code>/psndl game name</code>\nE.g. <code>/psndl grand theft auto</code>")
         return
 
+    if len(keyword) < 5:
+        await Message.reply_msg(update, "Search keyword is too short...")
+        return
+
     sent_msg = await Message.reply_msg(update, f"Searching...")
     search = await PSNDL.search(keyword)
 
