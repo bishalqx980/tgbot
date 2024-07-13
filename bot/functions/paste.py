@@ -13,7 +13,7 @@ async def func_paste(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     sent_msg = await Message.reply_msg(update, f"Creating...")
-    paste = await TELEGRAPH.paste(text, user.full_name)
+    paste = await TELEGRAPH.paste(text.replace("\n", "<br>"), user.full_name)
     if not paste:
         await Message.edit_msg(update, "Oops, something went wrong...", sent_msg)
         return

@@ -34,22 +34,22 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
             game_data = collections.get(game_id)
             counter += 1
             msg_list.append(
-                f"<b>No. {counter}</b><br>"
-                f"<b>• ID:</b> <code>{game_data.get('id')}</code><br>"
-                f"<b>• Name:</b> <code>{game_data.get('name')}</code><br>"
-                f"<b>• Type:</b> <code>{game_data.get('type')}</code><br>"
-                f"<b>• Region:</b> <code>{game_data.get('region')}</code><br>"
-                f"<b>• Link:</b> <a href='{game_data.get('link')}'>Download</a><br>"
-                f"<b>• Rap:</b> <code>{game_data.get('rap_name')}</code><br>"
-                f"<b>   Rap data »</b> <code>/rap {game_data.get('rap_data')}</code><br>"
-                f"<b>• Desc:</b> <code>{game_data.get('desc')}</code><br>"
-                f"<b>• Author:</b> <code>{game_data.get('author')}</code><br><br>"
-                "<i><b>Note:</b> To get rap file send the rap data with command /rap</i><br><br>"
+                f"<b>No. {counter}</b>\n"
+                f"<b>• ID:</b> <code>{game_data.get('id')}</code>\n"
+                f"<b>• Name:</b> <code>{game_data.get('name')}</code>\n"
+                f"<b>• Type:</b> <code>{game_data.get('type')}</code>\n"
+                f"<b>• Region:</b> <code>{game_data.get('region')}</code>\n"
+                f"<b>• Link:</b> <a href='{game_data.get('link')}'>Download</a>\n"
+                f"<b>• Rap:</b> <code>{game_data.get('rap_name')}</code>\n"
+                f"<b>• Rap data »</b> <code>/rap {game_data.get('rap_data')}</code>\n"
+                f"<b>• Desc:</b> <code>{game_data.get('desc')}</code>\n"
+                f"<b>• Author:</b> <code>{game_data.get('author')}</code>\n\n"
+                "<i><b>Note:</b> To get rap file send the rap data with command /rap</i>\n\n"
             )
     
     msg, counter, links = "", 0, []
     for one_msg in msg_list:
-        msg += one_msg
+        msg += one_msg.replace("\n", "<br>")
         counter += 1
         if len(msg_list) > 50 and counter == 50:
             link = await TELEGRAPH.paste(msg, user.full_name)
