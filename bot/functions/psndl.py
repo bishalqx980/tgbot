@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message
-from bot.modules.psndl.psndl import PSNDL
+from bot.modules.psndl import PSNDL
 from bot.modules.telegraph import TELEGRAPH
 
 
@@ -82,9 +82,7 @@ async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     game_data, rap_name, rap_location = gen_rap
-
-    with open(rap_location, "rb") as f:
-        rap_file = f.read()
+    rap_file = open(rap_location, "rb").read()
 
     caption = (
         f"<b>• ID:</b> <code>{game_data.get('id')}</code>\n"

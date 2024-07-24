@@ -11,19 +11,15 @@ class LOCAL_DATABASE:
             return
         
         try:
-            with open(LOCAL_DB, "r") as f:
-                load_db = json.load(f)
-            
+            load_db = json.load(open(LOCAL_DB, "r"))
             check_db = load_db.get(collection) # check if collection exist or not
             if check_db:
                 logger.info(f"Collection {collection} already exist!")
                 return
             
             load_db[collection] = {}
+            json.dump(load_db, open(LOCAL_DB, "w"), indent=4)
 
-            with open(LOCAL_DB, "w") as f:
-                json.dump(load_db, f, indent=4)
-            
             logger.info(f"Collection {collection} created...")
         except Exception as e:
             logger.error(f"Localdb: {e}")
@@ -43,8 +39,7 @@ class LOCAL_DATABASE:
                 return
         
         try:
-            with open(LOCAL_DB, "r") as f:
-                load_db = json.load(f)
+            load_db = json.load(open(LOCAL_DB, "r"))
             
             # bot_docs exception ...
             if data.get("_id"):
@@ -52,9 +47,7 @@ class LOCAL_DATABASE:
             
             load_collection = load_db.get(collection)
             load_collection.update(data)
-
-            with open(LOCAL_DB, "w") as f:
-                json.dump(load_db, f, indent=4)
+            json.dump(load_db, open(LOCAL_DB, "w"), indent=4)
             
             logger.info(f"{collection} updated in localdb...")
         except Exception as e:
@@ -76,8 +69,7 @@ class LOCAL_DATABASE:
                 return
 
         try:
-            with open(LOCAL_DB, "r") as f:
-                load_db = json.load(f)
+            load_db = json.load(open(LOCAL_DB, "r"))
 
             # exception ...
             if data.get("_id"):
@@ -94,9 +86,7 @@ class LOCAL_DATABASE:
                 is_identifier.update(data)
             
             load_db[collection] = load_collection
-
-            with open(LOCAL_DB, "w") as f:
-                json.dump(load_db, f, indent=4)
+            json.dump(load_db, open(LOCAL_DB, "w"), indent=4)
             
             if sub_collection:
                 logger.info(f"{sub_collection} has been updated in localdb...! Collection: {collection} Identifier: {identifier} ")
@@ -115,9 +105,7 @@ class LOCAL_DATABASE:
             return
         
         try:
-            with open(LOCAL_DB, "r") as f:
-                load_db = json.load(f)
-            
+            load_db = json.load(open(LOCAL_DB, "r"))
             load_collection = load_db.get(collection)
             return load_collection
         except Exception as e:
@@ -136,9 +124,7 @@ class LOCAL_DATABASE:
                 return
         
         try:
-            with open(LOCAL_DB, "r") as f:
-                load_db = json.load(f)
-            
+            load_db = json.load(open(LOCAL_DB, "r"))
             load_collection = load_db.get(collection)
             data = load_collection.get(str(find))
             return data
@@ -159,9 +145,7 @@ class LOCAL_DATABASE:
                 return
         
         try:
-            with open(LOCAL_DB, "r") as f:
-                load_db = json.load(f)
-            
+            load_db = json.load(open(LOCAL_DB, "r"))
             load_collection = load_db.get(collection)
             db_data = load_collection[data]
             return db_data

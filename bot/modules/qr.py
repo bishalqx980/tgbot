@@ -10,8 +10,7 @@ class QR:
         f_name = f"{dir_name}/qr_code.png"
         try:
             req = requests.get(url)
-            with open(f_name, "wb") as f:
-                f.write(req.content)
-                return f_name
+            open(f_name, "wb").write(req.content)
+            return f_name
         except Exception as e:
             logger.error(e)

@@ -33,9 +33,8 @@ class PYTUBE:
                 file_path = stream.download(output_path=file_path, filename=filename)
                 t_res = requests.get(thumbnail_url)
                 if t_res.status_code == 200:
-                    with open(thumbnail, "wb") as t_file:
-                        t_file.write(t_res.content)
-                        logger.info("Thumbnail Downloaded!")
+                    open(thumbnail, "wb").write(t_res.content)
+                    logger.info("Thumbnail Downloaded!")
                 else:
                     logger.info("Thumbnail Download Failed!")
                 if file_path:

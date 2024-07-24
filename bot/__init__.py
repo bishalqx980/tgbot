@@ -5,8 +5,7 @@ from telegram import Bot
 from dotenv import load_dotenv
 from bot.alive import alive
 
-with open('log.txt', 'w'):
-    pass
+open('log.txt', 'w')
 
 #Enable logging
 logging.basicConfig(
@@ -45,6 +44,9 @@ omdb_api = os.getenv("OMDB_API")
 weather_api = os.getenv("WEATHER_API")
 pastebin_api = os.getenv("PASTEBIN_API")
 
+#psndl
+psndl_db = "https://raw.githubusercontent.com/bishalqx980/python/main/psndl%20(ps3)/psndl_db.json"
+
 variables = [bot_token, mongodb_uri, db_name]
 for variable in variables:
     if len(variable) == 0:
@@ -58,15 +60,16 @@ LOCAL_DB = "database.json"
 check_local_db = os.path.isfile(LOCAL_DB)
 if not check_local_db:
     logger.info("localdb not found...")
-    with open(LOCAL_DB, "w") as f:
-        json.dump({}, f)
+    json.dump({}, open(LOCAL_DB, "w"))
     logger.info("localdb created...")
 
 try:
-    with open(LOCAL_DB, "w") as f:
-        data = {"bot_docs": {}, "users": {}, "groups": {}, "data_center": {}}
-        json.dump(data, f, indent=4)
-        logger.info("localdb updated...")
+    json.dump(
+        {"bot_docs": {}, "users": {}, "groups": {}, "data_center": {}},
+        open(LOCAL_DB, "w"),
+        indent=4
+    )
+    logger.info("localdb updated...")
 except Exception as e:
     logger.error(e)
 

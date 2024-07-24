@@ -32,8 +32,7 @@ for command in commands:
     print_out = process.stdout or process.stderr or None
     print(print_out)
     
-    with open("update.txt", "a") as f:
-        f.write(print_out)
+    open("update.txt", "a").write(print_out)
 
 if process.returncode == 0:
     print(f"Successfully updated with latest commit from {UPSTREAM_REPO}")

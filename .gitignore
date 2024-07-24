@@ -3,14 +3,9 @@
 *.mp3
 *.mp4
 *.png
+*.txt
+*.json
 venv
 config.env
-log.txt
-shell.txt
-update.txt
-tmp.txt
-database.json
-bot_cmds.json
 /.vscode
 /download
-/ytdl

@@ -208,8 +208,7 @@ def main():
         application.add_handler(CommandHandler(command, handler, block=False))
     
     # For temporary storing bot commands
-    with open("bot_cmds.json", "w") as f:
-        json.dump({"bot_commands": storage}, f, indent=4)
+    json.dump({"bot_commands": storage}, open("bot_cmds.json", "w"), indent=4)
     
     # filters
     application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services, block=False))

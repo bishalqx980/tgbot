@@ -22,8 +22,7 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     os.makedirs(dir_name, exist_ok=True)
     f_name = f"{dir_name}/image.png"
     req = requests.get(photo.file_path)
-    with open(f_name, "wb") as f:
-        f.write(req.content)
+    open(f_name, "wb").write(req.content)
     
     itl = await TELEGRAPH.upload_img(f_name)
     if not itl:

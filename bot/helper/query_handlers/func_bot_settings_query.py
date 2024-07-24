@@ -88,11 +88,8 @@ class QueryBotSettings:
         sent_msg = await Message.edit_msg(update, msg, query.message, btn)
 
         if not sent_msg:
-            with open("tmp.txt", "w") as f:
-                f.write(images)
-            with open("tmp.txt", "rb") as f:
-                tmp_file = f.read()
-            
+            open("tmp.txt", "w").write(images)
+            tmp_file = open("tmp.txt", "rb").read()
             await Message.send_doc(user.id, tmp_file, "image links.txt", "image links")
             
             msg = (

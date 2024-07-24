@@ -1,12 +1,14 @@
 import os
 import json
+import requests
+from bot import psndl_db
 
-JSON_FILE = "bot/modules/psndl/psndl_db.json"
+DATABASE = requests.get(psndl_db) # Github database link
 
 class PSNDL:
     async def search(keyword):
-        with open(JSON_FILE, "r") as f:
-            load_db = json.load(f)
+        # open(JSON_FILE, "r")
+        load_db = json.loads(DATABASE.text)
         
         filtered_data = {}
         for file_type in load_db:
@@ -31,8 +33,8 @@ class PSNDL:
 
 
     async def gen_rap(rap_data):
-        with open(JSON_FILE, "r") as f:
-            load_db = json.load(f)
+        # open(JSON_FILE, "r")
+        load_db = json.loads(DATABASE.text)
         
         for file_type in load_db:
             collection = load_db.get(file_type)
@@ -46,6 +48,5 @@ class PSNDL:
                         rap_name = game_data.get("rap_name")
                         os.makedirs("download", exist_ok=True)
                         rap_location = f"download/{rap_name}"
-                        with open(rap_location, "wb") as f:
-                            f.write(bytes.fromhex(db_rap_data))
+                        open(rap_location, "wb").write(bytes.fromhex(db_rap_data))
                         return game_data, rap_name, rap_location

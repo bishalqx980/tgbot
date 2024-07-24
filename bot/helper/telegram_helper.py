@@ -126,7 +126,7 @@ class Message:
 
     async def send_doc(chat_id, doc, filename, caption=None, reply_msg_id=None, parse_mode=ParseMode.HTML):
         """
-        doc = send as file > with open()
+        doc = send as file > open()
         """
         try:
             response = await bot.send_document(

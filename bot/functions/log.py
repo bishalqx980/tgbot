@@ -22,9 +22,7 @@ async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in del_msg_ids))
         return
     
-    with open("log.txt", "rb") as log_file:
-        log = log_file.read()
-    
+    log = open("log.txt", "rb").read()
     date_time = datetime.now()
 
     await Message.send_doc(user.id, log, "log.txt", date_time.strftime("%d-%m-%Y %H:%M:%S"))
