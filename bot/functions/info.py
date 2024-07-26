@@ -72,22 +72,11 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         for key in entries:
             data = find_group.get(key)
-
-            if key == "allowed_links":
-                storage, counter = "", 0
-                for i in data:
-                    counter += 1
-                    if counter == len(data):
-                        storage += f"{i}"
-                    else:
-                        storage += f"{i}, "
-                data = storage
-
-            if key == "filters":
-                storage = ""
-                for i in data:
-                    storage += f"» {i}\n"
-                data = storage
+            if data:
+                if key == "allowed_links":
+                    data = ", ".join(data)
+                elif key == "filters":
+                    data = "\n".join(f"» {i}" for i in data)
             
             if key in ["filters", "custom_welcome_msg"]:
                 msg += f"<b>{key}</b>:\n<pre>{data}</pre>\n"
