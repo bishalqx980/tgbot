@@ -5,43 +5,40 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 - **Checkout [https://github.com/bishalqx980/python](https://github.com/bishalqx980/python)**
 
 ```Spread Love ❤️
-_check = "Does the user Starred & forked the repository?"
-if _check:
-    print("Thanks you ❤️ for sharing love & giving me inspiration...")
-else:
-    print("Please 🥺 give a star to this repo! ...And fork it if you want to work with this repo!")
-
->> Don't be an ungrateful person...
+>> If you liked this project then please give it a star...!
 ```
 
-<sup>- *Fun fact: _check will always return True! [ becasue you (gave/will give) a star & fork the repo lol ] Thanks :)*</sup>
+## Features
 
-## Features ✨:
+- **Group Management**
+    - It has just everything...
+- **AI**
+    - ChatGPT
+    - AI photo imagine
+- **Misc**
+    - Get any movie info
+    - Translate any language
+    - Decode, Encode (base64)
+    - Short any url
+    - Ping any url
+    - Calculate basic math
+    - Take webshot (website screenshot)
+    - Get any location weather info
+    - Download YouTube video
+    - Search YouTube video
+    - Generate QR code (image)
+    - Convert image into a link (public)
+    - Convert text into a link
+    - Whisper user in group chat (secret message)
+    - Search games link for PS3 & other consoles
+    - Much more...
 
-- **ChatGPT AI:** Get response from _ChatGPT AI_
-- **AI Imazine:** Generate image from your prompt
-- **Group Management:** Manage Group as an active admin
-    - Welcome user, notify when user leave
-    - **Moderation**: ban, unban, mute, unmute, kick, kickme...
-    - Antibot, etc.
-    - many more feature...
-- **YouTube Download** Download/Search videos from YouTube
-- **Movie Info:** Provide movie information
-- **Language Translator:** Translate languages
-- **Encode/Decode base64:** Encode/decode base64
-- **URL Shortener:** Shorten URLs using shrinke.me api
-- **Ping Website** Ping any URL
-- **Calculator:** Works as everyday calculator
-- **Echo:** Echo your message for fun
-- **Webshot** Take website screenshot
-- **Weather** Provide weather information
-- **& Much more...**
 
-**<i>More Feature coming soon...</i>**
+**<i>ℹ️ Todo: add more features...</i>**
 
 • • • • • • • • • • • • • • • • • • • •
 
-## How to Deploy 🚀:
+## How to deploy 🚀
 
 <details>
 <summary><b>Setup 📦</b></summary>
@@ -55,7 +52,7 @@ else:
 - **_After deployment complete, don't forget to visit /bsettings_**
     <hr>
     <details>
-    <summary><b>Local Deploy 🚀</b></summary>
+    <summary><b>Local deploy</b></summary>
 
     ----- **Windows** -----
     - Required `python 3.11` or later
@@ -74,7 +71,7 @@ else:
     </details>
 
     <details>
-    <summary><b>Render Deploy 🚀</b></summary>
+    <summary><b>Render deploy</b></summary>
 
     - Signin/Signup on https://render.com/
     - Goto dashboard & create a New `Web Service`
@@ -101,7 +98,7 @@ else:
     </details>
 
     <details>
-    <summary><b>Heroku Deploy 🚀</b></summary>
+    <summary><b>Heroku deploy</b></summary>
 
     - Signin/Signup on http://heroku.com/
     - Give a star ⭐ and fork this repo https://github.com/bishalqx980/tgbot
