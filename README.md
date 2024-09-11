@@ -43,13 +43,13 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 <details>
 <summary><b>Setup 📦</b></summary>
 
-- Rename `sample_config.env` to `config.env` then fillup `config.env` file value's
+- Download & rename `sample_config.env` to `config.env` then fillup `config.env` file value's
+    - <small>⚠️ Don't share or upload the `config.env` any public place or repository</small>
 - `BOT_TOKEN` Get from https://t.me/BotFather E.g. 123456:abcdefGHIJK...
 - `OWNER_ID` Get from bot by /id command E.g. 2134776547
 - `OWNER_USERNAME` Your Username E.g. paste like bishalqx980 not @bishalqx980
 - `MONGODB_URI` Get from https://www.mongodb.com/
 - `DB_NAME` anything E.g. MissCiri_db
-- **_After deployment complete, don't forget to visit /bsettings_**
     <hr>
     <details>
     <summary><b>Local deploy</b></summary>
@@ -91,7 +91,7 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 
     ⚠ Advanced option > `Add secret file` filename: `config.env` - file content: paste all content from `sample_config.env` (make sure you filled up everything)
 
-    **_[ If you face anyproblem accessing `Advanced option` then just click on `Create Web Service` then from `Environment` > `Secret Files` add the config.env calues... Then restart/redeploy the web service ]_**
+    **_[ If you face anyproblem accessing `Advanced option` then just click on `Create Web Service` then from `Environment` > `Secret Files` add the config.env values... Then restart/redeploy the web service ]_**
 
     **Finally click on Create Web Service & wait few sec for deployment & Done | Enjoy 🎉**
 
@@ -118,6 +118,7 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
     **Enjoy 🍾**
 
     </details>
+- **_After deployment complete, don't forget to visit /bsettings_**
 
 </details>
 

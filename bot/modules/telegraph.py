@@ -2,7 +2,11 @@ from telegraph import Telegraph
 from bot import logger
 
 telegraph = Telegraph()
-telegraph.create_account("@MissCiri_bot")
+
+try:
+    telegraph.create_account("@MissCiri_bot")
+except Exception as e:
+    logger.error(e)
 
 class TELEGRAPH:
     async def paste(text, username="anonymous"):
