@@ -52,13 +52,27 @@ async def track_bot_chat_act(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 }
                 await MongoDB.insert_single_data("groups", data)
                 await LOCAL_DATABASE.insert_data("groups", chat.id, data)
+        
         if bot_exist:
-            msg = (
-                "Thanks for adding me in this nice chat!\n\n"
-                "Please make me admin in chat, so I can help you managing this chat effectively!\n/help for bot help..."
-            )
+            if cause == "JOINED":
+                msg = (
+                    "Thanks for adding me in this nice chat!\n"
+                    "Please make me admin in chat, so I can help you managing this chat effectively!\n"
+                    "/help for bot help..."
+                )
+                # send chat id you effective user
+                await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
+            elif cause == "PROMOTED":
+                msg = (
+                    "Thanks for adding me as admin!\n"
+                    "Don't forget to checkout /help section..."
+                )
+            elif cause == "DEMOTED":
+                msg = (
+                    "Ohh dear, have I done something wrong!\n"
+                    "I wish I could help..."
+                )
             await Message.send_msg(chat.id, msg)
-            await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
     else:
-        if bot_exist:
+        if bot_exist and cause == "JOINED":
             await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
