@@ -27,14 +27,17 @@ class QueryBotHelp:
             "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
         )
 
-        btn_name_row1 = ["Next page >>"]
-        btn_data_row1 = ["query_help_group_management_p2"]
+        btn_data_row1 = {
+            "Next page >>": "query_help_group_management_p2"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_help_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_help_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -56,14 +59,17 @@ class QueryBotHelp:
             "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
         )
 
-        btn_name_row1 = ["<< Previous page"]
-        btn_data_row1 = ["query_help_group_management_p1"]
+        btn_data_row1 = {
+            "<< Previous page": "query_help_group_management_p1"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_help_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_help_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -78,10 +84,12 @@ class QueryBotHelp:
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
 
-        btn_name = ["Back", "Close"]
-        btn_data = ["query_help_menu", "query_close"]
-        btn = await Button.cbutton(btn_name, btn_data, True)
+        btn_data = {
+            "Back": "query_help_menu",
+            "Close": "query_close"
+        }
 
+        btn = await Button.cbutton(btn_data, True)
         await Message.edit_msg(update, msg, query.message, btn)
 
 
@@ -111,10 +119,12 @@ class QueryBotHelp:
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
 
-        btn_name = ["Back", "Close"]
-        btn_data = ["query_help_menu", "query_close"]
-        btn = await Button.cbutton(btn_name, btn_data, True)
+        btn_data = {
+            "Back": "query_help_menu",
+            "Close": "query_close"
+        }
 
+        btn = await Button.cbutton(btn_data, True)
         await Message.edit_msg(update, msg, query.message, btn)
 
 
@@ -132,10 +142,12 @@ class QueryBotHelp:
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
 
-        btn_name = ["Back", "Close"]
-        btn_data = ["query_help_menu", "query_close"]
-        btn = await Button.cbutton(btn_name, btn_data, True)
+        btn_data = {
+            "Back": "query_help_menu",
+            "Close": "query_close"
+        }
 
+        btn = await Button.cbutton(btn_data, True)
         await Message.edit_msg(update, msg, query.message, btn)
     
 
@@ -168,8 +180,10 @@ class QueryBotHelp:
             "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
         )
 
-        btn_name = ["Back", "Close"]
-        btn_data = ["query_help_menu", "query_close"]
-        btn = await Button.cbutton(btn_name, btn_data, True)
+        btn_data = {
+            "Back": "query_help_menu",
+            "Close": "query_close"
+        }
 
+        btn = await Button.cbutton(btn_data, True)
         await Message.edit_msg(update, msg, query.message, btn)

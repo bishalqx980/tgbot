@@ -46,16 +46,19 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if _bot_info.username != "MissCiri_bot":
         msg += "\n\n<i>Cloned bot of @MissCiri_bot</i>"
 
-    btn_name_1 = ["Add me to your Group"]
-    btn_url_1 = [f"http://t.me/{_bot_info.username}?startgroup=start"]
-    btn_name_2 = ["Support Chat"]
-    btn_url_2 = [support_chat]
+    btn_data_1 = {
+        "Add me to your Group": f"http://t.me/{_bot_info.username}?startgroup=start"
+    }
 
-    row_1 = await Button.ubutton(btn_name_1, btn_url_1)
+    btn_data_2 = {
+        "Support Chat": support_chat
+    }
+
+    row_1 = await Button.ubutton(btn_data_1)
     btn = row_1
 
     if support_chat:
-        row_2 = await Button.ubutton(btn_name_2, btn_url_2)
+        row_2 = await Button.ubutton(btn_data_2)
         btn = row_1 + row_2
     
     if welcome_img and bot_pic:

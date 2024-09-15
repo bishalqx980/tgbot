@@ -82,9 +82,8 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     msg = f"Hey, {whisper_user} !! You got a message from {user.mention_html()}..."
 
-    btn_name = ["Check the message"]
-    btn_data = ["query_whisper"]
-
-    btn = await Button.cbutton(btn_name, btn_data)
-
+    btn_data = {
+        "Check the message": "query_whisper"
+    }
+    btn = await Button.cbutton(btn_data)
     await Message.send_msg(chat.id, msg, btn)

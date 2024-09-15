@@ -79,11 +79,11 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<code>{chatname}</code> chat title\n"
         )
 
-        btn_name = ["Close"]
-        btn_data = ["query_close"]
+        btn_data = {
+            "Close": "query_close"
+        }
 
-        btn = await Button.cbutton(btn_name, btn_data, True)
-
+        btn = await Button.cbutton(btn_data, True)
         await Message.reply_msg(update, msg, btn)
         return
 

@@ -15,18 +15,22 @@ class QueryChatSettings:
             "<i><b>Note:</b> Get your country language code from the below link!\neg. English language code is <code>en</code></i>"
         )
 
-        btn_name_row1 = ["Language code's"]
-        btn_url_row1 = ["https://telegra.ph/Language-Code-12-24"]
+        btn_url_row1 = {
+            "Language code's": "https://telegra.ph/Language-Code-12-24"
+        }
 
-        btn_name_row2 = ["Edit Value"]
-        btn_data_row2 = ["query_edit_value"]
+        btn_data_row2 = {
+            "Edit Value": "query_edit_value"
+        }
 
-        btn_name_row3 = ["Back", "Close"]
-        btn_data_row3 = ["query_chat_settings_menu", "query_close"]
+        btn_data_row3 = {
+            "Back": "query_chat_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.ubutton(btn_name_row1, btn_url_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2)
-        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+        row1 = await Button.ubutton(btn_url_row1)
+        row2 = await Button.cbutton(btn_data_row2)
+        row3 = await Button.cbutton(btn_data_row3, True)
 
         btn = row1 + row2 + row3
 
@@ -43,14 +47,18 @@ class QueryChatSettings:
             "<i><b>Note:</b> This will automatically translate chat conversation into chat default language!</i>"
         )
 
-        btn_name_row1 = ["Enable", "Disable"]
-        btn_data_row1 = ["query_true", "query_false"]
+        btn_data_row1 = {
+            "Enable": "query_true",
+            "Disable": "query_false"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -67,14 +75,18 @@ class QueryChatSettings:
             "<i><b>Note:</b> This will repeat user message!</i>"
         )
 
-        btn_name_row1 = ["Enable", "Disable"]
-        btn_data_row1 = ["query_true", "query_false"]
+        btn_data_row1 = {
+            "Enable": "query_true",
+            "Disable": "query_false"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -91,18 +103,23 @@ class QueryChatSettings:
             "<i><b>Note:</b> This will welcome the new chat member!</i>"
         )
 
-        btn_name_row1 = ["Enable", "Disable"]
-        btn_data_row1 = ["query_true", "query_false"]
+        btn_data_row1 = {
+            "Enable": "query_true",
+            "Disable": "query_false"
+        }
 
-        btn_name_row2 = ["Custom welcome message"]
-        btn_data_row2 = ["query_set_custom_welcome_msg"]
+        btn_data_row2 = {
+            "Custom welcome message": "query_set_custom_welcome_msg"
+        }
 
-        btn_name_row3 = ["Back", "Close"]
-        btn_data_row3 = ["query_chat_settings_menu", "query_close"]
+        btn_data_row3 = {
+            "Back": "query_chat_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2)
-        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2)
+        row3 = await Button.cbutton(btn_data_row3, True)
 
         btn = row1 + row2 + row3
 
@@ -131,14 +148,18 @@ class QueryChatSettings:
             "<code>{chatname}</code> chat title\n"
         )
 
-        btn_name_row1 = ["Set default message", "Set custom message"]
-        btn_data_row1 = ["query_rm_value", "query_edit_value"]
+        btn_data_row1 = {
+            "Set default message": "query_rm_value",
+            "Set custom message": "query_edit_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_welcome_user", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_welcome_user",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -157,14 +178,18 @@ class QueryChatSettings:
             "<i><b>Note:</b> This will send a farewell message to chat when a user left!\n</i>"
         )
 
-        btn_name_row1 = ["Enable", "Disable"]
-        btn_data_row1 = ["query_true", "query_false"]
+        btn_data_row1 = {
+            "Enable": "query_true",
+            "Disable": "query_false"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -181,14 +206,18 @@ class QueryChatSettings:
             "<i><b>Note:</b> This will prevent other bot from joining in chat!</i>"
         )
 
-        btn_name_row1 = ["Enable", "Disable"]
-        btn_data_row1 = ["query_true", "query_false"]
+        btn_data_row1 = {
+            "Enable": "query_true",
+            "Disable": "query_false"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -205,14 +234,18 @@ class QueryChatSettings:
             "<i><b>Note:</b> This will delete bot commands when you will send a command in chat!</i>"
         )
 
-        btn_name_row1 = ["Enable", "Disable"]
-        btn_data_row1 = ["query_true", "query_false"]
+        btn_data_row1 = {
+            "Enable": "query_true",
+            "Disable": "query_false"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -229,14 +262,18 @@ class QueryChatSettings:
             "<i><b>Note:</b> This will log every actions occurred in your chat (ban, kick, mute, etc.) using bot!\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -268,14 +305,18 @@ class QueryChatSettings:
             "<i>Echo/Auto translate won't work if message contains link!</i>"
         )
 
-        btn_name_row1 = ["All links", "Allowed links"]
-        btn_data_row1 = ["query_chat_all_links", "query_chat_allowed_links"]
+        btn_data_row1 = {
+            "All links": "query_chat_all_links",
+            "Allowed links": "query_chat_allowed_links"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -292,14 +333,19 @@ class QueryChatSettings:
             "<i><b>Note:</b> Select whether bot will delete the message or convert link into base64 or do nothing!</i>"
         )
 
-        btn_name_row1 = ["Delete", "Convert", "Nothing"]
-        btn_data_row1 = ["query_d_links", "query_c_links", "query_none_links"]
+        btn_data_row1 = {
+            "Delete": "query_d_links",
+            "Convert": "query_c_links",
+            "Nothing": "query_none_links"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_links_behave", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_links_behave",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -326,14 +372,18 @@ class QueryChatSettings:
             "<i><b>Note:</b> Send domain name of allowed links eg. <code>google.com</code> multiple domain will be separated by comma!</i>"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_links_behave", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_links_behave",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -365,14 +415,18 @@ class QueryChatSettings:
             "<i><b>Note:</b> Enable / Disbale AI functions in chat!</i>"
         )
 
-        btn_name_row1 = ["Enable", "Disable"]
-        btn_data_row1 = ["query_true", "query_false"]
+        btn_data_row1 = {
+            "Enable": "query_true",
+            "Disable": "query_false"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_chat_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_chat_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 

@@ -55,14 +55,18 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Auto tr: <code>{auto_tr}</code>\n\n"
         )
 
-        btn_name_row1 = ["Language", "Auto translate"]
-        btn_data_row1 = ["query_chat_lang", "query_chat_auto_tr"]
+        btn_data_row1 = {
+            "Language": "query_chat_lang",
+            "Auto translate": "query_chat_auto_tr"
+        }
 
-        btn_name_row2 = ["Echo", "Close"]
-        btn_data_row2 = ["query_chat_set_echo", "query_close"]
+        btn_data_row2 = {
+            "Echo": "query_chat_set_echo",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -170,30 +174,41 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• AI status: <code>{ai_status}</code>\n"
         )
 
-        btn_name_row1 = ["Language", "Auto translate"]
-        btn_data_row1 = ["query_chat_lang", "query_chat_auto_tr"]
+        btn_data_row1 = {
+            "Language": "query_chat_lang",
+            "Auto translate": "query_chat_auto_tr"
+        }
 
-        btn_name_row2 = ["Echo", "Anti bot"]
-        btn_data_row2 = ["query_chat_set_echo", "query_chat_antibot"]
+        btn_data_row2 = {
+            "Echo": "query_chat_set_echo",
+            "Anti bot": "query_chat_antibot"
+        }
 
-        btn_name_row3 = ["Welcome", "Farewell"]
-        btn_data_row3 = ["query_chat_welcome_user", "query_chat_farewell_user"]
+        btn_data_row3 = {
+            "Welcome": "query_chat_welcome_user",
+            "Farewell": "query_chat_farewell_user"
+        }
 
-        btn_name_row4 = ["Delete CMD", "Log channel"]
-        btn_data_row4 = ["query_chat_del_cmd", "query_chat_log_channel"]
+        btn_data_row4 = {
+            "Delete CMD": "query_chat_del_cmd",
+            "Log channel": "query_chat_log_channel"
+        }
 
-        btn_name_row5 = ["Links behave", "AI status"]
-        btn_data_row5 = ["query_chat_links_behave", "query_chat_ai_status"]
+        btn_data_row5 = {
+            "Links behave": "query_chat_links_behave",
+            "AI status": "query_chat_ai_status"
+        }
 
-        btn_name_row6 = ["Close"]
-        btn_data_row6 = ["query_close"]
+        btn_data_row6 = {
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-        row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
-        row4 = await Button.cbutton(btn_name_row4, btn_data_row4, True)
-        row5 = await Button.cbutton(btn_name_row5, btn_data_row5, True)
-        row6 = await Button.cbutton(btn_name_row6, btn_data_row6)
+        row2 = await Button.cbutton(btn_data_row2, True)
+        row3 = await Button.cbutton(btn_data_row3, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row4 = await Button.cbutton(btn_data_row4, True)
+        row5 = await Button.cbutton(btn_data_row5, True)
+        row6 = await Button.cbutton(btn_data_row6)
 
         btn = row1 + row2 + row3 + row4 + row5 + row6
 

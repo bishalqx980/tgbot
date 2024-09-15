@@ -16,14 +16,18 @@ class QueryBotSettings:
             "<i><b>Note:</b> Send an image url/link to set bot pic!</i>"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -40,14 +44,18 @@ class QueryBotSettings:
             "<i><b>Note:</b> Should bot show image on start?</i>"
         )
 
-        btn_name_row1 = ["Yes", "No"]
-        btn_data_row1 = ["query_true", "query_false"]
+        btn_data_row1 = {
+            "Yes": "query_true",
+            "No": "query_false"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1, True)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -74,14 +82,18 @@ class QueryBotSettings:
             "<i><b>Note:</b> Single image or send multiple image link separated by comma!</i>"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -110,14 +122,18 @@ class QueryBotSettings:
             f"Support Chat (link): <code>{support_chat}</code>\n"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -134,14 +150,18 @@ class QueryBotSettings:
             "<i><b>Note:</b> Bot will fall asleep if you deployed the bot on render (free) and don't set this value...</i>"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -168,14 +188,18 @@ class QueryBotSettings:
             "<i><b>Note:</b> The power user! Sudo users have owner function access!\nAdd user_id eg. <code>2134776547</code></i>"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -192,14 +216,18 @@ class QueryBotSettings:
             "<i><b>Note:</b> This api for /short command!</i>"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -216,14 +244,18 @@ class QueryBotSettings:
             "<i><b>Note:</b> This api for /movie command!</i>"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -240,14 +272,18 @@ class QueryBotSettings:
             "<i><b>Note:</b> This api for /weather command!</i>"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -264,14 +300,18 @@ class QueryBotSettings:
             "<i><b>Note:</b> This api for /paste command!</i>"
         )
 
-        btn_name_row1 = ["Edit Value", "Remove Value"]
-        btn_data_row1 = ["query_edit_value", "query_rm_value"]
+        btn_data_row1 = {
+            "Edit Value": "query_edit_value",
+            "Remove Value": "query_rm_value"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 
@@ -288,14 +328,17 @@ class QueryBotSettings:
             f"<i><b>Note:</b> This will erase all bot data/settings from database and restore data/settings from <code>config.env</code></i>"
         )
 
-        btn_name_row1 = ["⚠ Restore Database"]
-        btn_data_row1 = ["query_confirm_restore_db"]
+        btn_data_row1 = {
+            "⚠ Restore Database": "query_confirm_restore_db"
+        }
 
-        btn_name_row2 = ["Back", "Close"]
-        btn_data_row2 = ["query_bot_settings_menu", "query_close"]
+        btn_data_row2 = {
+            "Back": "query_bot_settings_menu",
+            "Close": "query_close"
+        }
 
-        row1 = await Button.cbutton(btn_name_row1, btn_data_row1)
-        row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
+        row1 = await Button.cbutton(btn_data_row1)
+        row2 = await Button.cbutton(btn_data_row2, True)
 
         btn = row1 + row2
 

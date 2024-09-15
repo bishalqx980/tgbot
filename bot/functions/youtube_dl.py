@@ -18,9 +18,10 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
 
     if chat.type != "private":
         _bot_info = await bot.get_me()
-        btn_name = ["Start me in private"]
-        btn_url = [f"http://t.me/{_bot_info.username}?start=start"]
-        btn = await Button.ubutton(btn_name, btn_url)
+        btn_data = {
+            "Start me in private": f"http://t.me/{_bot_info.username}?start=start"
+        }
+        btn = await Button.ubutton(btn_data)
         await Message.reply_msg(update, f"This function has some limitaions.\nYou can use it in pm.", btn)
         return
     
@@ -48,14 +49,17 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
 
     await LOCAL_DATABASE.insert_data("data_center", user.id, data)
     
-    btn_name_row1 = ["Video (mp4)", "Audio (mp3)"]
-    btn_data_row1 = ["mp4", "mp3"]
+    btn_data_row1 = {
+        "Video (mp4)": "mp4",
+        "Audio (mp3)": "mp3"
+    }
 
-    btn_name_row2 = ["Cancel"]
-    btn_data_row2 = ["query_close"]
+    btn_data_row2 = {
+        "Cancel": "query_close"
+    }
 
-    row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-    row2 = await Button.cbutton(btn_name_row2, btn_data_row2)
+    row1 = await Button.cbutton(btn_data_row1, True)
+    row2 = await Button.cbutton(btn_data_row2)
 
     btn = row1 + row2
 

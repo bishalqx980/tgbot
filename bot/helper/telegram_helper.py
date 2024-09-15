@@ -306,68 +306,46 @@ class Message:
 
 
 class Button:
-    async def ubutton(btn_name, url, same_line=bool(False)):
+    async def ubutton(data, same_line=bool(False)):
         """
         Example usage:\n
-        btn_name = ["Google"]\n
-        url = ["https://google.com"]\n
-        btn = await Button.ubutton(btn_name, url)\n\n
-        -> for multiple row\n
-        btn_name_1 = ["Google", "Bing"]\n
-        url_1 = ["https://google.com", "https://bing.com"]\n
-        btn_name_2 = ["Facebook", "X (Twitter)"]\n
-        url_2 = ["https://facebook.com", "https://x.com"]\n\n
-        row1 = await Button.ubutton(btn_name_1, url_1, True) # 1st line and both button are in same line\n
-        row2 = await Button.ubutton(btn_name_1, url_1) # 2nd line (facebook) and 3rd line (x) becasue not in same line\n\n
-        btn = row1 + row 2\n
+        btn_data = {\n
+            "btn_name": "btn_url",\n
+            "btn_name_2": "btn_url_2"\n
+        }\n
+        row1 = await Button.ubutton(btn_data, True) # 1st line and both button are in same line\n
+        btn = row1\n
         """
-        btn = []
-        sbtn = []
-
-        if len(btn_name) != len(url):
-            logger.error(f"btn={len(btn_name)} not equal url={len(url)}! Skiping...")
-            return
-        
+        btn, sbtn = [], []
         try:
-            for b_name, url_link in zip(btn_name, url): # list1 = [1, 2, 3] list2 = ['a', 'b'] Output: [(1, 'a'), (2, 'b')]
-                if same_line and len(btn_name) > 1:
-                    sbtn.append(InlineKeyboardButton(b_name, url_link))
+            for b_name, b_url in data.items():
+                if same_line and len(data) > 1:
+                    sbtn.append(InlineKeyboardButton(b_name, b_url))
                 else:
-                    btn.append([InlineKeyboardButton(b_name, url_link)])
+                    btn.append([InlineKeyboardButton(b_name, b_url)])
             buttons = btn + [sbtn]
             return buttons
         except Exception as e:
             logger.error(e)
 
 
-    async def cbutton(btn_name, callback_name, same_line=bool(False)):
+    async def cbutton(data, same_line=bool(False)):
         """
         Example usage:\n
-        btn_name = ["Google"]\n
-        callback_name = ["data"]\n
-        btn = await Button.cbutton(btn_name, callback_name)\n\n
-        -> for multiple row\n
-        btn_name_1 = ["Google", "Bing"]\n
-        callback_name_1 = ["google", "bing"]\n
-        btn_name_2 = ["Facebook", "X (Twitter)"]\n
-        callback_name_2 = ["facebook", "x_twitter"]\n\n
-        row1 = await Button.cbutton(btn_name_1, callback_name_1, True) # 1st line and both button are in same line\n
-        row2 = await Button.cbutton(btn_name_1, callback_name_2) # 2nd line (facebook) and 3rd line (x) becasue not in same line\n\n
-        btn = row1 + row 2
+        btn_data = {\n
+            "btn_name": "btn_data",\n
+            "btn_name_2": "btn_data_2"\n
+        }\n
+        row1 = await Button.cbutton(btn_data, True) # 1st line and both button are in same line\n
+        btn = row1\n
         """
-        btn = []
-        sbtn = []
-
-        if len(btn_name) != len(callback_name):
-            logger.error(f"Error: btn={len(btn_name)} not equal callback={len(callback_name)}! Skiping...")
-            return
-        
+        btn, sbtn = [], []
         try:
-            for b_name, c_name in zip(btn_name, callback_name): # list1 = [1, 2, 3] list2 = ['a', 'b'] Output: [(1, 'a'), (2, 'b')]
-                if same_line and len(btn_name) > 1:
-                    sbtn.append(InlineKeyboardButton(b_name, callback_data=c_name))
+            for b_name, b_data in data.items():
+                if same_line and len(data) > 1:
+                    sbtn.append(InlineKeyboardButton(b_name, callback_data=b_data))
                 else:
-                    btn.append([InlineKeyboardButton(b_name, callback_data=c_name)])
+                    btn.append([InlineKeyboardButton(b_name, callback_data=b_data)])
             buttons = btn + [sbtn]
             return buttons
         except Exception as e:

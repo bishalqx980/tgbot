@@ -280,18 +280,26 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"Pin message: <code>{is_pin}</code>"
             )
 
-            btn_name_row1 = ["Forward?", "YES", "NO"]
-            btn_data_row1 = ["query_none", "query_broadcast_forward_true", "query_broadcast_forward_false"]
+            btn_data_row1 = {
+                "Forward?": "query_none",
+                "YES": "query_broadcast_forward_true",
+                "NO": "query_broadcast_forward_false"
+            }
 
-            btn_name_row2 = ["Pin message?", "YES", "NO"]
-            btn_data_row2 = ["query_none", "query_broadcast_pin_true", "query_broadcast_pin_false"]
+            btn_data_row2 = {
+                "Pin message?": "query_none",
+                "YES": "query_broadcast_pin_true",
+                "NO": "query_broadcast_pin_false"
+            }
 
-            btn_name_row3 = ["Done", "Close"]
-            btn_data_row3 = ["query_broadcast_done", "query_close"]
+            btn_data_row3 = {
+                "Done": "query_broadcast_done",
+                "Close": "query_close"
+            }
 
-            row1 = await Button.cbutton(btn_name_row1, btn_data_row1, True)
-            row2 = await Button.cbutton(btn_name_row2, btn_data_row2, True)
-            row3 = await Button.cbutton(btn_name_row3, btn_data_row3, True)
+            row1 = await Button.cbutton(btn_data_row1, True)
+            row2 = await Button.cbutton(btn_data_row2, True)
+            row3 = await Button.cbutton(btn_data_row3, True)
 
             btn = row1 + row2 + row3
 

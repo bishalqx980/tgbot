@@ -53,9 +53,10 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             lang_code = find_user.get("lang")
             tr_msg = await translate(msg, lang_code)
             if not tr_msg:
-                btn_name = ["Language code's"]
-                btn_url = ["https://telegra.ph/Language-Code-12-24"]
-                btn = await Button.ubutton(btn_name, btn_url)
+                btn_data = {
+                    "Language code's": "https://telegra.ph/Language-Code-12-24"
+                }
+                btn = await Button.ubutton(btn_data)
                 await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
                 return
             
@@ -135,9 +136,10 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_msg(update, tr_msg)
             elif not tr_msg:
                 logger.error(e)
-                btn_name = ["Language code's"]
-                btn_url = ["https://telegra.ph/Language-Code-12-24"]
-                btn = await Button.ubutton(btn_name, btn_url)
+                btn_data = {
+                    "Language code's": "https://telegra.ph/Language-Code-12-24"
+                }
+                btn = await Button.ubutton(btn_data)
                 await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn)
         
         if filters:
