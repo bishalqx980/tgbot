@@ -1,7 +1,7 @@
 from telegram import Update
-from bot import bot
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
+from bot.modules.database.local_database import LOCAL_DATABASE
 
 
 class QueryBotHelp:
@@ -152,7 +152,7 @@ class QueryBotHelp:
     
 
     async def _query_help_bot_info(update: Update, query):
-        _bot_info = await bot.get_me()
+        _bot_info = await LOCAL_DATABASE.find("_bot_info")
         info_db = await MongoDB.info_db()
         for i in info_db:
             if i[0] == "users":
@@ -168,9 +168,9 @@ class QueryBotHelp:
         msg = (
             "<b><code>» bot.info()</code></b>\n\n"
 
-            f"<b>• Name:</b> {_bot_info.full_name}\n"
-            f"<b>• ID:</b> <code>{_bot_info.id}</code>\n"
-            f"<b>• Username:</b> {_bot_info.name}\n\n"
+            f"<b>• Name:</b> {_bot_info.get('full_name')}\n"
+            f"<b>• ID:</b> <code>{_bot_info.get('id')}</code>\n"
+            f"<b>• Username:</b> {_bot_info.get('name')}\n\n"
 
             f"<b>• Registered users:</b> <code>{total_users}</code>\n"
             f"<b>• Active users:</b> <code>{active_users}</code>\n"

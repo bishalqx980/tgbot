@@ -2,7 +2,7 @@ import os
 import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import bot, logger
+from bot import logger
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.re_link import RE_LINK
@@ -17,9 +17,9 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
     url = re_msg.text if re_msg else " ".join(context.args)
 
     if chat.type != "private":
-        _bot_info = await bot.get_me()
+        _bot_info = await LOCAL_DATABASE.find("_bot_info")
         btn_data = {
-            "Start me in private": f"http://t.me/{_bot_info.username}?start=start"
+            "Start me in private": f"{_bot_info.get('link')}?start=start"
         }
         btn = await Button.ubutton(btn_data)
         await Message.reply_msg(update, f"This function has some limitaions.\nYou can use it in pm.", btn)

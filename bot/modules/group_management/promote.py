@@ -35,10 +35,6 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
-    if not bot_permission.can_promote_members:
-        await Message.reply_msg(update, "I don't have enough rights to promote/demote chat member!")
-        return
-    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -48,12 +44,16 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
             await Message.reply_msg(update, "You don't have enough rights to promote/demote chat member!")
             return
     
+    if not bot_permission.can_promote_members:
+        await Message.reply_msg(update, "I don't have enough rights to promote/demote chat member!")
+        return
+    
     if not reply:
         await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to promote!\nTo set admin title eg. <code>/promote admin_title</code>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        if _bot_info.id == victim.id:
+        if _bot_info.get("id") == victim.id:
             await Message.reply_msg(update, "I'm already an admin!")
         else:
             await Message.reply_msg(update, "The user is already an admin!")

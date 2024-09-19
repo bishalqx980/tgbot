@@ -33,10 +33,6 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
-    if not bot_permission.can_change_info:
-        await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
-        return
-    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -45,6 +41,10 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not user_permission.can_change_info:
             await Message.reply_msg(update, "You don't have enough rights to manage this chat!")
             return
+    
+    if not bot_permission.can_change_info:
+        await Message.reply_msg(update, "I don't have enough rights to manage this chat!")
+        return
     
     permissions = {
         "can_send_messages": True,

@@ -35,10 +35,6 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
-    if not bot_permission.can_restrict_members:
-        await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
-        return
-    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -48,12 +44,16 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
             await Message.reply_msg(update, "You don't have enough rights to restrict/unrestrict chat member!")
             return
     
+    if not bot_permission.can_restrict_members:
+        await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
+        return
+    
     if not reply:
         await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to ban!\nTo mention with reason eg. <code>/ban reason</code>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        if _bot_info.id == victim.id:
+        if _bot_info.get("id") == victim.id:
             await Message.reply_msg(update, "I'm not going to ban myself!")
             return
         # Super power for chat owner

@@ -2,7 +2,6 @@ import random
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import Forbidden
-from bot import bot
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.combined_db import find_bot_docs, check_add_user_db
 from bot.modules.database.local_database import LOCAL_DATABASE
@@ -14,13 +13,13 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
 
     if chat.type != "private":
-        _bot_info = await bot.get_me()
+        _bot_info = await LOCAL_DATABASE.find("_bot_info")
         sent_msg = await Message.send_msg(user.id, ".")
         if sent_msg == Forbidden:
-            await Message.reply_msg(update, f"Hey, {user.mention_html()}!\n<a href='http://t.me/{_bot_info.username}'>Start me</a> in pm to chat with me!")
+            await Message.reply_msg(update, f"Hey, {user.mention_html()}!\n<a href='{_bot_info.get('link')}'>Start me</a> in pm to chat with me!")
             return
         elif sent_msg:
-            await Message.reply_msg(update, f"<a href='http://t.me/{_bot_info.username}'>Sent in your pm!</a>")
+            await Message.reply_msg(update, f"<a href='{_bot_info.get('link')}'>Sent in your pm!</a>")
             await Message.del_msg(user.id, sent_msg)
 
     data = {

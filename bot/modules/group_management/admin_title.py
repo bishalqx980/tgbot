@@ -36,10 +36,6 @@ async def func_admintitle(update: Update, context: ContextTypes.DEFAULT_TYPE, is
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
-    if not bot_permission.can_promote_members:
-        await Message.reply_msg(update, "I don't have enough rights to set admin title!")
-        return
-    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -48,6 +44,10 @@ async def func_admintitle(update: Update, context: ContextTypes.DEFAULT_TYPE, is
         if not user_permission.can_promote_members:
             await Message.reply_msg(update, "You don't have enough rights to set admin title!")
             return
+    
+    if not bot_permission.can_promote_members:
+        await Message.reply_msg(update, "I don't have enough rights to set admin title!")
+        return
     
     if not reply:
         await Message.reply_msg(update, "I don't know who you are talking about! Reply the admin to set admin title!\neg. <code>/admintitle admin_title</code>\n<i>Note:</i> bot can only set admin title if that admin is promoted by bot!")

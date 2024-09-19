@@ -35,10 +35,6 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
-    if not bot_permission.can_pin_messages:
-        await Message.reply_msg(update, "I don't have enough rights to pin/unpin messages!")
-        return
-    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -47,6 +43,10 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
         if not user_permission.can_pin_messages:
             await Message.reply_msg(update, "You don't have enough rights to pin/unpin messages!")
             return
+    
+    if not bot_permission.can_pin_messages:
+        await Message.reply_msg(update, "I don't have enough rights to pin/unpin messages!")
+        return
 
     if not reply:
         await Message.reply_msg(update, "This command will unpin replied message (which is already pinned)!")

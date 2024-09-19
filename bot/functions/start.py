@@ -1,8 +1,9 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import Forbidden
-from bot import bot, owner_id
+from bot import owner_id
 from bot.helper.telegram_helper import Message, Button
+from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.database.combined_db import find_bot_docs, check_add_user_db
 
 
@@ -15,15 +16,15 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, msg)
         return
     
-    _bot_info = await bot.get_me()
+    _bot_info = await LOCAL_DATABASE.find("_bot_info")
 
     if chat.type != "private":
         sent_msg = await Message.send_msg(user.id, ".")
         if sent_msg == Forbidden:
-            await Message.reply_msg(update, f"Hey, {user.mention_html()}!\n<a href='http://t.me/{_bot_info.username}'>Start me</a> in pm to chat with me!")
+            await Message.reply_msg(update, f"Hey, {user.mention_html()}!\n<a href='{_bot_info.get('link')}'>Start me</a> in pm to chat with me!")
             return
         elif sent_msg:
-            await Message.reply_msg(update, f"<a href='http://t.me/{_bot_info.username}'>Sent in your pm!</a>")
+            await Message.reply_msg(update, f"<a href='{_bot_info.get('link')}'>Sent in your pm!</a>")
             await Message.del_msg(user.id, sent_msg)
     
     _bot = await find_bot_docs()
@@ -35,7 +36,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     support_chat = _bot.get("support_chat")
 
     msg = (
-        f"Hey, {user.first_name}! I'm {_bot_info.first_name}!\n"
+        f"Hey, {user.first_name}! I'm {_bot_info.get('first_name')}!\n"
         "I can help you to manage your group with lots of useful features!\n"
         "Feel free to add me to your group.\n\n"
         "<b>/help - for bot help</b>\n\n"
@@ -43,11 +44,11 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
     )
 
-    if _bot_info.username != "MissCiri_bot":
+    if _bot_info.get("username") != "MissCiri_bot":
         msg += "\n\n<i>Cloned bot of @MissCiri_bot</i>"
 
     btn_data_1 = {
-        "Add me to your Group": f"http://t.me/{_bot_info.username}?startgroup=start"
+        "Add me to your Group": f"{_bot_info.get('link')}?startgroup=start"
     }
 
     btn_data_2 = {

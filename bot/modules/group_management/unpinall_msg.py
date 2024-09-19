@@ -33,12 +33,12 @@ async def func_unpinall_msg(update: Update, context: ContextTypes.DEFAULT_TYPE, 
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
-    if not bot_permission.can_pin_messages:
-        await Message.reply_msg(update, "I don't have enough rights to pin/unpin messages!")
-        return
-    
     if user_permission.status != ChatMember.OWNER:
         await Message.reply_msg(update, "This command is only for group owner!")
+        return
+    
+    if not bot_permission.can_pin_messages:
+        await Message.reply_msg(update, "I don't have enough rights to pin/unpin messages!")
         return
     
     try:

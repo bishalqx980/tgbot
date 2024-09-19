@@ -36,10 +36,6 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
-    if not bot_permission.can_delete_messages:
-        await Message.reply_msg(update, "I don't have enough rights to delete chat messages!")
-        return
-    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -48,6 +44,10 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
         if not user_permission.can_delete_messages:
             await Message.reply_msg(update, "You don't have enough rights to delete chat messages!")
             return
+    
+    if not bot_permission.can_delete_messages:
+        await Message.reply_msg(update, "I don't have enough rights to delete chat messages!")
+        return
     
     if not reply:
         await Message.reply_msg(update, "I don't know which message to delete from! Reply the message that you want to start delete from!\n\n<i><b>Note:</b> bots are unable to delete 48h old messages due to Telegram limitation/restriction...</i>")

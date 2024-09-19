@@ -65,7 +65,7 @@ if not check_local_db:
 
 try:
     json.dump(
-        {"bot_docs": {}, "users": {}, "groups": {}, "data_center": {}},
+        {"bot_docs": {}, "_bot_info": {}, "users": {}, "groups": {}, "data_center": {}},
         open(LOCAL_DB, "w"),
         indent=4
     )

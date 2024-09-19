@@ -38,17 +38,25 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sil
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
     
-    if not bot_permission.can_promote_members:
-        await Message.reply_msg(update, "I don't have enough rights to promote/demote chat member!")
-        return
-    
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not user_permission.can_promote_members:
             await Message.reply_msg(update, "You don't have enough rights to promote/demote chat member!")
             return
     
+    if not bot_permission.can_promote_members:
+        await Message.reply_msg(update, "I don't have enough rights to promote/demote chat member!")
+        return
+    
     if not reply:
         await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to demote!")
+        return
+    
+    if victim_permission.status != ChatMember.ADMINISTRATOR:
+        await Message.reply_msg(update, "The user isn't an admin!")
+        return
+    
+    if _bot_info.get("id") == victim.id:
+        await Message.reply_msg(update, "I'm not going to do this!")
         return
     
     try:

@@ -33,10 +33,6 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_msg(update, "I'm not an admin in this chat!")
         return
     
-    if not bot_permission.can_invite_users:
-        await Message.reply_msg(update, "I don't have enough rights to invite users in this chat!")
-        return
-    
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_msg(update, "You aren't an admin in this chat!")
         return
@@ -45,6 +41,10 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not user_permission.can_invite_users:
             await Message.reply_msg(update, "You don't have enough rights to invite users in this chat!")
             return
+    
+    if not bot_permission.can_invite_users:
+        await Message.reply_msg(update, "I don't have enough rights to invite users in this chat!")
+        return
     
     try:
         invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
