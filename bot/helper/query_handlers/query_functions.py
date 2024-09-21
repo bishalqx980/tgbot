@@ -6,7 +6,7 @@ from bot.modules.database.local_database import LOCAL_DATABASE
 
 
 class QueryFunctions:
-    async def query_edit_value(identifier, query, chat, new_value="default", is_list=bool(False), is_int=bool(False)):
+    async def query_edit_value(identifier, query, new_value="default", is_list=bool(False), is_int=bool(False)):
         """
         identifier > user.id or chat.id (data center identifier)\n
         query > query indicator\n
@@ -96,7 +96,7 @@ class QueryFunctions:
         
         if is_list:
             msg = f"Database updated!\n\nData: {edit_data_key}\nValue: {len(edit_data_value)} items..."
-        elif not is_int:
+        elif not is_int and new_value != None:
             if len(edit_data_value) > 100:
                 msg = "Data is too long, can't show! Check on message..."
         

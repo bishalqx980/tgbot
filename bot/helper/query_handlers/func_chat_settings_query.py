@@ -391,17 +391,17 @@ class QueryChatSettings:
     
 
     async def _query_d_links(query, chat):
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "all_links"})
         await QueryFunctions.query_edit_value(chat.id, query, "delete")
 
 
     async def _query_c_links(query, chat):
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "all_links"})
         await QueryFunctions.query_edit_value(chat.id, query, "convert")
     
 
     async def _query_none_links(query, chat):
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "all_links"})
         await QueryFunctions.query_edit_value(chat.id, query, None)
     
 

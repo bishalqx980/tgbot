@@ -110,7 +110,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 is_list = True
                 is_int = True
             
-            await QueryFunctions.query_edit_value(chat.id, query, chat, is_list=is_list, is_int=is_int)
+            await QueryFunctions.query_edit_value(chat.id, query, is_list=is_list, is_int=is_int)
         elif query.data == "query_rm_value":
             await QueryFunctions.query_rm_value(chat.id, query)
         elif query.data == "query_true":
