@@ -6,6 +6,10 @@ from bot.modules.safone import Safone
 
 
 async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await Message.reply_msg(update, "This function has been disabled for some limitations! Stay tuned for further notice.")
+    return
+
+    '''
     user = update.effective_user
     chat = update.effective_chat
     e_msg = update.effective_message
@@ -42,3 +46,4 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg += f"\n<b>Req by</b>: {user.mention_html()}"
     
     await Message.send_img(chat.id, imagine, msg)
+    '''

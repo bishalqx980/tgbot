@@ -8,6 +8,10 @@ from bot.modules.g4f import G4F
 
 
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await Message.reply_msg(update, "This function has been disabled for some limitations! Stay tuned for further notice.")
+    return
+
+    '''
     user = update.effective_user
     chat = update.effective_chat
     e_msg = update.effective_message
@@ -52,3 +56,4 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         g4f_gpt += f"\n\n*Req by*: {user.mention_markdown()}"
     
     await Message.edit_msg(update, g4f_gpt, sent_msg, parse_mode=ParseMode.MARKDOWN)
+    '''

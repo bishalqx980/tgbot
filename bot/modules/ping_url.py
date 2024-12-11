@@ -6,7 +6,7 @@ async def ping_url(ping_url):
   status_code = None
 
   try:
-    response = requests.get(ping_url)
+    response = requests.get(ping_url, timeout=5)
     status_code = response.status_code
     if status_code != 200:
       return True, ping_time, status_code
@@ -16,4 +16,4 @@ async def ping_url(ping_url):
     return True, ping_time, status_code
   except Exception as e:
     logger.error(e)
-    return None, e
+    return None, "An error occurred! [timeout?]"

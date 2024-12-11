@@ -41,6 +41,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Feel free to add me to your group.\n\n"
         "<b>/help - for bot help</b>\n\n"
         "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
+        "<b>• Report bug:</b> <a href='https://github.com/bishalqx980/tgbot/issues'>Report</a>\n"
         "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
     )
 
@@ -62,9 +63,8 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         row_2 = await Button.ubutton(btn_data_2)
         btn = row_1 + row_2
     
-    if welcome_img and bot_pic:
-        await Message.send_img(user.id, bot_pic, msg, btn)
-    else:
+    sent_img = await Message.send_img(user.id, bot_pic, msg, btn) if welcome_img and bot_pic else None
+    if not sent_img:
         await Message.send_msg(user.id, msg, btn)
     
     await check_add_user_db(user)
