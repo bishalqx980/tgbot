@@ -67,7 +67,8 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn_data_row5 = {
         "Weather API": "query_weather_api",
-        "Pastebin API": "query_pastebin_api"
+        "Pastebin API": "query_pastebin_api",
+        "ImgBB API": "query_imgbb_api"
     }
 
     btn_data_row6 = {

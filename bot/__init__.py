@@ -43,6 +43,7 @@ shrinkme_api = os.getenv("SHRINKME_API")
 omdb_api = os.getenv("OMDB_API")
 weather_api = os.getenv("WEATHER_API")
 pastebin_api = os.getenv("PASTEBIN_API")
+imgbb_api = os.getenv("IMGBB_API")
 
 #psndl
 psndl_db = "https://raw.githubusercontent.com/bishalqx980/python/main/psndl%20(ps3)/psndl_db.json"
