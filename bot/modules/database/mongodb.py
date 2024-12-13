@@ -143,5 +143,6 @@ class MongoDB:
         try:
             collection.delete_many({})
             logger.info(f"{collection_name} data deleted...")
+            return True
         except Exception as e:
             logger.error(e)

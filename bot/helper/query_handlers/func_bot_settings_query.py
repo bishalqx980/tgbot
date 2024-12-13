@@ -375,13 +375,14 @@ class QueryBotSettings:
 
 
     async def _query_confirm_restore_db(update: Update, data_center):
-        await MongoDB.delete_all_doc("bot_docs")
-        res = await update_database()
-        msg = "Database data has been restored successfully from <code>config.env</code>!" if res else "Something went wrong!"
+        res1 = await MongoDB.delete_all_doc("bot_docs")
+        res2 = await update_database()
+        msg = "Database data has been restored successfully from <code>config.env</code>!" if res1 and res2 else "Something went wrong! Check /log"
         await Message.send_msg(data_center.get("chat_id"), msg)
 
 
     async def _query_clear_localdb_cache(update: Update, data_center):
-        res = await LOCAL_DATABASE.restore_db()
-        msg = "LocalDB cache has been cleared!" if res else "Something went wrong!"
+        res1 = await LOCAL_DATABASE.restore_db()
+        res2 = await update_database()
+        msg = "LocalDB cache has been cleared!" if res1 and res2 else "Something went wrong! Check /log"
         await Message.send_msg(data_center.get("chat_id"), msg)
