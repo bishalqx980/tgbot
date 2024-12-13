@@ -31,7 +31,7 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if not prompt:
-        await Message.reply_msg(update, "Use <code>/gpt your_prompt</code>\nE.g. <code>/gpt what you can do?</code>")
+        await Message.reply_msg(update, "Use <code>/gpt your_prompt</code>\nE.g. <code>/gpt what can you do?</code>")
         return
     
     common_words = ["hi", "hello"]
