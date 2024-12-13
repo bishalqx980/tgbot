@@ -8,7 +8,6 @@ from bot import (
     owner_username,
     bot_pic,
     welcome_img,
-    github_repo,
     mongodb_uri,
     db_name,
     server_url,
@@ -50,7 +49,6 @@ async def update_database():
         "owner_username": owner_username,
         "bot_pic": bot_pic,
         "welcome_img": bool(welcome_img),
-        "github_repo": github_repo,
         #database
         "mongodb_uri": mongodb_uri,
         "db_name": db_name,

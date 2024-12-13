@@ -13,6 +13,8 @@ logging.basicConfig(
 )
 #set higher logging level for httpx to avoid all GET and POST requests being logged
 logging.getLogger("httpx").setLevel(logging.WARNING)
+# Disable Werkzeug logging
+logging.getLogger('werkzeug').setLevel(logging.ERROR)  # Use logging.CRITICAL to remove it completely
 
 console = logging.StreamHandler()
 console.setLevel(logging.INFO)
@@ -32,7 +34,6 @@ owner_id = os.getenv("OWNER_ID")
 owner_username = os.getenv("OWNER_USERNAME")
 bot_pic = os.getenv("BOT_PIC")
 welcome_img = os.getenv("WELCOME_IMG")
-github_repo = os.getenv("GITHUB_REPO")
 #database
 mongodb_uri = os.getenv("MONGODB_URI")
 db_name = os.getenv("DB_NAME")
