@@ -349,15 +349,16 @@ class QueryBotSettings:
     async def _query_restore_db(update: Update, query):
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
-            "Which data will be deleted? ⚠\n"
-            "- All bot setting\n\n"
-            "Which data won't be deleted?\n"
-            "- Bot users/groups data\n\n"
-            f"<i><b>Note:</b> This will erase all bot data/settings from database and restore data/settings from <code>config.env</code></i>"
+            "<b>» ⚠ Restore Database</b>\n"
+            "- <i>This will clear all bot data (excluding user & group data) from online database and restore data from the <code>config.env</code> file.</i>\n\n"
+            "<b>» ♻️ Clear LocalDB Cache</b>\n"
+            "- <i>This will clear local database cache.</i>\n\n"
+            "<i><b>Note:</b> Use <code>⚠ Restore Database</code> with caution!</i>"
         )
 
         btn_data_row1 = {
-            "⚠ Restore Database": "query_confirm_restore_db"
+            "⚠ Restore Database": "query_confirm_restore_db",
+            "♻️ Clear LocalDB Cache": "query_clear_localdb_cache"
         }
 
         btn_data_row2 = {
@@ -377,4 +378,10 @@ class QueryBotSettings:
         await MongoDB.delete_all_doc("bot_docs")
         res = await update_database()
         msg = "Database data has been restored successfully from <code>config.env</code>!" if res else "Something went wrong!"
+        await Message.send_msg(data_center.get("chat_id"), msg)
+
+
+    async def _query_clear_localdb_cache(update: Update, data_center):
+        res = await LOCAL_DATABASE.restore_db()
+        msg = "LocalDB cache has been cleared!" if res else "Something went wrong!"
         await Message.send_msg(data_center.get("chat_id"), msg)

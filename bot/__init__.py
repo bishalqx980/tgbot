@@ -57,6 +57,7 @@ for variable in variables:
     else:
         pass
 
+# Local Database
 LOCAL_DB = "database.json"
 
 check_local_db = os.path.isfile(LOCAL_DB)
@@ -75,6 +76,7 @@ try:
 except Exception as e:
     logger.error(e)
 
+# Main bot function
 bot = Bot(bot_token)
 
 logger.info(
@@ -95,4 +97,5 @@ Developed by
 '''
 )
 
+# Server breathing
 alive()

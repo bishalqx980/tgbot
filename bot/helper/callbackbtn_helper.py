@@ -205,7 +205,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "query_pastebin_api",
         "query_imgbb_api",
         "query_restore_db",
-        "query_confirm_restore_db"
+        "query_confirm_restore_db",
+        "query_clear_localdb_cache"
     ]:
         if collection_name != "bot_docs":
             await popup("Session expired! Send command again...!")
@@ -240,6 +241,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await QueryBotSettings._query_restore_db(update, query)
             elif query.data == "query_confirm_restore_db":
                 await QueryBotSettings._query_confirm_restore_db(update, data_center)
+            elif query.data == "query_clear_localdb_cache":
+                await QueryBotSettings._query_clear_localdb_cache(update, data_center)
     # Query menus ...
     elif query.data in [
         "query_help_menu",

@@ -1,3 +1,4 @@
+import os
 import json
 from bot import logger, LOCAL_DB
 
@@ -149,5 +150,26 @@ class LOCAL_DATABASE:
             load_collection = load_db.get(collection)
             db_data = load_collection[data]
             return db_data
+        except Exception as e:
+            logger.error(f"Localdb: {e}")
+
+
+    async def restore_db():
+        try:
+            # checking file
+            check_local_db = os.path.isfile(LOCAL_DB)
+            if not check_local_db:
+                logger.info("localdb not found...")
+                json.dump({}, open(LOCAL_DB, "w"))
+                logger.info("localdb created...")
+            
+            # restore process
+            json.dump(
+                {"bot_docs": {}, "_bot_info": {}, "users": {}, "groups": {}, "data_center": {}},
+                open(LOCAL_DB, "w"),
+                indent=4
+            )
+            logger.info("localdb has been restored successfully...")
+            return True
         except Exception as e:
             logger.error(f"Localdb: {e}")
