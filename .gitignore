@@ -11,3 +11,4 @@ config.env
 
 # Exception 
 !.vscode/settings.json
+!bot/modules/chatbot/chatbot_db.json

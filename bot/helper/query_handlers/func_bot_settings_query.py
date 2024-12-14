@@ -382,7 +382,7 @@ class QueryBotSettings:
 
 
     async def _query_clear_localdb_cache(update: Update, data_center):
-        res1 = await LOCAL_DATABASE.restore_db()
-        res2 = await update_database()
-        msg = "LocalDB cache has been cleared!" if res1 and res2 else "Something went wrong! Check /log"
+        res = await LOCAL_DATABASE.restore_db()
+        await update_database()
+        msg = "LocalDB cache has been cleared!" if res else "Something went wrong! Check /log"
         await Message.send_msg(data_center.get("chat_id"), msg)

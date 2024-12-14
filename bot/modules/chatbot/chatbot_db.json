@@ -1,0 +1,36 @@
+{
+    "greetings": {
+        "words": ["hi", "hello", "hey", "yo", "howdy"],
+        "responses": [
+            "Hi there! How can I help?",
+            "Hello! What's up?",
+            "Hey! How's it going?",
+            "Howdy! What can I do for you?"
+        ]
+    },
+    "farewell": {
+        "words": ["bye", "goodbye", "see you", "later", "peace"],
+        "responses": [
+            "Goodbye! See you next time!",
+            "Take care! Catch you later!",
+            "Bye! Have a great day!",
+            "See you soon! Don't be a stranger!"
+        ]
+    },
+    "thanks": {
+        "words": ["thanks", "thank"],
+        "responses": [
+            "You're welcome!",
+            "Glad I could help!"
+        ]
+    },
+    "asking": {
+        "words": ["how", "what", "can", "please", "help"],
+        "responses": [
+            "Sure, what do you need help with?",
+            "I'm here to assist! What can I do for you?",
+            "Of course! Please tell me more.",
+            "How can I assist you today?"
+        ]
+    }
+}
