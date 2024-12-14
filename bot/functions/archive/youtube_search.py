@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
-from bot.modules.ytdl import PYTUBE
+from bot.modules.archive.ytdl import PYTUBE
 
 
 async def func_yts(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -79,7 +79,7 @@ class QueryBotHelp:
     async def _query_help_ai(update: Update, query):
         msg = (
             "<b>Artificial intelligence</b>\n\n"
-            "/imagine » generate AI image\n"
+            # "/imagine » generate AI image\n"
             "/gpt » ask any question to ChatGPT\n\n"
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
@@ -103,10 +103,10 @@ class QueryBotHelp:
             "/short » short any url\n"
             "/ping » ping any url\n"
             "/calc » calculate any math (supported syntex: +, -, *, /)\n"
-            "/webshot » take screenshot of any website\n"
+            # "/webshot » take screenshot of any website\n"
             "/weather » get weather info of any city\n"
-            "/ytdl » download youtube video\n"
-            "/yts » search video on youtube\n"
+            # "/ytdl » download youtube video\n"
+            # "/yts » search video on youtube\n"
             "/qr » generate a QR code\n"
             "/itl » convert image into a public link\n"
             "/paste » paste your text in pastebin & get public link\n"

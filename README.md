@@ -1,132 +1,129 @@
-# [tgbot](https://bishalqx980.github.io/tgbot)
+# [tgbot](https://bishalqx980.github.io/tgbot) <img src="https://i.ibb.co/h7bL5bn/download.png" width="20px">
+
 This Telegram bot is built using the `python-telegram-bot` library **_version 20.7_** and performs various tasks within **Telegram**.
 
 - **This bot can be found as [𝕮𝖎𝖗𝖎 "希里"](https://t.me/MissCiri_bot) on Telegram.**
 - **Checkout [https://github.com/bishalqx980/python](https://github.com/bishalqx980/python)**
 
-```Spread Love ❤️
->> If you liked this project then please give it a star...!
-```
+<center><b><i>If you liked this project then please give it a ⭐</i></b></center>
 
-## Features
+## 🎃 Features 🎃
 
-- **Group Management**
+- **🔰 Note (14/12/2024):** _Certain features have been temporarily removed due to limitations. They may be reintroduced in future updates. Additionally, not all features are listed here. We encourage you to start the bot and explore its full functionality. Thank you for your understanding._
+
+- **Group Management 🛠️**
     - It has just everything...
-- **AI**
+- **AI 🤖**
     - ChatGPT
-    - AI photo imagine
-- **Misc**
+    - <s>AI photo imagine</s> `Removed for some limitations`
+- **Misc 🎁**
     - Get any movie info
     - Translate any language
     - Decode, Encode (base64)
     - Short any url
     - Ping any url
     - Calculate basic math
-    - Take webshot (website screenshot)
+    - <s>Take webshot (website screenshot)</s> `Removed for some limitations`
     - Get any location weather info
-    - Download YouTube video
-    - Search YouTube video
+    - <s>Download YouTube video</s> `Removed for some limitations`
+    - <s>Search YouTube video</s> `Removed for some limitations`
     - Generate QR code (image)
     - Convert image into a link (public)
     - Convert text into a link
     - Whisper user in group chat (secret message)
     - Search games link for PS3 & other consoles
-    - Much more...
+    - Much more... [Start](https://t.me/MissCiri_bot) now to see 👀
 
-
-**<i>ℹ️ Todo: add more features...</i>**
+**<i>ℹ️ Todo: add more features... 🎉</i>**
 
 • • • • • • • • • • • • • • • • • • • •
 
 ## How to deploy 🚀
 
-<details>
-<summary><b>Setup 📦</b></summary>
+<h3>Setup 📦</h3>
 
 - Download & rename `sample_config.env` to `config.env` then fillup `config.env` file value's
-    - <small>⚠️ Don't share or upload the `config.env` any public place or repository</small>
-- `BOT_TOKEN` Get from https://t.me/BotFather E.g. 123456:abcdefGHIJK...
-- `OWNER_ID` Get from bot by /id command E.g. 2134776547
-- `OWNER_USERNAME` Your Username E.g. paste like bishalqx980 not @bishalqx980
-- `MONGODB_URI` Get from https://www.mongodb.com/
-- `DB_NAME` anything E.g. MissCiri_db
-    <hr>
-    <details>
-    <summary><b>Local deploy</b></summary>
 
-    ----- **Windows** -----
-    - Required `python 3.11` or later
-    - Open `tgbot` directory on cmd
-    - Run on cmd `pip install -r requirements.txt`
-    - Finally `start.cmd`
+<h6>⚠️ Don't share or upload the `config.env` any public place or repository</h6>
 
-    <br>
+- `BOT_TOKEN` Get from [https://t.me/BotFather](https://t.me/BotFather) E.g. `123456:abcdefGHIJK...`
+- `OWNER_ID` Get from bot by /id command E.g. `2134776547`
+- `OWNER_USERNAME` Your Username E.g. paste like ✅ `bishalqx980` not ❌ `@bishalqx980`
+- `MONGODB_URI` Get from [https://www.mongodb.com/](https://www.mongodb.com/)
+- `DB_NAME` anything E.g. `MissCiri_db`
 
-    ----- **Linux** -----
-    - Required `python 3.11` or later
-    - Open `tgbot` directory on shell
-    - `pip install -r requirements.txt`
-    - Finally `bash start.sh`
+<h3>Deploy Section 🎯</h3>
 
-    </details>
+<center><h3>🖥️ <u>Local deploy</u></h3></center>
 
-    <details>
-    <summary><b>Render deploy</b></summary>
+----- **Windows** -----
+- Required `python 3.11` or later
+- Open `tgbot` directory on cmd
+- Run on cmd `pip install -r requirements.txt`
+- Finally `start.cmd` or `python main.py`
 
-    - Signin/Signup on https://render.com/
-    - Goto dashboard & create a New `Web Service`
-    - Select `Build and deploy from a Git repository` > `Public Git repository` https://github.com/bishalqx980/tgbot
+----- **Linux** -----
+- Required `python 3.11` or later
+- Open `tgbot` directory on shell
+- Run on shell `pip install -r requirements.txt`
+- Finally `bash start.sh` or `python main.py`
 
-    <br>
+<center><h3>📡 <u>Render deploy</u></h3></center>
 
-    `Branch` main
+- Signin/Signup on https://render.com/
+- Goto dashboard & create a New `Web Service`
+- Select `Build and deploy from a Git repository` > `Public Git repository` > `https://github.com/bishalqx980/tgbot`
 
-    `Runtime` Python 3
+- Then 👇
+```
+`Branch` main
 
-    `Build Command` pip install -r requirements.txt
+`Runtime` Python 3
 
-    `Start Command` python main.py
+`Build Command` pip install -r requirements.txt
 
-    `Instance Type` Free (maybe paid)
+`Start Command` python main.py
 
-    ⚠ Advanced option > `Add secret file` filename: `config.env` - file content: paste all content from `sample_config.env` (make sure you filled up everything)
+`Instance Type` Free (maybe paid)
+```
 
-    **_[ If you face anyproblem accessing `Advanced option` then just click on `Create Web Service` then from `Environment` > `Secret Files` add the config.env values... Then restart/redeploy the web service ]_**
+- Advanced option 👇
+```
+`Add secret file`
+filename >> `config.env`
+file content >> paste all content from `sample_config.env` (make sure you filled up everything)
+```
 
-    **Finally click on Create Web Service & wait few sec for deployment & Done | Enjoy 🎉**
+**Note:** _If you face anyproblem accessing `Advanced option` then just click on `Create Web Service` then from `Environment` > `Secret Files` add the `config.env` values. Then restart/redeploy the web service._
 
-    </details>
+**D.O.N.E 🥳**
 
-    <details>
-    <summary><b>Heroku deploy</b></summary>
+<center><h3>📡 <u>Heroku deploy</u></h3></center>
 
-    - Signin/Signup on http://heroku.com/
-    - Give a star ⭐ and fork this repo https://github.com/bishalqx980/tgbot
-    - Goto your forked repo `settings` > `General` > Check ✅ `Template repository`
-    - Come back and on the right top corner you will see a green button name `Use this template`, click on that and create a new private repo with these files
-    - On that private repo upload your `config.env` file and make sure required all values are filled up
-    - Then goto the private repo `settings` > `secrets and variables` > `Actions`
-    - Click on `New respository secret`
-        - **_Name_**: `HEROKU_EMAIL`
-        - **_Secret_**: `your_heroku_email`
-        - Repeat the step and add `HEROKU_APP_NAME` - unique name eg. tgbot007oc-bishalqx980
-        - Add `HEROKU_API_KEY` - get from https://dashboard.heroku.com/account scroll down `API Key` click on `Reveal` button then copy the value and paste it...
-    - Finally click on `Actions` tab from the top, select `Deploy to heroku`, on right side click on `Run workflow` > green button `Run workflow`
-    - Now wait for deployment complete... (you can check log here https://dashboard.heroku.com/apps/HEROKU_APP_NAME/logs)
-    - ⚠️ Add `Server url` from /bsettings before heroku shutdown... then restart dyno (heroku)
+- Signin/Signup on [http://heroku.com/](http://heroku.com/)
+- Give a ⭐ and fork this repo [https://github.com/bishalqx980/tgbot](https://github.com/bishalqx980/tgbot)
+- Goto your forked repo `settings` > `General` > Check ✅ `Template repository`
+- Come back and on the right top corner you will see a green button name `Use this template` [[ <img src="https://i.ibb.co.com/LrW5Z4G/image.png" width="50px"> ]], click on that and create a new private repo with these files
+- On that private repo upload your `config.env` file and make sure required all values are filled up
+- Then goto the private repo `settings` > `secrets and variables` > `Actions`
+- Click on `New respository secret`
+    - **_Name_**: `HEROKU_EMAIL`
+    - **_Secret_**: `your_heroku_email`
+    - Repeat the step and add `HEROKU_APP_NAME` - unique name eg. tgbot007oc-bishalqx980
+    - Add `HEROKU_API_KEY` - get from [https://dashboard.heroku.com/account](https://dashboard.heroku.com/account) scroll down `API Key` click on `Reveal` button then copy the value and paste it...
+- Finally click on `Actions` tab from the top, select `Deploy to heroku`, on right side click on `Run workflow` > green button `Run workflow`
+- Now wait for deployment complete... (you can check log here [https://dashboard.heroku.com/apps/HEROKU_APP_NAME/logs](https://dashboard.heroku.com/apps/HEROKU_APP_NAME/logs))
+- ⚠️ Add `Server url` from `/bsettings` before heroku shutdown... then restart dyno (heroku app)
 
-    **Enjoy 🍾**
+**D.O.N.E 🥳**
 
-    </details>
-- **_After deployment complete, don't forget to visit /bsettings_**
+- **_After deployment complete, don't forget to visit `/bsettings`_**
 
-</details>
+## License 📝
 
-## License
-
-GPL-3.0
+_GPL-3.0_
 <br>
-Original Creator - [bishalqx980](https://t.me/bishalqx980)
+_Original Creator_ - [@bishalqx980](https://t.me/bishalqx980)
 
 ```
 𝓐 𝓹𝓻𝓸𝓳𝓮𝓬𝓽 𝓸𝓯

@@ -6,7 +6,7 @@ from bot import logger
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.re_link import RE_LINK
-from bot.modules.ytdl import PYTUBE
+from bot.modules.archive.ytdl import PYTUBE
 
 
 async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):

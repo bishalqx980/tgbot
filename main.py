@@ -24,12 +24,12 @@ from bot.functions.b64encode import func_b64encode
 from bot.functions.shortener import func_shortener
 from bot.functions.ping import func_ping
 from bot.functions.calc import func_calc
-from bot.functions.webshot import func_webshot
+# from bot.functions.archive.webshot import func_webshot
 from bot.functions.weather import func_weather
-from bot.functions.imagine import func_imagine
+# from bot.functions.archive.imagine import func_imagine
 from bot.functions.chatgpt import func_chatgpt
-from bot.functions.youtube_dl import func_add_download_ytdl
-from bot.functions.youtube_search import func_yts
+# from bot.functions.youtube_dl import func_add_download_ytdl
+# from bot.functions.youtube_search import func_yts
 from bot.functions.gen_qr import func_gen_qr
 from bot.functions.img_to_link import func_img_to_link
 from bot.functions.paste import func_paste
@@ -130,12 +130,12 @@ def main():
         "short": func_shortener,
         "ping": func_ping,
         "calc": func_calc,
-        "webshot": func_webshot,
+        # "webshot": func_webshot,
         "weather": func_weather,
-        "imagine": func_imagine,
+        # "imagine": func_imagine,
         "gpt": func_chatgpt,
-        "ytdl": func_add_download_ytdl,
-        "yts": func_yts,
+        # "ytdl": func_add_download_ytdl,
+        # "yts": func_yts,
         "qr": func_gen_qr,
         "itl": func_img_to_link,
         "paste": func_paste,

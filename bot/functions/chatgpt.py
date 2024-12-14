@@ -4,7 +4,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ParseMode
 from bot.helper.telegram_helper import Message
 from bot.modules.database.combined_db import global_search
-from bot.modules.g4f import G4F
+# from bot.modules.unused.g4f import G4F
 
 
 async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
