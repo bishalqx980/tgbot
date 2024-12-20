@@ -15,7 +15,7 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
     - It has just everything...
 - **AI 🤖**
     - ChatGPT
-    - <s>AI photo imagine</s> `Removed for some limitations`
+    - <s>AI photo imagine</s> `Removed due to limitations`
 - **Misc 🎁**
     - Get any movie info
     - Translate any language
@@ -23,10 +23,10 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
     - Short any url
     - Ping any url
     - Calculate basic math
-    - <s>Take webshot (website screenshot)</s> `Removed for some limitations`
+    - <s>Take webshot (website screenshot)</s> `Removed due to limitations`
     - Get any location weather info
-    - <s>Download YouTube video</s> `Removed for some limitations`
-    - <s>Search YouTube video</s> `Removed for some limitations`
+    - <s>Download YouTube video</s> `Removed due to limitations`
+    - <s>Search YouTube video</s> `Removed due to limitations`
     - Generate QR code (image)
     - Convert image into a link (public)
     - Convert text into a link
@@ -103,7 +103,7 @@ file content >> paste all content from `sample_config.env` (make sure you filled
 - Signin/Signup on [http://heroku.com/](http://heroku.com/)
 - Give a ⭐ and fork this repo [https://github.com/bishalqx980/tgbot](https://github.com/bishalqx980/tgbot)
 - Goto your forked repo `settings` > `General` > Check ✅ `Template repository`
-- Come back and on the right top corner you will see a green button name `Use this template` [[ <img src="https://i.ibb.co.com/LrW5Z4G/image.png" width="50px"> ]], click on that and create a new private repo with these files
+- Come back and on the right top corner you will see a green button name `Use this template` <img src="https://i.ibb.co.com/LrW5Z4G/image.png" width="50px">, click on that and create a new private repo with these files
 - On that private repo upload your `config.env` file and make sure required all values are filled up
 - Then goto the private repo `settings` > `secrets and variables` > `Actions`
 - Click on `New respository secret`
@@ -122,7 +122,9 @@ file content >> paste all content from `sample_config.env` (make sure you filled
 ## License 📝
 
 _GPL-3.0_
+
 <br>
+
 _Original Creator_ - [@bishalqx980](https://t.me/bishalqx980)
 
 ```

@@ -16,7 +16,7 @@ class PASTEBIN:
         return pastebin_api
 
 
-    async def create(text):
+    async def create(text, title="Untitled"):
         check_api = await PASTEBIN.check_api()
         if not check_api:
             return False
@@ -25,11 +25,11 @@ class PASTEBIN:
             "api_dev_key": check_api,
             "api_option": "paste",
             "api_paste_code": text,
-            # "api_paste_name": title
+            "api_paste_name": title
         }
 
         try:
-            req = requests.post(POST_URL, data)
+            req = requests.post(POST_URL, data, timeout=10)
             return req.text
         except Exception as e:
             logger.error(e)

@@ -4,12 +4,11 @@ from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message
 from bot.modules.psndl import PSNDL
-from bot.modules.telegraph import TELEGRAPH
+from bot.modules.pastebin import PASTEBIN
 
 
 async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    chat = update.effective_chat
     keyword = " ".join(context.args)
 
     if not keyword:
@@ -33,31 +32,46 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         for game_id in collections:
             game_data = collections.get(game_id)
             counter += 1
+            # msg_list.append(
+            #     f"<b>No. {counter}</b>\n"
+            #     f"<b>• ID:</b> <code>{game_data.get('id')}</code>\n"
+            #     f"<b>• Name:</b> <code>{game_data.get('name')}</code>\n"
+            #     f"<b>• Type:</b> <code>{game_data.get('type')}</code>\n"
+            #     f"<b>• Region:</b> <code>{game_data.get('region')}</code>\n"
+            #     f"<b>• Link:</b> <a href='{game_data.get('link')}'>Download</a>\n"
+            #     f"<b>• Rap:</b> <code>{game_data.get('rap_name')}</code>\n"
+            #     f"<b>• Rap data »</b> <code>/rap {game_data.get('rap_data')}</code>\n"
+            #     f"<b>• Desc:</b> <code>{game_data.get('desc')}</code>\n"
+            #     f"<b>• Author:</b> <code>{game_data.get('author')}</code>\n\n"
+            #     "<i><b>Note:</b> To get rap file send the rap data with command /rap</i>\n\n"
+            # )
             msg_list.append(
-                f"<b>No. {counter}</b>\n"
-                f"<b>• ID:</b> <code>{game_data.get('id')}</code>\n"
-                f"<b>• Name:</b> <code>{game_data.get('name')}</code>\n"
-                f"<b>• Type:</b> <code>{game_data.get('type')}</code>\n"
-                f"<b>• Region:</b> <code>{game_data.get('region')}</code>\n"
-                f"<b>• Link:</b> <a href='{game_data.get('link')}'>Download</a>\n"
-                f"<b>• Rap:</b> <code>{game_data.get('rap_name')}</code>\n"
-                f"<b>• Rap data »</b> <code>/rap {game_data.get('rap_data')}</code>\n"
-                f"<b>• Desc:</b> <code>{game_data.get('desc')}</code>\n"
-                f"<b>• Author:</b> <code>{game_data.get('author')}</code>\n\n"
-                "<i><b>Note:</b> To get rap file send the rap data with command /rap</i>\n\n"
+                f"No. {counter}\n"
+                f"• ID: {game_data.get('id')}\n"
+                f"• Name: {game_data.get('name')}\n"
+                f"• Type: {game_data.get('type')}\n"
+                f"• Region: {game_data.get('region')}\n"
+                f"• Link: {game_data.get('link')}\n"
+                f"• Rap: {game_data.get('rap_name')}\n"
+                f"• Rap data » /rap {game_data.get('rap_data')}\n"
+                f"• Desc: {game_data.get('desc')}\n"
+                f"• Author: {game_data.get('author')}\n"
+                "Note: To get rap file send the rap data with command /rap\n\n"
             )
     
     msg, counter, links = "", 0, []
     for one_msg in msg_list:
-        msg += one_msg.replace("\n", "<br>")
+        msg += one_msg #one_msg.replace("\n", "<br>")
         counter += 1
         if len(msg_list) > 50 and counter == 50:
-            link = await TELEGRAPH.paste(msg, user.full_name)
+            # link = await TELEGRAPH.paste(msg, user.full_name)
+            link = await PASTEBIN.create(msg, f"{user.full_name} | {user.id}")
             links.append(link)
             msg, counter = "", 0
     
     if counter != 0:
-        link = await TELEGRAPH.paste(msg, user.full_name)
+        # link = await TELEGRAPH.paste(msg, user.full_name)
+        link = await PASTEBIN.create(msg, f"{user.full_name} | {user.id}")
         links.append(link)
         msg, counter = "", 0
     

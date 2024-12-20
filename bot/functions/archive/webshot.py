@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
-from bot.modules.safone import Safone
+from bot.modules.archive.safone import Safone
 
 async def func_webshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
