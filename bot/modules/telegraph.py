@@ -1,9 +1,8 @@
 from telegraph import Telegraph
 from bot import logger
 
-telegraph = Telegraph()
-
 try:
+    telegraph = Telegraph()
     telegraph.create_account("@MissCiri_bot")
 except Exception as e:
     logger.error(e)
