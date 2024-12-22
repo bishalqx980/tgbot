@@ -6,7 +6,7 @@ from bot.modules.telegraph import TELEGRAPH
 async def func_paste(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     re_msg = update.message.reply_to_message
-    text = re_msg.text_html or re_msg.caption_html if re_msg else " ".join(context.args)
+    text = (re_msg.text_html or re_msg.caption_html) if re_msg else " ".join(context.args)
 
     if not text:
         await Message.reply_msg(update, "Use <code>/paste text</code> or reply the message with <code>/paste</code>!")

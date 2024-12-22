@@ -377,7 +377,7 @@ class QueryBotSettings:
     async def _query_confirm_restore_db(update: Update, data_center):
         res1 = await MongoDB.delete_all_doc("bot_docs")
         res2 = await update_database()
-        msg = "Database data has been restored successfully from <code>config.env</code>!" if res1 and res2 else "Something went wrong! Check /log"
+        msg = "Database has been restored successfully from <code>config.env</code>!" if res1 and res2 else "Something went wrong! Check /log"
         await Message.send_msg(data_center.get("chat_id"), msg)
 
 

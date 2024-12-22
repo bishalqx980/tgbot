@@ -52,8 +52,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
     db_broadcast = localdb.get("broadcast")
-    is_forward = db_broadcast.get("is_forward") or False
-    is_pin = db_broadcast.get("is_pin") or False
+    is_forward = db_broadcast.get("is_forward", False)
+    is_pin = db_broadcast.get("is_pin", False)
     
     msg = (
         "<b><u>Broadcast</u></b>\n\n"

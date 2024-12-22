@@ -10,7 +10,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     re_msg = update.message.reply_to_message
-    msg = re_msg.text_html or re_msg.caption_html if re_msg else None
+    msg = (re_msg.text_html or re_msg.caption_html) if re_msg else None
     input_text = " ".join(context.args)
 
     if not msg and not input_text:

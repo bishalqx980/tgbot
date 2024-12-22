@@ -79,8 +79,9 @@ class QueryBotHelp:
     async def _query_help_ai(update: Update, query):
         msg = (
             "<b>Artificial intelligence</b>\n\n"
-            # "/imagine » generate AI image\n"
-            "/gpt » ask any question to ChatGPT\n\n"
+            "<b>⚠️ Disabled due to limitations. They may be reintroduced in future updates.</b>\n\n"
+            "<s>/imagine » generate AI image</s>\n"
+            "<s>/gpt » ask any question to ChatGPT</s>\n\n"
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
 

@@ -6,7 +6,7 @@ from bot.modules.archive.safone import Safone
 
 
 async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await Message.reply_msg(update, "This function has been disabled for some limitations! Stay tuned for further notice.")
+    await Message.reply_msg(update, "This function has been disabled due to limitations! This maybe reintroduced in future updates.")
     return
 
     '''

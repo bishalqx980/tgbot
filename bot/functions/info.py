@@ -25,12 +25,13 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id = info_user.id
     
     if not chat_id:
+        info_user_username = f"@{info_user.username}" if info_user.username else None
         msg = (
             f"<b>• Full name:</b> <code>{info_user.full_name}</code>\n"
             f"<b>  » First name:</b> <code>{info_user.first_name}</code>\n"
             f"<b>  » Last name:</b> <code>{info_user.last_name}</code>\n"
             f"<b>• Mention:</b> {info_user.mention_html()}\n"
-            f"<b>• Username:</b> @{info_user.username}\n"
+            f"<b>• Username:</b> {info_user_username}\n"
             f"<b>• ID:</b> <code>{info_user.id}</code>\n"
             f"<b>• Lang:</b> <code>{info_user.language_code}</code>\n"
             f"<b>• Is bot:</b> <code>{info_user.is_bot}</code>\n"
@@ -106,7 +107,8 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             data = find_user.get(key)
             if key in ["username", "mention"]:
                 if key == "username":
-                    msg += f"<b>{key}</b>: @{data}\n"
+                    data = f"@{data}" if data else None
+                    msg += f"<b>{key}</b>: {data}\n"
                 else:
                     msg += f"<b>{key}</b>: {data}\n"
             else:

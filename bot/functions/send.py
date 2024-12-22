@@ -47,10 +47,9 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not sent_msg:
         msg = "An error occurred!"
+    elif sent_msg == Forbidden:
+        msg =  f"Forbidden!"
     else:
-        if sent_msg == Forbidden:
-            msg =  f"Forbidden!"
-        else:
-            msg = "Message Sent!"
+        msg = "Message Sent!"
 
     await Message.reply_msg(update, msg)

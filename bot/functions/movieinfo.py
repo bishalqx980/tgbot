@@ -39,27 +39,31 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     poster, content_type, title, released, runtime, genre, director, writer, actors, plot, language, country, awards, meta_score, imdb_rating, imdb_votes, imdb_id, box_office = movie_info
+
+    movie_info_dict = {
+        "🎥 Content Type": content_type,
+        "📄 Title": title,
+        "👁‍🗨 Released": released,
+        "🕐 Time": runtime,
+        "🎨 Genre": genre,
+        "🤵‍♂️ Director": director,
+        "🧑‍💻 Writer": writer,
+        "👫 Actors": actors,
+        "🗣 Language": language,
+        "🌐 Country": country,
+        "🏆 Awards": awards,
+        "🎯 Meta Score": meta_score,
+        "🎯 IMDB Rating": imdb_rating,
+        "📊 IMDB Votes": imdb_votes,
+        "🏷 IMDB ID": f"<code>{imdb_id}</code>",
+        "💰 BoxOffice": box_office
+    }
+
+    msg = "<b>Movie Information:</b>\n\n"
+    for key, value in movie_info_dict.items():
+        msg += f"<b>{key}:</b> {value}\n"
     
-    msg = (
-        f"<b>🎥 Content Type:</b> {content_type}\n"
-        f"<b>📄 Title:</b> {title}\n"
-        f"<b>👁‍🗨 Released:</b> {released}\n"
-        f"<b>🕐 Time:</b> {runtime}\n"
-        f"<b>🎨 Genre:</b> {genre}\n"
-        f"<b>🤵‍♂️ Director:</b> {director}\n"
-        f"<b>🧑‍💻 Writer:</b> {writer}\n"
-        f"<b>👫 Actors:</b> {actors}\n" # plot len 9 at the last
-        f"<b>🗣 Language:</b> {language}\n"
-        f"<b>🌐 Country:</b> {country}\n"
-        f"<b>🏆 Awards:</b> {awards}\n"
-        f"<b>🎯 Meta Score:</b> {meta_score}\n"
-        f"<b>🎯 IMDB Rating:</b> {imdb_rating}\n"
-        f"<b>📊 IMDB Votes:</b> {imdb_votes}\n"
-        f"<b>🏷 IMDB ID:</b> <code>{imdb_id}</code>\n"
-        f"<b>💰 BoxOffice:</b> {box_office}\n\n" # break
-        f"<b>📝 **Plot:</b>\n"
-        f"<blockquote>{plot}</blockquote>\n"
-    )
+    msg += f"\n<b>📝 Plot:</b>\n<blockquote>{plot}</blockquote>\n"
 
     btn_data = {
         f"IMDB - {title}": f"https://www.imdb.com/title/{imdb_id}"

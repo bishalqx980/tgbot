@@ -6,7 +6,7 @@ from bot.modules.shrinkme import shortener_url
 
 async def func_shortener(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = update.message.reply_to_message
-    msg = re_msg.text or re_msg.caption if re_msg else " ".join(context.args)
+    msg = (re_msg.text or re_msg.caption) if re_msg else " ".join(context.args)
 
     if not msg:
         await Message.reply_msg(update, "Use <code>/short url</code>\nor reply the url with <code>/short</code>\nE.g. <code>/short https://google.com</code>")

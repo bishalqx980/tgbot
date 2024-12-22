@@ -17,24 +17,22 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     msg = update.message.text_html or update.message.caption_html if update.message else None
 
-    if not msg:
-        return
-
-    if user.id == 777000: # Telegram channel
+    if not msg or user.id == 777000: # Telegram channel
         return
     
     data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
-    if data_center:
-        is_editing = data_center.get("is_editing") # bool
-        if is_editing:
-            try:
-                msg = int(msg)
-            except:
-                msg = msg
-            
-            for key, value in zip(["edit_data_value", "edit_data_value_msg_pointer_id", "is_editing"], [msg, e_msg.id, False]):
-                await LOCAL_DATABASE.insert_data("data_center", chat.id, {key: value})
-            return
+    if data_center and data_center.get("is_editing"):
+        try:
+            msg = int(msg)
+        except ValueError:
+            pass
+
+        await LOCAL_DATABASE.insert_data("data_center", chat.id, {
+            "edit_data_value": msg,
+            "edit_data_value_msg_pointer_id": e_msg.id,
+            "is_editing": False
+        })
+        return
 
     if chat.type == "private":
         db = await global_search("users", "user_id", user.id)
@@ -133,14 +131,12 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_msg(update, msg)
         
         if auto_tr_status:
-            to_translate = msg
-            if msg_contains_link:
-                to_translate = clean_msg
+            to_translate = clean_msg if msg_contains_link else msg
             tr_msg = await translate(to_translate, lang_code)
-            if tr_msg != to_translate:
+            if tr_msg and tr_msg != to_translate:
                 await Message.reply_msg(update, tr_msg)
             elif not tr_msg:
-                logger.error(e)
+                logger.error("Error in auto translate!")
                 btn_data = {
                     "Language code's": "https://telegra.ph/Language-Code-12-24"
                 }

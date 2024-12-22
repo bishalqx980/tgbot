@@ -26,7 +26,7 @@ from bot.functions.ping import func_ping
 from bot.functions.calc import func_calc
 # from bot.functions.archive.webshot import func_webshot
 from bot.functions.weather import func_weather
-# from bot.functions.archive.imagine import func_imagine
+from bot.functions.imagine import func_imagine
 from bot.functions.chatgpt import func_chatgpt
 # from bot.functions.youtube_dl import func_add_download_ytdl
 # from bot.functions.youtube_search import func_yts
@@ -132,7 +132,7 @@ def main():
         "calc": func_calc,
         # "webshot": func_webshot,
         "weather": func_weather,
-        # "imagine": func_imagine,
+        "imagine": func_imagine,
         "gpt": func_chatgpt,
         # "ytdl": func_add_download_ytdl,
         # "yts": func_yts,
