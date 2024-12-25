@@ -1,7 +1,16 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import Update, ReactionTypeEmoji, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.constants import ParseMode
 from telegram.error import Forbidden
 from bot import bot, logger
+
+class ChatFunc:
+    async def get_chat(chat_id):
+        try:
+            response = await bot.get_chat(chat_id)
+            return response
+        except Exception as e:
+            logger.error(e)
+
 
 class Message:
     async def send_msg(chat_id, msg, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
@@ -301,6 +310,32 @@ class Message:
             return response
         except Forbidden:
             return Forbidden
+        except Exception as e:
+            logger.error(e)
+
+
+    async def del_msgs(chat_id, msg_ids=list):
+        if not msg_ids:
+            logger.error("msg_ids not specified!")
+            return
+        
+        try:
+            response = await bot.delete_messages(chat_id=chat_id, message_ids=msg_ids)
+            return response
+        except Forbidden:
+            return Forbidden
+        except Exception as e:
+            logger.error(e)
+
+
+    async def react_msg(chat_id, msg_id, reaction=str, is_big=bool(False)):
+        """
+        Example: reaction = "👍"\n
+        Reaction emoji. Currently, it can be one of "👍", "👎", "❤", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"
+        """
+        try:
+            response = await bot.set_message_reaction(chat_id, msg_id, [ReactionTypeEmoji(reaction)], is_big)
+            return response
         except Exception as e:
             logger.error(e)
 

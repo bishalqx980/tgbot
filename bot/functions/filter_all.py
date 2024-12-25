@@ -48,6 +48,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chatbot_res = await chatbot(msg)
         if chatbot_res:
             await Message.reply_msg(update, chatbot_res)
+            await Message.react_msg(chat.id, e_msg.id, "❤‍🔥", True)
 
         if echo_status:
             await Message.reply_msg(update, msg)

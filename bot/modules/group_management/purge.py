@@ -56,12 +56,11 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
     sent_msg = await Message.send_msg(chat.id, f"Purge started...")
 
     if purgefrom_id:
-        while purgefrom_id <= reply.id:
-            await Message.del_msg(chat.id, msg_id=purgefrom_id)
-            purgefrom_id += 1
+        msg_ids = list(range(purgefrom_id, reply.id))
     else:
-        await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in range(reply.id, e_msg.id + 1)))
-    
+        msg_ids = list(range(reply.id, e_msg.id + 1))
+    await Message.del_msgs(chat.id, msg_ids)
+
     if is_silent:
         await Message.del_msg(chat.id, sent_msg)
     else:

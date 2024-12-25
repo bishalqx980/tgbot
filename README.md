@@ -1,6 +1,6 @@
 # [tgbot](https://bishalqx980.github.io/tgbot) <img src="https://i.ibb.co/h7bL5bn/download.png" width="20px">
 
-This Telegram bot is built using the `python-telegram-bot` library **_version 20.7_** and performs various tasks within **Telegram**.
+This Telegram bot is built using the `python-telegram-bot` library **_version 21.9_** and performs various tasks within **Telegram**.
 
 - **This bot can be found as [𝕮𝖎𝖗𝖎 "希里"](https://t.me/MissCiri_bot) on Telegram.**
 - **Checkout [https://github.com/bishalqx980/python](https://github.com/bishalqx980/python)**
@@ -60,13 +60,13 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 20
 - Required `python 3.11` or later
 - Open `tgbot` directory on cmd
 - Run on cmd `pip install -r requirements.txt`
-- Finally `start.cmd` or `python main.py`
+- Finally `python main.py`
 
 ----- **Linux** -----
 - Required `python 3.11` or later
 - Open `tgbot` directory on shell
 - Run on shell `pip install -r requirements.txt`
-- Finally `bash start.sh` or `python main.py`
+- Finally `python main.py`
 
 <center><h3>📡 <u>Render deploy</u></h3></center>
 

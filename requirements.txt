@@ -1,4 +1,4 @@
-python-telegram-bot==20.7
+python-telegram-bot==21.9
 python-dotenv==1.0.1
 # g4f[all]==0.3.2.6
 deep-translator==1.11.4
