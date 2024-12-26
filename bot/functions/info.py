@@ -1,5 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.constants import MessageOriginType
 from bot.modules.database.mongodb import MongoDB
 from bot.helper.telegram_helper import Message
 from bot.functions.power_users import _power_users
@@ -9,33 +10,39 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     re_msg = update.message.reply_to_message
     chat_id = " ".join(context.args)
+    victim = None
 
     if re_msg:
-        if re_msg.forward_from:
-            info_user = re_msg.forward_from
-        elif re_msg.from_user:
-            if re_msg.from_user.id == user.id:
-                await Message.reply_msg(update, "<i>Replied user account is hidden!</i>")
-                return
-            info_user = re_msg.from_user
+        forward_origin = re_msg.forward_origin
+        from_user = re_msg.from_user
+    
+        if forward_origin and forward_origin.type == MessageOriginType.USER:
+            victim = forward_origin.sender_user
+        
+        if from_user and not forward_origin:
+            victim = from_user
+        
+        if not victim:
+            await Message.reply_msg(update, f"<b>• Full name:</b> <code>{forward_origin.sender_user_name}</code>\n<i>Replied user account is hidden!</i>")
+            return
     else:
-        info_user = user
+        victim = user
     
     if chat_id == "db" and re_msg:
-        chat_id = info_user.id
+        chat_id = victim.id
     
     if not chat_id:
-        info_user_username = f"@{info_user.username}" if info_user.username else None
+        victim_username = f"@{victim.username}" if victim.username else None
         msg = (
-            f"<b>• Full name:</b> <code>{info_user.full_name}</code>\n"
-            f"<b>  » First name:</b> <code>{info_user.first_name}</code>\n"
-            f"<b>  » Last name:</b> <code>{info_user.last_name}</code>\n"
-            f"<b>• Mention:</b> {info_user.mention_html()}\n"
-            f"<b>• Username:</b> {info_user_username}\n"
-            f"<b>• ID:</b> <code>{info_user.id}</code>\n"
-            f"<b>• Lang:</b> <code>{info_user.language_code}</code>\n"
-            f"<b>• Is bot:</b> <code>{info_user.is_bot}</code>\n"
-            f"<b>• Is premium:</b> <code>{info_user.is_premium}</code>"
+            f"<b>• Full name:</b> <code>{victim.full_name}</code>\n"
+            f"<b>  » First name:</b> <code>{victim.first_name}</code>\n"
+            f"<b>  » Last name:</b> <code>{victim.last_name}</code>\n"
+            f"<b>• Mention:</b> {victim.mention_html()}\n"
+            f"<b>• Username:</b> {victim_username}\n"
+            f"<b>• ID:</b> <code>{victim.id}</code>\n"
+            f"<b>• Lang:</b> <code>{victim.language_code}</code>\n"
+            f"<b>• Is bot:</b> <code>{victim.is_bot}</code>\n"
+            f"<b>• Is premium:</b> <code>{victim.is_premium}</code>"
         )
 
         await Message.reply_msg(update, msg)

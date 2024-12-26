@@ -21,8 +21,8 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != "private":
         await Message.reply_msg(update, f"Boss you are in public chat!")
         await asyncio.sleep(3)
-        del_msg_ids = [e_msg.id, e_msg.id + 1]
-        await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in del_msg_ids))
+        msg_ids = [e_msg.id, e_msg.id + 1]
+        await Message.del_msgs(chat.id, msg_ids)
         return
     
     if not text or not re_msg:
@@ -46,10 +46,11 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
             sent_msg = await Message.send_img(chat_id, re_msg.photo[-1].file_id, msg)
     
     if not sent_msg:
-        msg = "An error occurred!"
+        msg, reaction = "An error occurred!", "🤔"
     elif sent_msg == Forbidden:
-        msg =  f"Forbidden!"
+        msg, reaction = "Forbidden!", "👎"
     else:
-        msg = "Message Sent!"
+        msg, reaction = "Message Sent!", "👍"
 
+    await Message.react_msg(chat.id, re_msg.id, reaction)
     await Message.reply_msg(update, msg)

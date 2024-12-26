@@ -21,8 +21,8 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != "private":
         await Message.reply_msg(update, f"Boss you are in public chat!")
         await asyncio.sleep(3)
-        del_msg_ids = [e_msg.id, e_msg.id + 1]
-        await asyncio.gather(*(Message.del_msg(chat.id, msg_id=msg_id) for msg_id in del_msg_ids))
+        msg_ids = [e_msg.id, e_msg.id + 1]
+        await Message.del_msgs(chat.id, msg_ids)
         return
     
     _bot = await find_bot_docs()
