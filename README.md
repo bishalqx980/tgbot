@@ -49,8 +49,41 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
 - `BOT_TOKEN` Get from [https://t.me/BotFather](https://t.me/BotFather) E.g. `123456:abcdefGHIJK...`
 - `OWNER_ID` Get from bot by /id command E.g. `2134776547`
 - `OWNER_USERNAME` Your Username E.g. paste like ✅ `bishalqx980` not ❌ `@bishalqx980`
-- `MONGODB_URI` Get from [https://www.mongodb.com/](https://www.mongodb.com/)
+- `MONGODB_URI` Get from [https://www.mongodb.com/](https://www.mongodb.com/) (Check Below for instruction)
 - `DB_NAME` anything E.g. `MissCiri_db`
+
+<h3>Creating MongoDB URI</h3>
+
+- Signin/Signup on [MongoDB](https://www.mongodb.com/)
+- on [MongoDB Atlas](https://cloud.mongodb.com/) create `New Project`
+- After creating click on the project to access
+- on the left side list, click on `Clusters` > create a `cluster`
+- After creating again on the left side list, `Database Access` click on `ADD NEW DATABASE USER`
+
+1. `Authentication Method`: `Password`
+
+2. `Password Authentication`: give `username` and `password` (remember that)
+
+3. on `Database User Privileges` section
+
+4. `Built-in Role`: `Atlas admin`
+
+5. Finally click on `Add User`
+
+6. Now again goto `cluster` section and click on `connect`
+
+7. `Connect to your application` section `Drivers`
+
+8. `Connecting with MongoDB Driver` section `3. Add your connection string into your application code`
+
+9. Here you can see something like `mongodb+srv://something:<db_password>@cluster9800.AA11.mongodb.net/?retryWrites=true&w=majority&appName=Cluster9800`
+
+10. Remove the `<db_password>` from that URI and add your password which one you gave on `2. 'Password Authentication'`
+
+🥳 Done you have created your `MongoDB_URI` successfully...
+
+> **Note:** One last thing, on the left side list click on `Network Access` section click on `ADD IP ADDRESS` and set ip to `0.0.0.0/0` (Its important to access database without network restriction)
+
 
 <h3>Deploy Section 🎯</h3>
 
@@ -70,31 +103,27 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
 
 <center><h3>📡 <u>Render deploy</u></h3></center>
 
-- Signin/Signup on https://render.com/
+- Signin/Signup on [Render](https://render.com/)
 - Goto dashboard & create a New `Web Service`
-- Select `Build and deploy from a Git repository` > `Public Git repository` > `https://github.com/bishalqx980/tgbot`
+- Select `Public Git repository` > `https://github.com/bishalqx980/tgbot`
 
 - Then 👇
 ```
-`Branch` main
-
-`Runtime` Python 3
-
-`Build Command` pip install -r requirements.txt
-
-`Start Command` python main.py
-
-`Instance Type` Free (maybe paid)
+> Language: Docker
+> Branch: main
+> Instance Type: Free [or paid]
 ```
 
 - Advanced option 👇
 ```
-`Add secret file`
-filename >> `config.env`
-file content >> paste all content from `sample_config.env` (make sure you filled up everything)
+> Secret Files ⬇️
+> Filename: 'config.env'
+> File Contents: paste all content from 'sample_config.env' (make sure you filled up everything)
 ```
 
-**Note:** _If you face anyproblem accessing `Advanced option` then just click on `Create Web Service` then from `Environment` > `Secret Files` add the `config.env` values. Then restart/redeploy the web service._
+> **Note:** _If you face anyproblem accessing `Advanced option` then just click on `Create Web Service` then from `Environment` > `Secret Files` add the `config.env` values. Then restart/redeploy the web service._
+
+> **Important:** _After deployment complete go to [Render Dashboard](https://dashboard.render.com/) and open your service then you can see service url on top left corner [https://example.onrender.com]() copy that and go to bot `/bsettings` server url and edit with your service url. (**So that bot won't go to sleep**)_
 
 **D.O.N.E 🥳**
 
