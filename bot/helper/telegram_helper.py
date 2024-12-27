@@ -13,13 +13,14 @@ class ChatFunc:
 
 
 class Message:
-    async def send_msg(chat_id, msg, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
+    async def send_msg(chat_id, msg, reply_msg_id=None, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
         if btn:
             try:
                 reply_markup = InlineKeyboardMarkup(btn)
                 response = await bot.send_message(
                     chat_id=chat_id,
                     text=msg,
+                    reply_to_message_id=reply_msg_id,
                     reply_markup=reply_markup,
                     disable_web_page_preview=bool(disable_web_preview),
                     parse_mode=parse_mode
@@ -34,6 +35,7 @@ class Message:
                 response = await bot.send_message(
                     chat_id=chat_id,
                     text=msg,
+                    reply_to_message_id=reply_msg_id,
                     disable_web_page_preview=bool(disable_web_preview),
                     parse_mode=parse_mode
                 )
@@ -44,7 +46,7 @@ class Message:
                 logger.error(e)
 
 
-    async def send_img(chat_id, img, caption=None, btn=None, parse_mode=ParseMode.HTML):
+    async def send_img(chat_id, img, caption=None, reply_msg_id=None, btn=None, parse_mode=ParseMode.HTML):
         if btn:
             try:
                 reply_markup = InlineKeyboardMarkup(btn)
@@ -52,6 +54,7 @@ class Message:
                     chat_id=chat_id,
                     photo=img,
                     caption=caption,
+                    reply_to_message_id=reply_msg_id,
                     reply_markup=reply_markup,
                     parse_mode=parse_mode
                 )
@@ -66,6 +69,7 @@ class Message:
                     chat_id=chat_id,
                     photo=img,
                     caption=caption,
+                    reply_to_message_id=reply_msg_id,
                     parse_mode=parse_mode
                 )
                 return response
@@ -153,11 +157,16 @@ class Message:
             logger.error(e)
 
 
-    async def reply_msg(update: Update, msg, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
+    async def reply_msg(update: Update, msg, msg_id=None, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
+        """
+        msg_id: the message id you want to reply\n
+        Default is replied_msg or effective_msg id
+        """
         chat = update.effective_chat
         e_msg = update.effective_message
         re_msg = e_msg.reply_to_message
-        msg_id = re_msg.message_id if re_msg else e_msg.message_id
+        if not msg_id:
+            msg_id = re_msg.message_id if re_msg else e_msg.message_id
 
         if btn:
             reply_markup = InlineKeyboardMarkup(btn)
