@@ -86,4 +86,4 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Check the message": "query_whisper"
     }
     btn = await Button.cbutton(btn_data)
-    await Message.send_msg(chat.id, msg, btn)
+    await Message.send_msg(chat.id, msg, btn=btn)

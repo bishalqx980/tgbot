@@ -7,4 +7,4 @@ async def _pm_error(chat_id):
         "Add me to your Group": f"{_bot_info.get('link')}?startgroup=start"
     }
     btn = await Button.ubutton(btn_data)
-    await Message.send_msg(chat_id, "This command is made to be used in group chats, not in pm!", btn)
+    await Message.send_msg(chat_id, "This command is made to be used in group chats, not in pm!", btn=btn)

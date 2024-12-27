@@ -63,8 +63,8 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         row_2 = await Button.ubutton(btn_data_2)
         btn = row_1 + row_2
     
-    sent_img = await Message.send_img(user.id, bot_pic, msg, btn) if welcome_img and bot_pic else None
+    sent_img = await Message.send_img(user.id, bot_pic, msg, btn=btn) if welcome_img and bot_pic else None
     if not sent_img:
-        await Message.send_msg(user.id, msg, btn)
+        await Message.send_msg(user.id, msg, btn=btn)
     
     await check_add_user_db(user)

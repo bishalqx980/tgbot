@@ -74,8 +74,8 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         image = _bot.get("bot_pic")
 
-    sent_img = await Message.send_img(user.id, image, msg, btn) if image else None
+    sent_img = await Message.send_img(user.id, image, msg, btn=btn) if image else None
     if not sent_img:
-        await Message.send_msg(user.id, msg, btn)
+        await Message.send_msg(user.id, msg, btn=btn)
     
     await check_add_user_db(user)

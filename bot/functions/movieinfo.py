@@ -70,4 +70,4 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
     btn = await Button.ubutton(btn_data)
 
-    await Message.send_img(chat.id, poster, msg, btn)
+    await Message.send_img(chat.id, poster, msg, btn=btn)

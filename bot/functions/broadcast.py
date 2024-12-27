@@ -84,7 +84,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn = row1 + row2 + row3
 
-    sent_msg = await Message.reply_msg(update, msg, btn)
+    sent_msg = await Message.reply_msg(update, msg, btn=btn)
 
     timeout = 0
 

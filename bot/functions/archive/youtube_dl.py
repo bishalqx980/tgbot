@@ -22,7 +22,7 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
             "Start me in private": f"{_bot_info.get('link')}?start=start"
         }
         btn = await Button.ubutton(btn_data)
-        await Message.reply_msg(update, f"This function has some limitaions.\nYou can use it in pm.", btn)
+        await Message.reply_msg(update, f"This function has some limitaions.\nYou can use it in pm.", btn=btn)
         return
     
     if not url:
@@ -63,7 +63,7 @@ async def func_add_download_ytdl(update: Update, context: ContextTypes.DEFAULT_T
 
     btn = row1 + row2
 
-    del_msg = await Message.reply_msg(update, f"\nSelect <a href='{url}'>Content</a> Quality/Format", btn, disable_web_preview=False)
+    del_msg = await Message.reply_msg(update, f"\nSelect <a href='{url}'>Content</a> Quality/Format", btn=btn, disable_web_preview=False)
 
     timeout = 0
 

@@ -95,6 +95,6 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         image = _bot.get("bot_pic")
     
-    sent_img = await Message.send_img(chat.id, image, msg, btn) if image else None
+    sent_img = await Message.send_img(chat.id, image, msg, btn=btn) if image else None
     if not sent_img:
-        await Message.send_msg(chat.id, msg, btn)
+        await Message.send_msg(chat.id, msg, btn=btn)

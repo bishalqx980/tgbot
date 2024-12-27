@@ -84,7 +84,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
         btn = await Button.cbutton(btn_data, True)
-        await Message.reply_msg(update, msg, btn)
+        await Message.reply_msg(update, msg, btn=btn)
         return
 
     db = await global_search("groups", "chat_id", chat.id)

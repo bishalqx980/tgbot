@@ -81,9 +81,9 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             image = _bot.get("bot_pic")
 
         if image:
-            await Message.send_img(chat.id, image, msg, btn)
+            await Message.send_img(chat.id, image, msg, btn=btn)
         else:
-            await Message.send_msg(chat.id, msg, btn)
+            await Message.send_msg(chat.id, msg, btn=btn)
 
     elif chat.type in ["group", "supergroup"]:
         await func_del_command(update, context)
@@ -223,6 +223,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             image = _bot.get("bot_pic")
         
         if image:
-            await Message.send_img(chat.id, image, msg, btn)
+            await Message.send_img(chat.id, image, msg, btn=btn)
         else:
-            await Message.send_msg(chat.id, msg, btn)
+            await Message.send_msg(chat.id, msg, btn=btn)
