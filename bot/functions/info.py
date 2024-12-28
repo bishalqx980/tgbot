@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import MessageOriginType
 from bot.modules.database.mongodb import MongoDB
-from bot.helper.telegram_helper import Message
+from bot.helper.telegram_helper import Message, Button
 from bot.functions.power_users import _power_users
 
 
@@ -45,7 +45,12 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<b>• Is premium:</b> <code>{victim.is_premium}</code>"
         )
 
-        await Message.reply_msg(update, msg)
+        btn_data = {
+            "User Profile": f"tg://user?id={victim.id}"
+        }
+
+        btn = await Button.ubutton(btn_data)
+        await Message.reply_msg(update, msg, btn=btn)
         return
     
     power_users = await _power_users()
