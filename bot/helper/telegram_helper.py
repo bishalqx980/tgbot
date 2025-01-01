@@ -47,6 +47,17 @@ class Message:
 
 
     async def send_img(chat_id, img, caption=None, reply_msg_id=None, btn=None, parse_mode=ParseMode.HTML):
+        """
+        photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+            | :class:`pathlib.Path` | :class:`telegram.PhotoSize`): Photo to send.
+            |fileinput|
+            Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
+
+            Caution:
+                * The photo must be at most 10MB in size.
+                * The photo's width and height must not exceed 10000 in total.
+                * Width and height ratio must be at most 20.
+        """
         if btn:
             try:
                 reply_markup = InlineKeyboardMarkup(btn)
@@ -80,6 +91,12 @@ class Message:
 
 
     async def send_vid(chat_id, video, thumbnail=None, caption=None, reply_msg_id=None, btn=None, parse_mode=ParseMode.HTML):
+        """
+        video (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
+            | :class:`pathlib.Path` | :class:`telegram.Video`): Video file to send.
+            |fileinput|
+            Lastly you can pass an existing :class:`telegram.Video` object to send.
+        """
         if btn:
             try:
                 reply_markup = InlineKeyboardMarkup(btn)
@@ -121,6 +138,12 @@ class Message:
 
 
     async def send_audio(chat_id, audio, title, caption=None, reply_msg_id=None, parse_mode=ParseMode.HTML):
+        """
+        audio (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+            :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.Audio`): Audio file to
+            send. |fileinput|
+            Lastly you can pass an existing :class:`telegram.Audio` object to send.
+        """
         try:
             response = await bot.send_audio(
                 chat_id=chat_id,
@@ -139,7 +162,13 @@ class Message:
 
     async def send_doc(chat_id, doc, filename, caption=None, reply_msg_id=None, parse_mode=ParseMode.HTML):
         """
-        doc = send as file > open()
+        document (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
+        :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.Document`): File to send.
+        |fileinput|
+        Lastly you can pass an existing :class:`telegram.Document` object to send.
+
+        Note:
+            Sending by URL will currently only work ``GIF``, ``PDF`` & ``ZIP`` files.
         """
         try:
             response = await bot.send_document(

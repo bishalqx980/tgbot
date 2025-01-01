@@ -49,7 +49,7 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "User Profile": f"tg://user?id={victim.id}"
         }
 
-        btn = await Button.ubutton(btn_data)
+        btn = await Button.ubutton(btn_data) if victim.username else None
         await Message.reply_msg(update, msg, btn=btn)
         return
     
