@@ -31,7 +31,7 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Returns reaction on message\n"
             "Sent - '👍'\n"
             "Forbidden - '👎'\n"
-            "Something went wrong - '⚠️'"
+            "Something went wrong - '🤷‍♂'"
         )
         await Message.reply_msg(update, msg)
         return
@@ -68,7 +68,7 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
             sent_msg = await Message.send_doc(victim_id, document.file_id, document.file_name, caption)
     
     if not sent_msg:
-        reaction = "⚠️"
+        reaction = "🤷‍♂"
     elif sent_msg == Forbidden:
         reaction = "👎"
     else:
