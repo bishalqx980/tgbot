@@ -21,12 +21,11 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != "private":
         await Message.reply_msg(update, f"Boss you are in public chat!")
         await asyncio.sleep(3)
-        msg_ids = [e_msg.id, e_msg.id + 1]
-        await Message.del_msgs(chat.id, msg_ids)
+        await Message.del_msgs(chat.id, [e_msg.id, e_msg.id + 1])
         return
     
     if not text or not re_msg:
-        await Message.reply_msg(update, "Use <code>/send chat_id</code> by replying a message!\n<code>/send f chat_id</code> to forward the replied message to chat_id!")
+        await Message.reply_msg(update, "Use <code>/send 'chat_id'</code> by replying a message!\n<code>/send f 'chat_id'</code> to forward the replied message to chat_id!")
         return
     
     forward_confirm, chat_id = None, text

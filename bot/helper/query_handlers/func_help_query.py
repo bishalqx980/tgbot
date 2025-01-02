@@ -178,6 +178,7 @@ class QueryBotHelp:
             f"<b>• Inactive users:</b> <code>{inactive_users}</code>\n\n"
 
             "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
+            "<b>• Report bug:</b> <a href='https://github.com/bishalqx980/tgbot/issues'>Report</a>\n"
             "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
         )
 

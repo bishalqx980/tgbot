@@ -23,8 +23,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != "private":
         await Message.reply_msg(update, f"Boss you are in public chat!")
         await asyncio.sleep(3)
-        msg_ids = [e_msg.id, e_msg.id + 1]
-        await Message.del_msgs(chat.id, msg_ids)
+        await Message.del_msgs(chat.id, [e_msg.id, e_msg.id + 1])
         return
     
     if not re_msg:

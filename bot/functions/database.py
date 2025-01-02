@@ -19,19 +19,18 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != "private":
         await Message.reply_msg(update, f"Boss you are in public chat!")
         await asyncio.sleep(3)
-        msg_ids = [e_msg.id, e_msg.id + 1]
-        await Message.del_msgs(chat.id, msg_ids)
+        await Message.del_msgs(chat.id, [e_msg.id, e_msg.id + 1])
         return
     
     db = await MongoDB.info_db()
-    msg = "<b>⋰⋰⋰⋰⋰⋰⋰⋰⋰⋰</b>\n"
+    msg = "<b>Database\n――――――――</b>\n"
     for info in db:
         msg += (
             f"<b>Name</b>: <code>{info[0]}</code>\n"
             f"<b>Count</b>: <code>{info[1]}</code>\n"
             f"<b>Size</b>: <code>{info[2]}</code>\n"
             f"<b>A. size</b>: <code>{info[3]}</code>\n"
-            f"<b>⋰⋰⋰⋰⋰⋰⋰⋰⋰⋰</b>\n"
+            f"<b>――――――――</b>\n"
         )
     
     active_status = await MongoDB.find("users", "active_status")

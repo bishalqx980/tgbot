@@ -9,7 +9,7 @@ async def func_shortener(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = (re_msg.text or re_msg.caption) if re_msg else " ".join(context.args)
 
     if not msg:
-        await Message.reply_msg(update, "Use <code>/short url</code>\nor reply the url with <code>/short</code>\nE.g. <code>/short https://google.com</code>")
+        await Message.reply_msg(update, "Use <code>/short 'url'</code>\nor reply the url with <code>/short</code> command.\nE.g. <code>/short https://google.com</code>")
         return
     
     shorted_url = await shortener_url(msg)

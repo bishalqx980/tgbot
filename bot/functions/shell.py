@@ -23,12 +23,11 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != "private":
         await Message.reply_msg(update, f"Boss you are in public chat!")
         await asyncio.sleep(3)
-        msg_ids = [e_msg.id, e_msg.id + 1]
-        await Message.del_msgs(chat.id, msg_ids)
+        await Message.del_msgs(chat.id, [e_msg.id, e_msg.id + 1])
         return
     
     if not command:
-        await Message.reply_msg(update, "E.g. <code>/shell dir/ls</code> [linux/Windows Depend on your hosting device]")
+        await Message.reply_msg(update, "Use <code>/shell 'dir/ls'</code> [linux/Windows Depend on your hosting server]")
         return
     
     sent_msg = await Message.reply_msg(update, "<b>⌊ please wait... ⌉</b>")

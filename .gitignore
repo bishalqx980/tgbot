@@ -10,5 +10,6 @@ config.env
 /download
 
 # Exception 
+!requirements.txt
 !.vscode/settings.json
 !bot/modules/chatbot/chatbot_db.json

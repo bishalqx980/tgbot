@@ -17,7 +17,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not msg:
-        await Message.reply_msg(update, "Use <code>/whisper @mention_user message</code>\nor reply user by <code>/whisper message</code>\nE.g. <code>/whisper @bishalqx980 This is a secret message :)</code>")
+        await Message.reply_msg(update, "Use <code>/whisper @mention_user 'message'</code>\nor reply user by <code>/whisper 'message'</code>\nE.g. <code>/whisper @bishalqx980 This is a secret message 😜</code>")
         return
     
     await Message.del_msg(chat.id, e_msg)
@@ -83,7 +83,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = f"Hey, {whisper_user} !! You got a message from {user.mention_html()}..."
 
     btn_data = {
-        "Check the message": "query_whisper"
+        "Check the message 👀": "query_whisper"
     }
     btn = await Button.cbutton(btn_data)
     await Message.send_msg(chat.id, msg, btn=btn)

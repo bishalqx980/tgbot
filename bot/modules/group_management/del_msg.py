@@ -54,8 +54,7 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
         await Message.reply_msg(update, "I don't know which message to delete! Reply the message that you want to delete!\nTo mention with reason eg. <code>/del reason</code>")
         return
 
-    msg_ids = [e_msg.id, reply.id]
-    await Message.del_msgs(chat.id, msg_ids)
+    await Message.del_msgs(chat.id, [e_msg.id, reply.id])
     
     if not is_silent:
         msg = f"Lookout... {victim.mention_html()}, your message has been deleted!\n<b>Admin:</b> {user.first_name}"

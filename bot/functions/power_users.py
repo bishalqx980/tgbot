@@ -4,7 +4,7 @@ from bot.modules.database.local_database import LOCAL_DATABASE
 
 async def _power_users():
     """
-    retuns [] of sudo & owner id
+    retuns [] of sudo & owner_id
     """
     bot_docs = await LOCAL_DATABASE.find("bot_docs")
     if bot_docs:

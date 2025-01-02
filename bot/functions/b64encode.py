@@ -8,7 +8,7 @@ async def func_b64encode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args) or (re_msg.text or re_msg.caption if re_msg else None) 
 
     if not msg:
-        await Message.reply_msg(update, "Use <code>/encode the `Decoded` or `normal` text</code>\nor reply the `Decoded` or `normal` text with <code>/encode</code>\nE.g. <code>/encode the `Decoded` or `normal` text you want to encode</code>")
+        await Message.reply_msg(update, "Use <code>/encode 'text'</code>\nor reply any text with <code>/encode</code> command.")
         return
     
     encode = await BASE64.encode(msg)

@@ -12,7 +12,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"Language code: <code>{lang}</code>\n\n"
-            "<i><b>Note:</b> Get your country language code from the below link!\neg. English language code is <code>en</code></i>"
+            "<i><b>Note:</b> Get your country language code from the link below!\nE.g. English language code is <code>en</code></i>"
         )
 
         btn_url_row1 = {
@@ -412,7 +412,7 @@ class QueryChatSettings:
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
             f"AI status: <code>{ai_status}</code>\n\n"
-            "<i><b>Note:</b> Enable / Disbale AI functions in chat!</i>"
+            "<i><b>Note:</b> Enable/Disbale AI functions in chat!</i>"
         )
 
         btn_data_row1 = {

@@ -50,7 +50,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
         return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to mute!\nTo mention with reason eg. <code>/mute reason</code>\nTo give a duration of mute <code>/mute time</code> or <code>/mute time reason</code>\n<pre>50second » 50s\n45minute » 45m\n5hour » 5h\n3days » 3d</pre>")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to mute!\nTo mention with reason eg. <code>/mute reason</code>\nTo give a duration of mute <code>/mute time</code> or <code>/mute time reason</code>\n<quote>Time should be like this\n50second » 50s\n45minute » 45m\n5hour » 5h\n3days » 3d\n[s, m, h, d]</quote>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:

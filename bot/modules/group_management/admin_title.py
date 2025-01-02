@@ -50,11 +50,11 @@ async def func_admintitle(update: Update, context: ContextTypes.DEFAULT_TYPE, is
         return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the admin to set admin title!\neg. <code>/admintitle admin_title</code>\n<i>Note:</i> bot can only set admin title if that admin is promoted by bot!")
+        await Message.reply_msg(update, "I don't know who you are talking about! Reply the admin to set admin title!\neg. <code>/admintitle admin_title</code>\n<i>Note:</i> I can only set admin title if that admin is promoted by me!")
         return
     
     if not admin_title:
-        await Message.reply_msg(update, "Use <code>/admintitle admin_title</code>\n<i>Note:</i> bot can only set admin title if that admin is promoted by bot!")
+        await Message.reply_msg(update, "Use <code>/admintitle admin_title</code>\n<i>Note:</i> I can only set admin title if that admin is promoted by me!")
         return
     
     try:

@@ -18,7 +18,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Language code's": "https://telegra.ph/Language-Code-12-24"
         }
         btn = await Button.ubutton(btn_data)
-        await Message.reply_msg(update, "Use <code>/tr text</code> or <code>/tr lang_code text</code> or reply the text with <code>/tr</code> or <code>/tr lang_code</code>\n\nEnable auto translator mode for this chat from /settings", btn=btn)
+        await Message.reply_msg(update, "Use <code>/tr 'text'</code> or <code>/tr lang_code 'text'</code> or reply the text with <code>/tr</code> or <code>/tr lang_code</code>\n\nEnable auto translator mode for this chat from /settings", btn=btn)
         return
     
     to_translate = None
@@ -72,4 +72,4 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Language code's": "https://telegra.ph/Language-Code-12-24"
         }
         btn = await Button.ubutton(btn_data)
-        await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set your language.", btn=btn)
+        await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)

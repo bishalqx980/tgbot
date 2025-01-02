@@ -37,8 +37,8 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await LOCAL_DATABASE.insert_data("data_center", user.id, data)
 
     msg = (
-        f"Hey, {user.first_name}! Welcome to the bot help section...\n"
-        f"I'm a comprehensive Telegram bot designed to manage groups and perform various functions...\n\n"
+        f"Hey, {user.full_name}! Welcome to the bot help section.\n"
+        f"I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
         f"/start - to start the bot\n"
         f"/help - to see this message"
     )
