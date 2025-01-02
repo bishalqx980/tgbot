@@ -12,7 +12,7 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyword = " ".join(context.args)
 
     if not keyword:
-        await Message.reply_msg(update, "Use <code>/psndl 'game name'</code>\nE.g. <code>/psndl grand theft auto</code>")
+        await Message.reply_msg(update, "Use <code>/psndl game name</code>\nE.g. <code>/psndl grand theft auto</code>")
         return
 
     if len(keyword) < 5:
@@ -70,7 +70,7 @@ async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rap_data = " ".join(context.args)
 
     if not rap_data:
-        await Message.reply_msg(update, "Use <code>/rap 'rap_data'</code>\nE.g. <code>/rap D78710F4C0979FAD9CDB40C612C94F60</code>\n<i><b>Note:</b> You will get the rap data after searching content/game using /psndl command.</i>")
+        await Message.reply_msg(update, "Use <code>/rap rap_data</code>\nE.g. <code>/rap D78710F4C0979FAD9CDB40C612C94F60</code>\n<i><b>Note:</b> You will get the rap data after searching content/game using /psndl command.</i>")
         return
 
     sent_msg = await Message.reply_msg(update, "Creating...")

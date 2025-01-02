@@ -27,7 +27,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not command:
-        await Message.reply_msg(update, "Use <code>/shell 'dir/ls'</code> [linux/Windows Depend on your hosting server]")
+        await Message.reply_msg(update, "Use <code>/shell dir/ls</code> [linux/Windows Depend on your hosting server]")
         return
     
     sent_msg = await Message.reply_msg(update, "<b>⌊ please wait... ⌉</b>")
@@ -59,5 +59,5 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.edit_msg(update, e, sent_msg)
             return
         
-        await Message.send_doc(chat.id, shell, "shell.txt", f"<b>Command</b>: {command}\n<b>Execute time</b>: {(time_executed - time_executing):.2f}s", e_msg.id)
         await Message.del_msg(chat.id, sent_msg)
+        await Message.send_doc(chat.id, shell, "shell.txt", f"<b>Command</b>: {command}\n<b>Execute time</b>: {(time_executed - time_executing):.2f}s", e_msg.id)

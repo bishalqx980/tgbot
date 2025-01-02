@@ -8,7 +8,7 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = " ".join(context.args)
 
     if not url:
-        await Message.reply_msg(update, "Use <code>/ping 'url'</code>\nE.g. <code>/ping https://google.com</code>")
+        await Message.reply_msg(update, "Use <code>/ping url</code>\nE.g. <code>/ping https://google.com</code>")
         return
     
     if url[0:4] != "http":

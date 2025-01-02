@@ -11,7 +11,7 @@ async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = " ".join(context.args) or (re_msg.text or re_msg.caption if re_msg else None)
 
     if not data:
-        await Message.reply_msg(update, "Use <code>/qr 'url/data/text'</code> to generate a QR code image.\nor reply the 'url/data/text' with <code>/qr</code> command.\nE.g. <code>/qr https://google.com</code>")
+        await Message.reply_msg(update, "Use <code>/qr url/data/text</code> to generate a QR code image.\nor reply the 'url/data/text' with <code>/qr</code> command.\nE.g. <code>/qr https://google.com</code>")
         return
 
     sent_msg = await Message.reply_msg(update, f"Generating...")

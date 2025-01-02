@@ -8,7 +8,7 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     location = " ".join(context.args)
 
     if not location:
-        await Message.reply_msg(update, "Use <code>/weather 'location name'</code>\nE.g. <code>/weather london</code>")
+        await Message.reply_msg(update, "Use <code>/weather location_name</code>\nE.g. <code>/weather london</code>")
         return
     
     info = await weather_info(location)
