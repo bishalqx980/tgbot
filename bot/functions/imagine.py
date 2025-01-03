@@ -1,13 +1,45 @@
+import os
+import requests
 from telegram import Update
 from telegram.ext import ContextTypes
+from bot import logger
 from bot.helper.telegram_helper import Message
-from bot.modules.database.combined_db import global_search
+from bot.modules.database.local_database import LOCAL_DATABASE
 # from bot.modules.archive.safone import Safone
 
 
 async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await Message.reply_msg(update, "This function has been disabled due to limitations! This maybe reintroduced in future updates.")
-    return
+    chat = update.effective_chat
+    e_msg = update.effective_message
+    prompt = " ".join(context.args)
+
+    if not prompt:
+        await Message.reply_msg(update, "<code>!imagine prompt</code>")
+        return
+
+    # temporarily added imagine
+    imagine_api = await LOCAL_DATABASE.get_data("bot_docs", "imagine_api")
+    try:
+        res = requests.get(f"{imagine_api}{prompt}")
+    except Exception as e:
+        logger.error(e)
+    
+    if not res.content:
+        await Message.reply_msg(update, "Try again later!")
+        return
+    
+    os.makedirs("download", exist_ok=True)
+    file_name = "download/tmp_imagine.png"
+    
+    with open(file_name, "wb") as f:
+        f.write(res.content)
+
+    await Message.send_img(chat.id, file_name, reply_msg_id=e_msg.id)
+
+    try:
+        os.remove(file_name)
+    except Exception as e:
+        logger.error(e)
 
     '''
     user = update.effective_user
