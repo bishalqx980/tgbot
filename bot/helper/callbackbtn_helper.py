@@ -11,7 +11,20 @@ from bot.modules.database.combined_db import global_search
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.power_users import _power_users
 
+# helpers
+async def popup(query, msg):
+        try:
+            await query.answer(msg, True)
+        except Exception as e:
+            logger.error(e)
 
+async def del_query(query):
+    try:
+        await query.message.delete()
+    except Exception as e:
+        logger.error(e)
+
+# main function
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user = update.effective_user
@@ -21,37 +34,25 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "query_none":
         return
     
-    async def popup(msg):
-        try:
-            await query.answer(msg, True)
-        except Exception as e:
-            logger.error(e)
-    
-    async def del_query():
-        try:
-            await query.message.delete()
-        except Exception as e:
-            logger.error(e)
-    
     # Get data_center
     data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
 
     # Check data in data_center
     if not data_center:
-        await popup(f"{chat.id} wasn't found in data center!")
-        await del_query()
+        await popup(query, f"{chat.id} wasn't found in data center!")
+        await del_query(query)
         return
     
     # Check user_id in data_center
     user_id = data_center.get("user_id")
     if not user_id:
-        await popup(f"{user_id} wasn't found in data center!")
-        await del_query()
+        await popup(query, f"{user_id} wasn't found in data center!")
+        await del_query(query)
         return
     
     if query.data != "query_whisper": # query_whisper exception ...
         if user.id != user_id:
-            await popup("Access Denied!")
+            await popup(query, "Access Denied!")
             return
     
     # Get data from data center
@@ -70,25 +71,22 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "query_whisper":
         data = await LOCAL_DATABASE.find_one("data_center", chat.id)
         if not data:
-            await popup("Data wasn't found...")
-            await del_query()
+            await popup(query, "Data wasn't found...")
+            await del_query(query)
             return
         
         whisper_data = data.get("whisper_data")
 
         user_whisper_data = whisper_data.get(f"@{user.username}") or whisper_data.get(str(user.id))
         if not user_whisper_data:
-            await popup("This whisper isn't for you or whisper expired...!")
+            await popup(query, "This whisper isn't for you or whisper expired...!")
             return
         
         if user_whisper_data.get("whisper_user") not in {user.id, f"@{user.username}"}:
-            await popup("This whisper isn't for you!")
+            await popup(query, "This whisper isn't for you!")
             return
         
-        await popup(user_whisper_data.get("whisper_msg"))
-    # Youtube download ...
-    elif query.data in ["mp4", "mp3"]:
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"youtube_content_format": query.data})
+        await popup(query, user_whisper_data.get("whisper_msg"))
     # Database editing query ...
     elif query.data in [
         "query_edit_value",
@@ -202,15 +200,14 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "query_shrinkme_api",
         "query_omdb_api",
         "query_weather_api",
-        "query_pastebin_api",
         "query_imgbb_api",
         "query_restore_db",
         "query_confirm_restore_db",
         "query_clear_localdb_cache"
     ]:
         if collection_name != "bot_docs":
-            await popup("Session expired! Send command again...!")
-            await del_query()
+            await popup(query, "Session expired! Send command again...!")
+            await del_query(query)
             return
         
         power_users = await _power_users()
@@ -233,8 +230,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await QueryBotSettings._query_omdb_api(update, query, user, find_chat)
             elif query.data == "query_weather_api":
                 await QueryBotSettings._query_weather_api(update, query, user, find_chat)
-            elif query.data == "query_pastebin_api":
-                await QueryBotSettings._query_pastebin_api(update, query, user, find_chat)
             elif query.data == "query_imgbb_api":
                 await QueryBotSettings._query_imgbb_api(update, query, user, find_chat)
             elif query.data == "query_restore_db":

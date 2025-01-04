@@ -13,7 +13,6 @@ from telegram.ext import (
 from bot import bot_token, logger, owner_id
 from bot.update_db import update_database
 from bot.helper.telegram_helper import Message
-from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.power_users import _power_users
 from bot.functions.start import func_start
@@ -24,12 +23,9 @@ from bot.functions.b64encode import func_b64encode
 from bot.functions.shortener import func_shortener
 from bot.functions.ping import func_ping
 from bot.functions.calc import func_calc
-# from bot.functions.archive.webshot import func_webshot
 from bot.functions.weather import func_weather
 from bot.functions.imagine import func_imagine
 from bot.functions.chatgpt import func_chatgpt
-# from bot.functions.youtube_dl import func_add_download_ytdl
-# from bot.functions.youtube_search import func_yts
 from bot.functions.gen_qr import func_gen_qr
 from bot.functions.img_to_link import func_img_to_link
 from bot.functions.paste import func_paste
@@ -46,7 +42,6 @@ from bot.functions.owner_func.database import func_database
 from bot.functions.owner_func.bsettings import func_bsettings
 from bot.functions.owner_func.shell import func_shell
 from bot.functions.owner_func.log import func_log
-from bot.functions.owner_func.restart import func_restart
 from bot.functions.owner_func.sys import func_sys
 from bot.functions.filter_service_msg import func_filter_services
 from bot.functions.filter_all import func_filter_all
@@ -89,18 +84,13 @@ from bot.helper.callbackbtn_helper import func_callbackbtn
 async def server_alive():
     # executing after updating db so getting data from localdb...
     server_url = await LOCAL_DATABASE.get_data("bot_docs", "server_url")
-    bot_status = await LOCAL_DATABASE.get_data("bot_docs", "bot_status")
     power_users = await _power_users()
-    
-    if not bot_status or bot_status == "alive":
-        await asyncio.gather(*(Message.send_msg(user_id, "Bot Started!") for user_id in power_users))
-    elif bot_status == "restart":
-        await MongoDB.update_db("bot_docs", "bot_status", bot_status, "bot_status", "alive")
-        await asyncio.gather(*(Message.send_msg(user_id, "Bot Restarted!") for user_id in power_users))
+    # Send alive message to all sudo and bot owner
+    await asyncio.gather(*(Message.send_msg(user_id, "Bot Started!") for user_id in power_users))
 
     if not server_url:
-        logger.warning("Server URL not provided !!")
-        await Message.send_msg(owner_id, "Warning! Server URL not provided!\nGoto /bsettings and setup server url then restart bot...")
+        logger.warning("⚠️ Server url not provided !!")
+        await Message.send_msg(owner_id, "⚠️ Server url not provided!\nGoto /bsettings and setup server url then restart bot...")
         return
     
     while True:
@@ -130,12 +120,9 @@ def main():
         "short": func_shortener,
         "ping": func_ping,
         "calc": func_calc,
-        # "webshot": func_webshot,
         "weather": func_weather,
         "imagine": func_imagine,
         "gpt": func_chatgpt,
-        # "ytdl": func_add_download_ytdl,
-        # "yts": func_yts,
         "qr": func_gen_qr,
         "itl": func_img_to_link,
         "paste": func_paste,
@@ -196,7 +183,6 @@ def main():
         "bsettings": func_bsettings,
         "shell": func_shell,
         "log": func_log,
-        "restart": func_restart,
         "sys": func_sys
     }
 

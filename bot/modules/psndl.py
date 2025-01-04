@@ -7,7 +7,6 @@ DATABASE = requests.get(psndl_db) # Github database link
 
 class PSNDL:
     async def search(keyword):
-        # open(JSON_FILE, "r")
         load_db = json.loads(DATABASE.text)
         
         filtered_data = {}
@@ -33,7 +32,6 @@ class PSNDL:
 
 
     async def gen_rap(rap_data):
-        # open(JSON_FILE, "r")
         load_db = json.loads(DATABASE.text)
         
         for file_type in load_db:

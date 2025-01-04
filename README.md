@@ -3,7 +3,7 @@
 This Telegram bot is built using the `python-telegram-bot` library **_version 21.9_** and performs various tasks within **Telegram**.
 
 - **This bot can be found as [𝕮𝖎𝖗𝖎 "希里"](https://t.me/MissCiri_bot) on Telegram.**
-- **Checkout [https://github.com/bishalqx980/python](https://github.com/bishalqx980/python)**
+- **📚 Archive modules/functions can be found [HERE](https://github.com/bishalqx980/python)**
 
 <center><b><i>If you liked this project then please give it a ⭐</i></b></center>
 

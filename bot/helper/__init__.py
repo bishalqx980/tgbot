@@ -2,10 +2,6 @@ import asyncio
 from bot import bot, logger
 from telegram import BotCommand
 
-# commands = [
-#     BotCommand("start", "Start the bot")
-# ]
-
 command_help = [
     BotCommand("help", "Show help message")
 ]

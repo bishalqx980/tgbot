@@ -5,7 +5,6 @@ from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message
 from bot.modules.database.local_database import LOCAL_DATABASE
-# from bot.modules.archive.safone import Safone
 
 
 async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):

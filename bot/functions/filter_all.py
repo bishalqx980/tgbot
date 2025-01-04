@@ -2,7 +2,6 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helper import Message, Button
-from bot.modules.chatbot.chatbot import chatbot
 from bot.modules.database.combined_db import global_search
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.translator import translate
@@ -44,11 +43,6 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         echo_status = find_user.get("echo")
         auto_tr_status = find_user.get("auto_tr")
-
-        chatbot_res = await chatbot(msg)
-        if chatbot_res:
-            await Message.reply_msg(update, chatbot_res)
-            await Message.react_msg(chat.id, e_msg.id, "❤‍🔥", True)
 
         if echo_status:
             await Message.reply_msg(update, msg)
