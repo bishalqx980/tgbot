@@ -366,7 +366,7 @@ class Message:
             logger.error(e)
 
 
-    async def react_msg(chat_id, msg_id, reaction=str, is_big=bool(False)):
+    async def react_msg(chat_id, msg_id, reaction=str("❤"), is_big=bool(False)):
         """
         Example: reaction = "👍"\n
         Reaction emoji. Currently, it can be one of "👍", "👎", "❤", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"
@@ -381,6 +381,7 @@ class Message:
 class Button:
     async def ubutton(data, same_line=bool(False)):
         """
+        URL ButtonMaker\n
         Example usage:\n
         btn_data = {\n
             "btn_name": "btn_url",\n
@@ -404,6 +405,7 @@ class Button:
 
     async def cbutton(data, same_line=bool(False)):
         """
+        Callback ButtonMaker\n
         Example usage:\n
         btn_data = {\n
             "btn_name": "btn_data",\n
