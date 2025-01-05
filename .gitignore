@@ -7,7 +7,7 @@
 *.json
 venv
 config.env
-/download
+/downloads
 
 # Exception 
 !requirements.txt

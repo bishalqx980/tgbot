@@ -29,8 +29,8 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_msg(update, "Oops, something went wrong...", sent_msg)
         return
     
-    os.makedirs("download", exist_ok=True)
-    file_name = "download/tmp_imagine.png"
+    os.makedirs("downloads", exist_ok=True)
+    file_name = "downloads/tmp_imagine.png"
     
     with open(file_name, "wb") as f:
         f.write(r.content)

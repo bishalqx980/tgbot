@@ -44,7 +44,7 @@ class PSNDL:
                     db_rap_data = game_data.get("rap_data")
                     if rap_data == db_rap_data:
                         rap_name = game_data.get("rap_name")
-                        os.makedirs("download", exist_ok=True)
-                        rap_location = f"download/{rap_name}"
+                        os.makedirs("downloads", exist_ok=True)
+                        rap_location = f"downloads/{rap_name}"
                         open(rap_location, "wb").write(bytes.fromhex(db_rap_data))
                         return game_data, rap_name, rap_location
