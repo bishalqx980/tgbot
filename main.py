@@ -179,7 +179,7 @@ def main():
         # owner commands...
         "broadcast": func_broadcast,
         "send": func_send,
-        "db": func_database,
+        "database": func_database,
         "bsettings": func_bsettings,
         "shell": func_shell,
         "log": func_log,

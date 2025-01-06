@@ -3,37 +3,40 @@ import json
 from bot import logger, LOCAL_DB
 
 class LOCAL_DATABASE:
-    async def create_collection(collection):
+    @staticmethod
+    async def create_collection(collection_name):
         """
-        collection_name = db_collection_name eg. (users or docs)
+        `collection_name` example `users`\n
+        returns `data` | `None`
         """
-        if not collection:
-            logger.error("collection was't given...")
+        if not collection_name:
+            logger.error("Collection name was't given.")
             return
         
         try:
             load_db = json.load(open(LOCAL_DB, "r"))
-            check_db = load_db.get(collection) # check if collection exist or not
+            check_db = load_db.get(collection_name) # check if collection exist or not
             if check_db:
-                logger.info(f"Collection {collection} already exist!")
+                logger.info(f"Collection: {collection_name} already exist!")
                 return
             
-            load_db[collection] = {}
+            load_db[collection_name] = {}
             json.dump(load_db, open(LOCAL_DB, "w"), indent=4)
 
-            logger.info(f"Collection {collection} created...")
+            logger.info(f"Collection: {collection_name} created...")
+            return True
         except Exception as e:
             logger.error(f"Localdb: {e}")
     
 
-    async def insert_data_direct(collection, data):
+    @staticmethod
+    async def insert_data_direct(collection_name, data):
         """
-        collection = db_collection_name eg. (users or docs)\n
-        data = json data {"name": "bishal", "age": 20}\n\n
-        It will add or replace/modify existing data...\n
-        use >> insert_data instead if you want sub_entry/identifier
+        `collection_name` example `users` | `data` type: dict\n
+        Note: It will add new data or replace existing data. Use `insert_data` function if you want sub_entry/identifier\n
+        returns `True` | `None`
         """
-        params = [collection, data]
+        params = [collection_name, data]
         for i in params:
             if not i:
                 logger.error(f"Some required parameter was't given...")
@@ -46,24 +49,26 @@ class LOCAL_DATABASE:
             if data.get("_id"):
                 data["_id"] = str(data["_id"]) # mongodb _id >> make it str
             
-            load_collection = load_db.get(collection)
-            load_collection.update(data)
+            loaded_collection = load_db.get(collection_name)
+            loaded_collection.update(data)
             json.dump(load_db, open(LOCAL_DB, "w"), indent=4)
             
-            logger.info(f"{collection} updated in localdb...")
+            logger.info(f"Collection: {collection_name} updated in localdb.")
+            return True
         except Exception as e:
             logger.error(f"Localdb: {e}")
 
 
-    async def insert_data(collection, identifier, data, sub_collection=None):
+    @staticmethod
+    async def insert_data(collection_name, identifier, data, sub_collection_name=None):
         """
-        collection = db_collection_name eg. (users or docs)\n
-        identifier = unique data name eg. user.id or doc_1\n
-        data = json data {"name": "bishal", "age": 20}\n
-        sub_collection = db_sub_collection_name (collection > sub_collection)\n\n
-        It will add or replace/modify existing data...
+        `collection_name` example `users` | `identifier` example `2134776547` | `data` type: dict | `sub_collection` name \
+        if you want to add sub collection for this collection.
+
+        It will add or replace/modify existing data...\n
+        returns `True` | `None`
         """
-        params = [collection, identifier, data]
+        params = [collection_name, identifier, data]
         for i in params:
             if not i:
                 logger.error(f"Some required parameter was't given...")
@@ -76,49 +81,53 @@ class LOCAL_DATABASE:
             if data.get("_id"):
                 data["_id"] = str(data["_id"]) # mongodb _id >> make it str
             
-            load_collection = load_db.get(collection, {})
-            is_identifier = load_collection.setdefault(str(identifier), {})
+            loaded_collection = load_db.get(collection_name, {})
+            is_identifier = loaded_collection.setdefault(str(identifier), {})
 
             # sub_collection is under identifier ...
-            if sub_collection:
-                is_sub_collection = is_identifier.setdefault(str(sub_collection), {})
+            if sub_collection_name:
+                is_sub_collection = is_identifier.setdefault(str(sub_collection_name), {})
                 is_sub_collection.update(data)
             else:
                 is_identifier.update(data)
             
-            load_db[collection] = load_collection
+            load_db[collection_name] = loaded_collection
             json.dump(load_db, open(LOCAL_DB, "w"), indent=4)
             
-            if sub_collection:
-                logger.info(f"{sub_collection} has been updated in localdb...! Collection: {collection} Identifier: {identifier} ")
+            if sub_collection_name:
+                logger.info(f"Sub-Collection: {sub_collection_name} has been updated in localdb. Collection: {collection_name} Identifier: {identifier}")
             else:
-                logger.info(f"{identifier} has been updated in localdb...! Collection: {collection}")
+                logger.info(f"Identifier: {identifier} has been updated in localdb. Collection: {collection_name}")
+            return True
         except Exception as e:
             logger.error(f"Localdb: {e}")
     
 
-    async def find(collection):
+    @staticmethod
+    async def find(collection_name):
         """
-        collection = db_collection_name eg. (users or docs)
+        `collection_name` example `users`\n
+        returns `data` | `None`
         """
-        if not collection:
-            logger.error("collection was't given...")
+        if not collection_name:
+            logger.error("collection_name was't given...")
             return
         
         try:
             load_db = json.load(open(LOCAL_DB, "r"))
-            load_collection = load_db.get(collection)
-            return load_collection
+            loaded_collection = load_db.get(collection_name)
+            return loaded_collection
         except Exception as e:
             logger.error(f"Localdb: {e}")
     
 
-    async def find_one(collection, find):
+    @staticmethod
+    async def find_one(collection_name, find):
         """
-        collection = db_collection_name eg. (users or docs)\n
-        find = identifier >> unique data name eg. user_1 or doc_1
+        `collection_name` example `users` | `find` data to find\n
+        returns `data` | `None`
         """
-        params = [collection, find]
+        params = [collection_name, find]
         for i in params:
             if not i:
                 logger.error(f"Some required parameter was't given...")
@@ -126,20 +135,21 @@ class LOCAL_DATABASE:
         
         try:
             load_db = json.load(open(LOCAL_DB, "r"))
-            load_collection = load_db.get(collection)
-            data = load_collection.get(str(find))
+            loaded_collection = load_db.get(collection_name)
+            data = loaded_collection.get(str(find))
             return data
         except Exception as e:
             logger.error(f"Localdb: {e}")
     
 
-    async def get_data(collection, data):
+    @staticmethod
+    async def get_data(collection_name, data):
         """
-        collection = db_collection_name eg. (users or docs)\n
-        data = which data you want from specified collection\n
-        only works for which doesn't have sub collection
+        `collection_name` example `bot_docs` | `data` example `owner_id`\n
+        Note: only works if collection doesn't have any sub collection\n
+        returns `data` | `None`
         """
-        params = [collection, data]
+        params = [collection_name, data]
         for i in params:
             if not i:
                 logger.error(f"Some required parameter was't given...")
@@ -147,14 +157,18 @@ class LOCAL_DATABASE:
         
         try:
             load_db = json.load(open(LOCAL_DB, "r"))
-            load_collection = load_db.get(collection)
-            db_data = load_collection[data]
+            loaded_collection = load_db.get(collection_name)
+            db_data = loaded_collection[data]
             return db_data
         except Exception as e:
             logger.error(f"Localdb: {e}")
 
 
+    @staticmethod
     async def restore_db():
+        """
+        returns `True` | `None`
+        """
         try:
             # checking file
             check_local_db = os.path.isfile(LOCAL_DB)

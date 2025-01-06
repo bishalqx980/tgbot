@@ -1,148 +1,139 @@
-import pymongo
+from pymongo import MongoClient
 from bot import mongodb_uri, db_name, logger
 
 # connecting to db
-client = pymongo.MongoClient(mongodb_uri)
-db = client[db_name]
+client = MongoClient(mongodb_uri) # full cluster access
+db = client[db_name] # for only accessing bot database
 
 class MongoDB:
+    @staticmethod
     async def insert_single_data(collection_name, data):
         """
-        ex. data = {"name": "John", "age": 30, "city": "New York"}
+        `collection_name` example `users` | `data` type: dict
         """
-        collection = db[collection_name]
         try:
-            logger.info(f"Inserting single data in {collection_name}...")
-            inject = collection.insert_one(data)
-            inserted_id = inject.inserted_id
-            logger.info(f"Inserted ID: {inserted_id}")
-            return inserted_id
+            collection = db[collection_name]
+            inserted_data = collection.insert_one(data)
+            if not inserted_data.acknowledged:
+                logger.error(f"{collection_name} wasn't inserted.")
         except Exception as e:
             logger.error(e)
 
 
-    async def insert_multiple_data(collection_name, data_list):
+    @staticmethod
+    async def insert_multiple_data(collection_name, data):
         """
-        ex. data = [
-            { "name": "Alice", "age": 25, "city": "San Francisco" },
-            { "name": "Bob", "age": 28, "city": "Seattle" },
-        ]
+        `collection_name` example `users` | `data` type: list of dict
         """
-        collection = db[collection_name]
         try:
-            logger.info(f"Inserting multiple data in {collection_name}...")
-            inject = collection.insert_many(data_list)
-            inserted_ids = inject.inserted_ids
-            logger.info(f"Inserted IDs: {inserted_ids}")
-            return inserted_ids
+            collection = db[collection_name]
+            inserted_data = collection.insert_many(data)
+            if not inserted_data.acknowledged:
+                logger.error(f"{collection_name} wasn't inserted.")
         except Exception as e:
             logger.error(e)
 
 
+    @staticmethod
     async def find_one(collection_name, search, match):
         """
-        Example: x = find_one(collection_name)\n
-        x.get(item)
+        `collection_name` example `users` | `search` example `user_id` | `match` example `2134776547`\n
+        returns `data` | `None`
         """
-        collection = db[collection_name]
         try:
-            logger.info(f"Finding {collection_name} in db...")
+            collection = db[collection_name]
             document = collection.find_one({search: match})
             if document:
-                logger.info("Data found...")
-            else:
-                logger.info("Data not found...")
-                return
-            return document
+                return document
         except Exception as e:
             logger.error(e)
-    
 
+
+    @staticmethod
     async def find(collection_name, search):
         """
-        returns >> only searched data value
+        `collection_name` example `users` | `search` example `user_id`\n
+        returns `list` of matched data
         """
-        collection = db[collection_name]
         try:
-            logger.info(f"Finding {collection_name} in db...")
+            collection = db[collection_name]
             documents = collection.find({})
-            storage = []
-            if documents:
-                for document in documents:
-                    doc_value = document.get(search)
-                    storage.append(doc_value)
-                logger.info("Data found...")
-            else:
-                logger.info("Data not found...")
+            if not documents:
                 return
+            
+            storage = []
+            for document in documents:
+                doc_value = document.get(search)
+                storage.append(doc_value)
             return storage
         except Exception as e:
             logger.error(e)
 
 
-    async def get_data(collection_name, get_data):
-        collection = db[collection_name]
+    @staticmethod
+    async def get_data(collection_name, data):
+        """
+        Gets data from single document, which doesn't have multiple documents\n
+        `collection_name` example `bot_docs` | `data` example `owner_id`\n
+        returns `data` | `None`
+        """
         try:
-            logger.info(f"Getting {collection_name} from db...")
+            collection = db[collection_name]
             documents = collection.find_one()
-            data = documents.get(get_data)
+            data = documents.get(data)
             if data:
-                logger.info("Data found...")
-            else:
-                logger.info("Data not found...")
-                return
-            return data
+                return data
         except Exception as e:
             logger.error(e)
 
 
+    @staticmethod
     async def update_db(collection_name, search, match, update_data_key, update_data_value):
-        collection = db[collection_name]
+        """
+        `collection_name` example `users` | `search` example `user_id` | `match` example `2134776547` |\
+        `update_data_key` example `name` | `update_data_value` example `Bishal`
+        """
         try:
-            collection.update_one(
+            collection = db[collection_name]
+            updated_data = collection.update_one(
                 {search: match},
                 {"$set": {update_data_key: update_data_value}}
             )
-            logger.info(f"{collection_name} data updated in db...")
+            if not updated_data.acknowledged:
+                logger.error(f"{collection_name} wasn't updated.")
         except Exception as e:
             logger.error(e)
 
 
+    @staticmethod
     async def info_db(collection_name=None):
+        """
+        Get database info or any collection info
+        """
         docs_name = db.list_collection_names()
-        if collection_name:
-            logger.info(f"Getting {collection_name} from db...")
-            if collection_name in docs_name:
-                doc_stats = db.command("collstats", collection_name)
-                # stats
-                doc_name = collection_name
-                doc_count = doc_stats['count']
-                doc_size = f"{doc_stats['storageSize'] / (1024 * 1024):.2f} MB"
-                doc_acsize = f"{doc_stats['size'] / (1024 * 1024):.2f} MB"
-                logger.info("Data found...")
-                return doc_name, doc_count, doc_size, doc_acsize
-            else:
-                logger.info(f"{collection_name} not found...")
-        else:
-            storage = []
-            for collection_name in docs_name:
-                logger.info(f"Getting {collection_name} from db...")
-                doc_stats = db.command("collstats", collection_name)
-                # stats
-                doc_name = collection_name
-                doc_count = doc_stats['count']
-                doc_size = f"{doc_stats['storageSize'] / (1024 * 1024):.2f} MB"
-                doc_acsize = f"{doc_stats['size'] / (1024 * 1024):.2f} MB"
-                storage.append((doc_name, doc_count, doc_size, doc_acsize))
-            logger.info("Data found...")
-            return storage
+        storage = []
+        for collection_name in docs_name:
+            doc_stats = db.command("collstats", collection_name)
+            # stats
+            doc_name = collection_name
+            doc_count = doc_stats['count']
+            doc_size = f"{doc_stats['storageSize'] / (1024 * 1024):.2f} MB"
+            doc_acsize = f"{doc_stats['size'] / (1024 * 1024):.2f} MB"
+            storage.append((doc_name, doc_count, doc_size, doc_acsize))
+        return storage
 
 
+    @staticmethod
     async def delete_all_doc(collection_name):
-        collection = db[collection_name]
+        """
+        delete all data from `collection_name`
+        """
         try:
-            collection.delete_many({})
-            logger.info(f"{collection_name} data deleted...")
+            collection = db[collection_name]
+            deleted_data = collection.delete_many({})
+            if not deleted_data.acknowledged:
+                logger.error(f"{collection_name} wasn't deleted.")
+                return False
             return True
         except Exception as e:
             logger.error(e)

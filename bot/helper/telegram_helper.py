@@ -28,7 +28,7 @@ class Message:
     @staticmethod
     async def send_image(chat_id, image, caption=None, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML):
         """
-        `image` type `file object` | `url`
+        `image` type: `file object` | `url`
         """
         reply_markup = InlineKeyboardMarkup(btn) if btn else None
 
@@ -51,7 +51,7 @@ class Message:
     @staticmethod
     async def send_video(chat_id, video, thumbnail=None, caption=None, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML):
         """
-        `video` type `file object` | `url`
+        `video` type: `file object` | `url`
         """
         reply_markup = InlineKeyboardMarkup(btn) if btn else None
 
@@ -78,7 +78,7 @@ class Message:
     @staticmethod
     async def send_audio(chat_id, audio, title, caption=None, btn=None, reply_message_id=None, parse_mode=ParseMode.HTML):
         """
-        `audio` type `file object` | `url`
+        `audio` type: `file object` | `url`
         """
         reply_markup = InlineKeyboardMarkup(btn) if btn else None
 
@@ -102,7 +102,7 @@ class Message:
     @staticmethod
     async def send_document(chat_id, document, filename, caption=None, btn=None, reply_message_id=None, parse_mode=ParseMode.HTML):
         """
-        `document` type `file object` | `url`
+        `document` type: `file object` | `url`
         """
         reply_markup = InlineKeyboardMarkup(btn) if btn else None
 
@@ -246,7 +246,7 @@ class Button:
     async def ubutton(data, same_line=False):
         """
         _url button maker_\n
-        `data` type dict | `same_line` boolean\n
+        `data` type: dict | `same_line` boolean\n
         returns `list` | `None`
         """
         try:
@@ -266,7 +266,7 @@ class Button:
     async def cbutton(data, same_line=False):
         """
         _callback button maker_\n
-        `data` type dict | `same_line` boolean\n
+        `data` type: dict | `same_line` boolean\n
         returns `list` | `None`
         """
         try:
