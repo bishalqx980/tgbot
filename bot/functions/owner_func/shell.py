@@ -60,4 +60,4 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         await Message.delete_message(chat.id, sent_msg)
-        await Message.send_document(chat.id, shell, "shell.txt", f"<b>Command</b>: {command}\n<b>Execute time</b>: {(time_executed - time_executing):.2f}s", e_msg.id)
+        await Message.send_document(chat.id, shell, "shell.txt", f"<b>Command</b>: {command}\n<b>Execute time</b>: {(time_executed - time_executing):.2f}s", reply_message_id=e_msg.id)
