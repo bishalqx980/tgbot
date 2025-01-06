@@ -61,7 +61,7 @@ async def track_bot_chat_act(update: Update, context: ContextTypes.DEFAULT_TYPE)
                     "/help for bot help..."
                 )
                 # send chat id you effective user
-                await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
+                await Message.send_message(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
             elif cause == "PROMOTED":
                 msg = (
                     "Thanks for adding me as admin!\n"
@@ -72,7 +72,7 @@ async def track_bot_chat_act(update: Update, context: ContextTypes.DEFAULT_TYPE)
                     "Ohh dear, have I done something wrong!\n"
                     "I wish I could help..."
                 )
-            await Message.send_msg(chat.id, msg)
+            await Message.send_message(chat.id, msg)
     else:
         if bot_exist and cause == "JOINED":
-            await Message.send_msg(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
+            await Message.send_message(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")

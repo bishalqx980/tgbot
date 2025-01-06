@@ -5,13 +5,14 @@ from bot import bot, logger
 
 
 class Message:
-    async def send_msg(chat_id, msg, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=bool(True)):
+    @staticmethod
+    async def send_message(chat_id, message, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
         reply_markup = InlineKeyboardMarkup(btn) if btn else None
 
         try:
             response = await bot.send_message(
                 chat_id=chat_id,
-                text=msg,
+                text=message,
                 reply_to_message_id=reply_message_id,
                 reply_markup=reply_markup,
                 disable_web_page_preview=disable_web_preview,
@@ -24,24 +25,17 @@ class Message:
             logger.error(e)
 
 
-    async def send_img(chat_id, img, caption=None, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML):
+    @staticmethod
+    async def send_image(chat_id, image, caption=None, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML):
         """
-        photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
-            | :class:`pathlib.Path` | :class:`telegram.PhotoSize`): Photo to send.
-            |fileinput|
-            Lastly you can pass an existing :class:`telegram.PhotoSize` object to send.
-
-            Caution:
-                * The photo must be at most 10MB in size.
-                * The photo's width and height must not exceed 10000 in total.
-                * Width and height ratio must be at most 20.
+        `image` type `file object` | `url`
         """
         reply_markup = InlineKeyboardMarkup(btn) if btn else None
 
         try:
             response = await bot.send_photo(
                 chat_id=chat_id,
-                photo=img,
+                photo=image,
                 caption=caption,
                 reply_to_message_id=reply_message_id,
                 reply_markup=reply_markup,
@@ -54,12 +48,10 @@ class Message:
             logger.error(e)
 
 
-    async def send_vid(chat_id, video, thumbnail=None, caption=None, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML):
+    @staticmethod
+    async def send_video(chat_id, video, thumbnail=None, caption=None, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML):
         """
-        video (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
-            | :class:`pathlib.Path` | :class:`telegram.Video`): Video file to send.
-            |fileinput|
-            Lastly you can pass an existing :class:`telegram.Video` object to send.
+        `video` type `file object` | `url`
         """
         reply_markup = InlineKeyboardMarkup(btn) if btn else None
 
@@ -83,12 +75,10 @@ class Message:
             logger.error(e)
 
 
+    @staticmethod
     async def send_audio(chat_id, audio, title, caption=None, btn=None, reply_message_id=None, parse_mode=ParseMode.HTML):
         """
-        audio (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
-            :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.Audio`): Audio file to
-            send. |fileinput|
-            Lastly you can pass an existing :class:`telegram.Audio` object to send.
+        `audio` type `file object` | `url`
         """
         reply_markup = InlineKeyboardMarkup(btn) if btn else None
 
@@ -109,22 +99,17 @@ class Message:
             logger.error(e)
 
 
-    async def send_doc(chat_id, doc, filename, caption=None, btn=None, reply_message_id=None, parse_mode=ParseMode.HTML):
+    @staticmethod
+    async def send_document(chat_id, document, filename, caption=None, btn=None, reply_message_id=None, parse_mode=ParseMode.HTML):
         """
-        document (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | \
-        :obj:`bytes` | :class:`pathlib.Path` | :class:`telegram.Document`): File to send.
-        |fileinput|
-        Lastly you can pass an existing :class:`telegram.Document` object to send.
-
-        Note:
-            Sending by URL will currently only work ``GIF``, ``PDF`` & ``ZIP`` files.
+        `document` type `file object` | `url`
         """
         reply_markup = InlineKeyboardMarkup(btn) if btn else None
 
         try:
             response = await bot.send_document(
                 chat_id=chat_id,
-                document=doc,
+                document=document,
                 filename=filename,
                 caption=caption,
                 reply_markup=reply_markup,
@@ -138,7 +123,8 @@ class Message:
             logger.error(e)
 
 
-    async def reply_msg(update: Update, msg, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=bool(True)):
+    @staticmethod
+    async def reply_message(update: Update, message, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
         """
         `reply_message_id` default value is `effective message` or `replied message`
         """
@@ -149,7 +135,7 @@ class Message:
 
         try:
             response = await update.message.reply_text(
-                text=msg,
+                text=message,
                 disable_web_page_preview=disable_web_preview,
                 reply_to_message_id=msg_id,
                 reply_markup=reply_markup,
@@ -162,7 +148,8 @@ class Message:
             logger.error(e)
 
 
-    async def forward_msg(to_chat_id, from_chat_id, message_id):
+    @staticmethod
+    async def forward_message(to_chat_id, from_chat_id, message_id):
         try:
             response = await bot.forward_message(
                 chat_id=to_chat_id,
@@ -176,7 +163,8 @@ class Message:
             logger.error(e)
 
 
-    async def edit_msg(update: Update, new_text, message_to_edit, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=bool(True)):
+    @staticmethod
+    async def edit_message(update: Update, new_message, message_to_edit, btn=None, parse_mode=ParseMode.HTML, disable_web_preview=True):
         """
         `message_to_edit` could be the `ref message` or `ref message id`
         """
@@ -189,7 +177,7 @@ class Message:
         if is_caption:
             try:
                 response = await bot.edit_message_caption(
-                    caption=new_text,
+                    caption=new_message,
                     chat_id=chat_id,
                     message_id=msg_id,
                     reply_markup=reply_markup,
@@ -203,7 +191,7 @@ class Message:
         else:
             try:
                 response = await bot.edit_message_text(
-                    text=new_text,
+                    text=new_message,
                     chat_id=chat_id,
                     message_id=msg_id,
                     reply_markup=reply_markup,
@@ -217,7 +205,8 @@ class Message:
                 logger.error(e)
 
 
-    async def del_msg(chat_id, message_to_delete):
+    @staticmethod
+    async def delete_message(chat_id, message_to_delete):
         msg_id = message_to_delete.message_id or message_to_delete
 
         try:
@@ -229,9 +218,10 @@ class Message:
             logger.error(e)
 
 
-    async def del_msgs(chat_id, message_to_delete_id_list=list):
+    @staticmethod
+    async def delete_messages(chat_id, message_id_list=list):
         try:
-            response = await bot.delete_messages(chat_id=chat_id, message_ids=message_to_delete_id_list)
+            response = await bot.delete_messages(chat_id=chat_id, message_ids=message_id_list)
             return response
         except Forbidden:
             return Forbidden
@@ -239,9 +229,9 @@ class Message:
             logger.error(e)
 
 
-    async def react_msg(chat_id, message_id, reaction=str("❤"), is_big=bool(True)):
+    @staticmethod
+    async def react_msg(chat_id, message_id, reaction="❤", is_big=True):
         """
-        Example: reaction = "👍"\n
         Reaction emoji. Currently, it can be one of "👍", "👎", "❤", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"
         """
         try:
@@ -252,49 +242,41 @@ class Message:
 
 
 class Button:
-    async def ubutton(data, same_line=bool(False)):
+    @staticmethod
+    async def ubutton(data, same_line=False):
         """
-        URL ButtonMaker\n
-        Example usage:\n
-        btn_data = {\n
-            "btn_name": "btn_url",\n
-            "btn_name_2": "btn_url_2"\n
-        }\n
-        row1 = await Button.ubutton(btn_data, True) # 1st line and both button are in same line\n
-        btn = row1\n
+        _url button maker_\n
+        `data` type dict | `same_line` boolean\n
+        returns `list` | `None`
         """
-        btn, sbtn = [], []
         try:
-            for b_name, b_url in data.items():
-                if same_line and len(data) > 1:
-                    sbtn.append(InlineKeyboardButton(b_name, b_url))
-                else:
-                    btn.append([InlineKeyboardButton(b_name, b_url)])
-            buttons = btn + [sbtn]
-            return buttons
+            buttons = [
+                InlineKeyboardButton(btn_name, btn_url) for btn_name, btn_url in data.items()
+            ]
+
+            if same_line and len(data) > 1:
+                return [buttons]
+            else:
+                return [[button] for button in buttons]
         except Exception as e:
             logger.error(e)
 
 
-    async def cbutton(data, same_line=bool(False)):
+    @staticmethod
+    async def cbutton(data, same_line=False):
         """
-        Callback ButtonMaker\n
-        Example usage:\n
-        btn_data = {\n
-            "btn_name": "btn_data",\n
-            "btn_name_2": "btn_data_2"\n
-        }\n
-        row1 = await Button.cbutton(btn_data, True) # 1st line and both button are in same line\n
-        btn = row1\n
+        _callback button maker_\n
+        `data` type dict | `same_line` boolean\n
+        returns `list` | `None`
         """
-        btn, sbtn = [], []
         try:
-            for b_name, b_data in data.items():
-                if same_line and len(data) > 1:
-                    sbtn.append(InlineKeyboardButton(b_name, callback_data=b_data))
-                else:
-                    btn.append([InlineKeyboardButton(b_name, callback_data=b_data)])
-            buttons = btn + [sbtn]
-            return buttons
+            buttons = [
+                InlineKeyboardButton(btn_name, callback_data=btn_data) for btn_name, btn_data in data.items()
+            ]
+
+            if same_line and len(data) > 1:
+                return [buttons]
+            else:
+                return [[button] for button in buttons]
         except Exception as e:
             logger.error(e)

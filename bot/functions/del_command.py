@@ -17,14 +17,14 @@ async def func_del_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     db = await global_search("groups", "chat_id", chat.id)
     if db[0] == False:
-        await Message.reply_msg(update, db[1])
+        await Message.reply_message(update, db[1])
         return
     
     find_group = db[1]
 
     del_cmd = find_group.get("del_cmd")
     if del_cmd:
-        await Message.del_msg(chat.id, msg)
+        await Message.delete_message(chat.id, msg)
     
     bot_cmds = json.load(open("bot_cmds.json", "r"))
     bot_commands = bot_cmds.get("bot_commands")

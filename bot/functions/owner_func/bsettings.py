@@ -15,13 +15,13 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     power_users = await _power_users()
     if user.id not in power_users:
-        await Message.reply_msg(update, "Access denied!")
+        await Message.reply_message(update, "Access denied!")
         return
     
     if chat.type != "private":
-        await Message.reply_msg(update, f"Boss you are in public chat!")
+        await Message.reply_message(update, f"Boss you are in public chat!")
         await asyncio.sleep(3)
-        await Message.del_msgs(chat.id, [e_msg.id, e_msg.id + 1])
+        await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])
         return
     
     _bot = await find_bot_docs()
@@ -93,6 +93,6 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         image = _bot.get("bot_pic")
     
-    sent_img = await Message.send_img(chat.id, image, msg, btn=btn) if image else None
+    sent_img = await Message.send_image(chat.id, image, msg, btn=btn) if image else None
     if not sent_img:
-        await Message.send_msg(chat.id, msg, btn=btn)
+        await Message.send_message(chat.id, msg, btn=btn)

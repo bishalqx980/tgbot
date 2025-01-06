@@ -17,17 +17,17 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     power_users = await _power_users()
     if user.id not in power_users:
-        await Message.reply_msg(update, "Access denied!")
+        await Message.reply_message(update, "Access denied!")
         return
     
     if chat.type != "private":
-        await Message.reply_msg(update, f"Boss you are in public chat!")
+        await Message.reply_message(update, f"Boss you are in public chat!")
         await asyncio.sleep(3)
-        await Message.del_msgs(chat.id, [e_msg.id, e_msg.id + 1])
+        await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])
         return
     
     if not re_msg:
-        await Message.reply_msg(update, "Reply a message to broadcast!")
+        await Message.reply_message(update, "Reply a message to broadcast!")
         return
     
     data = {
@@ -83,7 +83,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn = row1 + row2 + row3
 
-    sent_msg = await Message.reply_msg(update, msg, btn=btn)
+    sent_msg = await Message.reply_message(update, msg, btn=btn)
 
     timeout = 0
 
@@ -96,10 +96,10 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if is_done:
             break
     
-    await Message.del_msg(chat.id, sent_msg)
+    await Message.delete_message(chat.id, sent_msg)
 
     if not is_done:
-        await Message.reply_msg(update, "Oops, Timeout!")
+        await Message.reply_message(update, "Oops, Timeout!")
         return
     
     is_forward = db_broadcast.get("is_forward")
@@ -117,21 +117,21 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if filter_user_id[1] == True:
                 active_users.append(filter_user_id[0])
     else:
-        await Message.reply_msg(update, f"An error occured!\nuser_id: {len(user_id)} isn't equal to active_status: {len(active_status)} !!")
+        await Message.reply_message(update, f"An error occured!\nuser_id: {len(user_id)} isn't equal to active_status: {len(active_status)} !!")
         return
     
     sent_count, except_count, pin_except_count = 0, 0, 0
-    notify = await Message.send_msg(user.id, f"Total users: {len(users_id)}\nActive users: {len(active_users)}")
+    notify = await Message.send_message(user.id, f"Total users: {len(users_id)}\nActive users: {len(active_users)}")
     start_time = time.time()
 
     for user_id in active_users:
         if is_forward:
-            sent_msg = await Message.forward_msg(user_id, chat.id, re_msg.id)
+            sent_msg = await Message.forward_message(user_id, chat.id, re_msg.id)
         else:
             if re_msg.text_html:
-                sent_msg = await Message.send_msg(user_id, broadcast_msg)
+                sent_msg = await Message.send_message(user_id, broadcast_msg)
             elif re_msg.caption_html:
-                sent_msg = await Message.send_img(user_id, re_msg.photo[-1].file_id, broadcast_msg)
+                sent_msg = await Message.send_image(user_id, re_msg.photo[-1].file_id, broadcast_msg)
         
         if not sent_msg:
             except_count += 1
@@ -145,7 +145,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     logger.error(e)
 
         progress = (sent_count + except_count) * 100 / len(active_users)
-        await Message.edit_msg(update, f"Total users: {len(users_id)}\nActive users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nPin exception: {pin_except_count}\nProgress: {(progress):.2f}%", notify)
+        await Message.edit_message(update, f"Total users: {len(users_id)}\nActive users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nPin exception: {pin_except_count}\nProgress: {(progress):.2f}%", notify)
         # sleep for 0.5 sec
         await asyncio.sleep(0.5)
     
@@ -154,4 +154,4 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if (end_time - start_time) > 60:
         time_took = f"{((end_time - start_time) / 60):.2f} min"
     
-    await Message.reply_msg(update, f"Broadcast Done!\nTime took: {time_took}")
+    await Message.reply_message(update, f"Broadcast Done!\nTime took: {time_took}")

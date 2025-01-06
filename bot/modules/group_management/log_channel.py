@@ -8,7 +8,7 @@ async def _log_channel(update: Update, chat, user, victim=None, action=None, rea
     """
     db = await global_search("groups", "chat_id", chat.id)
     if db[0] == False:
-        await Message.reply_msg(update, db[1])
+        await Message.reply_message(update, db[1])
         return
     
     find_group = db[1]
@@ -35,4 +35,4 @@ async def _log_channel(update: Update, chat, user, victim=None, action=None, rea
     if reason:
         msg = f"{msg}\n<b>Reason:</b> {reason}"
 
-    await Message.send_msg(log_channel, msg)
+    await Message.send_message(log_channel, msg)

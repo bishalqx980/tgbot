@@ -86,11 +86,11 @@ async def server_alive():
     server_url = await LOCAL_DATABASE.get_data("bot_docs", "server_url")
     power_users = await _power_users()
     # Send alive message to all sudo and bot owner
-    await asyncio.gather(*(Message.send_msg(user_id, "Bot Started!") for user_id in power_users))
+    await asyncio.gather(*(Message.send_message(user_id, "Bot Started!") for user_id in power_users))
 
     if not server_url:
         logger.warning("⚠️ Server url not provided !!")
-        await Message.send_msg(owner_id, "⚠️ Server url not provided!\nGoto /bsettings and setup server url then restart bot...")
+        await Message.send_message(owner_id, "⚠️ Server url not provided!\nGoto /bsettings and setup server url then restart bot...")
         return
     
     while True:

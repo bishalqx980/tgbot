@@ -13,13 +13,13 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     power_users = await _power_users()
     if user.id not in power_users:
-        await Message.reply_msg(update, "Access denied!")
+        await Message.reply_message(update, "Access denied!")
         return
     
     if chat.type != "private":
-        await Message.reply_msg(update, f"Boss you are in public chat!")
+        await Message.reply_message(update, f"Boss you are in public chat!")
         await asyncio.sleep(3)
-        await Message.del_msgs(chat.id, [e_msg.id, e_msg.id + 1])
+        await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])
         return
     
     db = await MongoDB.info_db()
@@ -36,4 +36,4 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     active_status = await MongoDB.find("users", "active_status")
     active_users = active_status.count(True)
     inactive_users = active_status.count(False)
-    await Message.reply_msg(update, f"{msg}<b>Active users</b>: <code>{active_users}</code>\n<b>Inactive users</b>: <code>{inactive_users}</code>")
+    await Message.reply_message(update, f"{msg}<b>Active users</b>: <code>{active_users}</code>\n<b>Inactive users</b>: <code>{inactive_users}</code>")

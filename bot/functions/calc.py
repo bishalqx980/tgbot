@@ -8,10 +8,10 @@ async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args) or (re_msg.text or re_msg.caption if re_msg else None)
 
     if not msg:
-        await Message.reply_msg(update, "Use <code>/calc math</code>\nor reply the math with <code>/calc</code> command.\nE.g. <code>/calc (980 - 80) + 100 / 4 * 4 - 20</code>")
+        await Message.reply_message(update, "Use <code>/calc math</code>\nor reply the math with <code>/calc</code> command.\nE.g. <code>/calc (980 - 80) + 100 / 4 * 4 - 20</code>")
         return
     
     calc = await calculator(msg)
     res, output = calc
     msg = f"Calculation: <code>{output}</code>" if res else f"Error: {output}"
-    await Message.reply_msg(update, msg)
+    await Message.reply_message(update, msg)

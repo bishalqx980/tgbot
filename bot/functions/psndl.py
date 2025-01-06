@@ -12,18 +12,18 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyword = " ".join(context.args)
 
     if not keyword:
-        await Message.reply_msg(update, "Use <code>/psndl game name</code>\nE.g. <code>/psndl grand theft auto</code>")
+        await Message.reply_message(update, "Use <code>/psndl game name</code>\nE.g. <code>/psndl grand theft auto</code>")
         return
 
     if len(keyword) < 5:
-        await Message.reply_msg(update, "Search keyword is too short...")
+        await Message.reply_message(update, "Search keyword is too short...")
         return
 
-    sent_msg = await Message.reply_msg(update, f"Searching...")
+    sent_msg = await Message.reply_message(update, f"Searching...")
     search = await PSNDL.search(keyword)
 
     if not search:
-        await Message.edit_msg(update, "Game not found! Check game name again!", sent_msg)
+        await Message.edit_message(update, "Game not found! Check game name again!", sent_msg)
         return
 
     msg_list, counter = [], 0
@@ -62,7 +62,7 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     for link in links:
         msg += f"» {link}\n"
-    await Message.edit_msg(update, msg, sent_msg)
+    await Message.edit_message(update, msg, sent_msg)
 
 
 async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -70,14 +70,14 @@ async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rap_data = " ".join(context.args)
 
     if not rap_data:
-        await Message.reply_msg(update, "Use <code>/rap rap_data</code>\nE.g. <code>/rap D78710F4C0979FAD9CDB40C612C94F60</code>\n<i><b>Note:</b> You will get the rap data after searching content/game using /psndl command.</i>")
+        await Message.reply_message(update, "Use <code>/rap rap_data</code>\nE.g. <code>/rap D78710F4C0979FAD9CDB40C612C94F60</code>\n<i><b>Note:</b> You will get the rap data after searching content/game using /psndl command.</i>")
         return
 
-    sent_msg = await Message.reply_msg(update, "Creating...")
+    sent_msg = await Message.reply_message(update, "Creating...")
 
     gen_rap = await PSNDL.gen_rap(rap_data)
     if not gen_rap:
-        await Message.edit_msg(update, "RAP file wasn't found!", sent_msg)
+        await Message.edit_message(update, "RAP file wasn't found!", sent_msg)
         return
     
     game_data, rap_name, rap_location = gen_rap
@@ -90,8 +90,8 @@ async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>• Region:</b> <code>{game_data.get('region')}</code>\n"
     )
 
-    await Message.send_doc(chat.id, rap_file, rap_name, caption)
-    await Message.del_msg(chat.id, sent_msg)
+    await Message.send_document(chat.id, rap_file, rap_name, caption)
+    await Message.delete_message(chat.id, sent_msg)
     # Removing rap file from storage
     try:
         os.remove(rap_location)

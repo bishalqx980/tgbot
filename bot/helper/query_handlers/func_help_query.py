@@ -41,7 +41,7 @@ class QueryBotHelp:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_help_group_management_p2(update: Update, query):
@@ -73,7 +73,7 @@ class QueryBotHelp:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_help_ai(update: Update, query):
@@ -91,7 +91,7 @@ class QueryBotHelp:
         }
 
         btn = await Button.cbutton(btn_data, True)
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_help_misc_functions(update: Update, query):
@@ -123,7 +123,7 @@ class QueryBotHelp:
         }
 
         btn = await Button.cbutton(btn_data, True)
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_help_owner_functions(update: Update, query):
@@ -145,7 +145,7 @@ class QueryBotHelp:
         }
 
         btn = await Button.cbutton(btn_data, True)
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
     
 
     async def _query_help_bot_info(update: Update, query):
@@ -184,4 +184,4 @@ class QueryBotHelp:
         }
 
         btn = await Button.cbutton(btn_data, True)
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)

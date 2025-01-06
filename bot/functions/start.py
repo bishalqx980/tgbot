@@ -13,19 +13,19 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not owner_id:
         msg = f"owner_id: <code>{chat.id}</code>\nPlease add owner_id in <code>config.env</code> file then retry. Otherwise bot won't work properly." if chat.type == "private" else "Error <i>owner_id</i> not provided!"
-        await Message.reply_msg(update, msg)
+        await Message.reply_message(update, msg)
         return
     
     _bot_info = await LOCAL_DATABASE.find("_bot_info")
 
     if chat.type != "private":
-        sent_msg = await Message.send_msg(user.id, ".")
+        sent_msg = await Message.send_message(user.id, ".")
         if sent_msg == Forbidden:
-            await Message.reply_msg(update, f"Hey, {user.mention_html()}!\n<a href='{_bot_info.get('link')}'>Start me</a> in pm to chat with me!")
+            await Message.reply_message(update, f"Hey, {user.mention_html()}!\n<a href='{_bot_info.get('link')}'>Start me</a> in pm to chat with me!")
             return
         elif sent_msg:
-            await Message.reply_msg(update, f"<a href='{_bot_info.get('link')}'>Sent in your pm!</a>")
-            await Message.del_msg(user.id, sent_msg)
+            await Message.reply_message(update, f"<a href='{_bot_info.get('link')}'>Sent in your pm!</a>")
+            await Message.delete_message(user.id, sent_msg)
     
     _bot = await find_bot_docs()
     if not _bot:
@@ -63,8 +63,8 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         row_2 = await Button.ubutton(btn_data_2)
         btn = row_1 + row_2
     
-    sent_img = await Message.send_img(user.id, bot_pic, msg, btn=btn) if welcome_img and bot_pic else None
+    sent_img = await Message.send_image(user.id, bot_pic, msg, btn=btn) if welcome_img and bot_pic else None
     if not sent_img:
-        await Message.send_msg(user.id, msg, btn=btn)
+        await Message.send_message(user.id, msg, btn=btn)
     
     await check_add_user_db(user)

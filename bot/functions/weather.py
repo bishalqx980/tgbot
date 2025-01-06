@@ -8,16 +8,16 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
     location = " ".join(context.args)
 
     if not location:
-        await Message.reply_msg(update, "Use <code>/weather location_name</code>\nE.g. <code>/weather london</code>")
+        await Message.reply_message(update, "Use <code>/weather location_name</code>\nE.g. <code>/weather london</code>")
         return
     
     info = await weather_info(location)
     if info == False:
-        await Message.reply_msg(update, "weather_api not found!")
+        await Message.reply_message(update, "weather_api not found!")
         return
     
     if not info:
-        await Message.reply_msg(update, "Oops, something went wrong...")
+        await Message.reply_message(update, "Oops, something went wrong...")
         return
     
     loc_name, country, zone, localtime, lastupdate, temp_c, f_temp_c, temp_f, f_temp_f , wind_mph , wind_kph, wind_deg, humidity, uv, condition, condition_icon = info
@@ -38,4 +38,4 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>UV Ray:</b> <code>{uv}</code>\n\nNote: <i>⚠ 8 or higher is harmful for skin!</i>"
     )
 
-    await Message.reply_msg(update, msg)
+    await Message.reply_message(update, msg)

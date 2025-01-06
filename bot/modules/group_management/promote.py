@@ -7,7 +7,7 @@ from bot.functions.del_command import func_del_command
 from bot.modules.group_management.check_permission import _check_permission
 
 
-async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=bool(None), full_promote=bool(None), is_anonymous=bool(None)):
+async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=False, full_promote=False, is_anonymous=False):
     chat = update.effective_chat
     user = update.effective_user
     reply = update.message.reply_to_message
@@ -21,7 +21,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
     await func_del_command(update, context)
 
     if user.is_bot:
-        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
 
     _chk_per = await _check_permission(update, victim, user)
@@ -32,31 +32,31 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
     _bot_info, bot_permission, user_permission, victim_permission = _chk_per
 
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this chat!")
+        await Message.reply_message(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_msg(update, "You aren't an admin in this chat!")
+        await Message.reply_message(update, "You aren't an admin in this chat!")
         return
     
     if user_permission.status == ChatMember.ADMINISTRATOR:
         if not user_permission.can_promote_members:
-            await Message.reply_msg(update, "You don't have enough rights to promote/demote chat member!")
+            await Message.reply_message(update, "You don't have enough rights to promote/demote chat member!")
             return
     
     if not bot_permission.can_promote_members:
-        await Message.reply_msg(update, "I don't have enough rights to promote/demote chat member!")
+        await Message.reply_message(update, "I don't have enough rights to promote/demote chat member!")
         return
     
     if not reply:
-        await Message.reply_msg(update, "I don't know who you are talking about! Reply the member whom you want to promote!\nTo set admin title eg. <code>/promote admin_title</code>")
+        await Message.reply_message(update, "I don't know who you are talking about! Reply the member whom you want to promote!\nTo set admin title eg. <code>/promote admin_title</code>")
         return
     
     if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         if _bot_info.get("id") == victim.id:
-            await Message.reply_msg(update, "I'm already an admin!")
+            await Message.reply_message(update, "I'm already an admin!")
         else:
-            await Message.reply_msg(update, "The user is already an admin!")
+            await Message.reply_message(update, "The user is already an admin!")
         return
     
     try:
@@ -83,9 +83,9 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
             msg = f"{victim.mention_html()} has been promoted!\n<b>Admin:</b> {user.first_name}"
     except Exception as e:
         logger.error(e)
-        error_msg = await Message.reply_msg(update, e)
+        error_msg = await Message.reply_message(update, e)
         if not error_msg:
-            await Message.reply_msg(update, e.message)
+            await Message.reply_message(update, e.message)
         return
     
     if admin_title:
@@ -94,12 +94,12 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
             msg = f"{msg}\nNew admin title: {admin_title}"
         except Exception as e:
             logger.error(e)
-            error_msg = await Message.reply_msg(update, e)
+            error_msg = await Message.reply_message(update, e)
             if not error_msg:
-                await Message.reply_msg(update, e.message)
+                await Message.reply_message(update, e.message)
     
     if not is_silent:
-        await Message.reply_msg(update, msg)
+        await Message.reply_message(update, msg)
 
 
 async def func_apromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -110,7 +110,7 @@ async def func_spromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     e_msg = update.effective_message
     
-    await Message.del_msg(chat.id, e_msg)
+    await Message.delete_message(chat.id, e_msg)
     await func_promote(update, context, is_silent=True)
 
 
@@ -118,7 +118,7 @@ async def func_sapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     e_msg = update.effective_message
     
-    await Message.del_msg(chat.id, e_msg)
+    await Message.delete_message(chat.id, e_msg)
     await func_promote(update, context, is_silent=True, is_anonymous=True)
 
 
@@ -134,7 +134,7 @@ async def func_sfpromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     e_msg = update.effective_message
 
-    await Message.del_msg(chat.id, e_msg)
+    await Message.delete_message(chat.id, e_msg)
     await func_promote(update, context, is_silent=True, full_promote=True)
 
 
@@ -142,5 +142,5 @@ async def func_sfapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     e_msg = update.effective_message
 
-    await Message.del_msg(chat.id, e_msg)
+    await Message.delete_message(chat.id, e_msg)
     await func_promote(update, context, is_silent=True, full_promote=True, is_anonymous=True)

@@ -39,4 +39,4 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if bots_storage:
         bots_storage = f"\n<b>Bot's:</b>\n{bots_storage}"
 
-    await Message.reply_msg(update, f"<b>{chat.title}</b>\n▬▬▬▬▬▬▬▬▬▬\n{owner_storage}{admins_storage}{bots_storage}")
+    await Message.reply_message(update, f"<b>{chat.title}</b>\n▬▬▬▬▬▬▬▬▬▬\n{owner_storage}{admins_storage}{bots_storage}")

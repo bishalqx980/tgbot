@@ -45,7 +45,7 @@ class QueryMenus:
 
         btn = row1 + row2 + row3 + row4 + row5 + row6
         
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_help_menu(update: Update, query, user):
@@ -78,7 +78,7 @@ class QueryMenus:
 
         btn = row1 + row2 + row3
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
     
 
     async def _query_chat_settings_menu(update: Update, query, chat, find_chat):
@@ -192,4 +192,4 @@ class QueryMenus:
 
             btn = row1 + row2 + row3 + row4 + row5 + row6
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)

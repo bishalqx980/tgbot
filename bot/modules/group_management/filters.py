@@ -16,7 +16,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     db = await global_search("groups", "chat_id", chat.id)
     if db[0] == False:
-        await Message.reply_msg(update, db[1])
+        await Message.reply_message(update, db[1])
         return
     
     find_group = db[1]
@@ -30,4 +30,4 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         msg += "- No filters\n"
 
-    await Message.reply_msg(update, msg)
+    await Message.reply_message(update, msg)

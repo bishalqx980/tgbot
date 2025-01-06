@@ -8,17 +8,17 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = " ".join(context.args)
 
     if not url:
-        await Message.reply_msg(update, "Use <code>/ping url</code>\nE.g. <code>/ping https://google.com</code>")
+        await Message.reply_message(update, "Use <code>/ping url</code>\nE.g. <code>/ping https://google.com</code>")
         return
     
     if url[0:4] != "http":
         url = f"http://{url}"
 
-    sent_msg = await Message.reply_msg(update, f"Pinging {url}\nPlease wait...")
+    sent_msg = await Message.reply_message(update, f"Pinging {url}\nPlease wait...")
     ping = await ping_url(url)
 
     if ping[0] == None:
-        await Message.edit_msg(update, ping[1], sent_msg)
+        await Message.edit_message(update, ping[1], sent_msg)
         return
 
     res, ping_time, status_code = ping
@@ -33,4 +33,4 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Status: {site_status}"
     )
 
-    await Message.edit_msg(update, msg, sent_msg)
+    await Message.edit_message(update, msg, sent_msg)

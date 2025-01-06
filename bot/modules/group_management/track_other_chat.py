@@ -20,7 +20,7 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
 
     db = await global_search("groups", "chat_id", chat.id)
     if db[0] == False:
-        # await Message.reply_msg(update, db[1])
+        # await Message.reply_message(update, db[1])
         return
     
     find_group = db[1]
@@ -49,11 +49,11 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
             _bot_info, bot_permission, user_permission, victim_permission = _chk_per
 
             if bot_permission.status != ChatMember.ADMINISTRATOR:
-                await Message.send_msg(chat.id, "<b>Antibot:</b> I'm not an admin in this chat!")
+                await Message.send_message(chat.id, "<b>Antibot:</b> I'm not an admin in this chat!")
                 return
             
             if not bot_permission.can_restrict_members:
-                await Message.reply_msg(update, "I don't have enough rights to restrict/unrestrict chat member!")
+                await Message.reply_message(update, "I don't have enough rights to restrict/unrestrict chat member!")
                 return
             
             if user_permission.status == ChatMember.ADMINISTRATOR:
@@ -61,17 +61,17 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
                     return
             
             if victim_permission.status == ChatMember.ADMINISTRATOR:
-                await Message.send_msg(chat.id, f"<b>Antibot:</b> {victim.mention_html()} has been added as an admin. I can't kick an admin!")
+                await Message.send_message(chat.id, f"<b>Antibot:</b> {victim.mention_html()} has been added as an admin. I can't kick an admin!")
                 return
             
             try:
                 await bot.unban_chat_member(chat.id, victim.id)
-                await Message.send_msg(chat.id, f"Antibot has kicked {victim.mention_html()} from this chat!")
+                await Message.send_message(chat.id, f"Antibot has kicked {victim.mention_html()} from this chat!")
             except Exception as e:
                 logger.error(e)
-                error_msg = await Message.reply_msg(update, e)
+                error_msg = await Message.reply_message(update, e)
                 if not error_msg:
-                    await Message.reply_msg(update, e.message)
+                    await Message.reply_message(update, e.message)
         elif welcome_user:
             if custom_welcome_msg:
                 formattings = {
@@ -89,8 +89,8 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
                         value = ""
                     custom_welcome_msg = custom_welcome_msg.replace(key, str(value))
 
-                await Message.send_msg(chat.id, custom_welcome_msg)
+                await Message.send_message(chat.id, custom_welcome_msg)
             else:
-                await Message.send_msg(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
+                await Message.send_message(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
     elif user_exist == False and cause == "LEFT" and farewell_user:
-        await Message.send_msg(chat.id, f"{victim.mention_html()} just left the chat...")
+        await Message.send_message(chat.id, f"{victim.mention_html()} just left the chat...")

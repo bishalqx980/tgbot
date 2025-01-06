@@ -63,7 +63,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Check on localdb if not found check on mongodb if not found show error
     db = await global_search(collection_name, db_find, db_vlaue)
     if db[0] == False:
-        await Message.reply_msg(update, db[1])
+        await Message.reply_message(update, db[1])
         return
     
     find_chat = db[1]
@@ -304,4 +304,4 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             btn = row1 + row2 + row3
 
-            await Message.edit_msg(update, msg, query.message, btn)
+            await Message.edit_message(update, msg, query.message, btn)

@@ -6,4 +6,4 @@ async def func_filter_services(update: Update, context: ContextTypes.DEFAULT_TYP
     chat = update.effective_chat
     e_msg = update.effective_message
     
-    await Message.del_msg(chat.id, e_msg)
+    await Message.delete_message(chat.id, e_msg)

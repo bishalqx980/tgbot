@@ -23,7 +23,7 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             victim = from_user
         
         if not victim:
-            await Message.reply_msg(update, f"<b>• Full name:</b> <code>{forward_origin.sender_user_name}</code>\n<i>Replied user account is hidden!</i>")
+            await Message.reply_message(update, f"<b>• Full name:</b> <code>{forward_origin.sender_user_name}</code>\n<i>Replied user account is hidden!</i>")
             return
     else:
         victim = user
@@ -50,18 +50,18 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
         btn = await Button.ubutton(btn_data) if victim.username else None
-        await Message.reply_msg(update, msg, btn=btn)
+        await Message.reply_message(update, msg, btn=btn)
         return
     
     power_users = await _power_users()
     if user.id not in power_users:
-        await Message.reply_msg(update, "Access denied!")
+        await Message.reply_message(update, "Access denied!")
         return
 
     if "-100" in str(chat_id):
         find_group = await MongoDB.find_one("groups", "chat_id", int(chat_id))
         if not find_group:
-            await Message.reply_msg(update, "Chat not found!")
+            await Message.reply_message(update, "Chat not found!")
             return
         
         entries = [
@@ -96,11 +96,11 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else: 
                 msg += f"<b>{key}</b>: <code>{data}</code>\n"
 
-        await Message.reply_msg(update, msg)
+        await Message.reply_message(update, msg)
     else:
         find_user = await MongoDB.find_one("users", "user_id", int(chat_id))
         if not find_user:
-            await Message.reply_msg(update, "User not found!")
+            await Message.reply_message(update, "User not found!")
             return
         
         entries = [
@@ -126,4 +126,4 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
                 msg += f"<b>{key}</b>: <code>{data}</code>\n"
         
-        await Message.reply_msg(update, msg)
+        await Message.reply_message(update, msg)

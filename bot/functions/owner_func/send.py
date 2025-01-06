@@ -15,13 +15,13 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     power_users = await _power_users()
     if user.id not in power_users:
-        await Message.reply_msg(update, "Access denied!")
+        await Message.reply_message(update, "Access denied!")
         return
     
     if chat.type != "private":
-        await Message.reply_msg(update, f"Boss you are in public chat!")
+        await Message.reply_message(update, f"Boss you are in public chat!")
         await asyncio.sleep(3)
-        await Message.del_msgs(chat.id, [e_msg.id, e_msg.id + 1])
+        await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])
         return
     
     if not text or not re_msg:
@@ -33,7 +33,7 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Forbidden - '👎'\n"
             "Something went wrong - '🤷‍♂'"
         )
-        await Message.reply_msg(update, msg)
+        await Message.reply_message(update, msg)
         return
     
     forward_confirm, victim_id = None, text
@@ -43,7 +43,7 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
         forward_confirm, victim_id = splited_text
 
     if forward_confirm:
-        sent_msg = await Message.forward_msg(victim_id, chat.id, re_msg.id)
+        sent_msg = await Message.forward_message(victim_id, chat.id, re_msg.id)
     else:
         text = re_msg.text_html
         photo = re_msg.photo
@@ -57,15 +57,15 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # video_note = e_msg.video_note
 
         if text:
-            sent_msg = await Message.send_msg(victim_id, text)
+            sent_msg = await Message.send_message(victim_id, text)
         elif photo:
-            sent_msg = await Message.send_img(victim_id, photo[-1].file_id, caption)
+            sent_msg = await Message.send_image(victim_id, photo[-1].file_id, caption)
         elif audio:
             sent_msg = await Message.send_audio(victim_id, audio.file_id, audio.file_name, caption)
         elif video:
-            sent_msg = await Message.send_vid(victim_id, video.file_id, caption=caption)
+            sent_msg = await Message.send_video(victim_id, video.file_id, caption=caption)
         elif document:
-            sent_msg = await Message.send_doc(victim_id, document.file_id, document.file_name, caption)
+            sent_msg = await Message.send_document(victim_id, document.file_id, document.file_name, caption)
     
     if not sent_msg:
         reaction = "🤷‍♂"

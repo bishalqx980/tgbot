@@ -17,14 +17,14 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not msg:
-        await Message.reply_msg(update, "Use <code>/whisper @mention_user message</code>\nor reply user by <code>/whisper message</code>\nE.g. <code>/whisper @bishalqx980 This is a secret message 😜</code>")
+        await Message.reply_message(update, "Use <code>/whisper @mention_user message</code>\nor reply user by <code>/whisper message</code>\nE.g. <code>/whisper @bishalqx980 This is a secret message 😜</code>")
         return
     
-    await Message.del_msg(chat.id, e_msg)
+    await Message.delete_message(chat.id, e_msg)
 
     if re_msg:
         if re_msg.from_user.is_bot:
-            await Message.reply_msg(update, "Whisper isn't for bots...!")
+            await Message.reply_message(update, "Whisper isn't for bots...!")
             return
         whisper_user = re_msg.from_user.id
     elif msg:
@@ -33,16 +33,16 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = " ".join(msg_split[1:])
 
         if not whisper_user.startswith("@"):
-            await Message.reply_msg(update, f"Give a valid username! <code>{whisper_user}</code> is an invalid username!\nor try to reply the user. /whisper for more details...")
+            await Message.reply_message(update, f"Give a valid username! <code>{whisper_user}</code> is an invalid username!\nor try to reply the user. /whisper for more details...")
             return
         
         # there is a problem > anonymous admin cant read this ...
         if whisper_user.endswith("bot"):
-            await Message.reply_msg(update, "Whisper isn't for bots...!")
+            await Message.reply_message(update, "Whisper isn't for bots...!")
             return
     
     if len(msg) > 100:
-        await Message.reply_msg(update, "Whisper is too long... (max limit 100 character)")
+        await Message.reply_message(update, "Whisper is too long... (max limit 100 character)")
         return
 
     data = {
@@ -65,7 +65,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if whisper_data:
             user_whisper_data = whisper_data.get(whisper_user)
             if user_whisper_data:
-                await Message.del_msg(chat.id, msg_id=user_whisper_data.get("msg_id"))
+                await Message.delete_message(chat.id, msg_id=user_whisper_data.get("msg_id"))
     
     data = {
         whisper_user: {
@@ -86,4 +86,4 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Check the message 👀": "query_whisper"
     }
     btn = await Button.cbutton(btn_data)
-    await Message.send_msg(chat.id, msg, btn=btn)
+    await Message.send_message(chat.id, msg, btn=btn)

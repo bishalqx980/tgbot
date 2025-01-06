@@ -13,19 +13,19 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         photo = re_msg.photo[-1] if re_msg.photo else None
 
     if not re_msg or not photo:
-        await Message.reply_msg(update, "Reply a photo to get a public link for that photo!")
+        await Message.reply_message(update, "Reply a photo to get a public link for that photo!")
         return
     
-    sent_msg = await Message.reply_msg(update, f"Generating public link...")
+    sent_msg = await Message.reply_message(update, f"Generating public link...")
     photo = await bot.get_file(photo.file_id)
 
     itl = await imgbb_upload(photo.file_path, user.id)
     if itl == False:
-        await Message.edit_msg(update, "imgbb_api not found!", sent_msg)
+        await Message.edit_message(update, "imgbb_api not found!", sent_msg)
         return
 
     if not itl:
-        await Message.edit_msg(update, "Oops, something went wrong...", sent_msg)
+        await Message.edit_message(update, "Oops, something went wrong...", sent_msg)
         return
     
     itl_data = itl.get("data")
@@ -44,5 +44,5 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<code>{img_url}</code>"
     )
 
-    await Message.send_img(chat.id, img_display_url, caption_msg)
-    await Message.del_msg(chat.id, sent_msg)
+    await Message.send_image(chat.id, img_display_url, caption_msg)
+    await Message.delete_message(chat.id, sent_msg)

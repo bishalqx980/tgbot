@@ -9,11 +9,11 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
 
     if not msg:
-        await Message.reply_msg(update, "Use <code>/movie movie_name</code>\nE.g. <code>/movie animal</code>\nor\n<code>/movie -i tt13751694</code> [IMDB ID]\nor\n<code>/movie bodyguard -y 2011</code>")
+        await Message.reply_message(update, "Use <code>/movie movie_name</code>\nE.g. <code>/movie animal</code>\nor\n<code>/movie -i tt13751694</code> [IMDB ID]\nor\n<code>/movie bodyguard -y 2011</code>")
         return
     
     if "-i" in msg and "-y" in msg:
-        await Message.reply_msg(update, "⚠ You can't use both statement in same message!\n/movie for details.")
+        await Message.reply_message(update, "⚠ You can't use both statement in same message!\n/movie for details.")
         return
     
     imdb_id = None
@@ -31,11 +31,11 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     movie_info = await get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
     
     if not movie_info:
-        await Message.send_msg(chat.id, "Movie name invalid!")
+        await Message.send_message(chat.id, "Movie name invalid!")
         return
     
     if movie_info == False:
-        await Message.send_msg(chat.id, "omdb_api not found!")
+        await Message.send_message(chat.id, "omdb_api not found!")
         return
 
     poster, content_type, title, released, runtime, genre, director, writer, actors, plot, language, country, awards, meta_score, imdb_rating, imdb_votes, imdb_id, box_office = movie_info
@@ -70,4 +70,4 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
     btn = await Button.ubutton(btn_data)
 
-    await Message.send_img(chat.id, poster, msg, btn=btn)
+    await Message.send_image(chat.id, poster, msg, btn=btn)

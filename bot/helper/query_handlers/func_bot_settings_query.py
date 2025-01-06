@@ -31,7 +31,7 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_welcome_img(update: Update, query, user, find_chat):
@@ -59,7 +59,7 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_images(update: Update, query, user, find_chat):
@@ -97,12 +97,12 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        sent_msg = await Message.edit_msg(update, msg, query.message, btn)
+        sent_msg = await Message.edit_message(update, msg, query.message, btn)
 
         if not sent_msg:
             open("tmp.txt", "w").write(images)
             tmp_file = open("tmp.txt", "rb").read()
-            await Message.send_doc(user.id, tmp_file, "image links.txt", "image links")
+            await Message.send_document(user.id, tmp_file, "image links.txt", "image links")
             
             msg = (
                 "<u><b>Bot Settings</b></u>\n\n"
@@ -110,7 +110,7 @@ class QueryBotSettings:
                 "<i><b>Note:</b> Single image or send multiple image link separated by comma!</i>"
             )
 
-            await Message.edit_msg(update, msg, query.message, btn)
+            await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_support_chat(update: Update, query, user, find_chat):
@@ -137,7 +137,7 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_server_url(update: Update, query, user, find_chat):
@@ -165,7 +165,7 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_sudo(update: Update, query, user, find_chat):
@@ -203,7 +203,7 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_shrinkme_api(update: Update, query, user, find_chat):
@@ -231,7 +231,7 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_omdb_api(update: Update, query, user, find_chat):
@@ -259,7 +259,7 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_weather_api(update: Update, query, user, find_chat):
@@ -287,7 +287,7 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_imgbb_api(update: Update, query, user, find_chat):
@@ -315,7 +315,7 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_restore_db(update: Update, query):
@@ -343,18 +343,18 @@ class QueryBotSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_confirm_restore_db(update: Update, data_center):
         res1 = await MongoDB.delete_all_doc("bot_docs")
         res2 = await update_database()
         msg = "Database has been restored successfully from <code>config.env</code>!" if res1 and res2 else "Something went wrong! Check /log"
-        await Message.send_msg(data_center.get("chat_id"), msg)
+        await Message.send_message(data_center.get("chat_id"), msg)
 
 
     async def _query_clear_localdb_cache(update: Update, data_center):
         res = await LOCAL_DATABASE.restore_db()
         await update_database()
         msg = "LocalDB cache has been cleared!" if res else "Something went wrong! Check /log"
-        await Message.send_msg(data_center.get("chat_id"), msg)
+        await Message.send_message(data_center.get("chat_id"), msg)

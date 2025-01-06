@@ -11,18 +11,18 @@ async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = " ".join(context.args) or (re_msg.text or re_msg.caption if re_msg else None)
 
     if not data:
-        await Message.reply_msg(update, "Use <code>/qr url/data/text</code> to generate a QR code image.\nor reply the 'url/data/text' with <code>/qr</code> command.\nE.g. <code>/qr https://google.com</code>")
+        await Message.reply_message(update, "Use <code>/qr url/data/text</code> to generate a QR code image.\nor reply the 'url/data/text' with <code>/qr</code> command.\nE.g. <code>/qr https://google.com</code>")
         return
 
-    sent_msg = await Message.reply_msg(update, f"Generating...")
+    sent_msg = await Message.reply_message(update, f"Generating...")
     gen_qr = await QR.gen_qr(data)
 
     if not gen_qr:
-        await Message.edit_msg(update, "Oops, something went wrong...", sent_msg)
+        await Message.edit_message(update, "Oops, something went wrong...", sent_msg)
         return
     
-    await Message.send_img(chat.id, gen_qr, data, re_msg.id if re_msg else None)
-    await Message.del_msg(chat.id, sent_msg)
+    await Message.send_image(chat.id, gen_qr, data, re_msg.id if re_msg else None)
+    await Message.delete_message(chat.id, sent_msg)
     # Remove the image from storage
     try:
         os.remove(gen_qr)

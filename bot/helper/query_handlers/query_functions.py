@@ -6,7 +6,7 @@ from bot.modules.database.local_database import LOCAL_DATABASE
 
 
 class QueryFunctions:
-    async def query_edit_value(identifier, query, new_value="default", is_list=bool(False), is_int=bool(False)):
+    async def query_edit_value(identifier, query, new_value="default", is_list=False, is_int=False):
         """
         identifier > user.id or chat.id (data center identifier)\n
         query > query indicator\n
@@ -40,7 +40,7 @@ class QueryFunctions:
         if new_value != "default":
             edit_data_value = new_value
         else:
-            sent_msg = await Message.send_msg(chat_id, "Now send a value:")
+            sent_msg = await Message.send_message(chat_id, "Now send a value:")
 
             await LOCAL_DATABASE.insert_data("data_center", identifier, {"is_editing": True})
 
@@ -54,8 +54,8 @@ class QueryFunctions:
                 await asyncio.sleep(0.5)
             
             await LOCAL_DATABASE.insert_data("data_center", identifier, {"edit_data_value": None, "is_editing": False})
-            await Message.del_msg(chat_id, msg_id=edit_data_value_msg_pointer_id)
-            await Message.del_msg(chat_id, sent_msg)
+            await Message.delete_message(chat_id, msg_id=edit_data_value_msg_pointer_id)
+            await Message.delete_message(chat_id, sent_msg)
             
             if not edit_data_value:
                 try:
@@ -266,7 +266,7 @@ class QueryFunctions:
         chat_id = data_center.get("chat_id")
         del_msg_pointer_id = data_center.get("del_msg_pointer_id")
 
-        await Message.del_msg(chat_id, msg_id=del_msg_pointer_id)
+        await Message.delete_message(chat_id, msg_id=del_msg_pointer_id)
 
         try:
             await query.message.delete()

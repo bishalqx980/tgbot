@@ -34,7 +34,7 @@ class QueryChatSettings:
 
         btn = row1 + row2 + row3
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_chat_auto_tr(update: Update, query, chat, find_chat):
@@ -62,7 +62,7 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_chat_set_echo(update: Update, query, chat, find_chat):
@@ -90,7 +90,7 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_chat_welcome_user(update: Update, query, chat, find_chat):
@@ -123,7 +123,7 @@ class QueryChatSettings:
 
         btn = row1 + row2 + row3
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_set_custom_welcome_msg(update: Update, query, chat, find_chat):
@@ -163,9 +163,9 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
         if is_sent_below:
-            await Message.reply_msg(update, find_chat.get("custom_welcome_msg"))
+            await Message.reply_message(update, find_chat.get("custom_welcome_msg"))
 
 
     async def _query_chat_farewell_user(update: Update, query, chat, find_chat):
@@ -193,7 +193,7 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_chat_antibot(update: Update, query, chat, find_chat):
@@ -221,7 +221,7 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
     
 
     async def _query_chat_del_cmd(update: Update, query, chat, find_chat):
@@ -249,7 +249,7 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
     
 
     async def _query_chat_log_channel(update: Update, query, chat, find_chat):
@@ -277,7 +277,7 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
     
 
     async def _query_chat_links_behave(update: Update, query, chat, find_chat):
@@ -320,7 +320,7 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
 
 
     async def _query_chat_all_links(update: Update, query, chat, find_chat):
@@ -349,7 +349,7 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
     
 
     async def _query_chat_allowed_links(update: Update, query, chat, find_chat):
@@ -387,7 +387,7 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)
     
 
     async def _query_d_links(query, chat):
@@ -430,4 +430,4 @@ class QueryChatSettings:
 
         btn = row1 + row2
 
-        await Message.edit_msg(update, msg, query.message, btn)
+        await Message.edit_message(update, msg, query.message, btn)

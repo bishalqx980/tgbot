@@ -36,7 +36,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type == "private":
         db = await global_search("users", "user_id", user.id)
         if db[0] == False:
-            await Message.reply_msg(update, db[1])
+            await Message.reply_message(update, db[1])
             return
         
         find_user = db[1]
@@ -45,7 +45,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         auto_tr_status = find_user.get("auto_tr")
 
         if echo_status:
-            await Message.reply_msg(update, msg)
+            await Message.reply_message(update, msg)
 
         if auto_tr_status:
             lang_code = find_user.get("lang")
@@ -55,11 +55,11 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "Language code's": "https://telegra.ph/Language-Code-12-24"
                 }
                 btn = await Button.ubutton(btn_data)
-                await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
+                await Message.send_message(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
                 return
             
             if tr_msg != msg:
-                await Message.reply_msg(update, tr_msg)
+                await Message.reply_message(update, tr_msg)
 
     elif chat.type in ["group", "supergroup"]:
         _chk_per = await _check_permission(update, user=user, checking_msg=False)
@@ -69,12 +69,12 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         _bot_info, bot_permission, user_permission, victim_permission = _chk_per
 
         if bot_permission.status != ChatMember.ADMINISTRATOR:
-            await Message.send_msg(chat.id, "I'm not an admin in this chat!")
+            await Message.send_message(chat.id, "I'm not an admin in this chat!")
             return
         
         db = await global_search("groups", "chat_id", chat.id)
         if db[0] == False:
-            await Message.reply_msg(update, db[1])
+            await Message.reply_message(update, db[1])
             return
         
         find_group = db[1]
@@ -116,27 +116,27 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     if allowed_links_count != len(links_list):
                         try:
                             clean_msg = f"{user.mention_html()}\n\n{clean_msg}\n\n<i>Delete reason: your message contains forbidden link/s!</i>"
-                            await Message.del_msg(chat.id, e_msg)
-                            await Message.send_msg(chat.id, clean_msg)
+                            await Message.delete_message(chat.id, e_msg)
+                            await Message.send_message(chat.id, clean_msg)
                             msg_contains_link = True
                         except Exception as e:
                             logger.error(e)
         
         if echo_status and not msg_contains_link:
-            await Message.reply_msg(update, msg)
+            await Message.reply_message(update, msg)
         
         if auto_tr_status:
             to_translate = clean_msg if msg_contains_link else msg
             tr_msg = await translate(to_translate, lang_code)
             if tr_msg and tr_msg != to_translate:
-                await Message.reply_msg(update, tr_msg)
+                await Message.reply_message(update, tr_msg)
             elif not tr_msg:
                 logger.error("Error in auto translate!")
                 btn_data = {
                     "Language code's": "https://telegra.ph/Language-Code-12-24"
                 }
                 btn = await Button.ubutton(btn_data)
-                await Message.send_msg(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
+                await Message.send_message(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
         
         if filters:
             for keyword in filters:
@@ -157,4 +157,4 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         if not value:
                             value = ""
                         filtered_msg = filtered_msg.replace(key, str(value))
-                    await Message.reply_msg(update, filtered_msg)
+                    await Message.reply_message(update, filtered_msg)

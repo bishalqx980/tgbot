@@ -14,13 +14,13 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type != "private":
         _bot_info = await LOCAL_DATABASE.find("_bot_info")
-        sent_msg = await Message.send_msg(user.id, ".")
+        sent_msg = await Message.send_message(user.id, ".")
         if sent_msg == Forbidden:
-            await Message.reply_msg(update, f"Hey, {user.mention_html()}!\n<a href='{_bot_info.get('link')}'>Start me</a> in pm to chat with me!")
+            await Message.reply_message(update, f"Hey, {user.mention_html()}!\n<a href='{_bot_info.get('link')}'>Start me</a> in pm to chat with me!")
             return
         elif sent_msg:
-            await Message.reply_msg(update, f"<a href='{_bot_info.get('link')}'>Sent in your pm!</a>")
-            await Message.del_msg(user.id, sent_msg)
+            await Message.reply_message(update, f"<a href='{_bot_info.get('link')}'>Sent in your pm!</a>")
+            await Message.delete_message(user.id, sent_msg)
 
     data = {
         "user_id": user.id,
@@ -75,8 +75,8 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         image = _bot.get("bot_pic")
 
-    sent_img = await Message.send_img(user.id, image, msg, btn=btn) if image else None
+    sent_img = await Message.send_image(user.id, image, msg, btn=btn) if image else None
     if not sent_img:
-        await Message.send_msg(user.id, msg, btn=btn)
+        await Message.send_message(user.id, msg, btn=btn)
     
     await check_add_user_db(user)

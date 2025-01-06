@@ -19,7 +19,7 @@ async def func_unpinall_msg(update: Update, context: ContextTypes.DEFAULT_TYPE, 
     await func_del_command(update, context)
 
     if user.is_bot:
-        await Message.reply_msg(update, "I don't take permission from anonymous admins!")
+        await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
 
     _chk_per = await _check_permission(update, user=user)
@@ -30,28 +30,28 @@ async def func_unpinall_msg(update: Update, context: ContextTypes.DEFAULT_TYPE, 
     _bot_info, bot_permission, user_permission, victim_permission = _chk_per
     
     if bot_permission.status != ChatMember.ADMINISTRATOR:
-        await Message.reply_msg(update, "I'm not an admin in this chat!")
+        await Message.reply_message(update, "I'm not an admin in this chat!")
         return
     
     if user_permission.status != ChatMember.OWNER:
-        await Message.reply_msg(update, "This command is only for group owner!")
+        await Message.reply_message(update, "This command is only for group owner!")
         return
     
     if not bot_permission.can_pin_messages:
-        await Message.reply_msg(update, "I don't have enough rights to pin/unpin messages!")
+        await Message.reply_message(update, "I don't have enough rights to pin/unpin messages!")
         return
     
     try:
         await bot.unpin_all_chat_messages(chat.id)
     except Exception as e:
         logger.error(e)
-        error_msg = await Message.reply_msg(update, e)
+        error_msg = await Message.reply_message(update, e)
         if not error_msg:
-            await Message.reply_msg(update, e.message)
+            await Message.reply_message(update, e.message)
         return
     
     if not is_silent:
-        await Message.reply_msg(update, f"All message unpinned!")
+        await Message.reply_message(update, f"All message unpinned!")
     await _log_channel(update, chat, user, action="UNPIN_ALL_MSG")
 
 
@@ -59,5 +59,5 @@ async def func_sunpinall_msg(update: Update, context: ContextTypes.DEFAULT_TYPE)
     chat = update.effective_chat
     e_msg = update.effective_message
     
-    await Message.del_msg(chat.id, e_msg)
+    await Message.delete_message(chat.id, e_msg)
     await func_unpinall_msg(update, context, is_silent=True)

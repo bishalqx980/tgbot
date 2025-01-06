@@ -9,13 +9,13 @@ async def func_paste(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (re_msg.text_html or re_msg.caption_html) if re_msg else " ".join(context.args)
 
     if not text:
-        await Message.reply_msg(update, "Use <code>/paste text</code> or reply the message/text with <code>/paste</code> command.")
+        await Message.reply_message(update, "Use <code>/paste text</code> or reply the message/text with <code>/paste</code> command.")
         return
 
-    sent_msg = await Message.reply_msg(update, f"Creating...")
+    sent_msg = await Message.reply_message(update, f"Creating...")
     paste = await TELEGRAPH.paste(text.replace("\n", "<br>"), user.full_name)
     if not paste:
-        await Message.edit_msg(update, "Oops, something went wrong...", sent_msg)
+        await Message.edit_message(update, "Oops, something went wrong...", sent_msg)
         return
 
-    await Message.edit_msg(update, paste, sent_msg)
+    await Message.edit_message(update, paste, sent_msg)
