@@ -65,7 +65,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if whisper_data:
             user_whisper_data = whisper_data.get(whisper_user)
             if user_whisper_data:
-                await Message.delete_message(chat.id, msg_id=user_whisper_data.get("msg_id"))
+                await Message.delete_message(chat.id, user_whisper_data.get("msg_id"))
     
     data = {
         whisper_user: {

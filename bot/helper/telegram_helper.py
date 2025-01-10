@@ -170,7 +170,7 @@ class Message:
         """
         is_caption = message_to_edit.caption
         chat_id = update.effective_chat.id
-        msg_id = message_to_edit.message_id or message_to_edit
+        msg_id = getattr(message_to_edit, "message_id", message_to_edit)
 
         reply_markup = InlineKeyboardMarkup(btn) if btn else None
 
@@ -207,7 +207,7 @@ class Message:
 
     @staticmethod
     async def delete_message(chat_id, message_to_delete):
-        msg_id = message_to_delete.message_id or message_to_delete
+        msg_id = getattr(message_to_delete, "message_id", message_to_delete)
 
         try:
             response = await bot.delete_message(chat_id=chat_id, message_id=msg_id)
@@ -230,7 +230,7 @@ class Message:
 
 
     @staticmethod
-    async def react_msg(chat_id, message_id, reaction="❤", is_big=True):
+    async def react_message(chat_id, message_id, reaction="❤", is_big=True):
         """
         Reaction emoji. Currently, it can be one of "👍", "👎", "❤", "🔥", "🥰", "👏", "😁", "🤔", "🤯", "😱", "🤬", "😢", "🎉", "🤩", "🤮", "💩", "🙏", "👌", "🕊", "🤡", "🥱", "🥴", "😍", "🐳", "❤‍🔥", "🌚", "🌭", "💯", "🤣", "⚡", "🍌", "🏆", "💔", "🤨", "😐", "🍓", "🍾", "💋", "🖕", "😈", "😴", "😭", "🤓", "👻", "👨‍💻", "👀", "🎃", "🙈", "😇", "😨", "🤝", "✍", "🤗", "🫡", "🎅", "🎄", "☃", "💅", "🤪", "🗿", "🆒", "💘", "🙉", "🦄", "😘", "💊", "🙊", "😎", "👾", "🤷‍♂", "🤷", "🤷‍♀", "😡"
         """

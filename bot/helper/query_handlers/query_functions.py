@@ -54,7 +54,7 @@ class QueryFunctions:
                 await asyncio.sleep(0.5)
             
             await LOCAL_DATABASE.insert_data("data_center", identifier, {"edit_data_value": None, "is_editing": False})
-            await Message.delete_message(chat_id, msg_id=edit_data_value_msg_pointer_id)
+            await Message.delete_message(chat_id, edit_data_value_msg_pointer_id)
             await Message.delete_message(chat_id, sent_msg)
             
             if not edit_data_value:
@@ -266,7 +266,7 @@ class QueryFunctions:
         chat_id = data_center.get("chat_id")
         del_msg_pointer_id = data_center.get("del_msg_pointer_id")
 
-        await Message.delete_message(chat_id, msg_id=del_msg_pointer_id)
+        await Message.delete_message(chat_id, del_msg_pointer_id)
 
         try:
             await query.message.delete()
