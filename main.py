@@ -23,6 +23,7 @@ from bot.functions.b64encode import func_b64encode
 from bot.functions.shortener import func_shortener
 from bot.functions.ping import func_ping
 from bot.functions.calc import func_calc
+from bot.functions.tts import func_tts
 from bot.functions.weather import func_weather
 from bot.functions.imagine import func_imagine
 from bot.functions.chatgpt import func_chatgpt
@@ -120,6 +121,7 @@ def main():
         "short": func_shortener,
         "ping": func_ping,
         "calc": func_calc,
+        "tts": func_tts,
         "weather": func_weather,
         "imagine": func_imagine,
         "gpt": func_chatgpt,

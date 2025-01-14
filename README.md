@@ -24,6 +24,7 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
     - Ping any url
     - Calculate basic math
     - <s>Take webshot (website screenshot)</s> `Removed due to limitations`
+    - Convert text into speech
     - Get any location weather info
     - <s>Download YouTube video</s> `Removed due to limitations`
     - <s>Search YouTube video</s> `Removed due to limitations`

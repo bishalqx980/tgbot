@@ -104,6 +104,7 @@ class QueryBotHelp:
             "/short » short any url\n"
             "/ping » ping any url\n"
             "/calc » calculate any math (supported syntex: +, -, *, /)\n"
+            "/tts » convert text into speech\n"
             "/weather » get weather info of any city\n"
             "/qr » generate a QR code\n"
             "/itl » convert image into a public link\n"
