@@ -27,6 +27,7 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
     - Convert text into speech
     - Get any location weather info
     - <s>Download YouTube video</s> `Removed due to limitations`
+    - Added YouTube audio/song download (14/01/2025)
     - <s>Search YouTube video</s> `Removed due to limitations`
     - Generate QR code (image)
     - Convert image into a link (public)
