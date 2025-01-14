@@ -110,6 +110,7 @@ class QueryBotHelp:
             "/itl » convert image into a public link\n"
             "/paste » paste your text in telegraph & get public link\n"
             "/whisper » secretly tell something to someone in group chat\n"
+            "/ytdl » download audio/song from youtube\n"
             "/id » show chat/user id\n"
             "/info » show user info\n"
             "/psndl » search ps3 & some other playstation games link (mostly ps3)\n"

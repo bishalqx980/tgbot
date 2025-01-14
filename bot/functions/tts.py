@@ -1,5 +1,7 @@
+import os
 from telegram import Update
 from telegram.ext import ContextTypes
+from bot import logger
 from bot.helper.telegram_helper import Message
 from bot.modules.gtts import tts
 
@@ -21,3 +23,9 @@ async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await Message.send_audio(chat.id, response, f"Voice {re_msg.id} [ {lang_code} ].mp3", reply_message_id=re_msg.id)
     await Message.delete_message(chat.id, sent_msg)
+
+    # Removing the audio file
+    try:
+        os.remove(response)
+    except Exception as e:
+        logger.error(e)

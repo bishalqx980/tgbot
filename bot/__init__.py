@@ -1,5 +1,6 @@
 import os
 import json
+import shutil
 import logging
 from telegram import Bot
 from dotenv import load_dotenv
@@ -8,6 +9,7 @@ from bot.alive import alive
 # Creating Required Folder/Directories
 try:
     for dir_name in ["downloads", "temp", "sys"]:
+        shutil.rmtree(dir_name)
         os.makedirs(dir_name, exist_ok=True)
 except Exception as e:
     print(e)

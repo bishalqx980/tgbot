@@ -1,3 +1,4 @@
+import os
 import requests
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -34,3 +35,9 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await Message.send_image(chat.id, file_name, prompt, e_msg.id)
     await Message.delete_message(chat.id, sent_msg)
+
+    # Removing the image
+    try:
+        os.remove(file_name)
+    except Exception as e:
+        logger.error(e)

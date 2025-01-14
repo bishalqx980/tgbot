@@ -7,5 +7,6 @@ Flask==3.0.3
 psutil==5.9.8
 telegraph==2.2.0
 gtts==2.5.4
+yt-dlp==2025.1.12
 requests
 TgCrypto
