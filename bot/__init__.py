@@ -9,7 +9,8 @@ from bot.alive import alive
 # Creating Required Folder/Directories
 try:
     for dir_name in ["downloads", "temp", "sys"]:
-        shutil.rmtree(dir_name)
+        if os.path.exists(dir_name):
+            shutil.rmtree(dir_name)
         os.makedirs(dir_name, exist_ok=True)
 except Exception as e:
     print(e)
