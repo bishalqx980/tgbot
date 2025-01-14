@@ -14,8 +14,8 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
 - **Group Management 🛠️**
     - It has just everything...
 - **AI 🤖**
-    - ChatGPT
-    - <s>AI photo imagine</s> `Removed due to limitations`
+    - <s>ChatGPT</s> `Removed due to limitations`
+    - AI photo imagine
 - **Misc 🎁**
     - Get any movie info
     - Translate any language
