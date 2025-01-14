@@ -192,7 +192,7 @@ def main():
         application.add_handler(PrefixHandler(["/", "!", "."], command, handler, block=False))
     
     # For temporary storing bot commands
-    json.dump({"bot_commands": storage}, open("bot_cmds.json", "w"), indent=4)
+    json.dump({"bot_commands": storage}, open("sys/bot_commands.json", "w"), indent=4)
     
     # filters
     application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services, block=False))

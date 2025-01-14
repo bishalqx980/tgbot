@@ -1,4 +1,3 @@
-import os
 import requests
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -21,24 +20,17 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # temporarily added imagine api
     imagine_api = await LOCAL_DATABASE.get_data("bot_docs", "imagine_api")
     try:
-        r = requests.get(f"{imagine_api}{prompt}")
+        req = requests.get(f"{imagine_api}{prompt}")
     except Exception as e:
         logger.error(e)
     
-    if not r.content:
+    if not imagine_api or not req.content:
         await Message.edit_message(update, "Oops, something went wrong...", sent_msg)
         return
     
-    os.makedirs("downloads", exist_ok=True)
-    file_name = "downloads/tmp_imagine.png"
-    
+    file_name = "downloads/imagine.png"
     with open(file_name, "wb") as f:
-        f.write(r.content)
+        f.write(req.content)
 
-    await Message.send_image(chat.id, file_name, reply_message_id=e_msg.id)
+    await Message.send_image(chat.id, file_name, prompt, e_msg.id)
     await Message.delete_message(chat.id, sent_msg)
-
-    try:
-        os.remove(file_name)
-    except Exception as e:
-        logger.error(e)

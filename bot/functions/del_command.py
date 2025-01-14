@@ -26,8 +26,8 @@ async def func_del_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if del_cmd:
         await Message.delete_message(chat.id, msg)
     
-    bot_cmds = json.load(open("bot_cmds.json", "r"))
-    bot_commands = bot_cmds.get("bot_commands")
+    load_bot_commands = json.load(open("sys/bot_commands.json", "r"))
+    bot_commands = load_bot_commands.get("bot_commands")
     
     if msg.text not in bot_commands:
         await func_filter_all(update, context)

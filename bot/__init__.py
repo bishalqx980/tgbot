@@ -5,11 +5,19 @@ from telegram import Bot
 from dotenv import load_dotenv
 from bot.alive import alive
 
-open('log.txt', 'w')
+# Creating Required Folder/Directories
+try:
+    for dir_name in ["downloads", "temp", "sys"]:
+        os.makedirs(dir_name, exist_ok=True)
+except Exception as e:
+    print(e)
+    exit(1)
+
+open("sys/log.txt", "w")
 
 #Enable logging
 logging.basicConfig(
-    filename="log.txt", format="%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(filename)s - %(message)s", level=logging.INFO
+    filename="sys/log.txt", format="%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(filename)s - %(message)s", level=logging.INFO
 )
 #set higher logging level for httpx to avoid all GET and POST requests being logged
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -57,7 +65,7 @@ for variable in variables:
         pass
 
 # Local Database
-LOCAL_DB = "database.json"
+LOCAL_DB = "sys/database.json"
 
 check_local_db = os.path.isfile(LOCAL_DB)
 if not check_local_db:

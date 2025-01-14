@@ -8,6 +8,8 @@
 venv
 config.env
 /downloads
+/temp
+/sys
 
 # Exception 
 !requirements.txt

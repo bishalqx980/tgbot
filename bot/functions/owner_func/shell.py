@@ -52,8 +52,8 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response = await Message.edit_message(update, f"<pre>{msg}</pre>", sent_msg)
     if not response:
         try:
-            open('shell.txt', 'w').write(msg)
-            shell = open("shell.txt", "rb").read()
+            open("sys/shell.txt", "w").write(msg)
+            shell = open("sys/shell.txt", "rb").read()
         except Exception as e:
             logger.error(e)
             await Message.edit_message(update, e, sent_msg)

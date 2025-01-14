@@ -21,7 +21,7 @@ async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])
         return
     
-    log = open("log.txt", "rb").read()
+    log = open("sys/log.txt", "rb").read()
     date_time = datetime.now()
 
     await Message.send_document(user.id, log, "log.txt", date_time.strftime("%d-%m-%Y %H:%M:%S"))
