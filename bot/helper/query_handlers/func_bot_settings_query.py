@@ -147,7 +147,7 @@ class QueryBotSettings:
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Server url: <code>{server_url}</code>\n\n"
-            "<i><b>Note:</b> Bot will fall asleep if you deployed the bot on render (free) and don't set this value...</i>"
+            "<i><b>Note:</b> Bot will fall asleep if you deployed the bot on render (free) and don't set this value. (Bot restart required)</i>"
         )
 
         btn_data_row1 = {

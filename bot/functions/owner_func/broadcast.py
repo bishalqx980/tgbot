@@ -121,6 +121,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     sent_count, except_count, pin_except_count = 0, 0, 0
+    exception_user_ids = []
     notify = await Message.send_message(user.id, f"Total users: {len(users_id)}\nActive users: {len(active_users)}")
     start_time = time.time()
 
@@ -135,6 +136,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         if not sent_msg:
             except_count += 1
+            exception_user_ids.append(user_id)
         else:
             sent_count += 1
             if is_pin:
@@ -154,4 +156,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if (end_time - start_time) > 60:
         time_took = f"{((end_time - start_time) / 60):.2f} min"
     
-    await Message.reply_message(update, f"Broadcast Done!\nTime took: {time_took}")
+    msg = f"Broadcast Done!\nTime took: {time_took}"
+    if len(exception_user_ids) > 0:
+        msg += f"\nException user ids: <code>{exception_user_ids}</code>"
+    
+    await Message.reply_message(update, msg)

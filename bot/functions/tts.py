@@ -2,7 +2,7 @@ import os
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
-from bot.helper.telegram_helper import Message
+from bot.helper.telegram_helper import Message, Button
 from bot.modules.gtts import tts
 
 async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -11,7 +11,8 @@ async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = update.message.reply_to_message
 
     if not re_msg:
-        await Message.reply_message(update, "Reply any text to convert it into a voice message! E.g. Reply any message with <code>!tts en</code> to get english accent voice.")
+        btn = await Button.ubutton({"tts language codes": "https://telegra.ph/Text-to-speech---language-codes-tts-01-23"})
+        await Message.reply_message(update, "Reply any text to convert it into a voice message! E.g. Reply any message with <code>!tts en</code> to get english accent voice.", btn=btn)
         return
     
     sent_msg = await Message.reply_message(update, "Processing...")
