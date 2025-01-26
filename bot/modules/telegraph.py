@@ -1,8 +1,18 @@
+import requests
 from telegraph import Telegraph
 from bot import logger
 
 try:
-    telegraph = Telegraph()
+    domains = ["telegra.ph", "graph.org"]
+    for domain in domains:
+        try:
+            r = requests.get(f"https://{domain}", timeout=5)
+            if r.status_code == 200:
+                break
+        except Exception as e:
+            logger.error(e)
+    
+    telegraph = Telegraph(domain=domain)
     telegraph.create_account("@MissCiri_bot")
 except Exception as e:
     logger.error(e)
