@@ -13,10 +13,10 @@ from bot.functions.power_users import _power_users
 
 # helpers
 async def popup(query, msg):
-        try:
-            await query.answer(msg, True)
-        except Exception as e:
-            logger.error(e)
+    try:
+        await query.answer(msg, True)
+    except Exception as e:
+        logger.error(e)
 
 async def del_query(query):
     try:

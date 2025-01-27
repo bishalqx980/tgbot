@@ -2,6 +2,7 @@ import time
 import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.error import Forbidden
 from bot import bot, logger
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
@@ -136,7 +137,11 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         if not sent_msg:
             except_count += 1
-            exception_user_ids.append(user_id)
+            exception_user_ids.append(f"🤷‍♂: <code>{user_id}</code>")
+        elif sent_msg == Forbidden:
+            except_count += 1
+            exception_user_ids.append(f"Forbidden: <code>{user_id}</code>")
+            await MongoDB.update_db("users", "user_id", int(user_id), "active_status", False)
         else:
             sent_count += 1
             if is_pin:
@@ -158,6 +163,6 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     msg = f"Broadcast Done!\nTime took: {time_took}"
     if len(exception_user_ids) > 0:
-        msg += f"\nException user ids: <code>{exception_user_ids}</code>"
+        msg += f"\nException user ids: {exception_user_ids}"
     
     await Message.reply_message(update, msg)

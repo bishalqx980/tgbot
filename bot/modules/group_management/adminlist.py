@@ -18,7 +18,7 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     owner_storage = "<b>Owner:</b>\n"
     admins_storage = ""
     bots_storage = ""
-      
+
     admins = await bot.get_chat_administrators(chat.id)
     for admin in admins:
         custom_title = f"- {admin.custom_title}" if admin.custom_title else ""
