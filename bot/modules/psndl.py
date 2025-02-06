@@ -1,12 +1,23 @@
 import json
 import requests
-from bot import psndl_db
+from bot import psndl_db, logger
 
-DATABASE = requests.get(psndl_db) # Github database link
+async def get_database():
+    try:
+        req = requests.get(psndl_db, timeout=3) # Github database link
+        if req.status_code == 200:
+            return req.text # string json
+    except Exception as e:
+        logger.error(e)
+
 
 class PSNDL:
     async def search(keyword):
-        load_db = json.loads(DATABASE.text)
+        database = await get_database()
+        if not database:
+            return
+        
+        load_db = json.loads(database)
         
         filtered_data = {}
         for file_type in load_db:
@@ -31,7 +42,11 @@ class PSNDL:
 
 
     async def gen_rap(rap_data):
-        load_db = json.loads(DATABASE.text)
+        database = await get_database()
+        if not database:
+            return
+        
+        load_db = json.loads(database)
         
         for file_type in load_db:
             collection = load_db.get(file_type)

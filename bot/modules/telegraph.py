@@ -6,7 +6,7 @@ try:
     domains = ["telegra.ph", "graph.org"]
     for domain in domains:
         try:
-            r = requests.get(f"https://{domain}", timeout=5)
+            r = requests.get(f"https://{domain}", timeout=3)
             if r.status_code == 200:
                 break
         except Exception as e:

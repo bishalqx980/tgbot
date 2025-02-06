@@ -20,7 +20,7 @@ async def get_movie_info(movie_name=None, imdb_id=None, year=None):
     return
 
   try:
-    response = requests.get(url)
+    response = requests.get(url, timeout=3)
     if response.status_code == 200:
       output = response.json()
 

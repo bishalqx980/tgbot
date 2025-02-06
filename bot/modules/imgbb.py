@@ -24,7 +24,7 @@ async def imgbb_upload(image_url, file_name):
             "name": file_name
         }
 
-        req = requests.post(post_url, payload)
+        req = requests.post(post_url, payload, timeout=3)
         if req.status_code == 200:
             return_data = req.json()
         else:

@@ -6,7 +6,7 @@ async def ping_url(ping_url):
   status_code = None
 
   try:
-    response = requests.get(ping_url, timeout=5)
+    response = requests.get(ping_url, timeout=3)
     status_code = response.status_code
     if status_code != 200:
       return True, ping_time, status_code

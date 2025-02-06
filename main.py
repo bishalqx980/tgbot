@@ -102,7 +102,7 @@ async def server_alive():
         if server_url[0:4] != "http":
             server_url = f"http://{server_url}"
         try:
-            response = requests.get(server_url)
+            response = requests.get(server_url, timeout=3)
             if response.status_code != 200:
                 logger.warning(f"{server_url} is down or unreachable. ❌ - code - {response.status_code}")
         except Exception as e:

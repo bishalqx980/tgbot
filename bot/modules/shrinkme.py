@@ -13,7 +13,10 @@ async def shortener_url(url):
     
     try:
         post_url = f"https://shrinkme.io/api?api={shrinkme_api}&url={url}"
-        response = requests.get(post_url)
+        response = requests.get(post_url, timeout=3)
+        if response.status_code != 200:
+            return
+        
         shortened_url = response.json().get("shortenedUrl")
         if shortened_url:
             return shortened_url

@@ -6,7 +6,10 @@ class QR:
         url = f"https://api.qrserver.com/v1/create-qr-code/?size=1024x1024&data={data}"
         f_name = f"downloads/qr_code.png"
         try:
-            req = requests.get(url)
+            req = requests.get(url, timeout=3)
+            if req.status_code != 200:
+                return
+            
             open(f_name, "wb").write(req.content)
             return f_name
         except Exception as e:
