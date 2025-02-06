@@ -20,13 +20,17 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # temporarily added imagine api
     imagine_api = await LOCAL_DATABASE.get_data("bot_docs", "imagine_api")
+    if not imagine_api:
+        await Message.edit_message(update, "Imagine API not found.", sent_msg)
+        return
+    
     try:
-        req = requests.get(f"{imagine_api}{prompt}")
+        req = requests.get(f"{imagine_api}{prompt}", timeout=3)
     except Exception as e:
         logger.error(e)
     
-    if not imagine_api or not req.content:
-        await Message.edit_message(update, "Oops, something went wrong...", sent_msg)
+    if req.status_code != 200:
+        await Message.edit_message(update, f"{req.status_code}: {req.text}", sent_msg)
         return
     
     file_name = "downloads/imagine.png"
