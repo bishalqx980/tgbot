@@ -80,7 +80,7 @@ class QueryBotHelp:
         msg = (
             "<b>Artificial intelligence</b>\n\n"
             "<b>⚠️ Disabled due to limitations. They may be reintroduced in future updates.</b>\n\n"
-            "/imagine » generate AI image (Available temporarily)\n"
+            "<s>/imagine » generate AI image</s>\n"
             "<s>/gpt » ask any question to ChatGPT</s>\n\n"
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
