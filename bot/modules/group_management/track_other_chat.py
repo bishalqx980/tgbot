@@ -41,7 +41,7 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
 
     if user_exist == True and cause == "JOINED":
         if victim.is_bot and antibot:
-            _chk_per = await _check_permission(update, victim, user, False)
+            _chk_per = await _check_permission(update, victim, user)
 
             if not _chk_per:
                 return
@@ -69,9 +69,7 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
                 await Message.send_message(chat.id, f"Antibot has kicked {victim.mention_html()} from this chat!")
             except Exception as e:
                 logger.error(e)
-                error_msg = await Message.reply_message(update, e)
-                if not error_msg:
-                    await Message.reply_message(update, e.message)
+                await Message.reply_message(update, str(e))
         elif welcome_user:
             if custom_welcome_msg:
                 formattings = {

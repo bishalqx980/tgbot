@@ -62,7 +62,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await Message.reply_message(update, tr_msg)
 
     elif chat.type in ["group", "supergroup"]:
-        _chk_per = await _check_permission(update, user=user, checking_msg=False)
+        _chk_per = await _check_permission(update, user=user)
         if not _chk_per:
             return
         

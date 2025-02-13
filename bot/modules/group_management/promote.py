@@ -83,9 +83,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
             msg = f"{victim.mention_html()} has been promoted!\n<b>Admin:</b> {user.first_name}"
     except Exception as e:
         logger.error(e)
-        error_msg = await Message.reply_message(update, e)
-        if not error_msg:
-            await Message.reply_message(update, e.message)
+        await Message.reply_message(update, str(e))
         return
     
     if admin_title:
@@ -94,9 +92,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
             msg = f"{msg}\nNew admin title: {admin_title}"
         except Exception as e:
             logger.error(e)
-            error_msg = await Message.reply_message(update, e)
-            if not error_msg:
-                await Message.reply_message(update, e.message)
+            await Message.reply_message(update, str(e))
     
     if not is_silent:
         await Message.reply_message(update, msg)

@@ -71,9 +71,7 @@ async def func_admintitle(update: Update, context: ContextTypes.DEFAULT_TYPE, is
         await _log_channel(update, chat, user, victim, action=f"ADMIN_TITLE ({admin_title})")
     except Exception as e:
         logger.error(e)
-        error_msg = await Message.reply_message(update, e)
-        if not error_msg:
-            await Message.reply_message(update, e.message) 
+        await Message.reply_message(update, str(e))
 
 
 async def func_sadmintitle(update: Update, context: ContextTypes.DEFAULT_TYPE):

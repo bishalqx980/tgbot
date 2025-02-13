@@ -193,7 +193,7 @@ def main():
     storage = []
     for command, handler in BOT_COMMANDS.items():
         storage.append(f"/{command}")
-        application.add_handler(PrefixHandler(["/", "!", "."], command, handler, block=False))
+        application.add_handler(PrefixHandler(["/", "!", ".", "-"], command, handler, block=False))
     
     # For temporary storing bot commands
     json.dump({"bot_commands": storage}, open("sys/bot_commands.json", "w"), indent=4)

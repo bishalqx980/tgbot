@@ -56,9 +56,7 @@ async def func_pin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
         await bot.pin_chat_message(chat.id, msg_id)
     except Exception as e:
         logger.error(e)
-        error_msg = await Message.reply_message(update, e)
-        if not error_msg:
-            await Message.reply_message(update, e.message)
+        await Message.reply_message(update, str(e))
         return
     
     if not is_silent:

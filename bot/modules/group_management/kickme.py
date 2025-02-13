@@ -41,9 +41,7 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await bot.unban_chat_member(chat.id, victim.id)
     except Exception as e:
         logger.error(e)
-        error_msg = await Message.reply_message(update, e)
-        if not error_msg:
-            await Message.reply_message(update, e.message)
+        await Message.reply_message(update, str(e))
         return
 
     await Message.reply_message(update, f"Nice Choice! Get out of my sight!\n{victim.mention_html()} has chosen the easy way to out!")

@@ -50,9 +50,7 @@ async def func_invite_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         invite_link = await bot.create_chat_invite_link(chat.id, name=user.first_name)
     except Exception as e:
         logger.error(e)
-        error_msg = await Message.reply_message(update, e)
-        if not error_msg:
-            await Message.reply_message(update, e.message)
+        await Message.reply_message(update, str(e))
         return
 
     if chat.link:

@@ -71,7 +71,7 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
         await bot.ban_chat_member(chat.id, victim.id)
     except Exception as e:
         logger.error(e)
-        error_msg = await Message.reply_message(update, e)
+        error_msg = await Message.reply_message(update, str(e))
         if not error_msg:
             await Message.reply_message(update, e.message)
         return

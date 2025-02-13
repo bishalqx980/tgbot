@@ -45,9 +45,7 @@ async def func_unpinall_msg(update: Update, context: ContextTypes.DEFAULT_TYPE, 
         await bot.unpin_all_chat_messages(chat.id)
     except Exception as e:
         logger.error(e)
-        error_msg = await Message.reply_message(update, e)
-        if not error_msg:
-            await Message.reply_message(update, e.message)
+        await Message.reply_message(update, str(e))
         return
     
     if not is_silent:

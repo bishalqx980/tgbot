@@ -1,7 +1,7 @@
 from telegram import Update
 from bot.modules.database.local_database import LOCAL_DATABASE
 
-async def _check_permission(update: Update, victim=None, user=None, checking_msg=True):
+async def _check_permission(update: Update, victim=None, user=None):
     chat = update.effective_chat
 
     _bot_info = await LOCAL_DATABASE.find("_bot_info")
