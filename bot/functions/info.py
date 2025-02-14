@@ -104,7 +104,7 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         entries = [
-            "Name",
+            "name",
             "user_id",
             "username",
             "mention",

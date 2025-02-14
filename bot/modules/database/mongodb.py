@@ -106,6 +106,24 @@ class MongoDB:
 
 
     @staticmethod
+    async def update_db_remove(collection_name, search, match, remove_field_key):
+        """
+        `collection_name` example `users` | `search` example `user_id` | `match` example `2134776547` |\
+        `remove_field_key` example `name`
+        """
+        try:
+            collection = db[collection_name]
+            updated_data = collection.update_one(
+                {search: match},
+                {"$unset": {remove_field_key: ""}}
+            )
+            if not updated_data.acknowledged:
+                logger.error(f"{collection_name} wasn't updated.")
+        except Exception as e:
+            logger.error(e)
+
+
+    @staticmethod
     async def info_db(collection_name=None):
         """
         Get database info or any collection info

@@ -28,7 +28,7 @@ async def track_bot_chat_act(update: Update, context: ContextTypes.DEFAULT_TYPE)
             if not find_user:
                 data = {
                     "user_id": user.id,
-                    "Name": user.full_name,
+                    "name": user.full_name,
                     "username": user.username,
                     "mention": user.mention_html(),
                     "lang": user.language_code

@@ -65,7 +65,7 @@ async def check_add_user_db(user):
     else:
         data = {
             "user_id": user.id,
-            "Name": user.full_name,
+            "name": user.full_name,
             "username": user.username,
             "mention": user.mention_html(),
             "lang": user.language_code,
