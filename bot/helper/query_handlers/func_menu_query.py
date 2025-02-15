@@ -27,8 +27,7 @@ class QueryMenus:
         }
 
         btn_data_row5 = {
-            "Weather API": "query_weather_api",
-            "ImgBB API": "query_imgbb_api"
+            "Weather API": "query_weather_api"
         }
 
         btn_data_row6 = {

@@ -1,48 +1,53 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import bot
-from bot.helper.telegram_helper import Message
-from bot.modules.imgbb import imgbb_upload
+from bot.helper.telegram_helper import Message, Button
+from bot.modules.freeimagehost import upload_image
 
 
 async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
     chat = update.effective_chat
     re_msg = update.message.reply_to_message
     if re_msg:
-        photo = re_msg.photo[-1] if re_msg.photo else None
+        if re_msg.photo:
+            photo = re_msg.photo[-1]
+        elif re_msg.document and re_msg.document.mime_type[0:5] == "image":
+            photo = re_msg.document
+        else:
+            photo = None
 
     if not re_msg or not photo:
         await Message.reply_message(update, "Reply a photo to get a public link for that photo!")
         return
     
-    sent_msg = await Message.reply_message(update, f"Generating public link...")
+    sent_msg = await Message.send_message(chat.id, f"Generating...", re_msg.id)
     photo = await bot.get_file(photo.file_id)
 
-    itl = await imgbb_upload(photo.file_path, user.id)
-    if itl == False:
-        await Message.edit_message(update, "imgbb_api not found!", sent_msg)
-        return
-
+    itl = await upload_image(photo.file_path)
     if not itl:
         await Message.edit_message(update, "Oops, something went wrong...", sent_msg)
         return
     
-    itl_data = itl.get("data")
-    img_url = itl_data.get("url") # actual image
-    img_display_url = itl_data.get("display_url") # preview image
-    img_width = itl_data.get("width")
-    img_height = itl_data.get("height")
-    img_size = itl_data.get("size")
+    if itl[0] == False:
+        await Message.edit_message(update, f"Oops, timeout, please try again or report issue.", sent_msg)
+        return
+    
+    image_data = itl[1]["image"]
 
-    caption_msg = (
+    img_url = image_data.get("url")
+    img_width = image_data.get("width")
+    img_height = image_data.get("height")
+    img_size = image_data.get("size_formatted")
+    img_mime = image_data["image"]["mime"]
+
+    msg = (
         "↓ <u><b>Image Details</b></u> ↓\n"
         f"<b>- URL:</b> <a href='{img_url}'>◊ See Image ◊</a>\n"
         f"<b>- Width:</b> <code>{img_width}px</code>\n"
         f"<b>- Height:</b> <code>{img_height}px</code>\n"
-        f"<b>- Size:</b> <code>{(img_size / 1024 / 1024):.2f} MB</code>\n\n"
-        f"<code>{img_url}</code>"
+        f"<b>- Size:</b> <code>{img_size}</code>\n"
+        f"<b>- Mime:</b> <code>{img_mime}</code>"
     )
 
-    await Message.send_image(chat.id, img_display_url, caption_msg)
-    await Message.delete_message(chat.id, sent_msg)
+    btn = await Button.ubutton({"View 👀": img_url})
+    await Message.edit_message(update, msg, sent_msg, btn)

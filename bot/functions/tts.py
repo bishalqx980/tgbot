@@ -16,7 +16,7 @@ async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     sent_msg = await Message.reply_message(update, "Processing...")
-    response = await tts(re_msg.text, lang_code)
+    response = await tts(re_msg.text or re_msg.caption, lang_code)
 
     if not response:
         await Message.edit_message(update, "Oops, something went wrong...", sent_msg)

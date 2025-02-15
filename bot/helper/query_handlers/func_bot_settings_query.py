@@ -290,34 +290,6 @@ class QueryBotSettings:
         await Message.edit_message(update, msg, query.message, btn)
 
 
-    async def _query_imgbb_api(update: Update, query, user, find_chat):
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "imgbb_api"})
-        imgbb_api = find_chat.get("imgbb_api")
-
-        msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"ImgBB API: <code>{imgbb_api}</code>\n\n"
-            "<i><b>Note:</b> This api for /itl command!</i>"
-        )
-
-        btn_data_row1 = {
-            "Edit Value": "query_edit_value",
-            "Remove Value": "query_rm_value"
-        }
-
-        btn_data_row2 = {
-            "Back": "query_bot_settings_menu",
-            "Close": "query_close"
-        }
-
-        row1 = await Button.cbutton(btn_data_row1)
-        row2 = await Button.cbutton(btn_data_row2, True)
-
-        btn = row1 + row2
-
-        await Message.edit_message(update, msg, query.message, btn)
-
-
     async def _query_restore_db(update: Update, query):
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"

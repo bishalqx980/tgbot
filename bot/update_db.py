@@ -13,8 +13,7 @@ from bot import (
     server_url,
     shrinkme_api,
     omdb_api,
-    weather_api,
-    imgbb_api
+    weather_api
 )
 
 
@@ -56,8 +55,7 @@ async def update_database():
         #api's
         "shrinkme_api": shrinkme_api,
         "omdb_api": omdb_api,
-        "weather_api": weather_api,
-        "imgbb_api": imgbb_api
+        "weather_api": weather_api
     }
 
     try:
