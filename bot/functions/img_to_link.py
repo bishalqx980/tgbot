@@ -25,11 +25,11 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     itl = await upload_image(photo.file_path)
     if not itl:
-        await Message.edit_message(update, "Oops, something went wrong...", sent_msg)
+        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return
     
     if itl[0] == False:
-        await Message.edit_message(update, f"Oops, timeout, please try again or report issue.", sent_msg)
+        await Message.edit_message(update, f"Timeout! Please try again or report the issue.", sent_msg)
         return
     
     image_data = itl[1]["image"]

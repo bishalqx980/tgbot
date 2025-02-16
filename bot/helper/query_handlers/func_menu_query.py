@@ -53,7 +53,7 @@ class QueryMenus:
             "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
             "/start - to start the bot\n"
             "/help - to see this message\n\n"
-            "<b>Note:</b> <i>The bot is compatible with the <code>/</code>, <code>!</code>, and <code>.</code> command prefixes.</i>"
+            "<b>Note:</b> <i>The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</i>"
         )
 
         btn_data_row1 = {

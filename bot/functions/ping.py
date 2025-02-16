@@ -1,7 +1,7 @@
+import requests
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
-from bot.modules.ping_url import ping_url
 
 
 async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -15,22 +15,40 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
         url = f"http://{url}"
 
     sent_msg = await Message.reply_message(update, f"Pinging {url}\nPlease wait...")
-    ping = await ping_url(url)
+    try:
+        res = requests.get(url, timeout=3)
+        if res:
+            status_codes = {
+                200: "✅ Online (OK)",
+                201: "✅ Created",
+                202: "✅ Accepted",
+                204: "⚠️ No Content",
+                301: "➡️ Moved Permanently",
+                302: "➡️ Found (Redirect)",
+                400: "❌ Bad Request",
+                401: "🔒 Unauthorized",
+                403: "🚫 Forbidden",
+                404: "❌ Not Found",
+                408: "⏳ Request Timeout",
+                500: "🔥 Internal Server Error",
+                502: "⚠️ Bad Gateway",
+                503: "⚠️ Service Unavailable"
+            }
 
-    if ping[0] == None:
-        await Message.edit_message(update, ping[1], sent_msg)
-        return
+            status = status_codes[res.status_code]
+            msg = (
+                f"Site: {url}\n"
+                f"R.time: <code>{int(res.elapsed.total_seconds() * 1000)}ms</code>\n"
+                f"R.code: <code>{res.status_code}</code>\n"
+                f"Status: <code>{status}</code>"
+            )
+        else:
+            msg = "Oops! Please try again or report the issue."
+    except requests.Timeout as e:
+        msg = "Error: Request timeout."
+    except requests.ConnectionError as e:
+        msg = "Error: Connection error."
+    except Exception as e:
+        msg = "Oops! Please try again or report the issue."
 
-    res, ping_time, status_code = ping
-    site_status = "offline"
-    if status_code == 200:
-        site_status = "online"
-
-    msg = (
-        f"Site: {url}\n"
-        f"R.time(ms): <code>{ping_time}</code>\n"
-        f"R.code: <code>{status_code}</code>\n"
-        f"Status: {site_status}"
-    )
-
-    await Message.edit_message(update, msg, sent_msg)
+    await Message.edit_message(update, f"<b>{msg}</b>", sent_msg)

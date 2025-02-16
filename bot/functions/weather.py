@@ -17,7 +17,7 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not info:
-        await Message.reply_message(update, "Oops, something went wrong...")
+        await Message.reply_message(update, "Oops! Please try again or report the issue.")
         return
     
     loc_name, country, zone, localtime, lastupdate, temp_c, f_temp_c, temp_f, f_temp_f , wind_mph , wind_kph, wind_deg, humidity, uv, condition, condition_icon = info

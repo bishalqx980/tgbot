@@ -1,3 +1,6 @@
+import time
+import psutil
+from datetime import datetime, timedelta
 from telegram import Update
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
@@ -163,9 +166,21 @@ class QueryBotHelp:
         active_status = await MongoDB.find("users", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
+        # Calculate the system uptime
+        sys_uptime = timedelta(seconds=datetime.now().timestamp() - psutil.boot_time())
+        # Extracting system uptime in days, hours and minutes
+        sys_days = sys_uptime.days
+        sys_hours, remainder = divmod(sys_uptime.seconds, 3600)
+        sys_minute = remainder / 60
+        # Getting bot uptime
+        bot_uptime = timedelta(seconds=time.time() - float(open("sys/bot_uptime.txt", "r").read()))
+        # Extracting bot uptime in days, hours and minutes
+        bot_days = bot_uptime.days
+        bot_hours, remainder = divmod(bot_uptime.seconds, 3600)
+        bot_minute = remainder / 60
 
         msg = (
-            "<b><code>» bot.info()</code></b>\n\n"
+            "<blockquote><code><b>» bot.info()</b></code></blockquote>\n\n"
 
             f"<b>• Name:</b> {_bot_info.get('full_name')}\n"
             f"<b>• ID:</b> <code>{_bot_info.get('id')}</code>\n"
@@ -174,6 +189,9 @@ class QueryBotHelp:
             f"<b>• Registered users:</b> <code>{total_users}</code>\n"
             f"<b>• Active users:</b> <code>{active_users}</code>\n"
             f"<b>• Inactive users:</b> <code>{inactive_users}</code>\n\n"
+
+            f"<b>• System uptime:</b> <code>{int(sys_days)}d {int(sys_hours)}h {int(sys_minute)}m</code>\n"
+            f"<b>• Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n\n"
 
             "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
             "<b>• Report bug:</b> <a href='https://github.com/bishalqx980/tgbot/issues'>Report</a>\n"

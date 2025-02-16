@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import shutil
 import logging
@@ -16,6 +17,9 @@ except Exception as e:
     print(e)
     exit(1)
 
+# storing bot uptime on startup
+open("sys/bot_uptime.txt", "w").write(str(time.time()))
+# Creating log.txt file
 open("sys/log.txt", "w")
 
 #Enable logging

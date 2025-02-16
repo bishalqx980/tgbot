@@ -19,7 +19,7 @@ async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response = await tts(re_msg.text or re_msg.caption, lang_code)
 
     if not response:
-        await Message.edit_message(update, "Oops, something went wrong...", sent_msg)
+        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return
     
     await Message.send_audio(chat.id, response, f"Voice {re_msg.id} [ {lang_code} ].mp3", reply_message_id=re_msg.id)

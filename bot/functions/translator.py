@@ -60,7 +60,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if tr_msg:
         sent_msg = await Message.reply_message(update, tr_msg)
         if not sent_msg:
-            await Message.reply_message(update, "Oops, something went wrong...")
+            await Message.reply_message(update, "Oops! Please try again or report the issue.")
         return
 
     if not tr_msg:

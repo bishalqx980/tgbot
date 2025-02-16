@@ -15,7 +15,7 @@ async def func_paste(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_msg = await Message.reply_message(update, f"Creating...")
     paste = await TELEGRAPH.paste(text.replace("\n", "<br>"), user.full_name)
     if not paste:
-        await Message.edit_message(update, "Oops, something went wrong...", sent_msg)
+        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return
 
     await Message.edit_message(update, paste, sent_msg)
