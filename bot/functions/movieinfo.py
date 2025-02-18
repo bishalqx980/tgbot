@@ -13,7 +13,7 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if "-i" in msg and "-y" in msg:
-        await Message.reply_message(update, "⚠ You can't use both statement in same message!\n/movie for details.")
+        await Message.reply_message(update, "⚠ You can't use both statement at once!\n/movie for details.")
         return
     
     imdb_id = None
@@ -29,45 +29,39 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = msg[0:index_y].strip()
 
     movie_info = await get_movie_info(movie_name=msg, imdb_id=imdb_id, year=year)
-    
-    if not movie_info:
-        await Message.send_message(chat.id, "Movie name invalid!")
-        return
-    
+
     if movie_info == False:
-        await Message.send_message(chat.id, "omdb_api not found!")
+        await Message.reply_message(update, "omdb_api not found!")
         return
-
-    poster, content_type, title, released, runtime, genre, director, writer, actors, plot, language, country, awards, meta_score, imdb_rating, imdb_votes, imdb_id, box_office = movie_info
-
-    movie_info_dict = {
-        "🎥 Content Type": content_type,
-        "📄 Title": title,
-        "👁‍🗨 Released": released,
-        "🕐 Time": runtime,
-        "🎨 Genre": genre,
-        "🤵‍♂️ Director": director,
-        "🧑‍💻 Writer": writer,
-        "👫 Actors": actors,
-        "🗣 Language": language,
-        "🌐 Country": country,
-        "🏆 Awards": awards,
-        "🎯 Meta Score": meta_score,
-        "🎯 IMDB Rating": imdb_rating,
-        "📊 IMDB Votes": imdb_votes,
-        "🏷 IMDB ID": f"<code>{imdb_id}</code>",
-        "💰 BoxOffice": box_office
-    }
-
-    msg = "<b>Movie Information:</b>\n\n"
-    for key, value in movie_info_dict.items():
-        msg += f"<b>{key}:</b> {value}\n"
+    elif not movie_info:
+        await Message.reply_message(update, "Oops! Please try again or report the issue.")
+        return
+    elif movie_info["Response"] == "False":
+        await Message.reply_message(update, "Invalid movie name!")
+        return
     
-    msg += f"\n<b>📝 Plot:</b>\n<blockquote>{plot}</blockquote>\n"
+    runtime = movie_info["Runtime"]
+    runtime = f"{int(runtime[0:3]) // 60} Hour {int(runtime[0:3]) % 60} Min"
 
-    btn_data = {
-        f"IMDB - {title}": f"https://www.imdb.com/title/{imdb_id}"
-    }
-    btn = await Button.ubutton(btn_data)
+    msg = (
+        f"<b><a href='https://www.imdb.com/title/{movie_info['imdbID']}'>{movie_info['Title']} | {movie_info['imdbID']}</a></b>\n\n"
+        f"<b>🎥 Content Type:</b> {movie_info['Type']}\n"
+        f"<b>📄 Title:</b> {movie_info['Title']}\n"
+        f"<b>👁‍🗨 Released:</b> {movie_info['Released']}\n"
+        f"<b>🕐 Time:</b> {runtime}\n"
+        f"<b>🎨 Genre:</b> {movie_info['Genre']}\n"
+        f"<b>🤵‍♂️ Director:</b> {movie_info['Director']}\n"
+        f"<b>🧑‍💻 Writer:</b> {movie_info['Writer']}\n"
+        f"<b>👫 Actors:</b> {movie_info['Actors']}\n"
+        f"<b>🗣 Language:</b> {movie_info['Language']}\n"
+        f"<b>🌐 Country:</b> {movie_info['Country']}\n"
+        f"<b>🏆 Awards:</b> {movie_info['Awards']}\n"
+        f"<b>🎯 Meta Score:</b> {movie_info['Metascore']}\n"
+        f"<b>🎯 IMDB Rating:</b> {movie_info['imdbRating']}\n"
+        f"<b>📊 IMDB Votes:</b> {movie_info['imdbVotes']}\n"
+        f"<b>🏷 IMDB ID:</b> <code>{movie_info['imdbID']}</code>\n"
+        f"<b>💰 BoxOffice:</b> {movie_info['BoxOffice']}\n\n"
+        f"<b>📝 Plot:</b>\n<blockquote>{movie_info['Plot']}</blockquote>\n"
+    )
 
-    await Message.send_image(chat.id, poster, msg, btn=btn)
+    await Message.send_image(chat.id, movie_info["Poster"], msg)

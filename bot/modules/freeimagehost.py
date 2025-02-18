@@ -1,4 +1,4 @@
-import requests
+import aiohttp
 from bot import logger
 
 async def upload_image(image_path):
@@ -20,9 +20,11 @@ async def upload_image(image_path):
     }
 
     try:
-        req = requests.post(url, params, timeout=3) # files=files
-        return True, req.json()
-    except requests.Timeout as e:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, params=params) as response:
+                json_data = await response.json()
+                return True, json_data
+    except aiohttp.ServerTimeoutError as e:
         logger.error(e)
         return False, e
     except Exception as e:

@@ -7,6 +7,7 @@ from bot.modules.qr import QR
 
 async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
+    user = update.effective_user
     re_msg = update.message.reply_to_message
     data = " ".join(context.args) or (re_msg.text or re_msg.caption if re_msg else None)
 
@@ -15,7 +16,7 @@ async def func_gen_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     sent_msg = await Message.reply_message(update, f"Generating...")
-    gen_qr = await QR.gen_qr(data)
+    gen_qr = await QR.gen_qr(data, user.id)
 
     if not gen_qr:
         await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)

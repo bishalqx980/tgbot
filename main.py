@@ -1,6 +1,6 @@
 import json
 import asyncio
-import requests
+import aiohttp
 from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
@@ -103,9 +103,10 @@ async def server_alive():
         if server_url[0:4] != "http":
             server_url = f"http://{server_url}"
         try:
-            response = requests.get(server_url, timeout=3)
-            if response.status_code != 200:
-                logger.warning(f"{server_url} is down or unreachable. ❌ - code - {response.status_code}")
+            async with aiohttp.ClientSession() as session:
+                async with session.get(server_url) as response:
+                    if response.status != 200:
+                        logger.warning(f"{server_url} is down or unreachable. ❌ - code - {response.status_code}")
         except Exception as e:
             logger.error(f"{server_url} > {e}")
         await asyncio.sleep(180) # 3 min

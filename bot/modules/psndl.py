@@ -1,12 +1,14 @@
 import json
-import requests
+import aiohttp
 from bot import psndl_db, logger
 
 async def get_database():
     try:
-        req = requests.get(psndl_db, timeout=3) # Github database link
-        if req.status_code == 200:
-            return req.text # string json
+        async with aiohttp.ClientSession() as session:
+            async with session.get(psndl_db) as response:
+                data = await response.text()
+                json_data = json.loads(data)
+                return json_data
     except Exception as e:
         logger.error(e)
 
@@ -17,11 +19,9 @@ class PSNDL:
         if not database:
             return
         
-        load_db = json.loads(database)
-        
         filtered_data = {}
-        for file_type in load_db:
-            collection = load_db.get(file_type)
+        for file_type in database:
+            collection = database.get(file_type)
             for region in collection:
                 region_data_coll = collection.get(region)
 
@@ -46,10 +46,8 @@ class PSNDL:
         if not database:
             return
         
-        load_db = json.loads(database)
-        
-        for file_type in load_db:
-            collection = load_db.get(file_type)
+        for file_type in database:
+            collection = database.get(file_type)
             for region in collection:
                 region_data_coll = collection.get(region)
 
