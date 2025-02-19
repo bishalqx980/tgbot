@@ -1,7 +1,7 @@
 import json
 import asyncio
 import aiohttp
-from telegram import Update
+from telegram import Update, BotCommand
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -11,7 +11,7 @@ from telegram.ext import (
     CallbackQueryHandler,
     ChatMemberHandler
 )
-from bot import bot_token, logger, owner_id
+from bot import bot_token, bot, logger, owner_id
 from bot.update_db import update_database
 from bot.helper.telegram_helper import Message
 from bot.modules.database.local_database import LOCAL_DATABASE
@@ -84,13 +84,25 @@ from bot.modules.group_management.track_other_chat import track_other_chat_act
 from bot.helper.callbackbtn_helper import func_callbackbtn
 
 
+async def post_boot():
+    # Setting up bot commands
+    command_help = [
+        BotCommand("help", "Show help message")
+    ]
+    try:
+        await bot.set_my_commands(command_help)
+        logger.info("Bot commands updated!")
+    except Exception as e:
+        logger.error(e)
+
+    # Send alive message to all sudo and bot owner
+    power_users = await _power_users()
+    await asyncio.gather(*(Message.send_message(user_id, "<b>Bot Started!</b>") for user_id in power_users))
+
+
 async def server_alive():
     # executing after updating db so getting data from localdb...
     server_url = await LOCAL_DATABASE.get_data("bot_docs", "server_url")
-    power_users = await _power_users()
-    # Send alive message to all sudo and bot owner
-    await asyncio.gather(*(Message.send_message(user_id, "Bot Started!") for user_id in power_users))
-
     if not server_url:
         logger.warning("⚠️ Server url not provided !!")
         await Message.send_message(owner_id, "⚠️ Server url not provided!\nGoto /bsettings and setup server url then restart bot...")
@@ -214,12 +226,15 @@ def main():
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
+async def start_up_work():
+    await update_database()
+    await post_boot()
+    await server_alive()
+
+
 if __name__ == "__main__":
-    async def start_up_work():
-        await update_database()
-        await server_alive()
-    
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     loop.create_task(start_up_work())
     loop.create_task(main())
     loop.run_forever()
