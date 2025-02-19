@@ -1,0 +1,29 @@
+name: GitHub Commit Notifier
+
+on:
+  push:
+    branches:
+      - main  # Change this if you want it to run on another branch
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: pip install requests
+
+      - name: Run Script
+        env:
+          BOT_TOKEN: ${{secrets.BOT_TOKEN}}
+          OWNER_ID: ${{secrets.OWNER_ID}}
+          CHAT_ID: ${{secrets.CHAT_ID}}
+        run: python commit_notify.py
