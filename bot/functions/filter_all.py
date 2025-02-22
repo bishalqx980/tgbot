@@ -14,6 +14,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     e_msg = update.effective_message
+    normal_message = update.message.text or update.message.caption if update.message else None
     msg = update.message.text_html or update.message.caption_html if update.message else None
 
     if not msg or user.id == 777000: # Telegram channel
@@ -49,12 +50,12 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if auto_tr_status:
             lang_code = find_user.get("lang")
-            tr_msg = await translate(msg, lang_code)
-            if tr_msg and tr_msg != msg:
+            tr_msg = await translate(normal_message, lang_code)
+            if tr_msg and tr_msg != normal_message:
                 await Message.reply_message(update, tr_msg)
             elif not lang_code or tr_msg == False:
                 btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
-                await Message.send_message(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)     
+                await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)     
 
 
     elif chat.type in ["group", "supergroup"]:
@@ -122,13 +123,13 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_message(update, msg)
         
         if auto_tr_status:
-            to_translate = clean_msg if msg_contains_link else msg
+            to_translate = clean_msg if msg_contains_link else normal_message
             tr_msg = await translate(to_translate, lang_code)
             if tr_msg and tr_msg != to_translate:
                 await Message.reply_message(update, tr_msg)
             elif not lang_code or tr_msg == False:
                 btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
-                await Message.send_message(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
+                await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
         
         if filters:
             for keyword in filters:

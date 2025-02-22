@@ -9,7 +9,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     re_msg = update.message.reply_to_message
-    msg = (re_msg.text_html or re_msg.caption_html) if re_msg else None
+    msg = (re_msg.text or re_msg.caption) if re_msg else None
     input_text = " ".join(context.args)
 
     if not msg and not input_text:
@@ -50,10 +50,13 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         find_chat = db[1]
         lang_code = find_chat.get("lang")
-
+    
+    sent_msg = await Message.reply_message(update, "🌐 Translating...")
     tr_msg = await translate(to_translate, lang_code)
     if tr_msg:
-        await Message.reply_message(update, tr_msg)
+        edit_msg = await Message.edit_message(update, tr_msg, sent_msg)
+        if not edit_msg:
+            await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
     elif not lang_code or tr_msg == False:
         btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
-        await Message.send_message(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
+        await Message.edit_message(update, "Chat language not found/invalid! Use /settings to set chat language.", sent_msg, btn)
