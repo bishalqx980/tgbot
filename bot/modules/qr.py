@@ -1,18 +1,25 @@
-import aiohttp
+import qrcode
 from bot import logger
 
 class QR:
-    async def gen_qr(data, file_name="image"):
-        url = f"https://api.qrserver.com/v1/create-qr-code/?size=1024x1024&data={data}"
-        f_name = f"downloads/{file_name}.png"
+    async def generate_qr(data, file_name="qrcode", size=50):
+        """
+        `size` multiply with (29 * size = image_pixels)
+        """
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as response:
-                    if response.status != 200:
-                        return
-                    
-                    content = await response.read()
-                    open(f_name, "wb").write(content)
-                    return f_name
+            qr = qrcode.QRCode(
+                error_correction=qrcode.constants.ERROR_CORRECT_M,
+                box_size=size,
+                border=4,
+            )
+
+            qr.add_data(data)
+            qr.make(fit=True)
+
+            img = qr.make_image(fill_color="black", back_color="white")
+
+            file_path = f"temp/{file_name}.png"
+            img.save(file_path)
+            return file_path
         except Exception as e:
             logger.error(e)

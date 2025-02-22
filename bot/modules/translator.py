@@ -6,7 +6,7 @@ LANG_CODE_LIST = ['af', 'sq', 'am', 'ar', 'hy', 'as', 'ay', 'az', 'bm', 'eu', 'b
 async def translate(text, lang_code="en"):
     if lang_code not in LANG_CODE_LIST:
         logger.error(f"Invalid language code! Given code: {lang_code}")
-        return
+        return False
     
     try:
         translated_text = GoogleTranslator(source='auto', target=lang_code).translate(text=text)

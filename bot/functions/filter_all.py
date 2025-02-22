@@ -50,16 +50,12 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if auto_tr_status:
             lang_code = find_user.get("lang")
             tr_msg = await translate(msg, lang_code)
-            if not tr_msg:
-                btn_data = {
-                    "Language code's": "https://telegra.ph/Language-Code-12-24"
-                }
-                btn = await Button.ubutton(btn_data)
-                await Message.send_message(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
-                return
-            
-            if tr_msg != msg:
+            if tr_msg and tr_msg != msg:
                 await Message.reply_message(update, tr_msg)
+            elif not lang_code or tr_msg == False:
+                btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
+                await Message.send_message(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)     
+
 
     elif chat.type in ["group", "supergroup"]:
         _chk_per = await _check_permission(update, user=user)
@@ -130,12 +126,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             tr_msg = await translate(to_translate, lang_code)
             if tr_msg and tr_msg != to_translate:
                 await Message.reply_message(update, tr_msg)
-            elif not tr_msg:
-                logger.error("Error in auto translate!")
-                btn_data = {
-                    "Language code's": "https://telegra.ph/Language-Code-12-24"
-                }
-                btn = await Button.ubutton(btn_data)
+            elif not lang_code or tr_msg == False:
+                btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
                 await Message.send_message(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
         
         if filters:

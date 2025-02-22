@@ -2,7 +2,6 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.combined_db import global_search
-from bot.modules.database.combined_db import find_bot_docs
 from bot.modules.translator import LANG_CODE_LIST, translate
 
 
@@ -14,10 +13,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
     input_text = " ".join(context.args)
 
     if not msg and not input_text:
-        btn_data = {
-            "Language code's": "https://telegra.ph/Language-Code-12-24"
-        }
-        btn = await Button.ubutton(btn_data)
+        btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
         await Message.reply_message(update, "Use <code>/tr text</code> or <code>/tr lang_code text</code> or reply the text with <code>/tr</code> or <code>/tr lang_code</code>\n\nEnable auto translator mode for this chat from /settings", btn=btn)
         return
     
@@ -53,23 +49,11 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         find_chat = db[1]
-        
         lang_code = find_chat.get("lang")
 
     tr_msg = await translate(to_translate, lang_code)
     if tr_msg:
-        sent_msg = await Message.reply_message(update, tr_msg)
-        if not sent_msg:
-            await Message.reply_message(update, "Oops! Please try again or report the issue.")
-        return
-
-    if not tr_msg:
-        _bot = await find_bot_docs()
-        if not _bot:
-            return
-        
-        btn_data = {
-            "Language code's": "https://telegra.ph/Language-Code-12-24"
-        }
-        btn = await Button.ubutton(btn_data)
+        await Message.reply_message(update, tr_msg)
+    elif not lang_code or tr_msg == False:
+        btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
         await Message.send_message(chat.id, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
