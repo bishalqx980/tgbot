@@ -3,7 +3,7 @@ name: GitHub Commit Notifier
 on:
   push:
     branches:
-      - main  # Change this if you want it to run on another branch
+      - main
 
 jobs:
   notify:

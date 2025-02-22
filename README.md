@@ -14,8 +14,8 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
 - **Group Management 🛠️**
     - It has just everything...
 - **AI 🤖**
-    - <s>ChatGPT</s> `Removed due to limitations`
-    - <s>AI photo imagine</s> `Removed due to limitations`
+    - ChatGPT
+    - AI photo imagine
 - **Misc 🎁**
     - Get any movie info
     - Translate any language
@@ -29,7 +29,7 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
     - <s>Download YouTube video</s> `Removed due to limitations`
     - Added YouTube audio/song download (14/01/2025)
     - <s>Search YouTube video</s> `Removed due to limitations`
-    - Generate QR code (image)
+    - Generate/Read QR code
     - Convert image into a link (public)
     - Convert text into a link
     - Whisper user in group chat (secret message)

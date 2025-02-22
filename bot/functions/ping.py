@@ -21,6 +21,11 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 response_time = int((time.time() - start_time) * 1000)
+                if response_time > 1000:
+                    response_time = f"{(response_time / 1000):.2f}s"
+                else:
+                    response_time = f"{response_time}ms"
+                
                 status_codes = {
                     200: "✅ Online (OK)",
                     201: "✅ Created",
@@ -41,7 +46,7 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 status = status_codes.get(response.status, "⚠️ Unknown Status")
                 msg = (
                     f"Site: {url}\n"
-                    f"R.time: <code>{response_time}ms</code>\n"
+                    f"R.time: <code>{response_time}</code>\n"
                     f"R.code: <code>{response.status}</code>\n"
                     f"Status: <code>{status}</code>"
                 )
