@@ -3,7 +3,7 @@ from bot.modules.database.local_database import LOCAL_DATABASE
 
 async def _check_permission(update: Update, victim=None, user=None):
     """
-    return's `_bot_info`, `bot_permission`, `user_permission`, `victim_permission`
+    return's `dict` of >> `_bot_info`, `bot_permission`, `user_permission`, `victim_permission`
     """
     chat = update.effective_chat
 
@@ -13,4 +13,11 @@ async def _check_permission(update: Update, victim=None, user=None):
     user_permission = await chat.get_member(user.id) if user else None
     victim_permission = await chat.get_member(victim.id) if victim else None
 
-    return _bot_info, bot_permission, user_permission, victim_permission
+    data = {
+        "_bot_info": _bot_info,
+        "bot_permission": bot_permission,
+        "user_permission": user_permission,
+        "victim_permission": victim_permission
+    }
+    
+    return data

@@ -25,26 +25,23 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
         return
 
     _chk_per = await _check_permission(update, victim, user)
-
     if not _chk_per:
         return
-    
-    _bot_info, bot_permission, user_permission, victim_permission = _chk_per
 
-    if bot_permission.status != ChatMember.ADMINISTRATOR:
+    if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
         await Message.reply_message(update, "I'm not an admin in this chat!")
         return
     
-    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+    if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_message(update, "You aren't an admin in this chat!")
         return
     
-    if user_permission.status == ChatMember.ADMINISTRATOR:
-        if not user_permission.can_restrict_members:
+    if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
+        if not _chk_per["user_permission"].can_restrict_members:
             await Message.reply_message(update, "You don't have enough rights to restrict/unrestrict chat member!")
             return
     
-    if not bot_permission.can_restrict_members:
+    if not _chk_per["bot_permission"].can_restrict_members:
         await Message.reply_message(update, "I don't have enough rights to restrict/unrestrict chat member!")
         return
     
@@ -52,18 +49,18 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
         await Message.reply_message(update, "I don't know who you are talking about! Reply the member whom you want to kick!\nTo mention with reason eg. <code>/kick reason</code>")
         return
     
-    if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        if _bot_info.get("id") == victim.id:
+    if _chk_per["victim_permission"].status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        if _chk_per["_bot_info"]["id"] == victim.id:
             await Message.reply_message(update, "I'm not going to kick myself!")
             return
         # Super power for chat owner
-        elif victim_permission.status == ChatMember.ADMINISTRATOR and user_permission.status == ChatMember.OWNER:
+        elif _chk_per["victim_permission"].status == ChatMember.ADMINISTRATOR and _chk_per["user_permission"].status == ChatMember.OWNER:
             pass
         else:
             await Message.reply_message(update, f"I'm not going to kick an admin! You must be joking!")
             return
     
-    if victim_permission.status == ChatMember.LEFT:
+    if _chk_per["victim_permission"].status == ChatMember.LEFT:
         await Message.reply_message(update, "The user isn't a member of this chat!")
         return
     

@@ -42,25 +42,22 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
     if user_exist == True and cause == "JOINED":
         if victim.is_bot and antibot:
             _chk_per = await _check_permission(update, victim, user)
-
             if not _chk_per:
                 return
-            
-            _bot_info, bot_permission, user_permission, victim_permission = _chk_per
 
-            if bot_permission.status != ChatMember.ADMINISTRATOR:
+            if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
                 await Message.send_message(chat.id, "<b>Antibot:</b> I'm not an admin in this chat!")
                 return
             
-            if not bot_permission.can_restrict_members:
+            if not _chk_per["bot_permission"].can_restrict_members:
                 await Message.reply_message(update, "I don't have enough rights to restrict/unrestrict chat member!")
                 return
             
-            if user_permission.status == ChatMember.ADMINISTRATOR:
-                if user_permission.can_invite_users:
+            if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
+                if _chk_per["user_permission"].can_invite_users:
                     return
             
-            if victim_permission.status == ChatMember.ADMINISTRATOR:
+            if _chk_per["victim_permission"].status == ChatMember.ADMINISTRATOR:
                 await Message.send_message(chat.id, f"<b>Antibot:</b> {victim.mention_html()} has been added as an admin. I can't kick an admin!")
                 return
             

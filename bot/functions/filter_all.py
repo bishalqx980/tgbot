@@ -62,10 +62,8 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         _chk_per = await _check_permission(update, user=user)
         if not _chk_per:
             return
-        
-        _bot_info, bot_permission, user_permission, victim_permission = _chk_per
 
-        if bot_permission.status != ChatMember.ADMINISTRATOR:
+        if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
             await Message.send_message(chat.id, "I'm not an admin in this chat!")
             return
         
@@ -95,7 +93,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg_contains_link = False
 
         if all_links:
-            if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+            if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
                 links_list = await RE_LINK.detect_link(msg)
                 if links_list:
                     clean_msg = msg

@@ -28,23 +28,21 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
 
     if not _chk_per:
         return
-    
-    _bot_info, bot_permission, user_permission, victim_permission = _chk_per
 
-    if bot_permission.status != ChatMember.ADMINISTRATOR:
+    if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
         await Message.reply_message(update, "I'm not an admin in this chat!")
         return
     
-    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+    if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_message(update, "You aren't an admin in this chat!")
         return
     
-    if user_permission.status == ChatMember.ADMINISTRATOR:
-        if not user_permission.can_promote_members:
+    if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
+        if not _chk_per["user_permission"].can_promote_members:
             await Message.reply_message(update, "You don't have enough rights to promote/demote chat member!")
             return
     
-    if not bot_permission.can_promote_members:
+    if not _chk_per["bot_permission"].can_promote_members:
         await Message.reply_message(update, "I don't have enough rights to promote/demote chat member!")
         return
     
@@ -52,8 +50,8 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
         await Message.reply_message(update, "I don't know who you are talking about! Reply the member whom you want to promote!\nTo set admin title eg. <code>/promote admin_title</code>")
         return
     
-    if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        if _bot_info.get("id") == victim.id:
+    if _chk_per["victim_permission"].status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        if _chk_per["_bot_info"]["id"] == victim.id:
             await Message.reply_message(update, "I'm already an admin!")
         else:
             await Message.reply_message(update, "The user is already an admin!")
@@ -89,7 +87,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
     if admin_title:
         try:
             await bot.set_chat_administrator_custom_title(chat.id, victim.id, admin_title)
-            msg = f"{msg}\nNew admin title: {admin_title}"
+            msg = f"{msg}\n<b>New admin title:</b> {admin_title}"
         except Exception as e:
             logger.error(e)
             await Message.reply_message(update, str(e))

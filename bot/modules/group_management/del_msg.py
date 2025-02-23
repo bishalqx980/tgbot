@@ -27,26 +27,23 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
         return
 
     _chk_per = await _check_permission(update, victim, user)
-
     if not _chk_per:
         return
     
-    _bot_info, bot_permission, user_permission, victim_permission = _chk_per
-    
-    if bot_permission.status != ChatMember.ADMINISTRATOR:
+    if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
         await Message.reply_message(update, "I'm not an admin in this chat!")
         return
     
-    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+    if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_message(update, "You aren't an admin in this chat!")
         return
     
-    if user_permission.status == ChatMember.ADMINISTRATOR:
-        if not user_permission.can_delete_messages:
+    if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
+        if not _chk_per["user_permission"].can_delete_messages:
             await Message.reply_message(update, "You don't have enough rights to delete chat messages!")
             return
     
-    if not bot_permission.can_delete_messages:
+    if not _chk_per["bot_permission"].can_delete_messages:
         await Message.reply_message(update, "I don't have enough rights to delete chat messages!")
         return
     

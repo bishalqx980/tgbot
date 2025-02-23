@@ -25,26 +25,23 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
         return
     
     _chk_per = await _check_permission(update, victim, user)
-
     if not _chk_per:
         return
     
-    _bot_info, bot_permission, user_permission, victim_permission = _chk_per
-    
-    if bot_permission.status != ChatMember.ADMINISTRATOR:
+    if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
         await Message.reply_message(update, "I'm not an admin in this chat!")
         return
     
-    if user_permission.status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+    if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         await Message.reply_message(update, "You aren't an admin in this chat!")
         return
     
-    if user_permission.status == ChatMember.ADMINISTRATOR:
-        if not user_permission.can_restrict_members:
+    if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
+        if not _chk_per["user_permission"].can_restrict_members:
             await Message.reply_message(update, "You don't have enough rights to restrict/unrestrict chat member!")
             return
     
-    if not bot_permission.can_restrict_members:
+    if not _chk_per["bot_permission"].can_restrict_members:
         await Message.reply_message(update, "I don't have enough rights to restrict/unrestrict chat member!")
         return
     
@@ -52,14 +49,14 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
         await Message.reply_message(update, "I don't know who you are talking about! Reply the member whom you want to unban!\nTo mention with reason eg. <code>/unban reason</code>")
         return
     
-    if victim_permission.status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        if _bot_info.get("id") == victim.id:
+    if _chk_per["victim_permission"].status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
+        if _chk_per["_bot_info"]["id"] == victim.id:
             await Message.reply_message(update, "Are you out of mind?")
         else:
             await Message.reply_message(update, f"Chat admin's can't be banned or unbanned.")
         return
     
-    if victim_permission.status != ChatMember.BANNED:
+    if _chk_per["victim_permission"].status != ChatMember.BANNED:
         await Message.reply_message(update, "The user isn't banned, so how could I unban?")
         return
     
