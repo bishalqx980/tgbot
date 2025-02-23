@@ -23,38 +23,39 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
     if user.is_bot:
         await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
-
+    
+    sent_msg = await Message.reply_message(update, "📑 Checking permissions...")
     _chk_per = await _check_permission(update, victim, user)
-
     if not _chk_per:
+        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return
 
     if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
-        await Message.reply_message(update, "I'm not an admin in this chat!")
+        await Message.edit_message(update, "I'm not an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_message(update, "You aren't an admin in this chat!")
+        await Message.edit_message(update, "You aren't an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
         if not _chk_per["user_permission"].can_promote_members:
-            await Message.reply_message(update, "You don't have enough rights to promote/demote chat member!")
+            await Message.edit_message(update, "You don't have enough rights to promote/demote chat member!", sent_msg)
             return
     
     if not _chk_per["bot_permission"].can_promote_members:
-        await Message.reply_message(update, "I don't have enough rights to promote/demote chat member!")
+        await Message.edit_message(update, "I don't have enough rights to promote/demote chat member!", sent_msg)
         return
     
     if not reply:
-        await Message.reply_message(update, "I don't know who you are talking about! Reply the member whom you want to promote!\nTo set admin title eg. <code>/promote admin_title</code>")
+        await Message.edit_message(update, "I don't know who you are talking about! Reply the member whom you want to promote!\nTo set admin title eg. <code>/promote admin_title</code>", sent_msg)
         return
     
     if _chk_per["victim_permission"].status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         if _chk_per["_bot_info"]["id"] == victim.id:
-            await Message.reply_message(update, "I'm already an admin!")
+            await Message.edit_message(update, "I'm already an admin!", sent_msg)
         else:
-            await Message.reply_message(update, "The user is already an admin!")
+            await Message.edit_message(update, "The user is already an admin!", sent_msg)
         return
     
     try:
@@ -81,7 +82,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
             msg = f"{victim.mention_html()} has been promoted!\n<b>Admin:</b> {user.first_name}"
     except Exception as e:
         logger.error(e)
-        await Message.reply_message(update, str(e))
+        await Message.edit_message(update, str(e), sent_msg)
         return
     
     if admin_title:
@@ -90,10 +91,12 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
             msg = f"{msg}\n<b>New admin title:</b> {admin_title}"
         except Exception as e:
             logger.error(e)
-            await Message.reply_message(update, str(e))
+            await Message.edit_message(update, str(e), sent_msg)
     
-    if not is_silent:
-        await Message.reply_message(update, msg)
+    if is_silent:
+        await Message.delete_message(chat.id, sent_msg)
+    else:
+        await Message.edit_message(update, msg, sent_msg)
 
 
 async def func_apromote(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -207,6 +207,9 @@ class Message:
 
     @staticmethod
     async def delete_message(chat_id, message_to_delete):
+        """
+        `message_to_delete` could be the `ref message` or `ref message id`
+        """
         msg_id = getattr(message_to_delete, "message_id", message_to_delete)
 
         try:

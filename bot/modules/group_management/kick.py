@@ -23,61 +23,66 @@ async def func_kick(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
     if user.is_bot:
         await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
-
+    
+    sent_msg = await Message.reply_message(update, "📑 Checking permissions...")
     _chk_per = await _check_permission(update, victim, user)
     if not _chk_per:
+        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return
 
     if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
-        await Message.reply_message(update, "I'm not an admin in this chat!")
+        await Message.edit_message(update, "I'm not an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_message(update, "You aren't an admin in this chat!")
+        await Message.edit_message(update, "You aren't an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
         if not _chk_per["user_permission"].can_restrict_members:
-            await Message.reply_message(update, "You don't have enough rights to restrict/unrestrict chat member!")
+            await Message.edit_message(update, "You don't have enough rights to restrict/unrestrict chat member!", sent_msg)
             return
     
     if not _chk_per["bot_permission"].can_restrict_members:
-        await Message.reply_message(update, "I don't have enough rights to restrict/unrestrict chat member!")
+        await Message.edit_message(update, "I don't have enough rights to restrict/unrestrict chat member!", sent_msg)
         return
     
     if not reply:
-        await Message.reply_message(update, "I don't know who you are talking about! Reply the member whom you want to kick!\nTo mention with reason eg. <code>/kick reason</code>")
+        await Message.edit_message(update, "I don't know who you are talking about! Reply the member whom you want to kick!\nTo mention with reason eg. <code>/kick reason</code>", sent_msg)
         return
     
     if _chk_per["victim_permission"].status in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
         if _chk_per["_bot_info"]["id"] == victim.id:
-            await Message.reply_message(update, "I'm not going to kick myself!")
+            await Message.edit_message(update, "I'm not going to kick myself!", sent_msg)
             return
         # Super power for chat owner
         elif _chk_per["victim_permission"].status == ChatMember.ADMINISTRATOR and _chk_per["user_permission"].status == ChatMember.OWNER:
             pass
         else:
-            await Message.reply_message(update, f"I'm not going to kick an admin! You must be joking!")
+            await Message.edit_message(update, f"I'm not going to kick an admin! You must be joking!", sent_msg)
             return
     
     if _chk_per["victim_permission"].status == ChatMember.LEFT:
-        await Message.reply_message(update, "The user isn't a member of this chat!")
+        await Message.edit_message(update, "The user isn't a member of this chat!", sent_msg)
         return
     
     try:
         await bot.unban_chat_member(chat.id, victim.id)
     except Exception as e:
         logger.error(e)
-        await Message.reply_message(update, str(e))
+        await Message.edit_message(update, str(e), sent_msg)
         return
     
-    if not is_silent:
+    if is_silent:
+        await Message.delete_message(chat.id, sent_msg)
+    else:
         msg = f"{victim.mention_html()} has been kicked out from this chat!\n<b>Admin:</b> {user.first_name}"
         if reason:
             msg = f"{msg}\n<b>Reason</b>: {reason}"
         
-        await Message.reply_message(update, msg)
-
+        await Message.edit_message(update, msg, sent_msg)
+    
+    # Send message to victim
     if chat.link:
         invite_link = chat.link
     else:

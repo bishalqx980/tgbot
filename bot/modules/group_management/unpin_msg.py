@@ -23,41 +23,45 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
     if user.is_bot:
         await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
-
+    
+    sent_msg = await Message.reply_message(update, "📑 Checking permissions...")
     _chk_per = await _check_permission(update, user=user)
     if not _chk_per:
+        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return
     
     if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
-        await Message.reply_message(update, "I'm not an admin in this chat!")
+        await Message.edit_message(update, "I'm not an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_message(update, "You aren't an admin in this chat!")
+        await Message.edit_message(update, "You aren't an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
         if not _chk_per["user_permission"].can_pin_messages:
-            await Message.reply_message(update, "You don't have enough rights to pin/unpin messages!")
+            await Message.edit_message(update, "You don't have enough rights to pin/unpin messages!", sent_msg)
             return
     
     if not _chk_per["bot_permission"].can_pin_messages:
-        await Message.reply_message(update, "I don't have enough rights to pin/unpin messages!")
+        await Message.edit_message(update, "I don't have enough rights to pin/unpin messages!", sent_msg)
         return
 
     if not reply:
-        await Message.reply_message(update, "This command will unpin replied message (which is already pinned)!")
+        await Message.edit_message(update, "This command will unpin replied message (which is already pinned)!", sent_msg)
         return
     
     try:
         await bot.unpin_chat_message(chat.id, msg_id)
     except Exception as e:
         logger.error(e)
-        await Message.reply_message(update, str(e))
+        await Message.edit_message(update, str(e), sent_msg)
         return
     
-    if not is_silent:
-        await Message.reply_message(update, f"Message unpinned!")
+    if is_silent:
+        await Message.delete_message(chat.id, sent_msg)
+    else:
+        await Message.edit_message(update, f"Message unpinned!", sent_msg)
     await _log_channel(update, chat, user, action="UNPIN")
 
 

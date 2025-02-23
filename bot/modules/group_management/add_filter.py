@@ -27,21 +27,23 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
     
+    sent_msg = await Message.reply_message(update, "📑 Checking permissions...")
     _chk_per = await _check_permission(update, user=user)
     if not _chk_per:
+        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return
         
     if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
-        await Message.reply_message(update, "I'm not an admin in this chat!")
+        await Message.edit_message(update, "I'm not an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_message(update, "You aren't an admin in this chat!")
+        await Message.edit_message(update, "You aren't an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
         if not _chk_per["user_permission"].can_change_info:
-            await Message.reply_message(update, "You don't have enough rights to manage this chat!")
+            await Message.edit_message(update, "You don't have enough rights to manage this chat!", sent_msg)
             return
     
     if not value or not keyword:
@@ -81,12 +83,12 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
         btn = await Button.cbutton(btn_data, True)
-        await Message.reply_message(update, msg, btn=btn)
+        await Message.edit_message(update, msg, sent_msg, btn)
         return
 
     db = await global_search("groups", "chat_id", chat.id)
     if db[0] == False:
-        await Message.reply_message(update, db[1])
+        await Message.edit_message(update, db[1], sent_msg)
         return
     
     find_group = db[1]
@@ -119,4 +121,4 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             msg_keywords += f"{i}, "
     
-    await Message.reply_message(update, f"<code>{msg_keywords}</code> has been added as filter!\n<b>Admin:</b> {user.first_name}")
+    await Message.edit_message(update, f"<code>{msg_keywords}</code> has been added as filter!\n<b>Admin:</b> {user.first_name}", sent_msg)

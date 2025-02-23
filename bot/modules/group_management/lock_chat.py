@@ -21,26 +21,28 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user.is_bot:
         await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
-
+    
+    sent_msg = await Message.reply_message(update, "📑 Checking permissions...")
     _chk_per = await _check_permission(update, user=user)
     if not _chk_per:
+        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return
         
     if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
-        await Message.reply_message(update, "I'm not an admin in this chat!")
+        await Message.edit_message(update, "I'm not an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_message(update, "You aren't an admin in this chat!")
+        await Message.edit_message(update, "You aren't an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
         if not _chk_per["user_permission"].can_change_info:
-            await Message.reply_message(update, "You don't have enough rights to manage this chat!")
+            await Message.edit_message(update, "You don't have enough rights to manage this chat!", sent_msg)
             return
     
     if not _chk_per["bot_permission"].can_change_info:
-        await Message.reply_message(update, "I don't have enough rights to manage this chat!")
+        await Message.edit_message(update, "I don't have enough rights to manage this chat!", sent_msg)
         return
     
     permissions = {
@@ -60,8 +62,8 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await bot.set_chat_permissions(chat.id, permissions)
     except Exception as e:
         logger.error(e)
-        await Message.reply_message(update, str(e))
+        await Message.edit_message(update, str(e), sent_msg)
         return
 
-    await Message.send_message(chat.id, f"This chat has been locked!\n<b>Admin:</b> {user.first_name}")
+    await Message.edit_message(update, f"This chat has been locked!\n<b>Admin:</b> {user.first_name}", sent_msg)
     await _log_channel(update, chat, user, action="CHAT_LOCK")

@@ -24,34 +24,36 @@ async def func_admintitle(update: Update, context: ContextTypes.DEFAULT_TYPE, is
     if user.is_bot:
         await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
-
+    
+    sent_msg = await Message.reply_message(update, "📑 Checking permissions...")
     _chk_per = await _check_permission(update, victim, user)
     if not _chk_per:
+        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return
 
     if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
-        await Message.reply_message(update, "I'm not an admin in this chat!")
+        await Message.edit_message(update, "I'm not an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_message(update, "You aren't an admin in this chat!")
+        await Message.edit_message(update, "You aren't an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
         if not _chk_per["user_permission"].can_promote_members:
-            await Message.reply_message(update, "You don't have enough rights to set admin title!")
+            await Message.edit_message(update, "You don't have enough rights to set admin title!", sent_msg)
             return
     
     if not _chk_per["bot_permission"].can_promote_members:
-        await Message.reply_message(update, "I don't have enough rights to set admin title!")
+        await Message.edit_message(update, "I don't have enough rights to set admin title!", sent_msg)
         return
     
     if not reply:
-        await Message.reply_message(update, "I don't know who you are talking about! Reply the admin to set admin title!\neg. <code>/admintitle admin_title</code>\n<i>Note:</i> I can only set admin title if that admin is promoted by me!")
+        await Message.edit_message(update, "I don't know who you are talking about! Reply the admin to set admin title!\neg. <code>/admintitle admin_title</code>\n<i>Note:</i> I can only set admin title if that admin is promoted by me!", sent_msg)
         return
     
     if not admin_title:
-        await Message.reply_message(update, "Use <code>/admintitle admin_title</code>\n<i>Note:</i> I can only set admin title if that admin is promoted by me!")
+        await Message.edit_message(update, "Use <code>/admintitle admin_title</code>\n<i>Note:</i> I can only set admin title if that admin is promoted by me!", sent_msg)
         return
     
     try:
@@ -62,13 +64,15 @@ async def func_admintitle(update: Update, context: ContextTypes.DEFAULT_TYPE, is
             f"<b>New admin title:</b> {admin_title}"
         )
 
-        if not is_silent:
-            await Message.reply_message(update, msg)
+        if is_silent:
+            await Message.delete_message(chat.id, sent_msg)
+        else:
+            await Message.edit_message(update, msg, sent_msg)
         
         await _log_channel(update, chat, user, victim, action=f"ADMIN_TITLE ({admin_title})")
     except Exception as e:
         logger.error(e)
-        await Message.reply_message(update, str(e))
+        await Message.edit_message(update, str(e), sent_msg)
 
 
 async def func_sadmintitle(update: Update, context: ContextTypes.DEFAULT_TYPE):

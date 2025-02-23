@@ -24,33 +24,35 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
     if user.is_bot:
         await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
-
+    
+    sent_msg = await Message.reply_message(update, "📑 Checking permissions...")
     _chk_per = await _check_permission(update, user=user)
     if not _chk_per:
+        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return
     
     if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
-        await Message.reply_message(update, "I'm not an admin in this chat!")
+        await Message.edit_message(update, "I'm not an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-        await Message.reply_message(update, "You aren't an admin in this chat!")
+        await Message.edit_message(update, "You aren't an admin in this chat!", sent_msg)
         return
     
     if _chk_per["user_permission"].status == ChatMember.ADMINISTRATOR:
         if not _chk_per["user_permission"].can_delete_messages:
-            await Message.reply_message(update, "You don't have enough rights to delete chat messages!")
+            await Message.edit_message(update, "You don't have enough rights to delete chat messages!", sent_msg)
             return
     
     if not _chk_per["bot_permission"].can_delete_messages:
-        await Message.reply_message(update, "I don't have enough rights to delete chat messages!")
+        await Message.edit_message(update, "I don't have enough rights to delete chat messages!", sent_msg)
         return
     
     if not reply:
-        await Message.reply_message(update, "I don't know which message to delete from! Reply the message that you want to start delete from!\n\n<i><b>Note:</b> bots are unable to delete 48h old messages due to Telegram limitation/restriction...</i>")
+        await Message.edit_message(update, "I don't know which message to delete from! Reply the message that you want to start delete from!\n\n<i><b>Note:</b> bots are unable to delete 48h old messages due to Telegram limitation/restriction...</i>", sent_msg)
         return
     
-    sent_msg = await Message.send_message(chat.id, f"Purge started...")
+    await Message.edit_message(update, f"🚀 Purge started...", sent_msg)
 
     if purgefrom_id:
         while purgefrom_id <= reply.id:
@@ -62,7 +64,7 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
     if is_silent:
         await Message.delete_message(chat.id, sent_msg)
     else:
-        await Message.edit_message(update, f"Purge completed!", sent_msg)
+        await Message.edit_message(update, f"✅ Purge completed!", sent_msg)
     await _log_channel(update, chat, user, action="MSG_PURGE")
 
 
@@ -90,8 +92,7 @@ async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await LOCAL_DATABASE.insert_data("data_center", chat.id, {"purgefrom_id": reply.id})
     sent_msg = await Message.reply_message(update, "<code>purgefrom</code> added...")
     await asyncio.sleep(5)
-    for del_msg in [e_msg, sent_msg]:
-        await Message.delete_message(chat.id, del_msg)
+    await Message.delete_messages(chat.id, [e_msg.id, sent_msg.id])
 
 
 async def func_purgeto(update: Update, context: ContextTypes.DEFAULT_TYPE):
