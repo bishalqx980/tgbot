@@ -92,8 +92,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         timeout += 1
         await asyncio.sleep(1)
         localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
-        db_broadcast = localdb.get("broadcast")
-        is_done = db_broadcast.get("is_done")
+        is_done = localdb["broadcast"]["is_done"]
         if is_done:
             break
     
@@ -103,8 +102,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_message(update, "Oops, Timeout!")
         return
     
-    is_forward = db_broadcast.get("is_forward")
-    is_pin = db_broadcast.get("is_pin")
+    is_forward = localdb["broadcast"]["is_forward"]
+    is_pin = localdb["broadcast"]["is_pin"]
     
     broadcast_msg = re_msg.text_html or re_msg.caption_html
 
@@ -123,7 +122,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sent_count, except_count, pin_except_count = 0, 0, 0
     exception_user_ids = []
-    notify = await Message.send_message(user.id, f"Total users: {len(users_id)}\nActive users: {len(active_users)}")
+    notify_btn = await Button.cbutton({"Cancel": "query_close"})
+    notify = await Message.send_message(user.id, f"Total users: {len(users_id)}\nActive users: {len(active_users)}", btn=notify_btn)
     start_time = time.time()
 
     for user_id in active_users:
@@ -152,17 +152,34 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     logger.error(e)
 
         progress = (sent_count + except_count) * 100 / len(active_users)
-        await Message.edit_message(update, f"Total users: {len(users_id)}\nActive users: {len(active_users)}\nSent: {sent_count}\nException occurred: {except_count}\nPin exception: {pin_except_count}\nProgress: {(progress):.2f}%", notify)
-        # sleep for 0.5 sec
-        await asyncio.sleep(0.5)
-    
+        edit_msg = (
+            f"<b>Total users:</b> <code>{len(users_id)}</code>\n"
+            f"<b>Active users:</b> <code>{len(active_users)}</code>\n"
+            f"<b>Sent:</b> <code>{sent_count}</code>\n"
+            f"<b>Exception occurred:</b> <code>{except_count}</code>\n"
+            f"<b>Pin exception:</b> <code>{pin_except_count}</code>\n"
+            f"<b>Progress:</b> <code>{(progress):.2f}%</code>"
+        )
+        edit_msg_btn = None if (sent_count + except_count) == len(active_users) else notify_btn
+        edited_msg = await Message.edit_message(update, edit_msg, notify, edit_msg_btn)
+        if edited_msg:
+            await asyncio.sleep(0.5) # sleep for 0.5 sec
+        else:
+            msg = (
+                "<b>⚠️ Operation cancelled!</b>\n\n"
+                "<b>» Progress</b>\n"
+                f"{edit_msg}"
+            )
+            await Message.reply_message(update, msg)
+            break
+
     end_time = time.time()
     time_took = f"{(end_time - start_time):.2f} sec"
     if (end_time - start_time) > 60:
         time_took = f"{((end_time - start_time) / 60):.2f} min"
     
-    msg = f"Broadcast Done!\nTime took: {time_took}"
+    msg = f"✅ Broadcast Done!\nTime took: <code>{time_took}</code>"
     if len(exception_user_ids) > 0:
         msg += f"\nException user ids: {exception_user_ids}"
     
-    await Message.reply_message(update, msg)
+    await Message.reply_message(update, f"<b>{msg}</b>")
