@@ -14,21 +14,22 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     e_msg = update.effective_message
-    normal_message = update.message.text or update.message.caption if update.message else None
-    msg = update.message.text_html or update.message.caption_html if update.message else None
 
-    if not msg or user.id == 777000: # Telegram channel
+    if not (e_msg.text or e_msg.caption): # return if there is no text or caption
+        return
+
+    if user.id == 777000: # Telegram channel
         return
     
     data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
     if data_center and data_center.get("is_editing"):
         try:
-            msg = int(msg)
+            data_value = int(e_msg.text)
         except ValueError:
-            pass
+            data_value = e_msg.text
 
         await LOCAL_DATABASE.insert_data("data_center", chat.id, {
-            "edit_data_value": msg,
+            "edit_data_value": data_value,
             "edit_data_value_msg_pointer_id": e_msg.id,
             "is_editing": False
         })
@@ -46,17 +47,20 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         auto_tr_status = find_user.get("auto_tr")
 
         if echo_status:
-            await Message.reply_message(update, msg)
+            await Message.reply_message(update, e_msg.text_html or e_msg.caption_html)
 
         if auto_tr_status:
             lang_code = find_user.get("lang")
-            tr_msg = await translate(normal_message, lang_code)
-            if tr_msg and tr_msg != normal_message:
-                await Message.reply_message(update, tr_msg)
-            elif not lang_code or tr_msg == False:
+            if lang_code:
+                translated_text = await translate(e_msg.text or e_msg.caption, lang_code)
+                if translated_text and (translated_text != e_msg.text and translated_text != e_msg.caption):
+                    await Message.reply_message(update, translated_text)
+                elif translated_text == False:
+                    btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
+                    await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
+            else:
                 btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
-                await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)     
-
+                await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
 
     elif chat.type in ["group", "supergroup"]:
         _chk_per = await _check_permission(update, user=user)
@@ -64,7 +68,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
 
         if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
-            await Message.send_message(chat.id, "I'm not an admin in this chat!")
+            await Message.reply_message(update, "I'm not an admin in this chat!")
             return
         
         db = await global_search("groups", "chat_id", chat.id)
@@ -77,6 +81,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         all_links = find_group.get("all_links")
         allowed_links = find_group.get("allowed_links")
         
+        # clean up the links
         if not allowed_links:
             allowed_links = []
         else:
@@ -89,14 +94,13 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         auto_tr_status = find_group.get("auto_tr")
         lang_code = find_group.get("lang")
         filters = find_group.get("filters")
-
         msg_contains_link = False
 
         if all_links:
             if _chk_per["user_permission"].status not in [ChatMember.ADMINISTRATOR, ChatMember.OWNER]:
-                links_list = await RE_LINK.detect_link(msg)
+                links_list = await RE_LINK.detect_link(e_msg.text or e_msg.caption)
                 if links_list:
-                    clean_msg = msg
+                    cleaned_msg = e_msg.text or e_msg.caption # keeping as variable to replace links later
                     allowed_links_count = 0
                     for link in links_list:
                         domain = await RE_LINK.get_domain(link)
@@ -104,34 +108,45 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                             allowed_links_count += 1
                         else:
                             if all_links == "delete":
-                                clean_msg = clean_msg.replace(link, f"<code>forbidden link</code>")
+                                cleaned_msg = cleaned_msg.replace(link, f"<code>forbidden link</code>")
                             if all_links == "convert":
                                 b64_link = await BASE64.encode(link)
-                                clean_msg = clean_msg.replace(link, f"<code>{b64_link}</code>")
+                                cleaned_msg = cleaned_msg.replace(link, f"<code>{b64_link}</code>")
                     if allowed_links_count != len(links_list):
-                        try:
-                            clean_msg = f"{user.mention_html()}\n\n{clean_msg}\n\n<i>Delete reason: your message contains forbidden link/s!</i>"
-                            await Message.delete_message(chat.id, e_msg)
-                            await Message.send_message(chat.id, clean_msg)
-                            msg_contains_link = True
-                        except Exception as e:
-                            logger.error(e)
-        
+                        cleaned_msg = f"{user.mention_html()}\n\n{cleaned_msg}\n\n<i>Delete reason: your message contains forbidden link/s!</i>"
+                        await Message.delete_message(chat.id, e_msg)
+                        await Message.reply_message(update, cleaned_msg)
+                        msg_contains_link = True
+
         if echo_status and not msg_contains_link:
-            await Message.reply_message(update, msg)
+            await Message.reply_message(update, e_msg.text_html or e_msg.caption_html)
         
-        if auto_tr_status:
-            to_translate = clean_msg if msg_contains_link else normal_message
-            tr_msg = await translate(to_translate, lang_code)
-            if tr_msg and tr_msg != to_translate:
-                await Message.reply_message(update, tr_msg)
-            elif not lang_code or tr_msg == False:
+        if auto_tr_status and lang_code:
+            if lang_code:
+                to_translate = cleaned_msg if msg_contains_link else (e_msg.text or e_msg.caption)
+                translated_text = await translate(to_translate, lang_code)
+                if translated_text and translated_text != to_translate:
+                    message = (
+                        f"{translated_text}\n\n"
+                        f"<a href='{e_msg.link}'>{e_msg.id}</a> | {user.mention_html()}"
+                    )
+                    await Message.reply_message(update, message)
+                elif translated_text == False:
+                    btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
+                    await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
+            else:
                 btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
                 await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
-        
+
         if filters:
             for keyword in filters:
-                filter_msg = msg.lower() if not isinstance(msg, int) else msg
+                message = e_msg.text or e_msg.caption
+
+                try:
+                    filter_msg = message.lower()
+                except AttributeError:
+                    filter_msg = message
+                
                 if keyword.lower() in filter_msg:
                     filtered_msg = filters[keyword]
                     formattings = {
