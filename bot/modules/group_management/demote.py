@@ -23,7 +23,7 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sil
         await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
     
-    sent_msg = await Message.reply_message(update, "📑 Checking permissions...")
+    sent_msg = await Message.reply_message(update, "💭")
     _chk_per = await _check_permission(update, victim, user)
     if not _chk_per:
         await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
@@ -54,7 +54,7 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sil
         await Message.edit_message(update, "The user isn't an admin!", sent_msg)
         return
     
-    if _chk_per["_bot_info"]["id"] == victim.id:
+    if bot.id == victim.id:
         await Message.edit_message(update, "I'm not going to do this!", sent_msg)
         return
     

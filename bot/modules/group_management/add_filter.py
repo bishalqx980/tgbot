@@ -27,7 +27,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
     
-    sent_msg = await Message.reply_message(update, "📑 Checking permissions...")
+    sent_msg = await Message.reply_message(update, "💭")
     _chk_per = await _check_permission(update, user=user)
     if not _chk_per:
         await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
@@ -78,11 +78,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<code>{chatname}</code> chat title\n"
         )
 
-        btn_data = {
-            "Close": "query_close"
-        }
-
-        btn = await Button.cbutton(btn_data, True)
+        btn = await Button.cbutton({"Close": "query_close"}, True)
         await Message.edit_message(update, msg, sent_msg, btn)
         return
 

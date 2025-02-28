@@ -2,6 +2,7 @@ import time
 import psutil
 from datetime import datetime, timedelta
 from telegram import Update
+from bot import bot
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
@@ -153,7 +154,6 @@ class QueryBotHelp:
     
 
     async def _query_help_bot_info(update: Update, query):
-        _bot_info = await LOCAL_DATABASE.find("_bot_info")
         info_db = await MongoDB.info_db()
         for i in info_db:
             if i[0] == "users":
@@ -181,9 +181,9 @@ class QueryBotHelp:
         msg = (
             "<blockquote><code><b>» bot.info()</b></code></blockquote>\n\n"
 
-            f"<b>• Name:</b> {_bot_info.get('full_name')}\n"
-            f"<b>• ID:</b> <code>{_bot_info.get('id')}</code>\n"
-            f"<b>• Username:</b> {_bot_info.get('name')}\n\n"
+            f"<b>• Name:</b> {bot.first_name}\n"
+            f"<b>• ID:</b> <code>{bot.id}</code>\n"
+            f"<b>• Username:</b> {bot.name}\n\n"
 
             f"<b>• Registered users:</b> <code>{total_users}</code>\n"
             f"<b>• Active users:</b> <code>{active_users}</code>\n"

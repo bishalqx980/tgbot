@@ -88,4 +88,4 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
             else:
                 await Message.send_message(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}")
     elif user_exist == False and cause == "LEFT" and farewell_user:
-        await Message.send_message(chat.id, f"{victim.mention_html()} just left the chat...")
+        await Message.send_message(chat.id, f"Nice to see you! {victim.mention_html()} left us!")

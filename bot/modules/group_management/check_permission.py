@@ -1,21 +1,18 @@
 from telegram import Update
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot import bot
 
 async def _check_permission(update: Update, victim=None, user=None):
     """
-    returns `dict` of >> `_bot_info`, `bot_permission`, `user_permission`, `victim_permission`\n
-    returns `_bot_info` & `bot_permission` as default
+    returns `dict` of >> `bot_permission`, `user_permission`, `victim_permission`\n
+    returns `bot_permission` as default
     """
     chat = update.effective_chat
 
-    _bot_info = await LOCAL_DATABASE.find("_bot_info")
-    bot_permission = await chat.get_member(_bot_info.get("id"))
-
+    bot_permission = await chat.get_member(bot.id)
     user_permission = await chat.get_member(user.id) if user else None
     victim_permission = await chat.get_member(victim.id) if victim else None
 
     data = {
-        "_bot_info": _bot_info,
         "bot_permission": bot_permission,
         "user_permission": user_permission,
         "victim_permission": victim_permission

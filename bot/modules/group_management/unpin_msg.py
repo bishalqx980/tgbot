@@ -24,7 +24,7 @@ async def func_unpin_msg(update: Update, context: ContextTypes.DEFAULT_TYPE, is_
         await Message.reply_message(update, "I don't take permission from anonymous admins!")
         return
     
-    sent_msg = await Message.reply_message(update, "📑 Checking permissions...")
+    sent_msg = await Message.reply_message(update, "💭")
     _chk_per = await _check_permission(update, user=user)
     if not _chk_per:
         await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
