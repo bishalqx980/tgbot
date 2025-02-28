@@ -7,6 +7,7 @@ from bot.functions.power_users import _power_users
 
 
 async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
     user = update.effective_user
     re_msg = update.message.reply_to_message
     chat_id = " ".join(context.args)
@@ -32,6 +33,11 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id = victim.id
     
     if not chat_id:
+        victim_photos = await victim.get_profile_photos()
+        victim_pfp = None
+        if victim_photos.photos:
+            victim_pfp = victim_photos.photos[0][-1].file_id # returns victims latest pfp file id
+        
         victim_username = f"@{victim.username}" if victim.username else None
         msg = (
             f"<b>• Full name:</b> <code>{victim.full_name}</code>\n"
@@ -45,12 +51,12 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<b>• Is premium:</b> <code>{victim.is_premium}</code>"
         )
 
-        btn_data = {
-            "User Profile": f"tg://user?id={victim.id}"
-        }
+        btn = await Button.ubutton({"User Profile": f"tg://user?id={victim.id}"}) if victim.username else None
 
-        btn = await Button.ubutton(btn_data) if victim.username else None
-        await Message.reply_message(update, msg, btn=btn)
+        if victim_pfp:
+            await Message.send_image(chat.id, victim_pfp, msg, btn=btn)
+        else:
+            await Message.reply_message(update, msg, btn=btn)
         return
     
     power_users = await _power_users()
