@@ -74,4 +74,4 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         reaction = "👍"
 
-    await Message.react_message(chat.id, e_msg.id, reaction)
+    await Message.message_reaction(chat.id, e_msg.id, reaction)
