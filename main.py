@@ -9,7 +9,8 @@ from telegram.ext import (
     MessageHandler,
     filters,
     CallbackQueryHandler,
-    ChatMemberHandler
+    ChatMemberHandler,
+    ContextTypes
 )
 from bot import bot_token, bot, logger, owner_id
 from bot.update_db import update_database
@@ -46,7 +47,7 @@ from bot.functions.owner_func.bsettings import func_bsettings
 from bot.functions.owner_func.shell import func_shell
 from bot.functions.owner_func.log import func_log
 from bot.functions.owner_func.sys import func_sys
-from bot.functions.filter_service_msg import func_filter_services
+# from bot.functions.filter_service_msg import func_filter_services
 from bot.functions.filter_all import func_filter_all
 from bot.functions.del_command import func_del_command
 from bot.modules.group_management.invite_link import func_invite_link
@@ -86,12 +87,13 @@ from bot.helper.callbackbtn_helper import func_callbackbtn
 
 async def post_boot():
     # Setting up bot commands
-    command_help = [
-        BotCommand("help", "Show help message")
-    ]
+    # command_help = [
+    #     BotCommand("help", "Show help message")
+    # ]
     try:
-        await bot.set_my_commands(command_help)
-        logger.info("Bot commands updated!")
+        # await bot.set_my_commands(command_help)
+        # logger.info("Bot commands updated!")
+        await bot.delete_my_commands()
     except Exception as e:
         logger.error(e)
 
@@ -122,6 +124,10 @@ async def server_alive():
         except Exception as e:
             logger.error(f"{server_url} > {e}")
         await asyncio.sleep(180) # 3 min
+
+
+async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.error(context.error)
 
 
 def main():
@@ -222,11 +228,14 @@ def main():
     application.add_handler(ChatMemberHandler(track_other_chat_act, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup/channel
     # Callback button
     application.add_handler(CallbackQueryHandler(func_callbackbtn, block=False))
+    # Error handler
+    application.add_error_handler(default_error_handler, block=False)
     # Check Updates
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 async def start_up_work():
+    await bot.initialize() # initializing the bot
     await update_database()
     await post_boot()
     await server_alive()

@@ -59,10 +59,8 @@ async def check_add_user_db(user):
     if find_user:
         return
     
-    find_user = await MongoDB.find_one("users", "user_id", user.id)
-    if find_user:
-        await LOCAL_DATABASE.insert_data("users", user.id, find_user)
-    else:
+    data = await MongoDB.find_one("users", "user_id", user.id)
+    if not data:
         data = {
             "user_id": user.id,
             "name": user.full_name,
@@ -73,4 +71,5 @@ async def check_add_user_db(user):
         }
 
         await MongoDB.insert_single_data("users", data)
-        await LOCAL_DATABASE.insert_data("users", user.id, data)
+    # inserts data to localdb
+    await LOCAL_DATABASE.insert_data("users", user.id, data)

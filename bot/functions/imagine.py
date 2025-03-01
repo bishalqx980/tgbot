@@ -25,12 +25,12 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     caption = (
-        f"<b>📝 Prompt:</b> <code>{prompt}</code>\n"
+        f"<b>💭 Prompt:</b> <code>{prompt}</code>\n"
         f"<b>⏳ R.time:</b> <code>{response_time}s</code>\n"
         f"<b>🗣 Req by:</b> {user.mention_html()} | <code>{user.id}</code>"
     )
 
-    await Message.send_image(chat.id, response, caption, e_msg.id)
+    await Message.reply_image(update, response, caption, e_msg.id)
     await Message.delete_message(chat.id, sent_msg)
 
     # Removing the image file

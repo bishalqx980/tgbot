@@ -20,7 +20,7 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_message(update, "Reply a photo to get a public link for that photo!")
         return
     
-    sent_msg = await Message.send_message(chat.id, f"Generating...", re_msg.id)
+    sent_msg = await Message.reply_message(update, f"💭 Generating...")
     photo = await bot.get_file(photo.file_id)
 
     itl = await upload_image(photo.file_path)

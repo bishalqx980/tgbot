@@ -72,7 +72,7 @@ async def track_bot_chat_act(update: Update, context: ContextTypes.DEFAULT_TYPE)
                     "Ohh dear, have I done something wrong!\n"
                     "I wish I could help..."
                 )
-            await Message.send_message(chat.id, msg)
+            await Message.reply_message(update, msg)
     else:
         if bot_exist and cause == "JOINED":
             await Message.send_message(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")

@@ -149,6 +149,31 @@ class Message:
 
 
     @staticmethod
+    async def reply_image(update: Update, image, caption=None, reply_message_id=None, btn=None, parse_mode=ParseMode.HTML):
+        """
+        `reply_message_id` default value is `effective message` or `replied message`
+        """
+        e_msg = update.effective_message
+        msg_id = reply_message_id or (e_msg.reply_to_message.message_id if e_msg.reply_to_message else e_msg.message_id)
+
+        reply_markup = InlineKeyboardMarkup(btn) if btn else None
+
+        try:
+            response = await update.message.reply_photo(
+                photo=image,
+                caption=caption,
+                reply_to_message_id=msg_id,
+                reply_markup=reply_markup,
+                parse_mode=parse_mode
+            )
+            return response
+        except Forbidden:
+            return Forbidden
+        except Exception as e:
+            logger.error(e)
+
+
+    @staticmethod
     async def forward_message(to_chat_id, from_chat_id, message_id):
         try:
             response = await bot.forward_message(

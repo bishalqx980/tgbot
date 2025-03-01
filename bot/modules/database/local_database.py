@@ -165,8 +165,9 @@ class LOCAL_DATABASE:
 
 
     @staticmethod
-    async def restore_db():
+    async def restore_db(default_structure):
         """
+        `structure`: `dict` format | example `{"bot_docs": {}, "users": {}, "groups": {}, "data_center": {}}`
         returns `True` | `None`
         """
         try:
@@ -179,7 +180,7 @@ class LOCAL_DATABASE:
             
             # restore process
             json.dump(
-                {"bot_docs": {}, "_bot_info": {}, "users": {}, "groups": {}, "data_center": {}},
+                default_structure,
                 open(LOCAL_DB, "w"),
                 indent=4
             )

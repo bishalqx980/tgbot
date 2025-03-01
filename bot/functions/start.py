@@ -9,9 +9,9 @@ from bot.modules.database.combined_db import find_bot_docs, check_add_user_db
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
-    args = context.args
+    args = " ".join(context.args)
 
-    if args and args[0] == "help":
+    if args == "help":
         await func_help(update, context)
         return
 
@@ -22,7 +22,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type != "private":
         btn = await Button.ubutton({"Start me in PM": f"{bot.link}?start=start"})
-        await Message.reply_message(update, f"Hey, {user.mention_html()}\nStart me in PM!", btn=btn)
+        await Message.reply_message(update, f"Hey, {user.first_name}\nStart me in PM!", btn=btn)
         return
     
     _bot = await find_bot_docs()
@@ -49,8 +49,8 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_data.update({"Support Chat": support_chat})
     
     btn = await Button.ubutton(btn_data)
-    sent_img = await Message.send_image(user.id, bot_pic, msg, btn=btn) if welcome_img and bot_pic else None
+    sent_img = await Message.reply_image(update, bot_pic, msg, btn=btn) if welcome_img and bot_pic else None
     if not sent_img:
-        await Message.send_message(user.id, msg, btn=btn)
+        await Message.reply_message(update, msg, btn=btn)
     
     await check_add_user_db(user)

@@ -64,4 +64,4 @@ async def func_movieinfo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>📝 Plot:</b>\n<blockquote>{movie_info['Plot']}</blockquote>\n"
     )
 
-    await Message.send_image(chat.id, movie_info["Poster"], msg)
+    await Message.reply_image(update, movie_info["Poster"], msg)

@@ -54,7 +54,7 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = await Button.ubutton({"User Profile": f"tg://user?id={victim.id}"}) if victim.username else None
 
         if victim_pfp:
-            await Message.send_image(chat.id, victim_pfp, msg, btn=btn)
+            await Message.reply_image(update, victim_pfp, msg, btn=btn)
         else:
             await Message.reply_message(update, msg, btn=btn)
         return

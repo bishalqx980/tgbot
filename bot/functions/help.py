@@ -14,7 +14,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type != "private":
         btn = await Button.ubutton({"Click here for help": f"{bot.link}?start=help"})
-        await Message.reply_message(update, f"Hey, {user.mention_html()}\nContact me in PM for help!", btn=btn)
+        await Message.reply_message(update, f"Hey, {user.first_name}\nContact me in PM for help!", btn=btn)
         return
 
     data = {

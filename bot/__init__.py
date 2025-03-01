@@ -72,6 +72,7 @@ for variable in variables:
 
 # Local Database
 LOCAL_DB = "sys/database.json"
+localdb_default_structure = {"bot_docs": {}, "users": {}, "groups": {}, "data_center": {}}
 
 check_local_db = os.path.isfile(LOCAL_DB)
 if not check_local_db:
@@ -81,7 +82,7 @@ if not check_local_db:
 
 try:
     json.dump(
-        {"bot_docs": {}, "_bot_info": {}, "users": {}, "groups": {}, "data_center": {}},
+        localdb_default_structure,
         open(LOCAL_DB, "w"),
         indent=4
     )

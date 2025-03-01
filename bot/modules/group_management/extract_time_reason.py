@@ -1,5 +1,5 @@
 import re
-import time
+from time import time
 
 async def _extract_time_reason(string):
     time_regex = re.compile(r'(\d+)([smhd])')
@@ -13,7 +13,7 @@ async def _extract_time_reason(string):
         for value, unit in find_time:
             value = int(value)
             unit = unit.lower()
-            time_duration = time.time() + value * multipliers.get(unit)
+            time_duration = time() + value * multipliers.get(unit)
             if (value < 35 and unit == "s") or (value > 365 and unit == "d"):
                 logical_time = "forever"
                 time_duration = None
