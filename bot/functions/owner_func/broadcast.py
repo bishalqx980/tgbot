@@ -42,9 +42,9 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "del_msg_pointer_id": e_msg.id,
         "edit_data_value_msg_pointer_id": None,
         "broadcast": {
-            "is_forward": None,
-            "is_pin": None,
-            "is_done": None
+            "is_forward": False,
+            "is_pin": False,
+            "is_done": False
         }
     }
 
@@ -61,33 +61,16 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Pin message: <code>{is_pin}</code>"
     )
 
-    btn_data_row1 = {
-        "Forward?": "query_none",
-        "YES": "query_broadcast_forward_true",
-        "NO": "query_broadcast_forward_false"
-    }
+    btn_data = [
+        {"Forward?": "query_none", "YES": "query_broadcast_forward_true", "NO": "query_broadcast_forward_false"},
+        {"Pin message?": "query_none", "YES": "query_broadcast_pin_true", "NO": "query_broadcast_pin_false"},
+        {"Done": "query_broadcast_done", "Close": "query_close"}
+    ]
 
-    btn_data_row2 = {
-        "Pin message?": "query_none",
-        "YES": "query_broadcast_pin_true",
-        "NO": "query_broadcast_pin_false"
-    }
-
-    btn_data_row3 = {
-        "Done": "query_broadcast_done",
-        "Close": "query_close"
-    }
-
-    row1 = await Button.cbutton(btn_data_row1, True)
-    row2 = await Button.cbutton(btn_data_row2, True)
-    row3 = await Button.cbutton(btn_data_row3, True)
-
-    btn = row1 + row2 + row3
-
+    btn = await Button.cbutton(btn_data)
     sent_msg = await Message.reply_message(update, msg, btn=btn)
 
     timeout = 0
-
     while timeout < 30:
         timeout += 1
         await asyncio.sleep(1)
@@ -122,7 +105,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sent_count, except_count, pin_except_count = 0, 0, 0
     exception_user_ids = []
-    notify_btn = await Button.cbutton({"Cancel": "query_close"})
+    notify_btn = await Button.cbutton([{"Cancel": "query_close"}])
     notify = await Message.send_message(user.id, f"Total users: {len(users_id)}\nActive users: {len(active_users)}", btn=notify_btn)
     start_time = time.time()
 

@@ -11,7 +11,7 @@ async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = update.message.reply_to_message
 
     if not re_msg:
-        btn = await Button.ubutton({"tts language codes": "https://telegra.ph/Text-to-speech---language-codes-tts-01-23"})
+        btn = await Button.ubutton([{"tts language codes": "https://telegra.ph/Text-to-speech---language-codes-tts-01-23"}])
         await Message.reply_message(update, "Reply any text to convert it into a voice message! E.g. Reply any message with <code>!tts en</code> to get english accent voice.", btn=btn)
         return
     

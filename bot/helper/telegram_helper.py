@@ -271,40 +271,36 @@ class Message:
 
 class Button:
     @staticmethod
-    async def ubutton(data, same_line=False):
+    async def ubutton(data=list):
         """
-        _url button maker_\n
-        `data` type: dict | `same_line` boolean\n
+        **url button maker**\n
+        `data` type: `list` of `dict` | *Note: same data in one `dict` will be in same row*\n
         returns `list` | `None`
         """
         try:
-            buttons = [
-                InlineKeyboardButton(btn_name, btn_url) for btn_name, btn_url in data.items()
-            ]
+            keyboard = []
+            for keyboard_data in data:
+                button = [InlineKeyboardButton(btn_name, btn_url) for btn_name, btn_url in keyboard_data.items()]
+                keyboard.append(button)
 
-            if same_line and len(data) > 1:
-                return [buttons]
-            else:
-                return [[button] for button in buttons]
+            return keyboard
         except Exception as e:
             logger.error(e)
 
 
     @staticmethod
-    async def cbutton(data, same_line=False):
+    async def cbutton(data=list):
         """
-        _callback button maker_\n
-        `data` type: dict | `same_line` boolean\n
+        **callback button maker**\n
+        `data` type: `list` of `dict` | *Note: same data in one `dict` will be in same row*\n
         returns `list` | `None`
         """
         try:
-            buttons = [
-                InlineKeyboardButton(btn_name, callback_data=btn_data) for btn_name, btn_data in data.items()
-            ]
-
-            if same_line and len(data) > 1:
-                return [buttons]
-            else:
-                return [[button] for button in buttons]
+            keyboard = []
+            for keyboard_data in data:
+                button = [InlineKeyboardButton(btn_name, callback_data=btn_data) for btn_name, btn_data in keyboard_data.items()]
+                keyboard.append(button)
+            
+            return keyboard
         except Exception as e:
             logger.error(e)

@@ -7,7 +7,6 @@ from bot.functions.power_users import _power_users
 
 
 async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
     user = update.effective_user
     re_msg = update.message.reply_to_message
     chat_id = " ".join(context.args)
@@ -51,7 +50,7 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<b>• Is premium:</b> <code>{victim.is_premium}</code>"
         )
 
-        btn = await Button.ubutton({"User Profile": f"tg://user?id={victim.id}"}) if victim.username else None
+        btn = await Button.ubutton([{"User Profile": f"tg://user?id={victim.id}"}]) if victim.username else None
 
         if victim_pfp:
             await Message.reply_image(update, victim_pfp, msg, btn=btn)

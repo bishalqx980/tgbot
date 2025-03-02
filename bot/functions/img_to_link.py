@@ -6,7 +6,6 @@ from bot.modules.freeimagehost import upload_image
 
 
 async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
     re_msg = update.message.reply_to_message
     if re_msg:
         if re_msg.photo:
@@ -49,5 +48,5 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>- Mime:</b> <code>{img_mime}</code>"
     )
 
-    btn = await Button.ubutton({"View 👀": img_url})
+    btn = await Button.ubutton([{"View 👀": img_url}])
     await Message.edit_message(update, msg, sent_msg, btn)

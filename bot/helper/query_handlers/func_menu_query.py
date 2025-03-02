@@ -5,49 +5,21 @@ from bot.helper.telegram_helper import Message, Button
 class QueryMenus:
     async def _query_bot_settings_menu(update: Update, query):
         msg = "<u><b>Bot Settings</b></u>"
+        btn_data = [
+            {"Bot pic": "query_bot_pic", "Welcome img": "query_welcome_img"},
+            {"Images": "query_images", "Support chat": "query_support_chat"},
+            {"Server url": "query_server_url", "Sudo": "query_sudo"},
+            {"Shrinkme API": "query_shrinkme_api", "OMDB API": "query_omdb_api"},
+            {"Weather API": "query_weather_api"},
+            {"> Restore DB?": "query_restore_db", "Close": "query_close"}
+        ]
 
-        btn_data_row1 = {
-            "Bot pic": "query_bot_pic",
-            "Welcome img": "query_welcome_img"
-        }
-
-        btn_data_row2 = {
-            "Images": "query_images",
-            "Support chat": "query_support_chat"
-        }
-
-        btn_data_row3 = {
-            "Server url": "query_server_url",
-            "Sudo": "query_sudo"
-        }
-
-        btn_data_row4 = {
-            "Shrinkme API": "query_shrinkme_api",
-            "OMDB API": "query_omdb_api"
-        }
-
-        btn_data_row5 = {
-            "Weather API": "query_weather_api"
-        }
-
-        btn_data_row6 = {
-            "> Restore DB?": "query_restore_db",
-            "Close": "query_close"
-        }
-
-        row1 = await Button.cbutton(btn_data_row1, True)
-        row2 = await Button.cbutton(btn_data_row2, True)
-        row3 = await Button.cbutton(btn_data_row3, True)
-        row4 = await Button.cbutton(btn_data_row4, True)
-        row5 = await Button.cbutton(btn_data_row5, True)
-        row6 = await Button.cbutton(btn_data_row6, True)
-
-        btn = row1 + row2 + row3 + row4 + row5 + row6
-        
+        btn = await Button.cbutton(btn_data)
         await Message.edit_message(update, msg, query.message, btn)
 
 
-    async def _query_help_menu(update: Update, query, user):
+    async def _query_help_menu(update: Update, query):
+        user = update.effective_user
         msg = (
             f"Hey, {user.full_name}! Welcome to the bot help section.\n"
             "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
@@ -56,36 +28,24 @@ class QueryMenus:
             "<b>Note:</b> <i>The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</i>"
         )
 
-        btn_data_row1 = {
-            "Group Management": "query_help_group_management_p1",
-            "AI": "query_help_ai"
-        }
+        btn_data = [
+            {"Group Management": "query_help_group_management_p1", "AI": "query_help_ai"},
+            {"misc": "query_help_misc_functions", "Bot owner": "query_help_owner_functions"},
+            {"» bot.info()": "query_help_bot_info", "Close": "query_close"}
+        ]
 
-        btn_data_row2 = {
-            "misc": "query_help_misc_functions",
-            "Bot owner": "query_help_owner_functions"
-        }
-
-        btn_data_row3 = {
-            "» bot.info()": "query_help_bot_info",
-            "Close": "query_close"
-        }
-
-        row1 = await Button.cbutton(btn_data_row1, True)
-        row2 = await Button.cbutton(btn_data_row2, True)
-        row3 = await Button.cbutton(btn_data_row3, True)
-
-        btn = row1 + row2 + row3
-
+        btn = await Button.cbutton(btn_data)
         await Message.edit_message(update, msg, query.message, btn)
     
 
-    async def _query_chat_settings_menu(update: Update, query, chat, find_chat):
+    async def _query_chat_settings_menu(update: Update, query, find_chat):
+        chat = update.effective_chat
+
         if chat.type == "private":
             user_mention = find_chat.get("mention")
             lang = find_chat.get("lang")
-            echo = find_chat.get("echo")
-            auto_tr = find_chat.get("auto_tr")
+            echo = find_chat.get("echo", False)
+            auto_tr = find_chat.get("auto_tr", False)
 
             msg = (
                 "<u><b>Chat Settings</b></u>\n\n"
@@ -97,30 +57,22 @@ class QueryMenus:
                 f"• Echo: <code>{echo}</code>\n"
             )
 
-            btn_data_row1 = {
-                "Language": "query_chat_lang",
-                "Auto translate": "query_chat_auto_tr"
-            }
+            btn_data = [
+                {"Language": "query_chat_lang", "Auto translate": "query_chat_auto_tr"},
+                {"Echo": "query_chat_set_echo", "Close": "query_close"}
+            ]
 
-            btn_data_row2 = {
-                "Echo": "query_chat_set_echo",
-                "Close": "query_close"
-            }
-
-            row1 = await Button.cbutton(btn_data_row1, True)
-            row2 = await Button.cbutton(btn_data_row2, True)
-
-            btn = row1 + row2
+            btn = await Button.cbutton(btn_data)
+        
         else:
             title = find_chat.get("title")
             lang = find_chat.get("lang")
-            echo = find_chat.get("echo")
-            auto_tr = find_chat.get("auto_tr")
-            welcome_user = find_chat.get("welcome_user")
-            farewell_user = find_chat.get("farewell_user")
-            antibot = find_chat.get("antibot")
-            ai_status = find_chat.get("ai_status") or True
-            del_cmd = find_chat.get("del_cmd")
+            echo = find_chat.get("echo", False)
+            auto_tr = find_chat.get("auto_tr", False)
+            welcome_user = find_chat.get("welcome_user", False)
+            farewell_user = find_chat.get("farewell_user", False)
+            antibot = find_chat.get("antibot", False)
+            del_cmd = find_chat.get("del_cmd", False)
             all_links = find_chat.get("all_links")
             allowed_links = find_chat.get("allowed_links")
             log_channel = find_chat.get("log_channel")
@@ -137,6 +89,7 @@ class QueryMenus:
 
             msg = (
                 "<u><b>Chat Settings</b></u>\n\n"
+
                 f"• Title: {title}\n"
                 f"• ID: <code>{chat.id}</code>\n\n"
 
@@ -150,45 +103,16 @@ class QueryMenus:
                 f"• Log channel: <code>{log_channel}</code>\n"
                 f"• All links: <code>{all_links}</code>\n"
                 f"• Allowed links: <code>{allowed_links}</code>\n"
-                f"• AI status: <code>{ai_status}</code>\n"
             )
 
-            btn_data_row1 = {
-                "Language": "query_chat_lang",
-                "Auto translate": "query_chat_auto_tr"
-            }
+            btn_data = [
+                {"Language": "query_chat_lang", "Auto translate": "query_chat_auto_tr"},
+                {"Echo": "query_chat_set_echo", "Anti bot": "query_chat_antibot"},
+                {"Welcome": "query_chat_welcome_user", "Farewell": "query_chat_farewell_user"},
+                {"Delete CMD": "query_chat_del_cmd", "Log channel": "query_chat_log_channel"},
+                {"Links behave": "query_chat_links_behave", "Close": "query_close"}
+            ]
 
-            btn_data_row2 = {
-                "Echo": "query_chat_set_echo",
-                "Anti bot": "query_chat_antibot"
-            }
-
-            btn_data_row3 = {
-                "Welcome": "query_chat_welcome_user",
-                "Farewell": "query_chat_farewell_user"
-            }
-
-            btn_data_row4 = {
-                "Delete CMD": "query_chat_del_cmd",
-                "Log channel": "query_chat_log_channel"
-            }
-
-            btn_data_row5 = {
-                "Links behave": "query_chat_links_behave",
-                "AI status": "query_chat_ai_status"
-            }
-
-            btn_data_row6 = {
-                "Close": "query_close"
-            }
-
-            row1 = await Button.cbutton(btn_data_row1, True)
-            row2 = await Button.cbutton(btn_data_row2, True)
-            row3 = await Button.cbutton(btn_data_row3, True)
-            row4 = await Button.cbutton(btn_data_row4, True)
-            row5 = await Button.cbutton(btn_data_row5, True)
-            row6 = await Button.cbutton(btn_data_row6)
-
-            btn = row1 + row2 + row3 + row4 + row5 + row6
+            btn = await Button.cbutton(btn_data)
 
         await Message.edit_message(update, msg, query.message, btn)

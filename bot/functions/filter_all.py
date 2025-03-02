@@ -56,10 +56,10 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if translated_text and (translated_text != e_msg.text and translated_text != e_msg.caption):
                     await Message.reply_message(update, translated_text)
                 elif translated_text == False:
-                    btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
+                    btn = await Button.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
                     await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
             else:
-                btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
+                btn = await Button.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
                 await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
 
     elif chat.type in ["group", "supergroup"]:
@@ -132,10 +132,10 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     )
                     await Message.reply_message(update, message)
                 elif translated_text == False:
-                    btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
+                    btn = await Button.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
                     await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
             else:
-                btn = await Button.ubutton({"Language code's": "https://telegra.ph/Language-Code-12-24"})
+                btn = await Button.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
                 await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
 
         if filters:

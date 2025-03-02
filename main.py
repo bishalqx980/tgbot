@@ -1,7 +1,7 @@
 import json
 import asyncio
 import aiohttp
-from telegram import Update, BotCommand
+from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -10,8 +10,10 @@ from telegram.ext import (
     filters,
     CallbackQueryHandler,
     ChatMemberHandler,
-    ContextTypes
+    ContextTypes,
+    Defaults
 )
+from telegram.constants import ParseMode
 from bot import bot_token, bot, logger, owner_id
 from bot.update_db import update_database
 from bot.helper.telegram_helper import Message
@@ -131,7 +133,8 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 def main():
-    application = ApplicationBuilder().token(bot_token).build()
+    default_param = Defaults(parse_mode=ParseMode.HTML, block=False, allow_sending_without_reply=True)
+    application = ApplicationBuilder().token(bot_token).defaults(default_param).build()
     # functions
     BOT_COMMANDS = {
         "start": func_start,
@@ -213,23 +216,23 @@ def main():
     storage = []
     for command, handler in BOT_COMMANDS.items():
         storage.append(f"/{command}")
-        application.add_handler(CommandHandler(command, handler, block=False)) # for /command
-        application.add_handler(PrefixHandler(["!", ".", "-"], command, handler, block=False)) # for other prefix command
+        application.add_handler(CommandHandler(command, handler)) # for /command
+        application.add_handler(PrefixHandler(["!", ".", "-"], command, handler)) # for other prefix command
     
     # For temporary storing bot commands
     json.dump({"bot_commands": storage}, open("sys/bot_commands.json", "w"), indent=4)
     
     # filters
-    # application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services, block=False))
-    application.add_handler(MessageHandler(filters.COMMAND, func_del_command, block=False))
-    application.add_handler(MessageHandler(filters.ALL, func_filter_all, block=False))
+    # application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services))
+    application.add_handler(MessageHandler(filters.COMMAND, func_del_command))
+    application.add_handler(MessageHandler(filters.ALL, func_filter_all))
     # Chat Member Handler
     application.add_handler(ChatMemberHandler(track_bot_chat_act, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking bot/private chat
     application.add_handler(ChatMemberHandler(track_other_chat_act, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup/channel
     # Callback button
-    application.add_handler(CallbackQueryHandler(func_callbackbtn, block=False))
+    application.add_handler(CallbackQueryHandler(func_callbackbtn))
     # Error handler
-    application.add_error_handler(default_error_handler, block=False)
+    application.add_error_handler(default_error_handler)
     # Check Updates
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 

@@ -21,7 +21,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if chat.type != "private":
-        btn = await Button.ubutton({"Start me in PM": f"{bot.link}?start=start"})
+        btn = await Button.ubutton([{"Start me in PM": f"{bot.link}?start=start"}])
         await Message.reply_message(update, f"Hey, {user.first_name}\nStart me in PM!", btn=btn)
         return
     
@@ -44,9 +44,9 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if bot.username != "MissCiri_bot":
         msg += "\n\n<i>Cloned bot of @MissCiri_bot</i>"
 
-    btn_data = {"Add me to your chat": f"{bot.link}?startgroup=help"}
+    btn_data = [{"Add me to your chat": f"{bot.link}?startgroup=help"}]
     if support_chat:
-        btn_data.update({"Support Chat": support_chat})
+        btn_data.append({"Support Chat": support_chat})
     
     btn = await Button.ubutton(btn_data)
     sent_img = await Message.reply_image(update, bot_pic, msg, btn=btn) if welcome_img and bot_pic else None

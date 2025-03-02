@@ -31,20 +31,12 @@ class QueryBotHelp:
             "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
         )
 
-        btn_data_row1 = {
-            "Next page >>": "query_help_group_management_p2"
-        }
+        btn_data = [
+            {"Next page →": "query_help_group_management_p2"},
+            {"Back": "query_help_menu", "Close": "query_close"}
+        ]
 
-        btn_data_row2 = {
-            "Back": "query_help_menu",
-            "Close": "query_close"
-        }
-
-        row1 = await Button.cbutton(btn_data_row1)
-        row2 = await Button.cbutton(btn_data_row2, True)
-
-        btn = row1 + row2
-
+        btn = await Button.cbutton(btn_data)
         await Message.edit_message(update, msg, query.message, btn)
 
 
@@ -63,20 +55,12 @@ class QueryBotHelp:
             "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
         )
 
-        btn_data_row1 = {
-            "<< Previous page": "query_help_group_management_p1"
-        }
+        btn_data = [
+            {"← Previous page": "query_help_group_management_p1"},
+            {"Back": "query_help_menu", "Close": "query_close"}
+        ]
 
-        btn_data_row2 = {
-            "Back": "query_help_menu",
-            "Close": "query_close"
-        }
-
-        row1 = await Button.cbutton(btn_data_row1)
-        row2 = await Button.cbutton(btn_data_row2, True)
-
-        btn = row1 + row2
-
+        btn = await Button.cbutton(btn_data)
         await Message.edit_message(update, msg, query.message, btn)
 
 
@@ -88,12 +72,7 @@ class QueryBotHelp:
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
 
-        btn_data = {
-            "Back": "query_help_menu",
-            "Close": "query_close"
-        }
-
-        btn = await Button.cbutton(btn_data, True)
+        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
         await Message.edit_message(update, msg, query.message, btn)
 
 
@@ -121,13 +100,8 @@ class QueryBotHelp:
             "/settings » settings of chat\n\n"
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
-
-        btn_data = {
-            "Back": "query_help_menu",
-            "Close": "query_close"
-        }
-
-        btn = await Button.cbutton(btn_data, True)
+        
+        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
         await Message.edit_message(update, msg, query.message, btn)
 
 
@@ -143,24 +117,24 @@ class QueryBotHelp:
             "/sys » get system info\n\n"
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
-
-        btn_data = {
-            "Back": "query_help_menu",
-            "Close": "query_close"
-        }
-
-        btn = await Button.cbutton(btn_data, True)
+        
+        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
         await Message.edit_message(update, msg, query.message, btn)
     
 
     async def _query_help_bot_info(update: Update, query):
         info_db = await MongoDB.info_db()
+        total_users = None
+        total_groups = None
+
         for i in info_db:
             if i[0] == "users":
                 total_users = i[1]
+            elif i[0] == "groups":
+                total_groups = i[1]
+            
+            if total_users and total_groups:
                 break
-            else:
-                total_users = "~"
         
         active_status = await MongoDB.find("users", "active_status")
         active_users = active_status.count(True)
@@ -187,7 +161,8 @@ class QueryBotHelp:
 
             f"<b>• Registered users:</b> <code>{total_users}</code>\n"
             f"<b>• Active users:</b> <code>{active_users}</code>\n"
-            f"<b>• Inactive users:</b> <code>{inactive_users}</code>\n\n"
+            f"<b>• Inactive users:</b> <code>{inactive_users}</code>\n"
+            f"<b>• Total chats:</b> <code>{total_groups}</code>\n\n"
 
             f"<b>• System uptime:</b> <code>{int(sys_days)}d {int(sys_hours)}h {int(sys_minute)}m</code>\n"
             f"<b>• Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n\n"
@@ -196,11 +171,6 @@ class QueryBotHelp:
             "<b>• Report bug:</b> <a href='https://github.com/bishalqx980/tgbot/issues'>Report</a>\n"
             "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
         )
-
-        btn_data = {
-            "Back": "query_help_menu",
-            "Close": "query_close"
-        }
-
-        btn = await Button.cbutton(btn_data, True)
+        
+        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
         await Message.edit_message(update, msg, query.message, btn)

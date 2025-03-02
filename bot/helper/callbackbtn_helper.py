@@ -9,7 +9,6 @@ from bot.helper.query_handlers.func_bot_settings_query import QueryBotSettings
 from bot.helper.query_handlers.func_menu_query import QueryMenus
 from bot.modules.database.combined_db import global_search
 from bot.modules.database.local_database import LOCAL_DATABASE
-from bot.functions.power_users import _power_users
 
 # helpers
 async def popup(query, msg):
@@ -20,9 +19,53 @@ async def popup(query, msg):
 
 async def del_query(query):
     try:
-        await query.message.delete()
+        await query.delete_message()
     except Exception as e:
         logger.error(e)
+
+
+async def validate_user(query, chat, user, prevent_unauth_access=True):
+    """
+    validates user and returns `datacenter`\n
+    prevents unauthorized access if `prevent_unauth_access` if true\n
+    returns `data_center` of `chat.id` else shows error
+    """
+    data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
+    if not data_center:
+        await popup(query, f"chat_id: {chat.id} wasn't found in data center!")
+        await del_query(query)
+        return
+    
+    user_id = data_center.get("user_id")
+    if not user_id:
+        await popup(query, f"user_id: {user_id} wasn't found in data center!")
+        await del_query(query)
+        return
+    
+    if prevent_unauth_access:
+        if user.id != user_id:
+            await popup(query, "Access Denied!")
+            return
+    
+    return data_center
+
+
+async def get_chat_data(update, data_center):
+    """
+    input `data_center` returns `data`\n
+    usually made to work after `validate_user` function
+    """
+    collection_name = data_center.get("collection_name")
+    db_find = data_center.get("db_find")
+    db_vlaue = data_center.get("db_vlaue")
+    
+    # Check on localdb if not found check on mongodb if not found show error
+    db = await global_search(collection_name, db_find, db_vlaue)
+    if db[0] == False:
+        await Message.reply_message(update, db[1])
+        return
+    
+    return db[1]
 
 # main function
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -34,72 +77,165 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "query_none":
         return
     
-    # Get data_center
-    data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
+    query_dict_help = {
+        "query_help_menu": QueryMenus._query_help_menu,
+        "query_help_group_management_p1": QueryBotHelp._query_help_group_management_p1,
+        "query_help_group_management_p2": QueryBotHelp._query_help_group_management_p2,
+        "query_help_ai": QueryBotHelp._query_help_ai,
+        "query_help_misc_functions": QueryBotHelp._query_help_misc_functions,
+        "query_help_owner_functions": QueryBotHelp._query_help_owner_functions,
+        "query_help_bot_info": QueryBotHelp._query_help_bot_info
+    }
 
-    # Check data in data_center
-    if not data_center:
-        await popup(query, f"{chat.id} wasn't found in data center!")
-        await del_query(query)
-        return
+    query_dict_chat_settings = {
+        "query_chat_settings_menu": QueryMenus._query_chat_settings_menu,
+        "query_chat_lang": QueryChatSettings._query_chat_lang,
+        "query_chat_auto_tr": QueryChatSettings._query_chat_auto_tr,
+        "query_chat_set_echo": QueryChatSettings._query_chat_set_echo,
+        "query_chat_welcome_user": QueryChatSettings._query_chat_welcome_user,
+        "query_set_custom_welcome_msg": QueryChatSettings._query_set_custom_welcome_msg,
+        "query_chat_farewell_user": QueryChatSettings._query_chat_farewell_user,
+        "query_chat_antibot": QueryChatSettings._query_chat_antibot,
+        "query_chat_del_cmd": QueryChatSettings._query_chat_del_cmd,
+        "query_chat_log_channel": QueryChatSettings._query_chat_log_channel,
+        "query_chat_links_behave": QueryChatSettings._query_chat_links_behave,
+        "query_chat_all_links": QueryChatSettings._query_chat_all_links,
+        "query_chat_allowed_links": QueryChatSettings._query_chat_allowed_links
+    }
+
+    query_dict_chat_settings_2 = {
+        "query_d_links": QueryChatSettings._query_d_links,
+        "query_c_links": QueryChatSettings._query_c_links,
+        "query_none_links": QueryChatSettings._query_none_links
+    }
+
+    query_dict_bot_settings = {
+        "query_bot_pic": QueryBotSettings._query_bot_pic,
+        "query_welcome_img": QueryBotSettings._query_welcome_img,
+        "query_images": QueryBotSettings._query_images,
+        "query_support_chat": QueryBotSettings._query_support_chat,
+        "query_server_url": QueryBotSettings._query_server_url,
+        "query_sudo": QueryBotSettings._query_sudo,
+        "query_shrinkme_api": QueryBotSettings._query_shrinkme_api,
+        "query_omdb_api": QueryBotSettings._query_omdb_api,
+        "query_weather_api": QueryBotSettings._query_weather_api
+    }
+
+    query_dict_bot_settings_2 = {
+        "query_bot_settings_menu": QueryMenus._query_bot_settings_menu,
+        "query_restore_db": QueryBotSettings._query_restore_db
+    }
+
+    query_dict_bot_settings_3 = {
+        "query_confirm_restore_db": QueryBotSettings._query_confirm_restore_db,
+        "query_clear_localdb_cache": QueryBotSettings._query_clear_localdb_cache,
+    }
+
+    query_dict_broadcast = {
+        "query_broadcast_forward_true": {"is_forward": True},
+        "query_broadcast_forward_false": {"is_forward": False},
+        "query_broadcast_pin_true": {"is_pin": True},
+        "query_broadcast_pin_false": {"is_pin": False},
+        "query_broadcast_done": {"is_done": True}
+    }
+
+    query_dict_db_edit = {
+        "query_edit_value": QueryFunctions.query_edit_value,
+        "query_rm_value": QueryFunctions.query_rm_value,
+        "query_true": QueryFunctions.query_true,
+        "query_false": QueryFunctions.query_false,
+        "query_close": QueryFunctions.query_close
+    }
+
+    if query.data in query_dict_help:
+        handler = query_dict_help[query.data]
+        await handler(update, query)
     
-    # Check user_id in data_center
-    user_id = data_center.get("user_id")
-    if not user_id:
-        await popup(query, f"{user_id} wasn't found in data center!")
-        await del_query(query)
-        return
-    
-    if query.data != "query_whisper": # query_whisper exception ...
-        if user.id != user_id:
-            await popup(query, "Access Denied!")
+    elif query.data in (query_dict_chat_settings or query_dict_chat_settings_2):
+        data_center = await validate_user(query, chat, user)
+        if not data_center:
             return
+        
+        find_chat = await get_chat_data(update, data_center)
+        if not find_chat:
+            return
+        
+        if query.data in query_dict_chat_settings:
+            handler = query_dict_chat_settings[query.data]
+            await handler(update, query, find_chat)
+        
+        elif query.data in query_dict_chat_settings_2:
+            handler = query_dict_chat_settings_2[query.data]
+            await handler(update, query)
     
-    # Get data from data center
-    collection_name = data_center.get("collection_name")
-    db_find = data_center.get("db_find")
-    db_vlaue = data_center.get("db_vlaue")
-    
-    # Check on localdb if not found check on mongodb if not found show error
-    db = await global_search(collection_name, db_find, db_vlaue)
-    if db[0] == False:
-        await Message.reply_message(update, db[1])
-        return
-    
-    find_chat = db[1]
-    
-    if query.data == "query_whisper":
-        data = await LOCAL_DATABASE.find_one("data_center", chat.id)
-        if not data:
-            await popup(query, "Data wasn't found...")
+    elif query.data in query_dict_bot_settings or query.data in query_dict_bot_settings_2 or query.data in query_dict_bot_settings_3:
+        data_center = await validate_user(query, chat, user)
+        if not data_center:
+            return
+        
+        if data_center.get("collection_name") != "bot_docs":
+            await popup(query, "Session expired!")
             await del_query(query)
             return
         
-        whisper_data = data.get("whisper_data")
+        find_chat = await get_chat_data(update, data_center)
+        if not find_chat:
+            return
+        
+        if query.data in query_dict_bot_settings:
+            handler = query_dict_bot_settings[query.data]
+            await handler(update, query, find_chat)
+        
+        elif query.data in query_dict_bot_settings_2:
+            handler = query_dict_bot_settings_2[query.data]
+            await handler(update, query)
+        
+        elif query.data in query_dict_bot_settings_3:
+            handler = query_dict_bot_settings_3[query.data]
+            await handler(update, data_center)
+    
+    elif query.data in query_dict_broadcast:
+        data_center = await validate_user(query, chat, user)
+        if not data_center:
+            return
+        
+        user_id = data_center.get("user_id")
+        data = query_dict_broadcast[query.data]
 
-        user_whisper_data = whisper_data.get(f"@{user.username}") or whisper_data.get(str(user.id))
-        if not user_whisper_data:
-            await popup(query, "This whisper isn't for you or whisper expired...!")
-            return
+        await LOCAL_DATABASE.insert_data("data_center", user_id, data, "broadcast")
         
-        if user_whisper_data.get("whisper_user") not in {user.id, f"@{user.username}"}:
-            await popup(query, "This whisper isn't for you!")
-            return
-        
-        await popup(query, user_whisper_data.get("whisper_msg"))
-    # Database editing query ...
-    elif query.data in [
-        "query_edit_value",
-        "query_rm_value",
-        "query_true",
-        "query_false",
-        "query_close"
-    ]:
+        if query.data != "query_broadcast_done":
+            localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
+            db_broadcast = localdb.get("broadcast")
+            is_forward = db_broadcast.get("is_forward", False)
+            is_pin = db_broadcast.get("is_pin", False)
+            
+            msg = (
+                "<b><u>Broadcast</u></b>\n\n"
+                f"Forward: <code>{is_forward}</code>\n"
+                f"Pin message: <code>{is_pin}</code>"
+            )
+
+            btn_data = [
+                {"Forward?": "query_none", "YES": "query_broadcast_forward_true", "NO": "query_broadcast_forward_false"},
+                {"Pin message?": "query_none", "YES": "query_broadcast_pin_true", "NO": "query_broadcast_pin_false"},
+                {"Done": "query_broadcast_done", "Close": "query_close"}
+            ]
+
+            btn = await Button.cbutton(btn_data)
+            await Message.edit_message(update, msg, query.message, btn)
+    
+    elif query.data in query_dict_db_edit:
+        handler = query_dict_db_edit[query.data]
+
         if query.data == "query_edit_value":
             is_list, is_int = False, False
-            data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
-            edit_data_key = data_center.get("edit_data_key")
+            data_center = await validate_user(query, chat, user)
+            if not data_center:
+                return
             
+            edit_data_key = data_center.get("edit_data_key")
+
             if edit_data_key in ["images", "allowed_links"]:
                 is_list = True
             elif edit_data_key in ["log_channel"]:
@@ -108,197 +244,26 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 is_list = True
                 is_int = True
             
-            await QueryFunctions.query_edit_value(chat.id, query, is_list=is_list, is_int=is_int)
-        elif query.data == "query_rm_value":
-            await QueryFunctions.query_rm_value(chat.id, query)
-        elif query.data == "query_true":
-            await QueryFunctions.query_true(chat.id, query)
-        elif query.data == "query_false":
-            await QueryFunctions.query_false(chat.id, query)
+            await handler(chat.id, query, is_list=is_list, is_int=is_int)
         elif query.data == "query_close":
-            await QueryFunctions.query_close(chat.id, query)
-    # Help section ...
-    elif query.data in [
-        "query_help_group_management_p1",
-        "query_help_group_management_p2",
-        "query_help_ai",
-        "query_help_misc_functions",
-        "query_help_owner_functions",
-        "query_help_bot_info"
-    ]:
-        if query.data == "query_help_group_management_p1":
-            await QueryBotHelp._query_help_group_management_p1(update, query)
-        elif query.data == "query_help_group_management_p2":
-            await QueryBotHelp._query_help_group_management_p2(update, query)
-        elif query.data == "query_help_ai":
-            await QueryBotHelp._query_help_ai(update, query)
-        elif query.data == "query_help_misc_functions":
-            await QueryBotHelp._query_help_misc_functions(update, query)
-        elif query.data == "query_help_owner_functions":
-            await QueryBotHelp._query_help_owner_functions(update, query)
-        elif query.data == "query_help_bot_info":
-            await QueryBotHelp._query_help_bot_info(update, query)
-    # Chat settings ...
-    elif query.data in [
-        "query_chat_lang",
-        "query_chat_auto_tr",
-        "query_chat_set_echo",
-        "query_chat_welcome_user",
-        "query_set_custom_welcome_msg",
-        "query_chat_farewell_user",
-        "query_chat_antibot",
-        "query_chat_del_cmd",
-        "query_chat_log_channel",
-        "query_chat_links_behave",
-        "query_chat_all_links",
-        "query_chat_allowed_links",
-        "query_d_links",
-        "query_c_links",
-        "query_none_links",
-        "query_chat_ai_status"
-    ]:
-        if query.data == "query_chat_lang":
-            await QueryChatSettings._query_chat_lang(update, query, chat, find_chat)
-        if query.data == "query_chat_auto_tr":
-            await QueryChatSettings._query_chat_auto_tr(update, query, chat, find_chat)
-        elif query.data == "query_chat_set_echo":
-            await QueryChatSettings._query_chat_set_echo(update, query, chat, find_chat)
-        elif query.data == "query_chat_welcome_user":
-            await QueryChatSettings._query_chat_welcome_user(update, query, chat, find_chat)
-        elif query.data == "query_set_custom_welcome_msg":
-            await QueryChatSettings._query_set_custom_welcome_msg(update, query, chat, find_chat)
-        elif query.data == "query_chat_farewell_user":
-            await QueryChatSettings._query_chat_farewell_user(update, query, chat, find_chat)
-        elif query.data == "query_chat_antibot":
-            await QueryChatSettings._query_chat_antibot(update, query, chat, find_chat)
-        elif query.data == "query_chat_del_cmd":
-            await QueryChatSettings._query_chat_del_cmd(update, query, chat, find_chat)
-        elif query.data == "query_chat_log_channel":
-            await QueryChatSettings._query_chat_log_channel(update, query, chat, find_chat)
-        elif query.data == "query_chat_links_behave":
-            await QueryChatSettings._query_chat_links_behave(update, query, chat, find_chat)
-        elif query.data == "query_chat_all_links":
-            await QueryChatSettings._query_chat_all_links(update, query, chat, find_chat)
-        elif query.data == "query_chat_allowed_links":
-            await QueryChatSettings._query_chat_allowed_links(update, query, chat, find_chat)
-        elif query.data == "query_d_links":
-            await QueryChatSettings._query_d_links(query, chat)
-        elif query.data == "query_c_links":
-            await QueryChatSettings._query_c_links(query, chat)
-        elif query.data == "query_none_links":
-            await QueryChatSettings._query_none_links(query, chat)
-        elif query.data == "query_chat_ai_status":
-            await QueryChatSettings._query_chat_ai_status(update, query, chat, find_chat)
-    # Bot settings ...
-    elif query.data in [
-        "query_bot_pic",
-        "query_welcome_img",
-        "query_images",
-        "query_support_chat",
-        "query_server_url",
-        "query_sudo",
-        "query_shrinkme_api",
-        "query_omdb_api",
-        "query_weather_api",
-        "query_restore_db",
-        "query_confirm_restore_db",
-        "query_clear_localdb_cache"
-    ]:
-        if collection_name != "bot_docs":
-            await popup(query, "Session expired! Send command again...!")
-            await del_query(query)
+            await handler(update, chat.id, query)
+        else:
+            await handler(chat.id, query)
+    
+    elif query.data == "query_whisper":
+        data_center = await validate_user(query, chat, user, False)
+        if not data_center:
             return
         
-        power_users = await _power_users()
-        if user.id in power_users:
-            if query.data == "query_bot_pic":
-                await QueryBotSettings._query_bot_pic(update, query, user, find_chat)
-            elif query.data == "query_welcome_img":
-                await QueryBotSettings._query_welcome_img(update, query, user, find_chat)
-            elif query.data == "query_images":
-                await QueryBotSettings._query_images(update, query, user, find_chat)
-            elif query.data == "query_support_chat":
-                await QueryBotSettings._query_support_chat(update, query, user, find_chat)
-            elif query.data == "query_server_url":
-                await QueryBotSettings._query_server_url(update, query, user, find_chat)
-            elif query.data == "query_sudo":
-                await QueryBotSettings._query_sudo(update, query, user, find_chat)
-            elif query.data == "query_shrinkme_api":
-                await QueryBotSettings._query_shrinkme_api(update, query, user, find_chat)
-            elif query.data == "query_omdb_api":
-                await QueryBotSettings._query_omdb_api(update, query, user, find_chat)
-            elif query.data == "query_weather_api":
-                await QueryBotSettings._query_weather_api(update, query, user, find_chat)
-            elif query.data == "query_restore_db":
-                await QueryBotSettings._query_restore_db(update, query)
-            elif query.data == "query_confirm_restore_db":
-                await QueryBotSettings._query_confirm_restore_db(update, data_center)
-            elif query.data == "query_clear_localdb_cache":
-                await QueryBotSettings._query_clear_localdb_cache(update, data_center)
-    # Query menus ...
-    elif query.data in [
-        "query_help_menu",
-        "query_chat_settings_menu",
-        "query_bot_settings_menu"
-    ]:
-        if query.data == "query_help_menu":
-            await QueryMenus._query_help_menu(update, query, user)
-        elif query.data == "query_chat_settings_menu":
-            await QueryMenus._query_chat_settings_menu(update, query, chat, find_chat)
-        elif query.data == "query_bot_settings_menu":
-            await QueryMenus._query_bot_settings_menu(update, query)
-    # Query broadcast ...
-    elif query.data in [
-        "query_broadcast_forward_true",
-        "query_broadcast_forward_false",
-        "query_broadcast_pin_true",
-        "query_broadcast_pin_false",
-        "query_broadcast_done"
-    ]:
-        if query.data == "query_broadcast_forward_true":
-            await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_forward": True}, "broadcast")
-        elif query.data == "query_broadcast_forward_false":
-            await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_forward": False}, "broadcast")
-        elif query.data == "query_broadcast_pin_true":
-            await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_pin": True}, "broadcast")
-        elif query.data == "query_broadcast_pin_false":
-            await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_pin": False}, "broadcast")
-        elif query.data == "query_broadcast_done":
-            await LOCAL_DATABASE.insert_data("data_center", user_id, {"is_done": True}, "broadcast")
+        whisper_data = data_center.get("whisper_data")
+
+        user_whisper_data = whisper_data.get(f"@{user.username}") or whisper_data.get(str(user.id))
+        if not user_whisper_data:
+            await popup(query, "This whisper isn't for you or whisper has expired!")
+            return
         
-        if query.data != "query_broadcast_done":
-            localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
-            db_broadcast = localdb.get("broadcast")
-            is_forward = db_broadcast.get("is_forward") or False
-            is_pin = db_broadcast.get("is_pin") or False
-            
-            msg = (
-                "<b><u>Broadcast</u></b>\n\n"
-                f"Forward: <code>{is_forward}</code>\n"
-                f"Pin message: <code>{is_pin}</code>"
-            )
-
-            btn_data_row1 = {
-                "Forward?": "query_none",
-                "YES": "query_broadcast_forward_true",
-                "NO": "query_broadcast_forward_false"
-            }
-
-            btn_data_row2 = {
-                "Pin message?": "query_none",
-                "YES": "query_broadcast_pin_true",
-                "NO": "query_broadcast_pin_false"
-            }
-
-            btn_data_row3 = {
-                "Done": "query_broadcast_done",
-                "Close": "query_close"
-            }
-
-            row1 = await Button.cbutton(btn_data_row1, True)
-            row2 = await Button.cbutton(btn_data_row2, True)
-            row3 = await Button.cbutton(btn_data_row3, True)
-
-            btn = row1 + row2 + row3
-
-            await Message.edit_message(update, msg, query.message, btn)
+        if user_whisper_data.get("whisper_user") not in {user.id, f"@{user.username}"}:
+            await popup(query, "This whisper isn't for you!")
+            return
+        
+        await popup(query, user_whisper_data.get("whisper_msg"))

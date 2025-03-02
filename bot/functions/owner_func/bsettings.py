@@ -25,9 +25,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     _bot = await find_bot_docs()
-    if not _bot:
-        return
-    
+
     data = {
         "user_id": user.id,
         "chat_id": chat.id,
@@ -44,47 +42,16 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     msg = "<u><b>Bot Settings</b></u>"
 
-    btn_data_row1 = {
-        "Bot pic": "query_bot_pic",
-        "Welcome img": "query_welcome_img"
-    }
+    btn_data = [
+        {"Bot pic": "query_bot_pic", "Welcome img": "query_welcome_img"},
+        {"Images": "query_images", "Support chat": "query_support_chat"},
+        {"Server url": "query_server_url", "Sudo": "query_sudo"},
+        {"Shrinkme API": "query_shrinkme_api", "OMDB API": "query_omdb_api"},
+        {"Weather API": "query_weather_api"},
+        {"> Restore DB?": "query_restore_db", "Close": "query_close"}
+    ]
 
-    btn_data_row2 = {
-        "Images": "query_images",
-        "Support chat": "query_support_chat"
-    }
-
-    btn_data_row3 = {
-        "Server url": "query_server_url",
-        "Sudo": "query_sudo"
-    }
-
-    btn_data_row4 = {
-        "Shrinkme API": "query_shrinkme_api",
-        "OMDB API": "query_omdb_api"
-    }
-
-    btn_data_row5 = {
-        "Weather API": "query_weather_api"
-    }
-
-    btn_data_row6 = {
-        "> Restore DB?": "query_restore_db",
-        "Close": "query_close"
-    }
-
-    row1 = await Button.cbutton(btn_data_row1, True)
-    row2 = await Button.cbutton(btn_data_row2, True)
-    row3 = await Button.cbutton(btn_data_row3, True)
-    row4 = await Button.cbutton(btn_data_row4, True)
-    row5 = await Button.cbutton(btn_data_row5, True)
-    row6 = await Button.cbutton(btn_data_row6, True)
-
-    btn = row1 + row2 + row3 + row4 + row5 + row6
-
-    _bot = await find_bot_docs()
-    if not _bot:
-        return
+    btn = await Button.cbutton(btn_data)
     
     images = _bot.get("images")
     if images:

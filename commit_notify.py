@@ -50,10 +50,11 @@ lastest_commit_url = res['html_url']
 commit_message = res['commit']['message']
 
 msg = (
-    f"Yep, another commit to <a href='https://github.com/{owner}/{repo}'>{repo}</a> 🥰\n\n"
-    f"» <a href='{lastest_commit_url}'>{res['sha'][:7]}</a> «\n\n"
+    f"A new commit has been made to <a href='https://github.com/{owner}/{repo}'>{repo}</a>\n\n"
+    f"<b>Latest commit:</b> <a href='{lastest_commit_url}'>{res['sha'][:7]}</a>\n"
+    f"<b>Commit message:</b>\n\n"
     f"<blockquote>{commit_message}</blockquote>\n\n"
-    f"<u>Signed by:</u> {committer['name']}"
+    f"<b>Committed by:</b> <i>{committer['name']}</i>"
 )
 
 sent_msg = send_message(bot_token, chat_id, f"<b>{msg}</b>")

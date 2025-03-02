@@ -78,7 +78,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<code>{chatname}</code> chat title\n"
         )
 
-        btn = await Button.cbutton({"Close": "query_close"}, True)
+        btn = await Button.cbutton([{"Close": "query_close"}])
         await Message.edit_message(update, msg, sent_msg, btn)
         return
 

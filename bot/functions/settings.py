@@ -55,24 +55,13 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Auto tr: <code>{auto_tr}</code>\n\n"
         )
 
-        btn_data_row1 = {
-            "Language": "query_chat_lang",
-            "Auto translate": "query_chat_auto_tr"
-        }
+        btn_data = [
+            {"Language": "query_chat_lang", "Auto translate": "query_chat_auto_tr"},
+            {"Echo": "query_chat_set_echo", "Close": "query_close"}
+        ]
 
-        btn_data_row2 = {
-            "Echo": "query_chat_set_echo",
-            "Close": "query_close"
-        }
-
-        row1 = await Button.cbutton(btn_data_row1, True)
-        row2 = await Button.cbutton(btn_data_row2, True)
-
-        btn = row1 + row2
-
+        btn = await Button.cbutton(btn_data)
         _bot = await find_bot_docs()
-        if not _bot:
-            return
         
         images = _bot.get("images")
         if images:
@@ -139,7 +128,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         welcome_user = find_group.get("welcome_user")
         farewell_user = find_group.get("farewell_user")
         antibot = find_group.get("antibot")
-        ai_status = find_group.get("ai_status") or True
         del_cmd = find_group.get("del_cmd")
         all_links = find_group.get("all_links")
         allowed_links = find_group.get("allowed_links")
@@ -157,6 +145,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
+
             f"• Title: {title}\n"
             f"• ID: <code>{chat.id}</code>\n\n"
 
@@ -170,50 +159,18 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Log channel: <code>{log_channel}</code>\n"
             f"• All links: <code>{all_links}</code>\n"
             f"• Allowed links: <code>{allowed_links}</code>\n"
-            f"• AI status: <code>{ai_status}</code>\n"
         )
 
-        btn_data_row1 = {
-            "Language": "query_chat_lang",
-            "Auto translate": "query_chat_auto_tr"
-        }
+        btn_data = [
+            {"Language": "query_chat_lang", "Auto translate": "query_chat_auto_tr"},
+            {"Echo": "query_chat_set_echo", "Anti bot": "query_chat_antibot"},
+            {"Welcome": "query_chat_welcome_user", "Farewell": "query_chat_farewell_user"},
+            {"Delete CMD": "query_chat_del_cmd", "Log channel": "query_chat_log_channel"},
+            {"Links behave": "query_chat_links_behave", "Close": "query_close"}
+        ]
 
-        btn_data_row2 = {
-            "Echo": "query_chat_set_echo",
-            "Anti bot": "query_chat_antibot"
-        }
-
-        btn_data_row3 = {
-            "Welcome": "query_chat_welcome_user",
-            "Farewell": "query_chat_farewell_user"
-        }
-
-        btn_data_row4 = {
-            "Delete CMD": "query_chat_del_cmd",
-            "Log channel": "query_chat_log_channel"
-        }
-
-        btn_data_row5 = {
-            "Links behave": "query_chat_links_behave",
-            "AI status": "query_chat_ai_status"
-        }
-
-        btn_data_row6 = {
-            "Close": "query_close"
-        }
-
-        row2 = await Button.cbutton(btn_data_row2, True)
-        row3 = await Button.cbutton(btn_data_row3, True)
-        row1 = await Button.cbutton(btn_data_row1, True)
-        row4 = await Button.cbutton(btn_data_row4, True)
-        row5 = await Button.cbutton(btn_data_row5, True)
-        row6 = await Button.cbutton(btn_data_row6)
-
-        btn = row1 + row2 + row3 + row4 + row5 + row6
-
+        btn = await Button.cbutton(btn_data)
         _bot = await find_bot_docs()
-        if not _bot:
-            return
         
         images = _bot.get("images")
         if images:

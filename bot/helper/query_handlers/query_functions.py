@@ -1,5 +1,6 @@
 import asyncio
 from bot import logger
+from telegram import Update
 from bot.helper.telegram_helper import Message
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
@@ -250,25 +251,23 @@ class QueryFunctions:
             logger.error(e)
 
 
-    async def query_close(identifier, query):
+    async def query_close(update: Update, identifier, query):
         """
         identifier > user.id or chat.id (data center identifier)\n
         query > query indicator
         """
+        chat = update.effective_chat
         data_center = await LOCAL_DATABASE.find_one("data_center", identifier)
-        if not data_center:
-            try:
-                await query.answer(f"Error: {identifier} wasn't found in data center! Try to send command again!", True)
-            except Exception as e:
-                logger.error(e)
-            return
+        if data_center:
+            chat_id = data_center.get("chat_id")
+            msg_id = data_center.get("del_msg_pointer_id")
+        else:
+            chat_id = chat.id
+            msg_id = query.message.message_id - 1
         
-        chat_id = data_center.get("chat_id")
-        del_msg_pointer_id = data_center.get("del_msg_pointer_id")
-
-        await Message.delete_message(chat_id, del_msg_pointer_id)
+        await Message.delete_message(chat_id, msg_id)
 
         try:
-            await query.message.delete()
+            await query.delete_message()
         except Exception as e:
             logger.error(e)
