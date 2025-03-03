@@ -90,7 +90,7 @@ class QueryChatSettings:
     async def _query_set_custom_welcome_msg(update: Update, query, find_chat):
         chat = update.effective_chat
         await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "custom_welcome_msg"})
-        custom_welcome_msg = find_chat.get("custom_welcome_msg", "default message")
+        custom_welcome_msg = find_chat.get("custom_welcome_msg") or "default message"
         is_sent_below = None
         if len(custom_welcome_msg) > 100:
             custom_welcome_msg = "Sent below..."

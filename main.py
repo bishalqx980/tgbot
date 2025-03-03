@@ -129,6 +129,16 @@ async def server_alive():
 
 
 async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message = (
+        "An error occured: (/log)\n"
+        f"<pre>{context.error}</pre>"
+    )
+
+    try:
+        await bot.send_message(owner_id, message, parse_mode=ParseMode.HTML)
+    except Exception as e:
+        logger.error(e)
+    
     logger.error(context.error)
 
 

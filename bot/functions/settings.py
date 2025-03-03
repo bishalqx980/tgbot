@@ -42,8 +42,8 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         user_mention = find_user.get("mention")
         lang = find_user.get("lang")
-        echo = find_user.get("echo")
-        auto_tr = find_user.get("auto_tr")
+        echo = find_user.get("echo", False)
+        auto_tr = find_user.get("auto_tr", False)
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
@@ -123,13 +123,13 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         title = find_group.get("title")
         lang = find_group.get("lang")
-        echo = find_group.get("echo")
-        auto_tr = find_group.get("auto_tr")
-        welcome_user = find_group.get("welcome_user")
-        farewell_user = find_group.get("farewell_user")
-        antibot = find_group.get("antibot")
-        del_cmd = find_group.get("del_cmd")
-        all_links = find_group.get("all_links")
+        echo = find_group.get("echo", False)
+        auto_tr = find_group.get("auto_tr", False)
+        welcome_user = find_group.get("welcome_user", False)
+        farewell_user = find_group.get("farewell_user", False)
+        antibot = find_group.get("antibot", False)
+        del_cmd = find_group.get("del_cmd", False)
+        all_links = find_group.get("all_links", False)
         allowed_links = find_group.get("allowed_links")
         log_channel = find_group.get("log_channel")
         

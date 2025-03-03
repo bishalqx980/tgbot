@@ -1,6 +1,6 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
-from bot import logger
+from telegram.constants import ChatID
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.combined_db import global_search
 from bot.modules.database.local_database import LOCAL_DATABASE
@@ -18,7 +18,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not (e_msg.text or e_msg.caption): # return if there is no text or caption
         return
 
-    if user.id == 777000: # Telegram channel
+    if user.id == ChatID.SERVICE_CHAT: # Telegram channel
         return
     
     data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
