@@ -108,13 +108,6 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
     await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
-
-    msg_keywords, counter = "", 0
-    for i in keywords:
-        counter += 1
-        if counter == len(keywords):
-            msg_keywords += f"{i}"
-        else:
-            msg_keywords += f"{i}, "
+    msg_keywords = ", ".join(keywords)
     
     await Message.edit_message(update, f"<code>{msg_keywords}</code> has been added as filter!\n<b>Admin:</b> {user.first_name}", sent_msg)

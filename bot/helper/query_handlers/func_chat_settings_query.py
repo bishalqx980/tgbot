@@ -208,16 +208,8 @@ class QueryChatSettings:
         await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
         all_links = find_chat.get("all_links")
         allowed_links = find_chat.get("allowed_links")
-
         if allowed_links:
-            storage, counter = "", 0
-            for i in allowed_links:
-                counter += 1
-                if counter == len(allowed_links):
-                    storage += f"{i}"
-                else:
-                    storage += f"{i}, "
-            allowed_links = storage
+            allowed_links = ", ".join(allowed_links)
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"
@@ -262,16 +254,8 @@ class QueryChatSettings:
         chat = update.effective_chat
         await LOCAL_DATABASE.insert_data("data_center", chat.id, {"edit_data_key": "allowed_links"})
         allowed_links = find_chat.get("allowed_links")
-        
         if allowed_links:
-            storage, counter = "", 0
-            for i in allowed_links:
-                counter += 1
-                if counter == len(allowed_links):
-                    storage += f"{i}"
-                else:
-                    storage += f"{i}, "
-            allowed_links = storage
+            allowed_links = ", ".join(allowed_links)
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"

@@ -80,9 +80,9 @@ class MongoDB:
         try:
             collection = db[collection_name]
             documents = collection.find_one()
-            data = documents.get(data)
-            if data:
-                return data
+            doc_data = documents.get(data)
+            if doc_data:
+                return doc_data
         except Exception as e:
             logger.error(e)
 
@@ -126,10 +126,11 @@ class MongoDB:
     @staticmethod
     async def info_db(collection_name=None):
         """
-        Get database info or any collection info
+        `collection_name`: optional\n
+        returns `dict`
         """
         docs_name = db.list_collection_names()
-        storage = []
+        data_dict = {}
         for collection_name in docs_name:
             doc_stats = db.command("collstats", collection_name)
             # stats
@@ -137,8 +138,9 @@ class MongoDB:
             doc_count = doc_stats['count']
             doc_size = f"{doc_stats['storageSize'] / (1024 * 1024):.2f} MB"
             doc_acsize = f"{doc_stats['size'] / (1024 * 1024):.2f} MB"
-            storage.append((doc_name, doc_count, doc_size, doc_acsize))
-        return storage
+
+            data_dict.update({doc_name: {"name": doc_name, "quantity": doc_count, "size": doc_size, "acsize": doc_acsize}})
+        return data_dict
 
 
     @staticmethod

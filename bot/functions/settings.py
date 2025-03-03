@@ -134,14 +134,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         log_channel = find_group.get("log_channel")
         
         if allowed_links:
-            storage, counter = "", 0
-            for i in allowed_links:
-                counter += 1
-                if counter == len(allowed_links):
-                    storage += f"{i}"
-                else:
-                    storage += f"{i}, "
-            allowed_links = storage
+            allowed_links = ", ".join(allowed_links)
 
         msg = (
             "<u><b>Chat Settings</b></u>\n\n"

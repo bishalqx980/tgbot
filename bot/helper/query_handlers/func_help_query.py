@@ -1,11 +1,12 @@
 import time
+import json
 import psutil
 from datetime import datetime, timedelta
 from telegram import Update
+from telegram.constants import ChatAction
 from bot import bot
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
 
 
 class QueryBotHelp:
@@ -110,7 +111,7 @@ class QueryBotHelp:
             "<b>Bot owner functions</b>\n\n"
             "/broadcast » broadcast message to all active users\n"
             "/send » send message to specified chat_id\n"
-            "/database » get bot database\n"
+            "/database » get bot/chat database\n"
             "/bsettings » get bot settings\n"
             "/shell » use system shell\n"
             "/log » get log file (for error handling)\n"
@@ -123,15 +124,22 @@ class QueryBotHelp:
     
 
     async def _query_help_bot_info(update: Update, query):
-        info_db = await MongoDB.info_db()
+        # giving a delay notification :)
+        try:
+            await update.effective_chat.send_action(ChatAction.TYPING)
+        except:
+            pass
+
+        database_info = await MongoDB.info_db()
         total_users = None
         total_groups = None
 
-        for i in info_db:
-            if i[0] == "users":
-                total_users = i[1]
-            elif i[0] == "groups":
-                total_groups = i[1]
+        for info in database_info:
+            info = database_info[info]
+            if info.get("name") == "users":
+                total_users = info.get("quantity")
+            elif info.get("name") == "groups":
+                total_groups = info.get("quantity")
             
             if total_users and total_groups:
                 break
@@ -151,6 +159,9 @@ class QueryBotHelp:
         bot_days = bot_uptime.days
         bot_hours, remainder = divmod(bot_uptime.seconds, 3600)
         bot_minute = remainder / 60
+        # loading bot_commands file
+        bot_commands = json.load(open("sys/bot_commands.json", "r"))
+        bot_commands = bot_commands.get("bot_commands")
 
         msg = (
             "<blockquote><code><b>» bot.info()</b></code></blockquote>\n\n"
@@ -165,7 +176,8 @@ class QueryBotHelp:
             f"<b>• Total chats:</b> <code>{total_groups}</code>\n\n"
 
             f"<b>• System uptime:</b> <code>{int(sys_days)}d {int(sys_hours)}h {int(sys_minute)}m</code>\n"
-            f"<b>• Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n\n"
+            f"<b>• Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n"
+            f"<b>• Total commands:</b> <code>{len(bot_commands)}</code>\n\n"
 
             "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
             "<b>• Report bug:</b> <a href='https://github.com/bishalqx980/tgbot/issues'>Report</a>\n"

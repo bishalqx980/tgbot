@@ -52,16 +52,8 @@ class QueryBotSettings:
         user = update.effective_user
         await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "images"})
         images = find_chat.get("images")
-
         if images:
-            storage, counter = "", 0
-            for i in images:
-                counter += 1
-                if counter == len(images):
-                    storage += f"{i}"
-                else:
-                    storage += f"{i}, "
-            images = storage
+            images = ", ".join(images)
         
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
@@ -74,7 +66,7 @@ class QueryBotSettings:
             {"Remove Value": "query_rm_value"},
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
-
+        
         btn = await Button.cbutton(btn_data)
         sent_msg = await Message.edit_message(update, msg, query.message, btn)
 
@@ -137,21 +129,13 @@ class QueryBotSettings:
         user = update.effective_user
         await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "sudo_users"})
         sudo_users = find_chat.get("sudo_users")
-
         if sudo_users:
-            storage, counter = "", 0
-            for i in sudo_users:
-                counter += 1
-                if counter == len(sudo_users):
-                    storage += f"{i}"
-                else:
-                    storage += f"{i}, "
-            sudo_users = storage
-
+            sudo_users = ", ".join(str(i) for i in sudo_users)
+        
         msg = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Sudo users: <code>{sudo_users}</code>\n\n"
-            "<i><b>Note:</b> The power user! Sudo users have owner function access!\nAdd user_id eg. <code>2134776547</code></i>"
+            "<i><b>Note:</b> The power user! Sudo users have owner function access!\nAdd user_id eg. <code>2134776547</code>\nmultiple id will be separated by comma!</i>"
         )
 
         btn_data = [

@@ -129,8 +129,16 @@ async def server_alive():
 
 
 async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    chat = update.effective_chat
+    e_msg = update.effective_message
+    chat_title = chat.full_name or chat.title
+
     message = (
-        "An error occured: (/log)\n"
+        "<b>⚠️ An error occured: [/log]</b>\n\n"
+        f"<b>User:</b> {user.mention_html()} | <code>{user.id}</code>\n"
+        f"<b>Chat:</b> {chat_title} | <code>{chat.id}</code>\n"
+        f"<b>Effective message:</b> <code>{e_msg.text}</code>\n\n"
         f"<pre>{context.error}</pre>"
     )
 

@@ -55,8 +55,7 @@ class QueryFunctions:
                 await asyncio.sleep(0.5)
             
             await LOCAL_DATABASE.insert_data("data_center", identifier, {"edit_data_value": None, "is_editing": False})
-            await Message.delete_message(chat_id, edit_data_value_msg_pointer_id)
-            await Message.delete_message(chat_id, sent_msg)
+            await Message.delete_messages(chat_id, [edit_data_value_msg_pointer_id, sent_msg.id])
             
             if not edit_data_value:
                 try:
@@ -69,17 +68,12 @@ class QueryFunctions:
                 if "," in str(edit_data_value):
                     storage = []
                     for value in edit_data_value.split(","):
-                        if is_int:
-                            storage.append(int(value))
-                        else:
-                            storage.append(value)
+                        value = int(value) if is_int else value.strip()
+                        storage.append(value)
                     edit_data_value = storage
                 else:
-                    if is_int:
-                        edit_data_value = [int(edit_data_value)]
-                    else:
-                        edit_data_value = [edit_data_value]
-        
+                    edit_data_value = [int(edit_data_value)] if is_int else [edit_data_value]
+                
         # bot_docs exception ...
         if db_find == "_id":
             db_vlaue = await MongoDB.find("bot_docs", "_id")
