@@ -129,18 +129,24 @@ async def server_alive():
 
 
 async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    chat = update.effective_chat
-    e_msg = update.effective_message
-    chat_title = chat.full_name or chat.title
+    if update:
+        user = update.effective_user
+        chat = update.effective_chat
+        e_msg = update.effective_message
+        chat_title = chat.full_name or chat.title
 
-    message = (
-        "<b>⚠️ An error occured: [/log]</b>\n\n"
-        f"<b>User:</b> {user.mention_html()} | <code>{user.id}</code>\n"
-        f"<b>Chat:</b> {chat_title} | <code>{chat.id}</code>\n"
-        f"<b>Effective message:</b> <code>{e_msg.text}</code>\n\n"
-        f"<pre>{context.error}</pre>"
-    )
+        message = (
+            "<b>⚠️ An error occured: [/log]</b>\n\n"
+            f"<b>User:</b> {user.mention_html()} | <code>{user.id}</code>\n"
+            f"<b>Chat:</b> {chat_title} | <code>{chat.id}</code>\n"
+            f"<b>Effective message:</b> <code>{e_msg.text}</code>\n\n"
+            f"<pre>{context.error}</pre>"
+        )
+    else:
+        message = (
+            "<b>⚠️ An error occured: [/log]</b>\n\n"
+            f"<pre>{context.error}</pre>"
+        )
 
     try:
         await bot.send_message(owner_id, message, parse_mode=ParseMode.HTML)
