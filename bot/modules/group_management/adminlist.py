@@ -19,9 +19,9 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     admins = await bot.get_chat_administrators(chat.id)
     for admin in admins:
-        custom_title = f"- <i>{admin.custom_title}</i>" if admin.custom_title else ""
+        custom_title = admin.custom_title if admin.custom_title else ""
         admin_name = "Ghost 👻" if admin.is_anonymous else admin.user.mention_html()
-        formatted_msg = f"• {admin_name} {custom_title}\n"
+        formatted_msg = f"• {admin_name} - <i>{custom_title}</i>\n"
 
         if admin.status == "creator":
             owner_storage += formatted_msg

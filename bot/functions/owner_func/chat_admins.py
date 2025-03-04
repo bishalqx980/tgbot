@@ -36,9 +36,8 @@ async def func_chat_admins(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     for admin in admins:
-        custom_title = f"- <i>{admin.custom_title}</i>" if admin.custom_title else ""
-        admin_name = "Ghost 👻" if admin.is_anonymous else admin.user.mention_html()
-        formatted_msg = f"• {admin_name} {custom_title}\n"
+        custom_title = admin.custom_title if admin.custom_title else ""
+        formatted_msg = f"• {admin.user.mention_html()} - <i>{custom_title}</i>\n"
 
         if admin.status == "creator":
             owner_storage += formatted_msg
