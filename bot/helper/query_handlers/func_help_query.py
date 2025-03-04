@@ -1,9 +1,8 @@
-import time
 import json
 import psutil
+from time import time
 from datetime import datetime, timedelta
 from telegram import Update
-from telegram.constants import ChatAction
 from bot import bot
 from bot.helper.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
@@ -124,12 +123,6 @@ class QueryBotHelp:
     
 
     async def _query_help_bot_info(update: Update, query):
-        # giving a delay notification :)
-        try:
-            await update.effective_chat.send_action(ChatAction.TYPING)
-        except:
-            pass
-
         database_info = await MongoDB.info_db()
         total_users = None
         total_groups = None
@@ -154,7 +147,7 @@ class QueryBotHelp:
         sys_hours, remainder = divmod(sys_uptime.seconds, 3600)
         sys_minute = remainder / 60
         # Getting bot uptime
-        bot_uptime = timedelta(seconds=time.time() - float(open("sys/bot_uptime.txt", "r").read()))
+        bot_uptime = timedelta(seconds=time() - float(open("sys/bot_uptime.txt", "r").read()))
         # Extracting bot uptime in days, hours and minutes
         bot_days = bot_uptime.days
         bot_hours, remainder = divmod(bot_uptime.seconds, 3600)

@@ -1,5 +1,5 @@
-import time
 import aiohttp
+from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
@@ -17,10 +17,10 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     sent_msg = await Message.reply_message(update, f"Pinging {url}\nPlease wait...")
     try:
-        start_time = time.time()
+        start_time = time()
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
-                response_time = int((time.time() - start_time) * 1000)
+                response_time = int((time() - start_time) * 1000)
                 if response_time > 1000:
                     response_time = f"{(response_time / 1000):.2f}s"
                 else:

@@ -1,5 +1,5 @@
-import time
 import psutil
+from time import time
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
@@ -22,7 +22,7 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sys_hours, remainder = divmod(sys_uptime.seconds, 3600)
     sys_minute = remainder / 60
     # Getting bot uptime
-    bot_uptime = timedelta(seconds=time.time() - float(open("sys/bot_uptime.txt", "r").read()))
+    bot_uptime = timedelta(seconds=time() - float(open("sys/bot_uptime.txt", "r").read()))
     # Extracting bot uptime in days, hours and minutes
     bot_days = bot_uptime.days
     bot_hours, remainder = divmod(bot_uptime.seconds, 3600)

@@ -1,5 +1,5 @@
-import time
 import asyncio
+from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import Forbidden
@@ -107,7 +107,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     exception_user_ids = []
     notify_btn = await Button.cbutton([{"Cancel": "query_close"}])
     notify = await Message.send_message(user.id, f"Total users: {len(users_id)}\nActive users: {len(active_users)}", btn=notify_btn)
-    start_time = time.time()
+    start_time = time()
 
     for user_id in active_users:
         if is_forward:
@@ -156,7 +156,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_message(update, msg)
             break
 
-    end_time = time.time()
+    end_time = time()
     time_took = f"{(end_time - start_time):.2f} sec"
     if (end_time - start_time) > 60:
         time_took = f"{((end_time - start_time) / 60):.2f} min"

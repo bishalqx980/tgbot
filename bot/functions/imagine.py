@@ -1,5 +1,5 @@
 import os
-import time
+from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
@@ -17,9 +17,9 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     sent_msg = await Message.reply_message(update, "🎨 Generating...")
-    start_time = time.time()
+    start_time = time()
     response = await LLM.imagine(prompt, f"imagine_{user.id}")
-    response_time = int(time.time() - start_time)
+    response_time = int(time() - start_time)
     if not response:
         await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
         return

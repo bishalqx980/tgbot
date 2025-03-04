@@ -1,6 +1,6 @@
-import time
 import asyncio
 import subprocess
+from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
@@ -32,7 +32,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sent_msg = await Message.reply_message(update, "<b>⌊ please wait... ⌉</b>")
     
-    time_executing = time.time()
+    time_executing = time()
 
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -40,7 +40,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logger.error(e)
         return
     
-    time_executed = time.time()
+    time_executed = time()
     
     if not result.stdout and not result.stderr:
         await Message.edit_message(update, "<b>⌊ None ⌉</b>", sent_msg)

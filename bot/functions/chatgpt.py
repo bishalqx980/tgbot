@@ -1,4 +1,4 @@
-import time
+from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helper import Message
@@ -13,9 +13,9 @@ async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     sent_msg = await Message.reply_message(update, "💭 Generating...")
-    start_time = time.time()
+    start_time = time()
     response = await LLM.text_gen(prompt)
-    response_time = int(time.time() - start_time)
+    response_time = int(time() - start_time)
     if response:
         msg = (
             f"<b>💭 Prompt:</b> <code>{prompt}</code>\n"

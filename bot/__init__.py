@@ -1,8 +1,8 @@
 import os
-import time
 import json
 import shutil
 import logging
+from time import time
 from telegram import Bot
 from dotenv import load_dotenv
 from bot.alive import alive
@@ -18,7 +18,7 @@ except Exception as e:
     exit(1)
 
 # storing bot uptime on startup
-open("sys/bot_uptime.txt", "w").write(str(time.time()))
+open("sys/bot_uptime.txt", "w").write(str(time()))
 # Creating log.txt file
 open("sys/log.txt", "w")
 
