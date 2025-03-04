@@ -44,6 +44,8 @@ from bot.functions.id import func_id
 from bot.functions.help import func_help
 from bot.functions.owner_func.broadcast import func_broadcast
 from bot.functions.owner_func.send import func_send
+from bot.functions.owner_func.chat_admins import func_chat_admins
+from bot.functions.owner_func.invitelink import func_get_invitelink
 from bot.functions.owner_func.database import func_database
 from bot.functions.owner_func.bsettings import func_bsettings
 from bot.functions.owner_func.shell import func_shell
@@ -230,6 +232,8 @@ def main():
         # owner commands...
         "broadcast": func_broadcast,
         "send": func_send,
+        "chatadmins": func_chat_admins,
+        "invitelink": func_get_invitelink,
         "database": func_database,
         "bsettings": func_bsettings,
         "shell": func_shell,

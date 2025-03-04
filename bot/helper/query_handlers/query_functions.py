@@ -252,14 +252,15 @@ class QueryFunctions:
         """
         chat = update.effective_chat
         data_center = await LOCAL_DATABASE.find_one("data_center", identifier)
+        msg_ids = [query.message.message_id - 1]
+
         if data_center:
             chat_id = data_center.get("chat_id")
-            msg_id = data_center.get("del_msg_pointer_id")
+            msg_ids.append(data_center.get("del_msg_pointer_id"))
         else:
             chat_id = chat.id
-            msg_id = query.message.message_id - 1
         
-        await Message.delete_message(chat_id, msg_id)
+        await Message.delete_messages(chat_id, msg_ids)
 
         try:
             await query.delete_message()

@@ -110,6 +110,8 @@ class QueryBotHelp:
             "<b>Bot owner functions</b>\n\n"
             "/broadcast » broadcast message to all active users\n"
             "/send » send message to specified chat_id\n"
+            "/chatadmins » to get adminlist of specified chat_id\n"
+            "/invitelink » to get invite link of specified chat_id\n"
             "/database » get bot/chat database\n"
             "/bsettings » get bot settings\n"
             "/shell » use system shell\n"
