@@ -26,13 +26,14 @@ async def func_chat_admins(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_message(update, "<code>/chatadmins chat_id</code> to get specified chat adminlist.\n<i>Note: only works if this bot is in that chat!</i>")
         return
     
+    sent_msg = await Message.reply_message(update, "Please wait...")
     owner_storage = "<b>Owner:</b>\n"
     admins_storage = ""
 
     try:
         admins = await bot.get_chat_administrators(chat_id)
     except Exception as e:
-        await Message.reply_message(update, str(e))
+        await Message.edit_message(update, str(e), sent_msg)
         return
     
     for admin in admins:
@@ -52,4 +53,4 @@ async def func_chat_admins(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{owner_storage}{admins_storage}"
     )
 
-    await Message.reply_message(update, msg)
+    await Message.edit_message(update, msg, sent_msg)
