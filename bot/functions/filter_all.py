@@ -52,8 +52,9 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if auto_tr_status:
             lang_code = find_user.get("lang")
             if lang_code:
-                translated_text = await translate(e_msg.text or e_msg.caption, lang_code)
-                if translated_text and (translated_text != e_msg.text and translated_text != e_msg.caption):
+                original_text = e_msg.text or e_msg.caption
+                translated_text = await translate(original_text, lang_code)
+                if translated_text and translated_text.lower() != original_text.lower():
                     await Message.reply_message(update, translated_text)
                 elif translated_text == False:
                     btn = await Button.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
@@ -125,7 +126,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if lang_code:
                 to_translate = cleaned_msg if msg_contains_link else (e_msg.text or e_msg.caption)
                 translated_text = await translate(to_translate, lang_code)
-                if translated_text and translated_text != to_translate:
+                if translated_text and translated_text.lower() != to_translate.lower():
                     message = (
                         f"{translated_text}\n\n"
                         f"<a href='{e_msg.link}'>{e_msg.id}</a> | {user.mention_html()}"

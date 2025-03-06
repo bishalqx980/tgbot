@@ -6,7 +6,8 @@ def get_latest_commit(owner, repo):
     try:
         response = requests.get(url)
         if response.status_code != 200:
-            return response.text
+            print(response.text)
+            return
         
         commits_data = response.json()
         latest_commit = commits_data[0]
