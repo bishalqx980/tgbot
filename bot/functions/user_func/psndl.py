@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helpers.telegram_helper import Message
-from bot.modules.psndl import PSNDL
+from bot.modules.psndl.psndl import PSNDL
 from bot.modules.telegraph import TELEGRAPH
 
 

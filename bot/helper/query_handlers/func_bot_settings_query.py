@@ -1,5 +1,5 @@
 from telegram import Update
-from bot import localdb_default_structure
+from bot import LOCAL_DB_DEFAULT
 from bot.update_db import update_database
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
@@ -239,7 +239,7 @@ class QueryBotSettings:
 
 
     async def _query_clear_localdb_cache(update: Update, data_center):
-        res = await LOCAL_DATABASE.restore_db(localdb_default_structure)
+        res = await LOCAL_DATABASE.restore_db(LOCAL_DB_DEFAULT)
         await update_database()
         msg = "LocalDB cache has been cleared!" if res else "Something went wrong! Check /log"
         await Message.send_message(data_center.get("chat_id"), msg)
