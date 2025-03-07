@@ -4,7 +4,7 @@ from time import time
 from datetime import datetime, timedelta
 from telegram import Update
 from bot import bot
-from bot.helper.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
 
 

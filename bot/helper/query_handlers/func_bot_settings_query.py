@@ -1,7 +1,7 @@
 from telegram import Update
 from bot import localdb_default_structure
 from bot.update_db import update_database
-from bot.helper.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
 

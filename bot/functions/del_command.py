@@ -2,7 +2,7 @@ import json
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.functions.filter_all import func_filter_all
-from bot.helper.telegram_helper import Message
+from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.modules.database.combined_db import global_search
 
 async def func_del_command(update: Update, context: ContextTypes.DEFAULT_TYPE):

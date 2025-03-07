@@ -1,5 +1,5 @@
 from telegram import Update
-from bot.helper.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.helper.query_handlers.query_functions import QueryFunctions
 from bot.modules.database.local_database import LOCAL_DATABASE
 

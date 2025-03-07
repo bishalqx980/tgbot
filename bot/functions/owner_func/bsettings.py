@@ -2,7 +2,7 @@ import random
 import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database.combined_db import find_bot_docs
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.power_users import _power_users

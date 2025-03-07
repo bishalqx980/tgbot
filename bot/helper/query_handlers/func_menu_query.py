@@ -1,5 +1,5 @@
 from telegram import Update
-from bot.helper.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.telegram_helper import Message, Button
 
 
 class QueryMenus:

@@ -4,7 +4,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import Forbidden
 from bot import bot, logger
-from bot.helper.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.power_users import _power_users

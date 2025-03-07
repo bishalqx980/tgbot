@@ -3,7 +3,7 @@ from time import time
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.telegram_helper import Message
+from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.functions.power_users import _power_users
 
 

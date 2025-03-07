@@ -1,11 +1,11 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from telegram.constants import ChatID
-from bot.helper.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database.combined_db import global_search
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.modules.translator import translate
-from bot.modules.group_management.check_permission import _check_permission
+from bot.functions.group_management.check_permission import _check_permission
 from bot.modules.re_link import RE_LINK
 from bot.modules.base64 import BASE64
 

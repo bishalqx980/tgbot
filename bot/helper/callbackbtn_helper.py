@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
-from bot.helper.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.helper.query_handlers.query_functions import QueryFunctions
 from bot.helper.query_handlers.func_help_query import QueryBotHelp
 from bot.helper.query_handlers.func_chat_settings_query import QueryChatSettings

@@ -2,7 +2,7 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import bot
-from bot.helper.telegram_helper import Message
+from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.functions.power_users import _power_users
 
 async def func_chat_admins(update: Update, context: ContextTypes.DEFAULT_TYPE):

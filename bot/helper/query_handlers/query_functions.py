@@ -1,7 +1,7 @@
 import asyncio
 from bot import logger
 from telegram import Update
-from bot.helper.telegram_helper import Message
+from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.modules.database.mongodb import MongoDB
 from bot.modules.database.local_database import LOCAL_DATABASE
 

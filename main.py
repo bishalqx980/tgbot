@@ -16,32 +16,32 @@ from telegram.ext import (
 from telegram.constants import ParseMode
 from bot import bot_token, bot, logger, owner_id
 from bot.update_db import update_database
-from bot.helper.telegram_helper import Message
+from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.power_users import _power_users
-from bot.functions.start import func_start
-from bot.functions.movieinfo import func_movieinfo
-from bot.functions.translator import func_translator
-from bot.functions.b64decode import func_b64decode
-from bot.functions.b64encode import func_b64encode
-from bot.functions.shortener import func_shortener
-from bot.functions.ping import func_ping
-from bot.functions.calc import func_calc
-from bot.functions.tts import func_tts
-from bot.functions.weather import func_weather
-from bot.functions.imagine import func_imagine
-from bot.functions.chatgpt import func_chatgpt
-from bot.functions.gen_qr import func_gen_qr
-from bot.functions.img_to_link import func_img_to_link
-from bot.functions.paste import func_paste
-from bot.functions.whisper import func_whisper
-from bot.functions.ytdl import func_ytdl
-from bot.functions.info import func_info
-from bot.functions.psndl import func_psndl
-from bot.functions.psndl import func_rap
-from bot.functions.settings import func_settings
-from bot.functions.id import func_id
-from bot.functions.help import func_help
+from bot.functions.core.start import func_start
+from bot.functions.user_func.movieinfo import func_movieinfo
+from bot.functions.user_func.translator import func_translator
+from bot.functions.user_func.b64decode import func_b64decode
+from bot.functions.user_func.b64encode import func_b64encode
+from bot.functions.user_func.shortener import func_shortener
+from bot.functions.user_func.ping import func_ping
+from bot.functions.user_func.calc import func_calc
+from bot.functions.user_func.tts import func_tts
+from bot.functions.user_func.weather import func_weather
+from bot.functions.user_func.imagine import func_imagine
+from bot.functions.user_func.chatgpt import func_chatgpt
+from bot.functions.user_func.gen_qr import func_gen_qr
+from bot.functions.user_func.img_to_link import func_img_to_link
+from bot.functions.user_func.paste import func_paste
+from bot.functions.user_func.whisper import func_whisper
+from bot.functions.user_func.ytdl import func_ytdl
+from bot.functions.user_func.info import func_info
+from bot.functions.user_func.psndl import func_psndl
+from bot.functions.user_func.psndl import func_rap
+from bot.functions.user_func.settings import func_settings
+from bot.functions.user_func.id import func_id
+from bot.functions.core.help import func_help
 from bot.functions.owner_func.broadcast import func_broadcast
 from bot.functions.owner_func.send import func_send
 from bot.functions.owner_func.chat_admins import func_chat_admins
@@ -54,8 +54,8 @@ from bot.functions.owner_func.sys import func_sys
 # from bot.functions.filter_service_msg import func_filter_services
 from bot.functions.filter_all import func_filter_all
 from bot.functions.del_command import func_del_command
-from bot.modules.group_management.invite_link import func_invite_link
-from bot.modules.group_management.promote import (
+from bot.functions.group_management.invite_link import func_invite_link
+from bot.functions.group_management.promote import (
     func_promote,
     func_apromote,
     func_spromote,
@@ -65,27 +65,27 @@ from bot.modules.group_management.promote import (
     func_sfpromote,
     func_sfapromote
 )
-from bot.modules.group_management.admin_title import func_admintitle, func_sadmintitle
-from bot.modules.group_management.demote import func_demote, func_sdemote
-from bot.modules.group_management.pin_msg import func_pin_msg, func_spin_msg
-from bot.modules.group_management.unpin_msg import func_unpin_msg, func_sunpin_msg
-from bot.modules.group_management.unpinall_msg import func_unpinall_msg, func_sunpinall_msg
-from bot.modules.group_management.ban import func_ban, func_sban
-from bot.modules.group_management.unban import func_unban, func_sunban
-from bot.modules.group_management.kick import func_kick, func_skick
-from bot.modules.group_management.kickme import func_kickme
-from bot.modules.group_management.mute import func_mute, func_smute
-from bot.modules.group_management.unmute import func_unmute, func_sunmute
-from bot.modules.group_management.del_msg import func_del, func_sdel
-from bot.modules.group_management.purge import func_purge, func_spurge, func_purgefrom, func_purgeto
-from bot.modules.group_management.lock_chat import func_lockchat
-from bot.modules.group_management.unlock_chat import func_unlockchat
-from bot.modules.group_management.add_filter import func_filter
-from bot.modules.group_management.remove_filter import func_remove
-from bot.modules.group_management.filters import func_filters
-from bot.modules.group_management.adminlist import func_adminlist
-from bot.modules.group_management.track_bot_chat import track_bot_chat_act
-from bot.modules.group_management.track_other_chat import track_other_chat_act
+from bot.functions.group_management.admin_title import func_admintitle, func_sadmintitle
+from bot.functions.group_management.demote import func_demote, func_sdemote
+from bot.functions.group_management.pin_msg import func_pin_msg, func_spin_msg
+from bot.functions.group_management.unpin_msg import func_unpin_msg, func_sunpin_msg
+from bot.functions.group_management.unpinall_msg import func_unpinall_msg, func_sunpinall_msg
+from bot.functions.group_management.ban import func_ban, func_sban
+from bot.functions.group_management.unban import func_unban, func_sunban
+from bot.functions.group_management.kick import func_kick, func_skick
+from bot.functions.group_management.kickme import func_kickme
+from bot.functions.group_management.mute import func_mute, func_smute
+from bot.functions.group_management.unmute import func_unmute, func_sunmute
+from bot.functions.group_management.del_msg import func_del, func_sdel
+from bot.functions.group_management.purge import func_purge, func_spurge, func_purgefrom, func_purgeto
+from bot.functions.group_management.lock_chat import func_lockchat
+from bot.functions.group_management.unlock_chat import func_unlockchat
+from bot.functions.group_management.add_filter import func_filter
+from bot.functions.group_management.remove_filter import func_remove
+from bot.functions.group_management.filters import func_filters
+from bot.functions.group_management.adminlist import func_adminlist
+from bot.functions.group_management.track_bot_chat import track_bot_chat_act
+from bot.functions.group_management.track_other_chat import track_other_chat_act
 from bot.helper.callbackbtn_helper import func_callbackbtn
 
 
