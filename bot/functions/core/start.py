@@ -1,21 +1,24 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import bot, owner_id
+from bot import CONFIG_FILE, bot
+from bot.config import load_config
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.functions.core.help import func_help
-from bot.modules.database.combined_db import find_bot_docs, check_add_user_db
-
+from bot.modules.database import MemoryDB
+from bot.modules.database.common import database_add_user
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    ENV_CONFIG = load_config(CONFIG_FILE)
     user = update.effective_user
     chat = update.effective_chat
     args = " ".join(context.args)
+    
 
     if args == "help":
         await func_help(update, context)
         return
 
-    if not owner_id:
+    if not ENV_CONFIG["owner_id"]:
         msg = f"owner_id: <code>{chat.id}</code>\nPlease add owner_id in <code>config.env</code> file then retry. Otherwise bot won't work properly." if chat.type == "private" else "Error <i>owner_id</i> not provided!"
         await Message.reply_message(update, msg)
         return
@@ -24,12 +27,9 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = await Button.ubutton([{"Start me in PM": f"{bot.link}?start=start"}])
         await Message.reply_message(update, f"Hey, {user.first_name}\nStart me in PM!", btn=btn)
         return
-    
-    _bot = await find_bot_docs()
 
-    bot_pic = _bot.get("bot_pic")
-    welcome_img = _bot.get("welcome_img")
-    support_chat = _bot.get("support_chat")
+    bot_pic = MemoryDB.bot_data.get("bot_pic")
+    support_chat = MemoryDB.bot_data.get("support_chat")
 
     msg = (
         f"Hey, {user.first_name}! I'm {bot.first_name}!\n"
@@ -49,8 +49,8 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_data.append({"Support Chat": support_chat})
     
     btn = await Button.ubutton(btn_data)
-    sent_img = await Message.reply_image(update, bot_pic, msg, btn=btn) if welcome_img and bot_pic else None
+    sent_img = await Message.reply_image(update, bot_pic, msg, btn=btn) if bot_pic else None
     if not sent_img:
         await Message.reply_message(update, msg, btn=btn)
     
-    await check_add_user_db(user)
+    database_add_user(user)

@@ -2,9 +2,8 @@ import random
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
-from bot.modules.database.combined_db import global_search
-from bot.modules.database.combined_db import find_bot_docs
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database import MemoryDB
+from bot.modules.database.common import database_search
 from bot.functions.del_command import func_del_command
 from bot.functions.group_management.check_permission import _check_permission
 
@@ -13,10 +12,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     e_msg = update.effective_message
-
-    _bot = await find_bot_docs()
-    if not _bot:
-        return
 
     if chat.type == "private":
         data = {
@@ -31,9 +26,9 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "edit_data_value_msg_pointer_id": None
         }
 
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+        MemoryDB.insert_data("data_center", chat.id, data)
 
-        db = await global_search("users", "user_id", user.id)
+        db = database_search("users", "user_id", user.id)
         if db[0] == False:
             await Message.reply_message(update, db[1])
             return
@@ -61,13 +56,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
 
         btn = await Button.cbutton(btn_data)
-        _bot = await find_bot_docs()
-        
-        images = _bot.get("images")
+
+        images = MemoryDB.bot_data.get("images")
         if images:
             image = random.choice(images).strip()
         else:
-            image = _bot.get("bot_pic")
+            image = MemoryDB.bot_data.get("bot_pic")
 
         if image:
             await Message.reply_image(update, image, msg, btn=btn)
@@ -112,9 +106,9 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "edit_data_value_msg_pointer_id": None
         }
         
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+        MemoryDB.insert_data("data_center", chat.id, data)
 
-        db = await global_search("groups", "chat_id", chat.id)
+        db = database_search("groups", "chat_id", chat.id)
         if db[0] == False:
             await Message.edit_message(update, db[1], sent_msg)
             return
@@ -163,13 +157,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ]
 
         btn = await Button.cbutton(btn_data)
-        _bot = await find_bot_docs()
         
-        images = _bot.get("images")
+        images = MemoryDB.bot_data.get("images")
         if images:
             image = random.choice(images).strip()
         else:
-            image = _bot.get("bot_pic")
+            image = MemoryDB.bot_data.get("bot_pic")
         
         if image:
             await Message.reply_image(update, image, msg, btn=btn)

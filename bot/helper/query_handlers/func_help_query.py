@@ -5,8 +5,7 @@ from datetime import datetime, timedelta
 from telegram import Update
 from bot import bot
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
-from bot.modules.database.mongodb import MongoDB
-
+from bot.modules.database import MemoryDB, MongoDB
 
 class QueryBotHelp:
     async def _query_help_group_management_p1(update: Update, query):
@@ -125,7 +124,7 @@ class QueryBotHelp:
     
 
     async def _query_help_bot_info(update: Update, query):
-        database_info = await MongoDB.info_db()
+        database_info = MongoDB.info_db()
         total_users = None
         total_groups = None
 
@@ -139,24 +138,23 @@ class QueryBotHelp:
             if total_users and total_groups:
                 break
         
-        active_status = await MongoDB.find("users", "active_status")
+        active_status = MongoDB.find("users", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
-        # Calculate the system uptime
+
         sys_uptime = timedelta(seconds=datetime.now().timestamp() - psutil.boot_time())
-        # Extracting system uptime in days, hours and minutes
+
         sys_days = sys_uptime.days
         sys_hours, remainder = divmod(sys_uptime.seconds, 3600)
         sys_minute = remainder / 60
-        # Getting bot uptime
-        bot_uptime = timedelta(seconds=time() - float(open("sys/bot_uptime.txt", "r").read()))
-        # Extracting bot uptime in days, hours and minutes
+
+        bot_uptime = timedelta(seconds=time() - float(MemoryDB.bot_data.get("bot_uptime", 0)))
+
         bot_days = bot_uptime.days
         bot_hours, remainder = divmod(bot_uptime.seconds, 3600)
         bot_minute = remainder / 60
-        # loading bot_commands file
-        bot_commands = json.load(open("sys/bot_commands.json", "r"))
-        bot_commands = bot_commands.get("bot_commands")
+
+        bot_commands = MemoryDB.bot_data.get("bot_commands", [])
 
         msg = (
             "<blockquote><code><b>» bot.info()</b></code></blockquote>\n\n"

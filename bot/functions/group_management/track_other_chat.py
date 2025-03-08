@@ -2,7 +2,7 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import bot, logger
 from bot.helper.telegram_helpers.telegram_helper import Message
-from bot.modules.database.combined_db import global_search
+from bot.modules.database.common import database_search
 from bot.functions.group_management.log_channel import _log_channel
 from bot.functions.group_management.check_permission import _check_permission
 from bot.functions.group_management.chat_member_status import _chat_member_status
@@ -18,7 +18,7 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
     user = chat_member.from_user # cause user
     victim = chat_member.new_chat_member.user
 
-    db = await global_search("groups", "chat_id", chat.id)
+    db = database_search("groups", "chat_id", chat.id)
     if db[0] == False:
         # await Message.send_message(chat.id, db[1])
         return

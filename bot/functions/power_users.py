@@ -1,14 +1,14 @@
-from bot import owner_id
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot import CONFIG_FILE
+from bot.config import load_config
+from bot.modules.database import MemoryDB
 
 async def _power_users():
     """
     retuns `list` of `sudo's` including **owner_id**
     """
-    bot_docs = await LOCAL_DATABASE.find("bot_docs")
-    if bot_docs:
-        sudo_users = bot_docs.get("sudo_users")
+    ENV_CONFIG = load_config(CONFIG_FILE)
+    sudo_users = MemoryDB.bot_data.get("sudo_users")
 
     power_users = sudo_users if sudo_users else []
-    power_users.append(int(owner_id))
+    power_users.append(int(ENV_CONFIG["owner_id"]))
     return power_users

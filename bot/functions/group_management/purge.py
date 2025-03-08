@@ -2,9 +2,9 @@ import asyncio
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.telegram_helper import Message
+from bot.modules.database import MemoryDB
 from bot.functions.group_management.pm_error import _pm_error
 from bot.functions.group_management.log_channel import _log_channel
-from bot.modules.database.local_database import LOCAL_DATABASE
 from bot.functions.del_command import func_del_command
 from bot.functions.group_management.check_permission import _check_permission
 
@@ -89,7 +89,7 @@ async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_message(update, "Reply the message with /purgefrom which message you want to purge from! Then reply the message with /purgeto where to stop purge!")
         return
     
-    await LOCAL_DATABASE.insert_data("data_center", chat.id, {"purgefrom_id": reply.id})
+    MemoryDB.insert_data("data_center", chat.id, {"purgefrom_id": reply.id})
     sent_msg = await Message.reply_message(update, "<code>purgefrom</code> added...")
     await asyncio.sleep(5)
     await Message.delete_messages(chat.id, [e_msg.id, sent_msg.id])
@@ -104,15 +104,15 @@ async def func_purgeto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     purgefrom_id = None
-    localdb = await LOCAL_DATABASE.find_one("data_center", chat.id)
-    if localdb:
-        purgefrom_id = localdb.get("purgefrom_id")
+    data_center = MemoryDB.data_center.get(chat.id)
+    if data_center:
+        purgefrom_id = data_center.get("purgefrom_id")
     
     if not purgefrom_id:
         await Message.reply_message(update, "Reply the message with /purgefrom which message you want to purge from! Then reply the message with /purgeto where to stop purge!")
         return
     
-    await LOCAL_DATABASE.insert_data("data_center", chat.id, {"purgefrom_id": None})
+    MemoryDB.insert_data("data_center", chat.id, {"purgefrom_id": None})
     await func_purge(update, context, purgefrom_id=purgefrom_id)
     await asyncio.sleep(5)
     await Message.delete_message(chat.id, e_msg)

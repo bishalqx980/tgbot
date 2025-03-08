@@ -1,9 +1,8 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
-from bot.modules.database.combined_db import global_search
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database.common import database_search
+from bot.modules.database import MemoryDB, MongoDB
 from bot.functions.group_management.pm_error import _pm_error
 from bot.functions.del_command import func_del_command
 from bot.functions.group_management.check_permission import _check_permission
@@ -59,7 +58,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "edit_data_value_msg_pointer_id": None
         }
 
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+        MemoryDB.insert_data("data_center", chat.id, data)
 
         msg = (
             "To set filters for this chat follow the instruction below...\n"
@@ -82,7 +81,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_message(update, msg, sent_msg, btn)
         return
 
-    db = await global_search("groups", "chat_id", chat.id)
+    db = database_search("groups", "chat_id", chat.id)
     if db[0] == False:
         await Message.edit_message(update, db[1], sent_msg)
         return
@@ -100,14 +99,14 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = {}
         for keyword in keywords:
             data.update({keyword: value})
-        await MongoDB.update_db("groups", "chat_id", chat.id, "filters", data)
+        MongoDB.update_db("groups", "chat_id", chat.id, "filters", data)
     else:
         for keyword in keywords:
             filters[keyword] = value
-        await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
+        MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
     
-    group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
-    await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
+    group_data = MongoDB.find_one("groups", "chat_id", chat.id)
+    MemoryDB.insert_data("chat_data", chat.id, group_data)
     msg_keywords = ", ".join(keywords)
     
     await Message.edit_message(update, f"<code>{msg_keywords}</code> has been added as filter!\n<b>Admin:</b> {user.first_name}", sent_msg)

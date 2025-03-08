@@ -1,4 +1,3 @@
-import asyncio
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.telegram_helper import Message

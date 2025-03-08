@@ -2,8 +2,8 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from telegram.constants import ChatID
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
-from bot.modules.database.combined_db import global_search
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database import MemoryDB
+from bot.modules.database.common import database_search
 from bot.modules.translator import translate
 from bot.functions.group_management.check_permission import _check_permission
 from bot.modules.re_link import RE_LINK
@@ -21,14 +21,14 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user.id == ChatID.SERVICE_CHAT: # Telegram channel
         return
     
-    data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
+    data_center = MemoryDB.data_center.get(chat.id)
     if data_center and data_center.get("is_editing"):
         try:
             data_value = int(e_msg.text)
         except ValueError:
             data_value = e_msg.text
 
-        await LOCAL_DATABASE.insert_data("data_center", chat.id, {
+        MemoryDB.insert_data("data_center", chat.id, {
             "edit_data_value": data_value,
             "edit_data_value_msg_pointer_id": e_msg.id,
             "is_editing": False
@@ -36,7 +36,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if chat.type == "private":
-        db = await global_search("users", "user_id", user.id)
+        db = database_search("users", "user_id", user.id)
         if db[0] == False:
             await Message.reply_message(update, db[1])
             return
@@ -72,7 +72,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_message(update, "I'm not an admin in this chat!")
             return
         
-        db = await global_search("groups", "chat_id", chat.id)
+        db = database_search("groups", "chat_id", chat.id)
         if db[0] == False:
             await Message.reply_message(update, db[1])
             return

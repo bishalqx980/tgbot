@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
-from bot.modules.database.combined_db import global_search
+from bot.modules.database.common import database_search
 from bot.modules.translator import LANG_CODE_LIST, translate
 
 
@@ -43,7 +43,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             to_find = "chat_id"
             to_match = chat.id
 
-        db = await global_search(collection_name, to_find, to_match)
+        db = database_search(collection_name, to_find, to_match)
         if db[0] == False:
             await Message.reply_message(update, db[1])
             return

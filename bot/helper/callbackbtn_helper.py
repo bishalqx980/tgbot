@@ -7,8 +7,8 @@ from bot.helper.query_handlers.func_help_query import QueryBotHelp
 from bot.helper.query_handlers.func_chat_settings_query import QueryChatSettings
 from bot.helper.query_handlers.func_bot_settings_query import QueryBotSettings
 from bot.helper.query_handlers.func_menu_query import QueryMenus
-from bot.modules.database.combined_db import global_search
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database import MemoryDB
+from bot.modules.database.common import database_search
 
 # helpers
 async def popup(query, msg):
@@ -30,7 +30,7 @@ async def validate_user(query, chat, user, prevent_unauth_access=True):
     prevents unauthorized access if `prevent_unauth_access` if true\n
     returns `data_center` of `chat.id` else shows error
     """
-    data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
+    data_center = MemoryDB.data_center.get(chat.id)
     if not data_center:
         await popup(query, f"chat_id: {chat.id} wasn't found in data center!")
         await del_query(query)
@@ -59,13 +59,13 @@ async def get_chat_data(update, data_center):
     db_find = data_center.get("db_find")
     db_vlaue = data_center.get("db_vlaue")
     
-    # Check on localdb if not found check on mongodb if not found show error
-    db = await global_search(collection_name, db_find, db_vlaue)
-    if db[0] == False:
-        await Message.reply_message(update, db[1])
+    # Check on memory if not found check on mongodb if not found show error
+    database = database_search(collection_name, db_find, db_vlaue)
+    if database[0] == False:
+        await Message.reply_message(update, database[1])
         return
     
-    return db[1]
+    return database[1]
 
 # main function
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -111,7 +111,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     query_dict_bot_settings = {
         "query_bot_pic": QueryBotSettings._query_bot_pic,
-        "query_welcome_img": QueryBotSettings._query_welcome_img,
         "query_images": QueryBotSettings._query_images,
         "query_support_chat": QueryBotSettings._query_support_chat,
         "query_server_url": QueryBotSettings._query_server_url,
@@ -128,7 +127,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     query_dict_bot_settings_3 = {
         "query_confirm_restore_db": QueryBotSettings._query_confirm_restore_db,
-        "query_clear_localdb_cache": QueryBotSettings._query_clear_localdb_cache,
+        "query_clear_memory_cache": QueryBotSettings._query_clear_memory_cache,
     }
 
     query_dict_broadcast = {
@@ -173,7 +172,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not data_center:
             return
         
-        if data_center.get("collection_name") != "bot_docs":
+        if data_center.get("collection_name") != "bot_data":
             await popup(query, "Session expired!")
             await del_query(query)
             return
@@ -202,11 +201,17 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = data_center.get("user_id")
         data = query_dict_broadcast[query.data]
 
-        await LOCAL_DATABASE.insert_data("data_center", user_id, data, "broadcast")
+        data_center = MemoryDB.data_center.get(user_id)
+        if data_center:
+            broadcast_data = data_center.get("broadcast")
+            if broadcast_data:
+                broadcast_data.update(data)
+        else:
+            MemoryDB.insert_data("data_center", user_id, {"broadcast": data})
         
         if query.data != "query_broadcast_done":
-            localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
-            db_broadcast = localdb.get("broadcast")
+            data_center = MemoryDB.data_center.get(user.id)
+            db_broadcast = data_center.get("broadcast")
             is_forward = db_broadcast.get("is_forward", False)
             is_pin = db_broadcast.get("is_pin", False)
             

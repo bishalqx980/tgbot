@@ -1,12 +1,12 @@
 from telegram import Update
 from bot.helper.telegram_helpers.telegram_helper import Message
-from bot.modules.database.combined_db import global_search
+from bot.modules.database.common import database_search
 
 async def _log_channel(update: Update, chat, user, victim=None, action=None, reason=None):
     """
     sends chat actions to log channel
     """
-    db = await global_search("groups", "chat_id", chat.id)
+    db = database_search("groups", "chat_id", chat.id)
     if db[0] == False:
         await Message.reply_message(update, db[1])
         return

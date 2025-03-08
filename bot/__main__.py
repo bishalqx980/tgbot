@@ -1,6 +1,7 @@
 import json
 import asyncio
 import aiohttp
+from time import time
 from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
@@ -14,10 +15,13 @@ from telegram.ext import (
     Defaults
 )
 from telegram.constants import ParseMode
-from bot import bot_token, bot, logger, owner_id
+from bot import CONFIG_FILE, bot, logger
+from bot.config import load_config
+from bot.alive import alive
 from bot.update_db import update_database
 from bot.helper.telegram_helpers.telegram_helper import Message
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.helper.callbackbtn_helper import func_callbackbtn
+from bot.modules.database import MemoryDB
 from bot.functions.power_users import _power_users
 from bot.functions.core.start import func_start
 from bot.functions.user_func.movieinfo import func_movieinfo
@@ -86,10 +90,12 @@ from bot.functions.group_management.filters import func_filters
 from bot.functions.group_management.adminlist import func_adminlist
 from bot.functions.group_management.track_bot_chat import track_bot_chat_act
 from bot.functions.group_management.track_other_chat import track_other_chat_act
-from bot.helper.callbackbtn_helper import func_callbackbtn
 
+ENV_CONFIG = load_config(CONFIG_FILE)
 
 async def post_boot():
+    # storing bot uptime
+    MemoryDB.insert_data("bot_data", None, {"bot_uptime": str(time())})
     # Setting up bot commands
     # command_help = [
     #     BotCommand("help", "Show help message")
@@ -107,15 +113,16 @@ async def post_boot():
 
 
 async def server_alive():
-    # executing after updating db so getting data from localdb...
-    server_url = await LOCAL_DATABASE.get_data("bot_docs", "server_url")
+    # executing after updating database so getting data from memory...
+    server_url = MemoryDB.bot_data.get("server_url")
     if not server_url:
         logger.warning("⚠️ Server url not provided !!")
-        await Message.send_message(owner_id, "⚠️ Server url not provided!\nGoto /bsettings and setup server url then restart bot...")
+        await Message.send_message(ENV_CONFIG["owner_id"], "⚠️ Server url not provided!\nGoto /bsettings and setup server url then restart bot...")
         return
     
     while True:
-        server_url = await LOCAL_DATABASE.get_data("bot_docs", "server_url")
+        # everytime check if there is new server_url
+        server_url = MemoryDB.bot_data.get("server_url")
         if not server_url:
             return
         if server_url[0:4] != "http":
@@ -135,13 +142,15 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
         user = update.effective_user
         chat = update.effective_chat
         e_msg = update.effective_message
+        query = update.callback_query
         chat_title = chat.full_name or chat.title
 
         message = (
             "<b>⚠️ An error occured: [/log]</b>\n\n"
             f"<b>User:</b> {user.mention_html()} | <code>{user.id}</code>\n"
             f"<b>Chat:</b> {chat_title} | <code>{chat.id}</code>\n"
-            f"<b>Effective message:</b> <code>{e_msg.text}</code>\n\n"
+            f"<b>Effective message:</b> <code>{e_msg.text}</code>\n"
+            f"<b>Query message:</b> <code>{query.data}</code>\n\n"
             f"<pre>{context.error}</pre>"
         )
     else:
@@ -151,7 +160,7 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
         )
 
     try:
-        await bot.send_message(owner_id, message, parse_mode=ParseMode.HTML)
+        await bot.send_message(ENV_CONFIG["owner_id"], message, parse_mode=ParseMode.HTML)
     except Exception as e:
         logger.error(e)
     
@@ -160,7 +169,7 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
 
 def main():
     default_param = Defaults(parse_mode=ParseMode.HTML, block=False, allow_sending_without_reply=True)
-    application = ApplicationBuilder().token(bot_token).defaults(default_param).build()
+    application = ApplicationBuilder().token(ENV_CONFIG["bot_token"]).defaults(default_param).build()
     # functions
     BOT_COMMANDS = {
         "start": func_start,
@@ -247,8 +256,8 @@ def main():
         application.add_handler(CommandHandler(command, handler)) # for /command
         application.add_handler(PrefixHandler(["!", ".", "-"], command, handler)) # for other prefix command
     
-    # For temporary storing bot commands
-    json.dump({"bot_commands": storage}, open("sys/bot_commands.json", "w"), indent=4)
+    # storing bot commands
+    MemoryDB.insert_data("bot_data", None, {"bot_commands": storage})
     
     # filters
     # application.add_handler(MessageHandler(filters.StatusUpdate.ALL, func_filter_services))
@@ -266,8 +275,9 @@ def main():
 
 
 async def start_up_work():
+    alive() # Server breathing
     await bot.initialize() # initializing the bot
-    await update_database()
+    update_database()
     await post_boot()
     await server_alive()
 

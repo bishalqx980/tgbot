@@ -3,7 +3,8 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot import bot
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
-from bot.modules.database.combined_db import find_bot_docs, check_add_user_db
+from bot.modules.database import MemoryDB
+from bot.modules.database.common import database_add_user
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -30,16 +31,15 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     btn = await Button.cbutton(btn_data)
-    _bot = await find_bot_docs()
 
-    images = _bot.get("images")
+    images = MemoryDB.bot_data.get("images")
     if images:
         image = random.choice(images).strip()
     else:
-        image = _bot.get("bot_pic")
+        image = MemoryDB.bot_data.get("bot_pic")
 
     sent_img = await Message.reply_image(update, image, msg, btn=btn) if image else None
     if not sent_img:
         await Message.reply_message(update, msg, btn=btn)
     
-    await check_add_user_db(user)
+    database_add_user(user)

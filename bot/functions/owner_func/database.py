@@ -1,7 +1,7 @@
 import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.modules.database.mongodb import MongoDB
+from bot.modules.database import MongoDB
 from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.functions.power_users import _power_users
 
@@ -24,7 +24,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not chat_id:
-        database_info = await MongoDB.info_db()
+        database_info = MongoDB.info_db()
         msg_storage = "<b><u>Database</u></b>\n\n"
         for info in database_info:
             info = database_info[info]
@@ -35,7 +35,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"<b>• A. size:</b> <code>{info.get('acsize')}</code>\n\n"
             )
         
-        active_status = await MongoDB.find("users", "active_status")
+        active_status = MongoDB.find("users", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
 
@@ -57,7 +57,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # if chat_id given
     if "-100" in str(chat_id):
-        find_group = await MongoDB.find_one("groups", "chat_id", chat_id) # chat_id as int
+        find_group = MongoDB.find_one("groups", "chat_id", chat_id) # chat_id as int
         if not find_group:
             await Message.reply_message(update, "Chat not found!")
             return
@@ -81,7 +81,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<blockquote>{find_group.get('custom_welcome_msg')}</blockquote>\n"
         )
     else:
-        find_user = await MongoDB.find_one("users", "user_id", chat_id) # chat_id as int
+        find_user = MongoDB.find_one("users", "user_id", chat_id) # chat_id as int
         if not find_user:
             await Message.reply_message(update, "User not found!")
             return

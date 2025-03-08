@@ -1,18 +1,20 @@
 from pymongo import MongoClient
-from bot import mongodb_uri, db_name, logger
+from bot import CONFIG_FILE, logger
+from bot.config import load_config
 
-# connecting to db
-client = MongoClient(mongodb_uri) # full cluster access
-db = client[db_name] # for only accessing bot database
+class MongoDatabase:
+    def __init__(self):
+        ENV_CONFIG = load_config(CONFIG_FILE)
+        self.client = MongoClient(ENV_CONFIG["mongodb_uri"]) # full cluster access
+        self.database = self.client[ENV_CONFIG["db_name"]] # for only accessing bot database
+    
 
-class MongoDB:
-    @staticmethod
-    async def insert_single_data(collection_name, data):
+    def insert_single_data(self, collection_name, data):
         """
         `collection_name` example `users` | `data` type: dict
         """
         try:
-            collection = db[collection_name]
+            collection = self.database[collection_name]
             inserted_data = collection.insert_one(data)
             if not inserted_data.acknowledged:
                 logger.error(f"{collection_name} wasn't inserted.")
@@ -20,28 +22,25 @@ class MongoDB:
             logger.error(e)
 
 
-    @staticmethod
-    async def insert_multiple_data(collection_name, data):
+    def insert_multiple_data(self, collection_name, data):
         """
         `collection_name` example `users` | `data` type: list of dict
         """
         try:
-            collection = db[collection_name]
+            collection = self.database[collection_name]
             inserted_data = collection.insert_many(data)
             if not inserted_data.acknowledged:
                 logger.error(f"{collection_name} wasn't inserted.")
         except Exception as e:
             logger.error(e)
 
-
-    @staticmethod
-    async def find_one(collection_name, search, match):
+    def find_one(self, collection_name, search, match):
         """
         `collection_name` example `users` | `search` example `user_id` | `match` example `2134776547`\n
         returns `data` | `None`
         """
         try:
-            collection = db[collection_name]
+            collection = self.database[collection_name]
             document = collection.find_one({search: match})
             if document:
                 return document
@@ -49,14 +48,13 @@ class MongoDB:
             logger.error(e)
 
 
-    @staticmethod
-    async def find(collection_name, search):
+    def find(self, collection_name, search):
         """
         `collection_name` example `users` | `search` example `user_id`\n
         returns `list` of matched data
         """
         try:
-            collection = db[collection_name]
+            collection = self.database[collection_name]
             documents = collection.find({})
             if not documents:
                 return
@@ -70,15 +68,14 @@ class MongoDB:
             logger.error(e)
 
 
-    @staticmethod
-    async def get_data(collection_name, data):
+    def get_data(self, collection_name, data):
         """
         Gets data from single document, which doesn't have multiple documents\n
-        `collection_name` example `bot_docs` | `data` example `owner_id`\n
+        `collection_name` example `bot_data` | `data` example `owner_id`\n
         returns `data` | `None`
         """
         try:
-            collection = db[collection_name]
+            collection = self.database[collection_name]
             documents = collection.find_one()
             doc_data = documents.get(data)
             if doc_data:
@@ -87,14 +84,13 @@ class MongoDB:
             logger.error(e)
 
 
-    @staticmethod
-    async def update_db(collection_name, search, match, update_data_key, update_data_value):
+    def update_db(self, collection_name, search, match, update_data_key, update_data_value):
         """
         `collection_name` example `users` | `search` example `user_id` | `match` example `2134776547` |\
         `update_data_key` example `name` | `update_data_value` example `Bishal`
         """
         try:
-            collection = db[collection_name]
+            collection = self.database[collection_name]
             updated_data = collection.update_one(
                 {search: match},
                 {"$set": {update_data_key: update_data_value}}
@@ -105,14 +101,13 @@ class MongoDB:
             logger.error(e)
 
 
-    @staticmethod
-    async def update_db_remove(collection_name, search, match, remove_field_key):
+    def update_db_remove(self, collection_name, search, match, remove_field_key):
         """
         `collection_name` example `users` | `search` example `user_id` | `match` example `2134776547` |\
         `remove_field_key` example `name`
         """
         try:
-            collection = db[collection_name]
+            collection = self.database[collection_name]
             updated_data = collection.update_one(
                 {search: match},
                 {"$unset": {remove_field_key: ""}}
@@ -123,16 +118,15 @@ class MongoDB:
             logger.error(e)
 
 
-    @staticmethod
-    async def info_db(collection_name=None):
+    def info_db(self, collection_name=None):
         """
         `collection_name`: optional\n
         returns `dict`
         """
-        docs_name = db.list_collection_names()
+        docs_name = self.database.list_collection_names()
         data_dict = {}
         for collection_name in docs_name:
-            doc_stats = db.command("collstats", collection_name)
+            doc_stats = self.database.command("collstats", collection_name)
             # stats
             doc_name = collection_name
             doc_count = doc_stats['count']
@@ -143,13 +137,12 @@ class MongoDB:
         return data_dict
 
 
-    @staticmethod
-    async def delete_all_doc(collection_name):
+    def delete_all_doc(self, collection_name):
         """
         delete all data from `collection_name`
         """
         try:
-            collection = db[collection_name]
+            collection = self.database[collection_name]
             deleted_data = collection.delete_many({})
             if not deleted_data.acknowledged:
                 logger.error(f"{collection_name} wasn't deleted.")
@@ -157,3 +150,8 @@ class MongoDB:
             return True
         except Exception as e:
             logger.error(e)
+    
+
+    def close_connection(self):
+        """Close the MongoDB connection."""
+        self.client.close()

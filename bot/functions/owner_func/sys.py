@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.telegram_helper import Message
+from bot.modules.database import MemoryDB
 from bot.functions.power_users import _power_users
 
 
@@ -15,15 +16,14 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_message(update, "Access denied!")
         return
     
-    # Calculate the system uptime
     sys_uptime = timedelta(seconds=datetime.now().timestamp() - psutil.boot_time())
-    # Extracting system uptime in days, hours and minutes
+
     sys_days = sys_uptime.days
     sys_hours, remainder = divmod(sys_uptime.seconds, 3600)
     sys_minute = remainder / 60
-    # Getting bot uptime
-    bot_uptime = timedelta(seconds=time() - float(open("sys/bot_uptime.txt", "r").read()))
-    # Extracting bot uptime in days, hours and minutes
+
+    bot_uptime = timedelta(seconds=time() - float(MemoryDB.bot_data.get("bot_uptime", 0)))
+    
     bot_days = bot_uptime.days
     bot_hours, remainder = divmod(bot_uptime.seconds, 3600)
     bot_minute = remainder / 60

@@ -2,9 +2,8 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.helper.telegram_helpers.telegram_helper import Message
-from bot.modules.database.combined_db import global_search
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database import MemoryDB, MongoDB
+from bot.modules.database.common import database_search
 from bot.functions.group_management.pm_error import _pm_error
 from bot.functions.del_command import func_del_command
 from bot.functions.group_management.check_permission import _check_permission
@@ -52,7 +51,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_message(update, msg, sent_msg)
         return
 
-    db = await global_search("groups", "chat_id", chat.id)
+    db = database_search("groups", "chat_id", chat.id)
     if db[0] == False:
         await Message.edit_message(update, db[1], sent_msg)
         return
@@ -63,24 +62,24 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if filters and keyword:
         if keyword == "clear_all":
-            await MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
+            MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
             await Message.edit_message(update, f"All filters of this chat has been removed!\n<b>Admin:</b> {user.first_name}", sent_msg)
 
-            group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
-            await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
+            group_data = MongoDB.find_one("groups", "chat_id", chat.id)
+            MemoryDB.insert_data("chat_data", chat.id, group_data)
             return
         
         try:
             if keyword.lower() in filters:
                 del filters[keyword]
-                await MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
+                MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
                 await Message.edit_message(update, f"<code>{keyword}</code> filter has been removed!\n<b>Admin:</b> {user.first_name}", sent_msg)
             else:
                 await Message.edit_message(update, "There are no such filter available for this chat to delete!\nCheckout /filters", sent_msg)
                 return
             
-            group_data = await MongoDB.find_one("groups", "chat_id", chat.id)
-            await LOCAL_DATABASE.insert_data("groups", chat.id, group_data)
+            group_data = MongoDB.find_one("groups", "chat_id", chat.id)
+            MemoryDB.insert_data("chat_data", chat.id, group_data)
         except Exception as e:
             logger.error(e)
             await Message.edit_message(update, str(e), sent_msg)

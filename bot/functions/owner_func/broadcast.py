@@ -5,8 +5,7 @@ from telegram.ext import ContextTypes
 from telegram.error import Forbidden
 from bot import bot, logger
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database import MemoryDB, MongoDB
 from bot.functions.power_users import _power_users
 
 
@@ -48,10 +47,10 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
     }
 
-    await LOCAL_DATABASE.insert_data("data_center", user.id, data)
+    MemoryDB.insert_data("data_center", user.id, data)
 
-    localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
-    db_broadcast = localdb.get("broadcast")
+    data_center = MemoryDB.data_center.get(user.id)
+    db_broadcast = data_center.get("broadcast")
     is_forward = db_broadcast.get("is_forward", False)
     is_pin = db_broadcast.get("is_pin", False)
     
@@ -74,8 +73,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     while timeout < 30:
         timeout += 1
         await asyncio.sleep(1)
-        localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
-        is_done = localdb["broadcast"]["is_done"]
+        data_center = MemoryDB.data_center.get(user.id)
+        is_done = data_center["broadcast"]["is_done"]
         if is_done:
             break
     
@@ -85,13 +84,13 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_message(update, "Oops, Timeout!")
         return
     
-    is_forward = localdb["broadcast"]["is_forward"]
-    is_pin = localdb["broadcast"]["is_pin"]
+    is_forward = data_center["broadcast"]["is_forward"]
+    is_pin = data_center["broadcast"]["is_pin"]
     
     broadcast_msg = re_msg.text_html or re_msg.caption_html
 
-    users_id = await MongoDB.find("users", "user_id")
-    active_status = await MongoDB.find("users", "active_status")
+    users_id = MongoDB.find("users", "user_id")
+    active_status = MongoDB.find("users", "active_status")
 
     if len(users_id) == len(active_status):
         combined_list = list(zip(users_id, active_status))
@@ -124,7 +123,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif sent_msg == Forbidden:
             except_count += 1
             exception_user_ids.append(f"Forbidden: <code>{user_id}</code>")
-            await MongoDB.update_db("users", "user_id", int(user_id), "active_status", False)
+            MongoDB.update_db("users", "user_id", int(user_id), "active_status", False)
         else:
             sent_count += 1
             if is_pin:

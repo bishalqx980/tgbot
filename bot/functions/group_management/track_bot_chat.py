@@ -1,8 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.telegram_helper import Message
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database import MemoryDB, MongoDB
 from bot.functions.group_management.chat_member_status import _chat_member_status
 
 
@@ -22,9 +21,9 @@ async def track_bot_chat_act(update: Update, context: ContextTypes.DEFAULT_TYPE)
     bot_exist, cause = _chk_stat
 
     if chat.type == "private":
-        find_user = await LOCAL_DATABASE.find_one("users", user.id)
+        find_user = MemoryDB.user_data.get(user.id)
         if not find_user:
-            find_user = await MongoDB.find_one("users", "user_id", user.id)
+            find_user = MongoDB.find_one("users", "user_id", user.id)
             if not find_user:
                 data = {
                     "user_id": user.id,
@@ -33,25 +32,25 @@ async def track_bot_chat_act(update: Update, context: ContextTypes.DEFAULT_TYPE)
                     "mention": user.mention_html(),
                     "lang": user.language_code
                 }
-                await MongoDB.insert_single_data("users", data)
-                await LOCAL_DATABASE.insert_data("users", user.id, data)
+                MongoDB.insert_single_data("users", data)
+                MemoryDB.insert_data("user_data", user.id, data)
         
         if bot_exist:
-            await MongoDB.update_db("users", "user_id", user.id, "active_status", True)
+            MongoDB.update_db("users", "user_id", user.id, "active_status", True)
         else:
-            await MongoDB.update_db("users", "user_id", user.id, "active_status", False)
+            MongoDB.update_db("users", "user_id", user.id, "active_status", False)
 
     elif chat.type in ["group", "supergroup"]:
-        find_group = await LOCAL_DATABASE.find_one("groups", chat.id)
+        find_group = MemoryDB.chat_data.get(chat.id)
         if not find_group:
-            find_group = await MongoDB.find_one("groups", "chat_id", chat.id)
+            find_group = MongoDB.find_one("groups", "chat_id", chat.id)
             if not find_group:
                 data = {
                     "chat_id": chat.id,
                     "title": chat.title
                 }
-                await MongoDB.insert_single_data("groups", data)
-                await LOCAL_DATABASE.insert_data("groups", chat.id, data)
+                MongoDB.insert_single_data("groups", data)
+                MemoryDB.insert_data("chat_data", chat.id, data)
         
         if bot_exist:
             if cause == "JOINED":

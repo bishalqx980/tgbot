@@ -1,8 +1,8 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
+from bot.modules.database import MemoryDB
 from bot.functions.group_management.pm_error import _pm_error
-from bot.modules.database.local_database import LOCAL_DATABASE
 
 
 async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -57,9 +57,9 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "edit_data_value_msg_pointer_id": None
     }
 
-    await LOCAL_DATABASE.insert_data("data_center", chat.id, data)
+    MemoryDB.insert_data("data_center", chat.id, data)
 
-    data = await LOCAL_DATABASE.find_one("data_center", chat.id)
+    data = MemoryDB.data_center.get(chat.id)
     if data:
         whisper_data = data.get("whisper_data")
         if whisper_data:
@@ -75,7 +75,13 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
     }
 
-    await LOCAL_DATABASE.insert_data("data_center", chat.id, data, "whisper_data")
+    data_center = MemoryDB.data_center.get(chat.id)
+    if data_center:
+        whisper_data = data_center.get("whisper_data")
+        if whisper_data:
+            whisper_data.update(data)
+    else:
+        MemoryDB.insert_data("data_center", chat.id, {"whisper_data": data})
 
     if re_msg:
         whisper_user = re_msg.from_user.mention_html()

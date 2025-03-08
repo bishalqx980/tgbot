@@ -1,16 +1,14 @@
 from telegram import Update
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
 
-
 class QueryMenus:
     async def _query_bot_settings_menu(update: Update, query):
         msg = "<u><b>Bot Settings</b></u>"
         btn_data = [
-            {"Bot pic": "query_bot_pic", "Welcome img": "query_welcome_img"},
-            {"Images": "query_images", "Support chat": "query_support_chat"},
-            {"Server url": "query_server_url", "Sudo": "query_sudo"},
-            {"Shrinkme API": "query_shrinkme_api", "OMDB API": "query_omdb_api"},
-            {"Weather API": "query_weather_api"},
+            {"Bot pic": "query_bot_pic", "Images": "query_images"},
+            {"Support chat": "query_support_chat", "Server url": "query_server_url"},
+            {"Sudo": "query_sudo", "Shrinkme API": "query_shrinkme_api"},
+            {"OMDB API": "query_omdb_api", "Weather API": "query_weather_api"},
             {"> Restore DB?": "query_restore_db", "Close": "query_close"}
         ]
 

@@ -95,13 +95,13 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
 - Required `python 3.11` or later
 - Open `tgbot` directory on cmd
 - Run on cmd `pip install -r requirements.txt`
-- Finally `python main.py`
+- Finally `python -m bot`
 
 ----- **Linux** -----
 - Required `python 3.11` or later
 - Open `tgbot` directory on shell
 - Run on shell `pip install -r requirements.txt`
-- Finally `python main.py`
+- Finally `python -m bot`
 
 <center><h3>📡 <u>Render deploy</u></h3></center>
 

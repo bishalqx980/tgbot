@@ -1,15 +1,12 @@
 from telegram import Update
-from bot import LOCAL_DB_DEFAULT
 from bot.update_db import update_database
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
-
+from bot.modules.database import MemoryDB, MongoDB
 
 class QueryBotSettings:
     async def _query_bot_pic(update: Update, query, find_chat):
         user = update.effective_user
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "bot_pic"})
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "bot_pic"})
         bot_pic = find_chat.get("bot_pic")
 
         msg = (
@@ -28,29 +25,9 @@ class QueryBotSettings:
         await Message.edit_message(update, msg, query.message, btn)
 
 
-    async def _query_welcome_img(update: Update, query, find_chat):
-        user = update.effective_user
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "welcome_img"})
-        welcome_img = find_chat.get("welcome_img")
-
-        msg = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"Welcome img: <code>{welcome_img}</code>\n\n"
-            "<i><b>Note:</b> Should bot show image on start?</i>"
-        )
-
-        btn_data = [
-            {"Yes": "query_true", "No": "query_false"},
-            {"Back": "query_bot_settings_menu", "Close": "query_close"}
-        ]
-
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
-
-
     async def _query_images(update: Update, query, find_chat):
         user = update.effective_user
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "images"})
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "images"})
         images = find_chat.get("images")
         if images:
             images = ", ".join(images)
@@ -86,7 +63,7 @@ class QueryBotSettings:
 
     async def _query_support_chat(update: Update, query, find_chat):
         user = update.effective_user
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "support_chat"})
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "support_chat"})
         support_chat = find_chat.get("support_chat")
 
         msg = (
@@ -106,7 +83,7 @@ class QueryBotSettings:
 
     async def _query_server_url(update: Update, query, find_chat):
         user = update.effective_user
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "server_url"})
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "server_url"})
         server_url = find_chat.get("server_url")
 
         msg = (
@@ -127,7 +104,7 @@ class QueryBotSettings:
 
     async def _query_sudo(update: Update, query, find_chat):
         user = update.effective_user
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "sudo_users"})
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "sudo_users"})
         sudo_users = find_chat.get("sudo_users")
         if sudo_users:
             sudo_users = ", ".join(str(i) for i in sudo_users)
@@ -150,7 +127,7 @@ class QueryBotSettings:
 
     async def _query_shrinkme_api(update: Update, query, find_chat):
         user = update.effective_user
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "shrinkme_api"})
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "shrinkme_api"})
         shrinkme_api = find_chat.get("shrinkme_api")
 
         msg = (
@@ -171,7 +148,7 @@ class QueryBotSettings:
 
     async def _query_omdb_api(update: Update, query, find_chat):
         user = update.effective_user
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "omdb_api"})
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "omdb_api"})
         omdb_api = find_chat.get("omdb_api")
 
         msg = (
@@ -192,7 +169,7 @@ class QueryBotSettings:
 
     async def _query_weather_api(update: Update, query, find_chat):
         user = update.effective_user
-        await LOCAL_DATABASE.insert_data("data_center", user.id, {"edit_data_key": "weather_api"})
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "weather_api"})
         weather_api = find_chat.get("weather_api")
 
         msg = (
@@ -216,14 +193,14 @@ class QueryBotSettings:
             "<u><b>Bot Settings</b></u>\n\n"
             "<b>» ⚠ Restore Database</b>\n"
             "- <i>This will clear all bot data (excluding user & group data) from online database and restore data from the <code>config.env</code> file.</i>\n\n"
-            "<b>» ♻️ Clear LocalDB Cache</b>\n"
+            "<b>» 💾 Clear Memory Cache</b>\n"
             "- <i>This will clear local database cache.</i>\n\n"
             "<i><b>Note:</b> Use <code>⚠ Restore Database</code> with caution!</i>"
         )
 
         btn_data = [
             {"⚠ Restore Database": "query_confirm_restore_db"},
-            {"♻️ Clear LocalDB Cache": "query_clear_localdb_cache"},
+            {"💾 Clear Memory Cache": "query_clear_memory_cache"},
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
 
@@ -232,14 +209,13 @@ class QueryBotSettings:
 
 
     async def _query_confirm_restore_db(update: Update, data_center):
-        res1 = await MongoDB.delete_all_doc("bot_docs")
-        res2 = await update_database()
-        msg = "Database has been restored successfully from <code>config.env</code>!" if res1 and res2 else "Something went wrong! Check /log"
+        res = MongoDB.delete_all_doc("bot_data")
+        update_database()
+        msg = "Database has been restored successfully from <code>config.env</code>!" if res else "Something went wrong! Check /log"
         await Message.send_message(data_center.get("chat_id"), msg)
 
 
-    async def _query_clear_localdb_cache(update: Update, data_center):
-        res = await LOCAL_DATABASE.restore_db(LOCAL_DB_DEFAULT)
-        await update_database()
-        msg = "LocalDB cache has been cleared!" if res else "Something went wrong! Check /log"
-        await Message.send_message(data_center.get("chat_id"), msg)
+    async def _query_clear_memory_cache(update: Update, data_center):
+        MemoryDB.clear_all()
+        update_database()
+        await Message.send_message(data_center.get("chat_id"), "Local database has been cleared!")
