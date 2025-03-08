@@ -143,6 +143,7 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
         chat = update.effective_chat
         e_msg = update.effective_message
         query = update.callback_query
+        query_data = query.data if query else None
         chat_title = chat.full_name or chat.title
 
         message = (
@@ -150,7 +151,7 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
             f"<b>User:</b> {user.mention_html()} | <code>{user.id}</code>\n"
             f"<b>Chat:</b> {chat_title} | <code>{chat.id}</code>\n"
             f"<b>Effective message:</b> <code>{e_msg.text}</code>\n"
-            f"<b>Query message:</b> <code>{query.data}</code>\n\n"
+            f"<b>Query message:</b> <code>{query_data}</code>\n\n"
             f"<pre>{context.error}</pre>"
         )
     else:
