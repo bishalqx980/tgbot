@@ -1,5 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
 from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.modules.database.common import database_search
 from bot.functions.del_command import func_del_command
@@ -8,18 +9,18 @@ from bot.functions.group_management.pm_error import _pm_error
 async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     
-    if chat.type not in ["group", "supergroup"]:
+    if chat.type == ChatType.PRIVATE:
         await _pm_error(chat.id)
         return
     
     await func_del_command(update, context)
     
-    db = database_search("groups", "chat_id", chat.id)
-    if db[0] == False:
-        await Message.reply_message(update, db[1])
+    database = database_search("groups", "chat_id", chat.id)
+    if database[0] == False:
+        await Message.reply_message(update, database[1])
         return
     
-    find_group = db[1]
+    find_group = database[1]
 
     filters = find_group.get("filters")
 

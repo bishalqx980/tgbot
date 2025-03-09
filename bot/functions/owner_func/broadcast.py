@@ -2,6 +2,7 @@ import asyncio
 from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
 from telegram.error import Forbidden
 from bot import bot, logger
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
@@ -20,7 +21,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.reply_message(update, "Access denied!")
         return
     
-    if chat.type != "private":
+    if chat.type != ChatType.PRIVATE:
         await Message.reply_message(update, f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
         await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])

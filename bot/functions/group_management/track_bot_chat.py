@@ -1,5 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
 from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.modules.database import MemoryDB, MongoDB
 from bot.functions.group_management.chat_member_status import _chat_member_status
@@ -20,7 +21,7 @@ async def track_bot_chat_act(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
     bot_exist, cause = _chk_stat
 
-    if chat.type == "private":
+    if chat.type == ChatType.PRIVATE:
         find_user = MemoryDB.user_data.get(user.id)
         if not find_user:
             find_user = MongoDB.find_one("users", "user_id", user.id)
@@ -40,7 +41,7 @@ async def track_bot_chat_act(update: Update, context: ContextTypes.DEFAULT_TYPE)
         else:
             MongoDB.update_db("users", "user_id", user.id, "active_status", False)
 
-    elif chat.type in ["group", "supergroup"]:
+    elif chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
         find_group = MemoryDB.chat_data.get(chat.id)
         if not find_group:
             find_group = MongoDB.find_one("groups", "chat_id", chat.id)

@@ -1,5 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database.common import database_search
 from bot.modules.translator import LANG_CODE_LIST, translate
@@ -34,7 +35,7 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
         to_translate = msg
     
     if not lang_code:
-        if chat.type == "private":
+        if chat.type == ChatType.PRIVATE:
             collection_name = "users"
             to_find = "user_id"
             to_match = user.id
@@ -43,12 +44,12 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             to_find = "chat_id"
             to_match = chat.id
 
-        db = database_search(collection_name, to_find, to_match)
-        if db[0] == False:
-            await Message.reply_message(update, db[1])
+        database = database_search(collection_name, to_find, to_match)
+        if database[0] == False:
+            await Message.reply_message(update, database[1])
             return
         
-        find_chat = db[1]
+        find_chat = database[1]
         lang_code = find_chat.get("lang")
     
     sent_msg = await Message.reply_message(update, "🌐 Translating...")

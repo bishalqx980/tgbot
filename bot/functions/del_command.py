@@ -1,6 +1,6 @@
-import json
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
 from bot.functions.filter_all import func_filter_all
 from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.modules.database import MemoryDB
@@ -13,10 +13,10 @@ async def func_del_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     msg = update.effective_message
 
-    if chat.type == "private":
+    if chat.type == ChatType.PRIVATE:
         return
     
-    database = await database_search("groups", "chat_id", chat.id)
+    database = database_search("groups", "chat_id", chat.id)
     if database[0] == False:
         await Message.reply_message(update, database[1])
         return

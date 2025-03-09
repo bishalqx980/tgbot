@@ -18,12 +18,12 @@ async def track_other_chat_act(update: Update, context: ContextTypes.DEFAULT_TYP
     user = chat_member.from_user # cause user
     victim = chat_member.new_chat_member.user
 
-    db = database_search("groups", "chat_id", chat.id)
-    if db[0] == False:
+    database = database_search("groups", "chat_id", chat.id)
+    if database[0] == False:
         # await Message.send_message(chat.id, db[1])
         return
     
-    find_group = db[1]
+    find_group = database[1]
 
     welcome_user = find_group.get("welcome_user")
     custom_welcome_msg = find_group.get("custom_welcome_msg")

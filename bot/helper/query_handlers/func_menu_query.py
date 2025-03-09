@@ -1,4 +1,5 @@
 from telegram import Update
+from telegram.constants import ChatType
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
 
 class QueryMenus:
@@ -39,7 +40,7 @@ class QueryMenus:
     async def _query_chat_settings_menu(update: Update, query, find_chat):
         chat = update.effective_chat
 
-        if chat.type == "private":
+        if chat.type == ChatType.PRIVATE:
             user_mention = find_chat.get("mention")
             lang = find_chat.get("lang")
             echo = find_chat.get("echo", False)

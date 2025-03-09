@@ -1,29 +1,27 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import CONFIG_FILE, bot
-from bot.config import load_config
+from telegram.constants import ChatType
+from bot import ENV_CONFIG, bot
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.functions.core.help import func_help
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_add_user
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    ENV_CONFIG = load_config(CONFIG_FILE)
     user = update.effective_user
     chat = update.effective_chat
     args = " ".join(context.args)
-    
 
     if args == "help":
         await func_help(update, context)
         return
 
     if not ENV_CONFIG["owner_id"]:
-        msg = f"owner_id: <code>{chat.id}</code>\nPlease add owner_id in <code>config.env</code> file then retry. Otherwise bot won't work properly." if chat.type == "private" else "Error <i>owner_id</i> not provided!"
+        msg = f"owner_id: <code>{chat.id}</code>\nPlease add owner_id in <code>config.env</code> file then retry. Otherwise bot won't work properly." if chat.type == ChatType.PRIVATE else "Error <i>owner_id</i> not provided!"
         await Message.reply_message(update, msg)
         return
 
-    if chat.type != "private":
+    if chat.type != ChatType.PRIVATE:
         btn = await Button.ubutton([{"Start me in PM": f"{bot.link}?start=start"}])
         await Message.reply_message(update, f"Hey, {user.first_name}\nStart me in PM!", btn=btn)
         return

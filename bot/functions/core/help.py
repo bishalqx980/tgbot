@@ -1,6 +1,7 @@
 import random
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
 from bot import bot
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database import MemoryDB
@@ -11,7 +12,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
 
-    if chat.type != "private":
+    if chat.type != ChatType.PRIVATE:
         btn = await Button.ubutton([{"Click here for help": f"{bot.link}?start=help"}])
         await Message.reply_message(update, f"Hey, {user.first_name}\nContact me in PM for help!", btn=btn)
         return

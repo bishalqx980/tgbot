@@ -1,5 +1,6 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
 from bot import bot, logger
 from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.functions.group_management.pm_error import _pm_error
@@ -13,7 +14,7 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sil
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
 
-    if chat.type not in ["group", "supergroup"]:
+    if chat.type == ChatType.PRIVATE:
         await _pm_error(chat.id)
         return
 

@@ -1,4 +1,5 @@
 from telegram import Update
+from telegram.constants import ChatType
 from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database import MemoryDB
@@ -12,7 +13,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = update.message.reply_to_message
     msg = " ".join(context.args)
 
-    if chat.type not in ["group", "supergroup"]:
+    if chat.type == ChatType.PRIVATE:
         await _pm_error(chat.id)
         return
     
@@ -59,8 +60,8 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     MemoryDB.insert_data("data_center", chat.id, data)
 
-    data = MemoryDB.data_center.get(chat.id)
-    if data:
+    data_center = MemoryDB.data_center.get(chat.id)
+    if data_center:
         whisper_data = data.get("whisper_data")
         if whisper_data:
             user_whisper_data = whisper_data.get(whisper_user)
@@ -74,8 +75,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "msg_id": e_msg.id + 1
         }
     }
-
-    data_center = MemoryDB.data_center.get(chat.id)
+    
     if data_center:
         whisper_data = data_center.get("whisper_data")
         if whisper_data:

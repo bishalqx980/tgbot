@@ -1,5 +1,6 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
 from bot import logger
 from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.modules.database import MemoryDB, MongoDB
@@ -14,7 +15,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     keyword = " ".join(context.args).lower()
     
-    if chat.type not in ["group", "supergroup"]:
+    if chat.type == ChatType.PRIVATE:
         await _pm_error(chat.id)
         return
 
@@ -51,12 +52,12 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_message(update, msg, sent_msg)
         return
 
-    db = database_search("groups", "chat_id", chat.id)
-    if db[0] == False:
-        await Message.edit_message(update, db[1], sent_msg)
+    database = database_search("groups", "chat_id", chat.id)
+    if database[0] == False:
+        await Message.edit_message(update, database[1], sent_msg)
         return
     
-    find_group = db[1]
+    find_group = database[1]
     
     filters = find_group.get("filters")
 

@@ -20,10 +20,10 @@ except Exception as e:
 
 # logger & env config file
 logger = setup_logging()
-env_config = load_config(CONFIG_FILE)
+ENV_CONFIG = load_config(CONFIG_FILE)
 
 # Main bot function
-bot = Bot(env_config["bot_token"])
+bot = Bot(ENV_CONFIG["bot_token"])
 
 logger.info(
 """

@@ -1,6 +1,7 @@
 import random
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
@@ -13,7 +14,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
 
-    if chat.type == "private":
+    if chat.type == ChatType.PRIVATE:
         data = {
             "user_id": user.id,
             "chat_id": chat.id,
@@ -28,12 +29,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         MemoryDB.insert_data("data_center", chat.id, data)
 
-        db = database_search("users", "user_id", user.id)
-        if db[0] == False:
-            await Message.reply_message(update, db[1])
+        database = database_search("users", "user_id", user.id)
+        if database[0] == False:
+            await Message.reply_message(update, database[1])
             return
         
-        find_user = db[1]
+        find_user = database[1]
         
         user_mention = find_user.get("mention")
         lang = find_user.get("lang")
@@ -68,7 +69,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await Message.reply_message(update, msg, btn=btn)
 
-    elif chat.type in ["group", "supergroup"]:
+    elif chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
         await func_del_command(update, context)
 
         if user.is_bot:
@@ -108,12 +109,12 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         MemoryDB.insert_data("data_center", chat.id, data)
 
-        db = database_search("groups", "chat_id", chat.id)
-        if db[0] == False:
-            await Message.edit_message(update, db[1], sent_msg)
+        database = database_search("groups", "chat_id", chat.id)
+        if database[0] == False:
+            await Message.edit_message(update, database[1], sent_msg)
             return
         
-        find_group = db[1]
+        find_group = database[1]
         
         title = find_group.get("title")
         lang = find_group.get("lang")

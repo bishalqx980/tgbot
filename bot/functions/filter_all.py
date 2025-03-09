@@ -1,6 +1,6 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
-from telegram.constants import ChatID
+from telegram.constants import ChatID, ChatType
 from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
@@ -35,13 +35,13 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
         })
         return
 
-    if chat.type == "private":
-        db = database_search("users", "user_id", user.id)
-        if db[0] == False:
-            await Message.reply_message(update, db[1])
+    if chat.type == ChatType.PRIVATE:
+        database = database_search("users", "user_id", user.id)
+        if database[0] == False:
+            await Message.reply_message(update, database[1])
             return
         
-        find_user = db[1]
+        find_user = database[1]
         
         echo_status = find_user.get("echo")
         auto_tr_status = find_user.get("auto_tr")
@@ -63,7 +63,7 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 btn = await Button.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
                 await Message.reply_message(update, "Chat language not found/invalid! Use /settings to set chat language.", btn=btn)
 
-    elif chat.type in ["group", "supergroup"]:
+    elif chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
         _chk_per = await _check_permission(update, user=user)
         if not _chk_per:
             return
@@ -72,12 +72,12 @@ async def func_filter_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Message.reply_message(update, "I'm not an admin in this chat!")
             return
         
-        db = database_search("groups", "chat_id", chat.id)
-        if db[0] == False:
-            await Message.reply_message(update, db[1])
+        database = database_search("groups", "chat_id", chat.id)
+        if database[0] == False:
+            await Message.reply_message(update, database[1])
             return
         
-        find_group = db[1]
+        find_group = database[1]
         
         all_links = find_group.get("all_links")
         allowed_links = find_group.get("allowed_links")

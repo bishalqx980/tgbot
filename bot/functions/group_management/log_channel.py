@@ -6,12 +6,12 @@ async def _log_channel(update: Update, chat, user, victim=None, action=None, rea
     """
     sends chat actions to log channel
     """
-    db = database_search("groups", "chat_id", chat.id)
-    if db[0] == False:
-        await Message.reply_message(update, db[1])
+    database = database_search("groups", "chat_id", chat.id)
+    if database[0] == False:
+        await Message.reply_message(update, database[1])
         return
     
-    find_group = db[1]
+    find_group = database[1]
     
     log_channel = find_group.get("log_channel")
     if not log_channel:

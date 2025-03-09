@@ -1,6 +1,7 @@
 import asyncio
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
 from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.modules.database import MemoryDB
 from bot.functions.group_management.pm_error import _pm_error
@@ -15,7 +16,7 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
     e_msg = update.effective_message
     reply = update.message.reply_to_message
     
-    if chat.type not in ["group", "supergroup"]:
+    if chat.type == ChatType.PRIVATE:
         await _pm_error(chat.id)
         return
 
@@ -81,7 +82,7 @@ async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply = update.message.reply_to_message
     e_msg = update.effective_message
 
-    if chat.type not in ["group", "supergroup"]:
+    if chat.type == ChatType.PRIVATE:
         await _pm_error(chat.id)
         return
 
@@ -99,7 +100,7 @@ async def func_purgeto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     e_msg = update.effective_message
 
-    if chat.type not in ["group", "supergroup"]:
+    if chat.type == ChatType.PRIVATE:
         await _pm_error(chat.id)
         return
 

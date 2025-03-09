@@ -15,8 +15,7 @@ from telegram.ext import (
     Defaults
 )
 from telegram.constants import ParseMode
-from bot import CONFIG_FILE, bot, logger
-from bot.config import load_config
+from bot import ENV_CONFIG, bot, logger
 from bot.alive import alive
 from bot.update_db import update_database
 from bot.helper.telegram_helpers.telegram_helper import Message
@@ -91,7 +90,6 @@ from bot.functions.group_management.adminlist import func_adminlist
 from bot.functions.group_management.track_bot_chat import track_bot_chat_act
 from bot.functions.group_management.track_other_chat import track_other_chat_act
 
-ENV_CONFIG = load_config(CONFIG_FILE)
 
 async def post_boot():
     # storing bot uptime

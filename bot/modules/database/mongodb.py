@@ -1,10 +1,8 @@
 from pymongo import MongoClient
-from bot import CONFIG_FILE, logger
-from bot.config import load_config
+from bot import ENV_CONFIG, logger
 
 class MongoDatabase:
     def __init__(self):
-        ENV_CONFIG = load_config(CONFIG_FILE)
         self.client = MongoClient(ENV_CONFIG["mongodb_uri"]) # full cluster access
         self.database = self.client[ENV_CONFIG["db_name"]] # for only accessing bot database
     
