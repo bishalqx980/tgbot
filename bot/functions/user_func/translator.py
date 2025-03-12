@@ -57,15 +57,15 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Chat language code wasn't found! Use /tr to get more details or /settings to set chat language.", reply_markup=btn)
         return
     
-    await effective_message.reply_text("💭 Translating...")
+    sent_message = await effective_message.reply_text("💭 Translating...")
 
     translated_text = translate(to_translate, lang_code)
     if translated_text == False:
         btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
-        await effective_message.edit_text("Invalid language code was given! Use /tr to get more details or /settings to set chat language.", reply_markup=btn)
+        await context.bot.edit_message_text("Invalid language code was given! Use /tr to get more details or /settings to set chat language.", chat.id, sent_message.id, reply_markup=btn)
 
     elif not translated_text:
-        await effective_message.edit_text("Oops! Something went wrong!")
+        await context.bot.edit_message_text("Oops! Something went wrong!", chat.id, sent_message.id)
 
     else:
-        await effective_message.edit_text(translated_text)
+        await context.bot.edit_message_text(translated_text, chat.id, sent_message.id)

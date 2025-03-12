@@ -1,7 +1,7 @@
 import json
 from bot import logger
 
-def fetch_database(database_path="database.json"):
+def fetch_database(database_path="bot/modules/psndl/database.json"):
     """
     :param database_path: `.json` file location
     """

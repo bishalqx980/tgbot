@@ -18,17 +18,17 @@ class QueryChatSettings:
         )
 
         btn_data = [
+            {"Language code's": "https://telegra.ph/Language-Code-12-24"},
             {"Edit Value": "query_edit_value"},
             {"Back": "query_chat_settings_menu", "Close": "query_close"}
         ]
 
-        btn1 = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
-        btn2 = ButtonMaker.cbutton(btn_data)
+        btn = ButtonMaker.cbutton(btn_data)
 
         if effective_message.text:
-            await effective_message.edit_text(text, reply_markup=btn1 + btn2)
+            await effective_message.edit_text(text, reply_markup=btn)
         elif effective_message.caption:
-            await effective_message.edit_caption(text, reply_markup=btn1 + btn2)
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
     async def _query_chat_auto_tr(update: Update, find_chat):

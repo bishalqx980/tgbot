@@ -5,6 +5,7 @@ from bot.modules.telegraph import TELEGRAPH
 
 async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    chat = update.effective_chat
     effective_message = update.effective_message
     game_name = " ".join(context.args)
 
@@ -12,15 +13,15 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Use <code>/psndl game name</code>\nE.g. <code>/psndl red dead redemption</code>")
         return
 
-    if len(effective_message) < 4:
+    if len(effective_message.text) < 4:
         await effective_message.reply_text("Search keyword is too short...")
         return
 
-    await effective_message.reply_text(f"Searching...")
+    sent_message = await effective_message.reply_text(f"Searching...")
 
     result = PSNDL.search(game_name)
     if not result:
-        await effective_message.edit_text("Game wasn't found! Check game name again!")
+        await context.bot.edit_message_text("Game wasn't found! Check game name again!", chat.id, sent_message.id)
         return
 
     msg_list, counter = [], 0
@@ -60,4 +61,4 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for link in links:
         msg += f"• {link}\n"
 
-    await effective_message.edit_text(msg)
+    await context.bot.edit_message_text(msg, chat.id, sent_message.id)

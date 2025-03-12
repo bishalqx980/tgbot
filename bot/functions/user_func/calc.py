@@ -12,4 +12,4 @@ async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     res, output = Utils.calculator(text)
-    await effective_message.reply_text(f"Calculation: <code>{output}</code>" if res else f"Error: {output}")
+    await effective_message.reply_text(f"Calculation: <code>{output}</code>" if res else f"Error: {output.msg}")

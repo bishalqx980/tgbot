@@ -5,6 +5,7 @@ from bot.modules.ai_llm import LLM
 
 async def func_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    chat = update.effective_chat
     effective_message = update.effective_message
     prompt = " ".join(context.args)
 
@@ -12,7 +13,7 @@ async def func_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Use <code>/gpt prompt</code>\nE.g. <code>/gpt what is relativity? explain in simple and short way.</code>")
         return
     
-    await effective_message.reply_text("💭 Generating...")
+    sent_message = await effective_message.reply_text("💭 Generating...")
     start_time = time()
     response = await LLM.text_gen(prompt)
     response_time = int(time() - start_time)
@@ -26,4 +27,4 @@ async def func_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         text = "Oops! Something went wrong!"
     
-    await effective_message.edit_text(text)
+    await context.bot.edit_message_text(text, chat.id, sent_message.id)

@@ -149,7 +149,10 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data in query_dict_help:
         handler = query_dict_help[query.data]
-        await handler(update, query)
+        if query.data == "query_help_bot_info":
+            await handler(update, context)
+        else:
+            await handler(update)
     
     elif query.data in (query_dict_chat_settings or query_dict_chat_settings_2):
         data_center = await validate_user(query, chat, user)
@@ -162,7 +165,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         if query.data in query_dict_chat_settings:
             handler = query_dict_chat_settings[query.data]
-            await handler(update, query, find_chat)
+            await handler(update, find_chat)
         
         elif query.data in query_dict_chat_settings_2:
             handler = query_dict_chat_settings_2[query.data]
@@ -178,21 +181,21 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await del_query(query)
             return
         
-        find_chat = await get_chat_data(update, data_center)
-        if not find_chat:
+        database_data = await get_chat_data(update, data_center)
+        if not database_data:
             return
         
         if query.data in query_dict_bot_settings:
             handler = query_dict_bot_settings[query.data]
-            await handler(update, query, find_chat)
+            await handler(update, database_data)
         
         elif query.data in query_dict_bot_settings_2:
             handler = query_dict_bot_settings_2[query.data]
-            await handler(update, query)
+            await handler(update)
         
         elif query.data in query_dict_bot_settings_3:
             handler = query_dict_bot_settings_3[query.data]
-            await handler(update, data_center)
+            await handler(update)
     
     elif query.data in query_dict_broadcast:
         data_center = await validate_user(query, chat, user)
@@ -254,9 +257,9 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 is_list = True
                 is_int = True
             
-            await handler(chat.id, query, is_list=is_list, is_int=is_int)
+            await handler(context, chat.id, query, is_list=is_list, is_int=is_int)
         elif query.data == "query_close":
-            await handler(update, chat.id, query)
+            await handler(update, context, chat.id, query)
         else:
             await handler(chat.id, query)
     

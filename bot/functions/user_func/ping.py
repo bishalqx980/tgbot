@@ -4,6 +4,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
     effective_message = update.effective_message
     url = " ".join(context.args)
 
@@ -14,7 +15,7 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if url[0:4] != "http":
         url = f"http://{url}"
 
-    await effective_message.reply_text(f"Pinging {url}\nPlease wait...")
+    sent_message = await effective_message.reply_text(f"Pinging {url}\nPlease wait...")
     start_time = time()
     try:
         async with aiohttp.ClientSession() as session:
@@ -56,4 +57,4 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception:
         text = "Oops! Something went wrong!"
 
-    await effective_message.edit_text(f"<b>{text}</b>")
+    await context.bot.edit_message_text(f"<b>{text}</b>", chat.id, sent_message.id)

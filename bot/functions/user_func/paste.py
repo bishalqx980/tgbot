@@ -4,6 +4,7 @@ from bot.modules.telegraph import TELEGRAPH
 
 async def func_paste(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    chat = update.effective_chat
     effective_message = update.effective_message
     re_msg = effective_message.reply_to_message
     text = (re_msg.text_html or re_msg.caption_html) if re_msg else " ".join(context.args)
@@ -12,10 +13,10 @@ async def func_paste(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Use <code>/paste text</code> or reply the message/text with <code>/paste</code> command.")
         return
 
-    await effective_message.reply_text(f"Creating...")
+    sent_message = await effective_message.reply_text(f"Creating...")
     paste = TELEGRAPH.paste(text.replace("\n", "<br>"), user.full_name)
     if not paste:
-        await effective_message.edit_text("Oops! Something went wrong!")
+        await context.bot.edit_message_text("Oops! Something went wrong!", chat.id, sent_message.id)
         return
     
-    await effective_message.edit_text(paste)
+    await context.bot.edit_message_text(paste, chat.id, sent_message.id)

@@ -7,6 +7,7 @@ from bot.modules.ai_llm import LLM
 
 async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    chat = update.effective_chat
     effective_message = update.effective_message
     prompt = " ".join(context.args)
 
@@ -14,12 +15,12 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Use <code>/imagine prompt</code>\nE.g. <code>/imagine A cat and a dog playing</code>")
         return
     
-    await effective_message.reply_text("🎨 Generating...")
+    sent_message = await effective_message.reply_text("🎨 Generating...")
     start_time = time()
     response = await LLM.imagine(prompt, f"imagine_{user.id}")
     response_time = int(time() - start_time)
     if not response:
-        await effective_message.edit_text("Oops! Something went wrong!")
+        await context.bot.edit_message_text("Oops! Something went wrong!", chat.id, sent_message.id)
         return
     
     caption = (
@@ -28,8 +29,8 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>🗣 Req by:</b> {user.mention_html()} | <code>{user.id}</code>"
     )
 
-    await effective_message.reply_photo(response, caption, reply_to_message_id=effective_message.id)
-    await effective_message.delete()
+    await context.bot.delete_message(chat.id, sent_message.id)
+    await effective_message.reply_photo(response, caption)
 
     # Removing the image file
     try:

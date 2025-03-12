@@ -5,6 +5,7 @@ from bot import logger
 from bot.modules.psndl.psndl import PSNDL
 
 async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
     effective_message = update.effective_message
     hex_data = " ".join(context.args)
 
@@ -12,11 +13,11 @@ async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Use <code>/rap rap data (hex)</code>\nE.g. <code>/rap D78710F4C0979FAD9CDB40C612C94F60</code>\n<i><b>Note:</b> You will get the rap data after searching content/game using /psndl command.</i>")
         return
 
-    await effective_message.reply_text("Creating...")
+    sent_message = await effective_message.reply_text("Creating...")
 
     result = PSNDL.gen_rap(hex_data)
     if not result:
-        await effective_message.edit_text("RAP file wasn't found!")
+        await context.bot.edit_message_text("RAP file wasn't found!", chat.id, sent_message.id)
         return
     
     rap_file = open(result["rap_path"], "rb").read()
@@ -27,9 +28,9 @@ async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>• Type:</b> <code>{result['game_data'].get('type')}</code>\n"
         f"<b>• Region:</b> <code>{result['game_data'].get('region')}</code>\n"
     )
-
+    
+    await context.bot.delete_message(chat.id, sent_message.id)
     await effective_message.reply_document(rap_file, caption, filename=result["rap_name"])
-    await effective_message.delete()
 
     # Removing rap file from storage
     try:

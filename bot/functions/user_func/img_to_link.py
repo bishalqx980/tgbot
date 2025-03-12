@@ -4,6 +4,7 @@ from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.freeimagehost import upload_image
 
 async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
     effective_message = update.effective_message
     re_msg = effective_message.reply_to_message
 
@@ -19,12 +20,12 @@ async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Reply a photo to get a public link for that photo!")
         return
     
-    await effective_message.reply_text(f"💭 Generating...")
+    sent_message = await effective_message.reply_text(f"💭 Generating...")
     photo = await context.bot.get_file(photo.file_id)
 
     response = await upload_image(photo.file_path)
     if not response:
-        await effective_message.edit_text("Timeout! Please try again or report the issue." if response is False else "Oops! Something went wrong!")
+        await context.bot.edit_message_text("Timeout! Please try again or report the issue." if response is False else "Oops! Something went wrong!", chat.id, sent_message.id)
         return
     
     image_data = response["image"]
@@ -45,4 +46,4 @@ async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     btn = ButtonMaker.ubutton([{"View 👀": img_url}])
-    await effective_message.edit_text(text, reply_markup=btn)
+    await context.bot.edit_message_text(text, chat.id, sent_message.id, reply_markup=btn)
