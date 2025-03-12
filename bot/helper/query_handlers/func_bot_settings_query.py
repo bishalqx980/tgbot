@@ -1,15 +1,17 @@
 from telegram import Update
 from bot.update_db import update_database
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB, MongoDB
 
 class QueryBotSettings:
-    async def _query_bot_pic(update: Update, query, find_chat):
+    async def _query_bot_pic(update: Update, database_data):
         user = update.effective_user
-        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "bot_pic"})
-        bot_pic = find_chat.get("bot_pic")
+        effective_message = update.effective_message
 
-        msg = (
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "bot_pic"})
+        bot_pic = database_data.get("bot_pic")
+
+        text = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Bot pic (link): <code>{bot_pic}</code>\n\n"
             "<i><b>Note:</b> Send an image url/link to set bot pic!</i>"
@@ -21,18 +23,24 @@ class QueryBotSettings:
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_images(update: Update, query, find_chat):
+    async def _query_images(update: Update, database_data):
         user = update.effective_user
+        effective_message = update.effective_message
+
         MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "images"})
-        images = find_chat.get("images")
+        images = database_data.get("images")
         if images:
             images = ", ".join(images)
         
-        msg = (
+        text = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Images (link): <code>{images}</code>\n\n"
             "<i><b>Note:</b> Single image or send multiple image link separated by comma!</i>"
@@ -44,29 +52,42 @@ class QueryBotSettings:
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
         
-        btn = await Button.cbutton(btn_data)
-        sent_msg = await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
 
-        if not sent_msg:
-            open("temp/temp.txt", "w").write(images)
-            tmp_file = open("temp/temp.txt", "rb").read()
-            await Message.send_document(user.id, tmp_file, "image links.txt", "image links")
+        if effective_message.text:
+            is_sent = await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            is_sent = await effective_message.edit_caption(text, reply_markup=btn)
+
+        if not is_sent:
+            with open("temp/temp.txt", "w") as f:
+                f.write(images)
             
-            msg = (
+            with open("temp/temp.txt", "rb") as f:
+                tmp_file = f.read()
+            
+            await effective_message.reply_document(tmp_file, "image links", filename="image links.txt")
+            
+            text = (
                 "<u><b>Bot Settings</b></u>\n\n"
                 f"Images (link): <code>Text file sent below!</code>\n\n"
                 "<i><b>Note:</b> Single image or send multiple image link separated by comma!</i>"
             )
 
-            await Message.edit_message(update, msg, query.message, btn)
+            if effective_message.text:
+                await effective_message.edit_text(text, reply_markup=btn)
+            elif effective_message.caption:
+                await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_support_chat(update: Update, query, find_chat):
+    async def _query_support_chat(update: Update, database_data):
         user = update.effective_user
-        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "support_chat"})
-        support_chat = find_chat.get("support_chat")
+        effective_message = update.effective_message
 
-        msg = (
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "support_chat"})
+        support_chat = database_data.get("support_chat")
+
+        text = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Support Chat (link): <code>{support_chat}</code>\n"
         )
@@ -77,16 +98,22 @@ class QueryBotSettings:
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_server_url(update: Update, query, find_chat):
+    async def _query_server_url(update: Update, database_data):
         user = update.effective_user
-        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "server_url"})
-        server_url = find_chat.get("server_url")
+        effective_message = update.effective_message
 
-        msg = (
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "server_url"})
+        server_url = database_data.get("server_url")
+
+        text = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Server url: <code>{server_url}</code>\n\n"
             "<i><b>Note:</b> Bot will fall asleep if you deployed the bot on render (free) and don't set this value. (Bot restart required)</i>"
@@ -98,18 +125,24 @@ class QueryBotSettings:
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_sudo(update: Update, query, find_chat):
+    async def _query_sudo(update: Update, database_data):
         user = update.effective_user
+        effective_message = update.effective_message
+
         MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "sudo_users"})
-        sudo_users = find_chat.get("sudo_users")
+        sudo_users = database_data.get("sudo_users")
         if sudo_users:
             sudo_users = ", ".join(str(i) for i in sudo_users)
         
-        msg = (
+        text = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Sudo users: <code>{sudo_users}</code>\n\n"
             "<i><b>Note:</b> The power user! Sudo users have owner function access!\nAdd user_id eg. <code>2134776547</code>\nmultiple id will be separated by comma!</i>"
@@ -121,19 +154,25 @@ class QueryBotSettings:
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_shrinkme_api(update: Update, query, find_chat):
+    async def _query_shrinkme_api(update: Update, database_data):
         user = update.effective_user
-        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "shrinkme_api"})
-        shrinkme_api = find_chat.get("shrinkme_api")
+        effective_message = update.effective_message
 
-        msg = (
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "shrinkme_api"})
+        shrinkme_api = database_data.get("shrinkme_api")
+
+        text = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Shrinkme API: <code>{shrinkme_api}</code>\n\n"
-            "<i><b>Note:</b> This api for /short command!</i>"
+            "<i><b>Note:</b> This api for /shorturl command!</i>"
         )
 
         btn_data = [
@@ -142,16 +181,22 @@ class QueryBotSettings:
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_omdb_api(update: Update, query, find_chat):
+    async def _query_omdb_api(update: Update, database_data):
         user = update.effective_user
-        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "omdb_api"})
-        omdb_api = find_chat.get("omdb_api")
+        effective_message = update.effective_message
 
-        msg = (
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "omdb_api"})
+        omdb_api = database_data.get("omdb_api")
+
+        text = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"OMDB API: <code>{omdb_api}</code>\n\n"
             "<i><b>Note:</b> This api for /movie command!</i>"
@@ -163,16 +208,22 @@ class QueryBotSettings:
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_weather_api(update: Update, query, find_chat):
+    async def _query_weather_api(update: Update, database_data):
         user = update.effective_user
-        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "weather_api"})
-        weather_api = find_chat.get("weather_api")
+        effective_message = update.effective_message
 
-        msg = (
+        MemoryDB.insert_data("data_center", user.id, {"edit_data_key": "weather_api"})
+        weather_api = database_data.get("weather_api")
+
+        text = (
             "<u><b>Bot Settings</b></u>\n\n"
             f"Weather API: <code>{weather_api}</code>\n\n"
             "<i><b>Note:</b> This api for /weather command!</i>"
@@ -184,12 +235,18 @@ class QueryBotSettings:
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_restore_db(update: Update, query):
-        msg = (
+    async def _query_restore_db(update: Update):
+        effective_message = update.effective_message
+
+        text = (
             "<u><b>Bot Settings</b></u>\n\n"
             "<b>» ⚠ Restore Database</b>\n"
             "- <i>This will clear all bot data (excluding user & group data) from online database and restore data from the <code>config.env</code> file.</i>\n\n"
@@ -204,18 +261,24 @@ class QueryBotSettings:
             {"Back": "query_bot_settings_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_confirm_restore_db(update: Update, data_center):
+    async def _query_confirm_restore_db(update: Update):
+        effective_message = update.effective_message
         res = MongoDB.delete_all_doc("bot_data")
         update_database()
-        msg = "Database has been restored successfully from <code>config.env</code>!" if res else "Something went wrong! Check /log"
-        await Message.send_message(data_center.get("chat_id"), msg)
+        text = "Database has been restored successfully from <code>config.env</code>!" if res else "Something went wrong! Check /log"
+        await effective_message.reply_text(text)
 
 
-    async def _query_clear_memory_cache(update: Update, data_center):
+    async def _query_clear_memory_cache(update: Update):
+        effective_message = update.effective_message
         MemoryDB.clear_all()
         update_database()
-        await Message.send_message(data_center.get("chat_id"), "Local database has been cleared!")
+        await effective_message.reply_text("Local database has been cleared!")

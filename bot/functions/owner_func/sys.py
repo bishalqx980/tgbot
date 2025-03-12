@@ -3,17 +3,18 @@ from time import time
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.telegram_helpers.telegram_helper import Message
+
+
 from bot.modules.database import MemoryDB
-from bot.functions.power_users import _power_users
+from bot.functions.sudo_users import _power_users
 
 
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
 
-    power_users = await _power_users()
+    power_users = fetch_sudos()
     if user.id not in power_users:
-        await Message.reply_message(update, "Access denied!")
+        await effective_message.reply_text("Access denied!")
         return
     
     sys_uptime = timedelta(seconds=datetime.now().timestamp() - psutil.boot_time())
@@ -62,4 +63,4 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>"
     )
 
-    await Message.reply_message(update, sys_info)
+    await effective_message.reply_text(sys_info)

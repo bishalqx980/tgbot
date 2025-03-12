@@ -3,9 +3,11 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
+
+
+
 from bot.modules.database import MemoryDB
-from bot.functions.power_users import _power_users
+from bot.functions.sudo_users import _power_users
 
 
 async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -13,13 +15,13 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     e_msg = update.effective_message
 
-    power_users = await _power_users()
+    power_users = fetch_sudos()
     if user.id not in power_users:
-        await Message.reply_message(update, "Access denied!")
+        await effective_message.reply_text("Access denied!")
         return
     
     if chat.type != ChatType.PRIVATE:
-        await Message.reply_message(update, f"This command is made to be used in pm, not in public chat!")
+        await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
         await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])
         return
@@ -48,14 +50,11 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         {"> Restore DB?": "query_restore_db", "Close": "query_close"}
     ]
 
-    btn = await Button.cbutton(btn_data)
+    btn = ButtonMaker.cbutton(btn_data)
     
     images = MemoryDB.bot_data.get("images")
-    if images:
-        image = random.choice(images).strip()
-    else:
-        image = MemoryDB.bot_data.get("bot_pic")
+    photo = random.choice(images).strip() if images else MemoryDB.bot_data.get("bot_pic")
     
-    sent_img = await Message.reply_image(update, image, msg, btn=btn) if image else None
+    sent_img = await Message.reply_image(update, image, msg, reply_markup=btn) if image else None
     if not sent_img:
-        await Message.reply_message(update, msg, btn=btn)
+        await effective_message.reply_text(msg, reply_markup=btn)

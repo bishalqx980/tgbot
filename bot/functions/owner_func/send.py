@@ -3,24 +3,25 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import Forbidden
-from bot.helper.telegram_helpers.telegram_helper import Message
-from bot.functions.power_users import _power_users
+
+
+from bot.functions.sudo_users import _power_users
 
 
 async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     e_msg = update.effective_message
-    re_msg = update.message.reply_to_message
+    re_msg = effective_message.reply_to_message
     text = " ".join(context.args) # contains something if forward is true and contains victim_id >> /send f chat_id
 
-    power_users = await _power_users()
+    power_users = fetch_sudos()
     if user.id not in power_users:
-        await Message.reply_message(update, "Access denied!")
+        await effective_message.reply_text("Access denied!")
         return
     
     if chat.type != ChatType.PRIVATE:
-        await Message.reply_message(update, f"This command is made to be used in pm, not in public chat!")
+        await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
         await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])
         return
@@ -34,7 +35,7 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Forbidden - '👎'\n"
             "Something went wrong - '🤷‍♂'"
         )
-        await Message.reply_message(update, msg)
+        await effective_message.reply_text(msg)
         return
     
     forward_confirm, victim_id = None, text

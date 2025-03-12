@@ -1,5 +1,4 @@
 from telegram import Update
-from bot import bot
 
 async def _check_permission(update: Update, victim=None, user=None):
     """

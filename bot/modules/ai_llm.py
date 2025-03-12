@@ -2,8 +2,7 @@ import json
 import aiohttp
 from bot import logger
 
-async def fetch_ai_models():
-    ai_models_url = "https://gist.githubusercontent.com/bishalqx980/204d6dfa707a8d573bdbf9c2928e6296/raw/data.json"
+async def fetch_ai_models(ai_models_url="https://gist.githubusercontent.com/bishalqx980/204d6dfa707a8d573bdbf9c2928e6296/raw/data.json"):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(ai_models_url) as response:
@@ -17,7 +16,7 @@ async def fetch_ai_models():
 class LLM:
     async def text_gen(prompt, only_response=True):
         """
-        `only_response` returns only response text if `True`
+        :param only_response: returns only response text if `True`
         """
         ai_models = await fetch_ai_models()
         if not ai_models:
@@ -42,7 +41,7 @@ class LLM:
 
     async def imagine(prompt, file_name="imagine"):
         """
-        `file_name`: file name without file extention
+        :param file_name: file name without `file extention`
         """
         ai_models = await fetch_ai_models()
         if not ai_models:

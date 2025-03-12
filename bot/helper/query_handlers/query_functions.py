@@ -1,11 +1,11 @@
 import asyncio
 from bot import logger
 from telegram import Update
-from bot.helper.telegram_helpers.telegram_helper import Message
+from telegram.ext import ContextTypes
 from bot.modules.database import MemoryDB, MongoDB
 
 class QueryFunctions:
-    async def query_edit_value(identifier, query, new_value="default", is_list=False, is_int=False):
+    async def query_edit_value(context: ContextTypes.DEFAULT_TYPE, identifier, query, new_value="default", is_list=False, is_int=False):
         """
         identifier > user.id or chat.id (data center identifier)\n
         query > query indicator\n
@@ -39,7 +39,7 @@ class QueryFunctions:
         if new_value != "default":
             edit_data_value = new_value
         else:
-            sent_msg = await Message.send_message(chat_id, "Now send a value:")
+            sent_msg = await context.bot.send_message(chat_id, "Now send a value:")
 
             MemoryDB.insert_data("data_center", identifier, {"is_editing": True})
 
@@ -53,7 +53,7 @@ class QueryFunctions:
                 await asyncio.sleep(0.5)
             
             MemoryDB.insert_data("data_center", identifier, {"edit_data_value": None, "is_editing": False})
-            await Message.delete_messages(chat_id, [edit_data_value_msg_pointer_id, sent_msg.id])
+            await context.bot.delete_messages(chat_id, [edit_data_value_msg_pointer_id, sent_msg.id])
             
             if not edit_data_value:
                 try:
@@ -271,7 +271,7 @@ class QueryFunctions:
             logger.error(e)
 
 
-    async def query_close(update: Update, identifier, query):
+    async def query_close(update: Update, context: ContextTypes.DEFAULT_TYPE, identifier, query):
         """
         identifier > user.id or chat.id (data center identifier)\n
         query > query indicator
@@ -286,7 +286,7 @@ class QueryFunctions:
         else:
             chat_id = chat.id
         
-        await Message.delete_messages(chat_id, msg_ids)
+        await context.bot.delete_messages(chat_id, msg_ids)
 
         try:
             await query.delete_message()

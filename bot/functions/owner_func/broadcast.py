@@ -4,31 +4,33 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import Forbidden
-from bot import bot, logger
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
+from bot import logger
+
+
+
 from bot.modules.database import MemoryDB, MongoDB
-from bot.functions.power_users import _power_users
+from bot.functions.sudo_users import fetch_sudos
 
 
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     e_msg = update.effective_message
-    re_msg = update.message.reply_to_message
+    re_msg = effective_message.reply_to_message
 
-    power_users = await _power_users()
+    power_users = fetch_sudos()
     if user.id not in power_users:
-        await Message.reply_message(update, "Access denied!")
+        await effective_message.reply_text("Access denied!")
         return
     
     if chat.type != ChatType.PRIVATE:
-        await Message.reply_message(update, f"This command is made to be used in pm, not in public chat!")
+        await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
         await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])
         return
     
     if not re_msg:
-        await Message.reply_message(update, "Reply a message to broadcast!")
+        await effective_message.reply_text("Reply a message to broadcast!")
         return
     
     data = {
@@ -67,8 +69,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         {"Done": "query_broadcast_done", "Close": "query_close"}
     ]
 
-    btn = await Button.cbutton(btn_data)
-    sent_msg = await Message.reply_message(update, msg, btn=btn)
+    btn = ButtonMaker.cbutton(btn_data)
+    sent_msg = await effective_message.reply_text(msg, reply_markup=btn)
 
     timeout = 0
     while timeout < 30:
@@ -82,7 +84,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await Message.delete_message(chat.id, sent_msg)
 
     if not is_done:
-        await Message.reply_message(update, "Oops, Timeout!")
+        await effective_message.reply_text("Oops, Timeout!")
         return
     
     is_forward = data_center["broadcast"]["is_forward"]
@@ -100,12 +102,12 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if filter_user_id[1] == True:
                 active_users.append(filter_user_id[0])
     else:
-        await Message.reply_message(update, f"An error occured!\nuser_id: {len(user_id)} isn't equal to active_status: {len(active_status)} !!")
+        await effective_message.reply_text(f"An error occured!\nuser_id: {len(user_id)} isn't equal to active_status: {len(active_status)} !!")
         return
     
     sent_count, except_count, pin_except_count = 0, 0, 0
     exception_user_ids = []
-    notify_btn = await Button.cbutton([{"Cancel": "query_close"}])
+    notify_btn = ButtonMaker.cbutton([{"Cancel": "query_close"}])
     notify = await Message.send_message(user.id, f"Total users: {len(users_id)}\nActive users: {len(active_users)}", btn=notify_btn)
     start_time = time()
 
@@ -153,7 +155,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "<b>» Progress</b>\n"
                 f"{edit_msg}"
             )
-            await Message.reply_message(update, msg)
+            await effective_message.reply_text(msg)
             break
 
     end_time = time()
@@ -165,4 +167,4 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if len(exception_user_ids) > 0:
         msg += f"\nException user ids: {exception_user_ids}"
     
-    await Message.reply_message(update, f"<b>{msg}</b>")
+    await effective_message.reply_text(f"<b>{msg}</b>")

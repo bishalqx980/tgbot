@@ -1,15 +1,16 @@
-import json
 import psutil
 from time import time
 from datetime import datetime, timedelta
 from telegram import Update
-from bot import bot
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
+from telegram.ext import ContextTypes
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB, MongoDB
 
 class QueryBotHelp:
-    async def _query_help_group_management_p1(update: Update, query):
-        msg = (
+    async def _query_help_group_management_p1(update: Update):
+        effective_message = update.effective_message
+
+        text = (
             "<b>Group Moderation Commands | p:1</b>\n\n"
             "/id » Show chat/user id\n"
             "/invite » Generate chat invite link\n"
@@ -35,12 +36,18 @@ class QueryBotHelp:
             {"Back": "query_help_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_help_group_management_p2(update: Update, query):
-        msg = (
+    async def _query_help_group_management_p2(update: Update):
+        effective_message = update.effective_message
+
+        text = (
             "<b>Group Moderation Commands | p:2</b>\n\n"
             "/del » delete the replied message with a warning!\n"
             "/purge » delete every messages from replied to current message!\n"
@@ -59,36 +66,48 @@ class QueryBotHelp:
             {"Back": "query_help_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_help_ai(update: Update, query):
-        msg = (
+    async def _query_help_ai(update: Update):
+        effective_message = update.effective_message
+
+        text = (
             "<b>Artificial intelligence</b>\n\n"
             "/imagine » generate AI image\n"
             "/gpt » ask any question to ChatGPT\n\n"
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
 
-        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_help_misc_functions(update: Update, query):
-        msg = (
+    async def _query_help_misc_functions(update: Update):
+        effective_message = update.effective_message
+
+        text = (
             "<b>Misc functions</b>\n\n"
             "/movie » get any movie info by name or imdb id\n"
             "/tr » translate any language\n"
             "/decode » convert base64 into text\n"
             "/encode » convert text into base64\n"
-            "/short » short any url\n"
+            "/shorturl » short any url\n"
             "/ping » ping any url\n"
             "/calc » calculate any math (supported syntex: +, -, *, /)\n"
             "/tts » convert text into speech\n"
             "/weather » get weather info of any city\n"
             "/qr » generate a QR code\n"
-            "/itl » convert image into a public link\n"
+            "/imgtolink » convert image into a public link\n"
             "/paste » paste your text in telegraph & get public link\n"
             "/whisper » secretly tell something to someone in group chat\n"
             "/ytdl » download audio/song from youtube\n"
@@ -100,12 +119,18 @@ class QueryBotHelp:
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
         
-        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_help_owner_functions(update: Update, query):
-        msg = (
+    async def _query_help_owner_functions(update: Update):
+        effective_message = update.effective_message
+
+        text = (
             "<b>Bot owner functions</b>\n\n"
             "/broadcast » broadcast message to all active users\n"
             "/send » send message to specified chat_id\n"
@@ -119,11 +144,17 @@ class QueryBotHelp:
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
         
-        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
     
 
-    async def _query_help_bot_info(update: Update, query):
+    async def _query_help_bot_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        effective_message = update.effective_message
+
         database_info = MongoDB.info_db()
         total_users = None
         total_groups = None
@@ -156,12 +187,12 @@ class QueryBotHelp:
 
         bot_commands = MemoryDB.bot_data.get("bot_commands", [])
 
-        msg = (
+        text = (
             "<blockquote><code><b>» bot.info()</b></code></blockquote>\n\n"
 
-            f"<b>• Name:</b> {bot.first_name}\n"
-            f"<b>• ID:</b> <code>{bot.id}</code>\n"
-            f"<b>• Username:</b> {bot.name}\n\n"
+            f"<b>• Name:</b> {context.bot.first_name}\n"
+            f"<b>• ID:</b> <code>{context.bot.id}</code>\n"
+            f"<b>• Username:</b> {context.bot.name}\n\n"
 
             f"<b>• Registered users:</b> <code>{total_users}</code>\n"
             f"<b>• Active users:</b> <code>{active_users}</code>\n"
@@ -177,5 +208,9 @@ class QueryBotHelp:
             "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
         )
         
-        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)

@@ -2,25 +2,24 @@ import aiohttp
 from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.telegram_helpers.telegram_helper import Message
-
 
 async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    effective_message = update.effective_message
     url = " ".join(context.args)
 
     if not url:
-        await Message.reply_message(update, "Use <code>/ping url</code>\nE.g. <code>/ping https://google.com</code>")
+        await effective_message.reply_text("Use <code>/ping url</code>\nE.g. <code>/ping https://google.com</code>")
         return
     
     if url[0:4] != "http":
         url = f"http://{url}"
 
-    sent_msg = await Message.reply_message(update, f"Pinging {url}\nPlease wait...")
+    await effective_message.reply_text(f"Pinging {url}\nPlease wait...")
+    start_time = time()
     try:
-        start_time = time()
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
-                response_time = int((time() - start_time) * 1000)
+                response_time = int((time() - start_time) * 1000) # converting to ms
                 if response_time > 1000:
                     response_time = f"{(response_time / 1000):.2f}s"
                 else:
@@ -44,17 +43,17 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 }
 
                 status = status_codes.get(response.status, "⚠️ Unknown Status")
-                msg = (
+                text = (
                     f"Site: {url}\n"
                     f"R.time: <code>{response_time}</code>\n"
                     f"R.code: <code>{response.status}</code>\n"
                     f"Status: <code>{status}</code>"
                 )
     except aiohttp.ServerTimeoutError:
-        msg = "Error: Request timeout."
+        text = "Error: Request timeout."
     except aiohttp.ServerConnectionError:
-        msg = "Error: Connection error."
+        text = "Error: Connection error."
     except Exception:
-        msg = "Oops! Please try again or report the issue."
+        text = "Oops! Something went wrong!"
 
-    await Message.edit_message(update, f"<b>{msg}</b>", sent_msg)
+    await effective_message.edit_text(f"<b>{text}</b>")

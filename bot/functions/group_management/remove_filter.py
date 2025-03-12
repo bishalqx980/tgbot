@@ -2,11 +2,12 @@ from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot import logger
-from bot.helper.telegram_helpers.telegram_helper import Message
+
+
 from bot.modules.database import MemoryDB, MongoDB
 from bot.modules.database.common import database_search
 from bot.functions.group_management.pm_error import _pm_error
-from bot.functions.del_command import func_del_command
+
 from bot.functions.group_management.check_permission import _check_permission
 
 
@@ -19,16 +20,16 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _pm_error(chat.id)
         return
 
-    await func_del_command(update, context)
+    
 
     if user.is_bot:
-        await Message.reply_message(update, "I don't take permission from anonymous admins!")
+        await effective_message.reply_text("I don't take permission from anonymous admins!")
         return
     
-    sent_msg = await Message.reply_message(update, "💭")
+    sent_msg = await effective_message.reply_text("💭")
     _chk_per = await _check_permission(update, user=user)
     if not _chk_per:
-        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
+        await Message.edit_message(update, "Oops! Something went wrong!", sent_msg)
         return
         
     if _chk_per["bot_permission"].status != ChatMember.ADMINISTRATOR:
@@ -52,7 +53,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await Message.edit_message(update, msg, sent_msg)
         return
 
-    database = database_search("groups", "chat_id", chat.id)
+    response, database_data = database_search("groups", "chat_id", chat.id)
     if database[0] == False:
         await Message.edit_message(update, database[1], sent_msg)
         return

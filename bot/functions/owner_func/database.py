@@ -3,8 +3,9 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot.modules.database import MongoDB
-from bot.helper.telegram_helpers.telegram_helper import Message
-from bot.functions.power_users import _power_users
+
+
+from bot.functions.sudo_users import _power_users
 
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -13,13 +14,13 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     e_msg = update.effective_message
     chat_id = " ".join(context.args)
 
-    power_users = await _power_users()
+    power_users = fetch_sudos()
     if user.id not in power_users:
-        await Message.reply_message(update, "Access denied!")
+        await effective_message.reply_text("Access denied!")
         return
     
     if chat.type != ChatType.PRIVATE:
-        await Message.reply_message(update, f"This command is made to be used in pm, not in public chat!")
+        await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
         await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])
         return
@@ -47,20 +48,20 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<i>Note: <code>/database chat_id</code> to get specific chat database information.</i>"
         )
 
-        await Message.reply_message(update, msg)
+        await effective_message.reply_text(msg)
         return
     
     try:
         chat_id = int(chat_id)
     except ValueError:
-        await Message.reply_message(update, "Invalid ChatID!")
+        await effective_message.reply_text("Invalid ChatID!")
         return
 
     # if chat_id given
     if "-100" in str(chat_id):
         find_group = MongoDB.find_one("groups", "chat_id", chat_id) # chat_id as int
         if not find_group:
-            await Message.reply_message(update, "Chat not found!")
+            await effective_message.reply_text("Chat not found!")
             return
         
         msg = (
@@ -84,7 +85,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         find_user = MongoDB.find_one("users", "user_id", chat_id) # chat_id as int
         if not find_user:
-            await Message.reply_message(update, "User not found!")
+            await effective_message.reply_text("User not found!")
             return
         
         msg = (
@@ -98,4 +99,4 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     
     # common message sender for both group chat & private chat database info
-    await Message.reply_message(update, msg)
+    await effective_message.reply_text(msg)

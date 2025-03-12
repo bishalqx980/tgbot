@@ -1,10 +1,12 @@
 from telegram import Update
 from telegram.constants import ChatType
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
 
 class QueryMenus:
-    async def _query_bot_settings_menu(update: Update, query):
-        msg = "<u><b>Bot Settings</b></u>"
+    async def _query_bot_settings_menu(update: Update):
+        effective_message = update.effective_message
+
+        text = "<u><b>Bot Settings</b></u>"
         btn_data = [
             {"Bot pic": "query_bot_pic", "Images": "query_images"},
             {"Support chat": "query_support_chat", "Server url": "query_server_url"},
@@ -13,13 +15,19 @@ class QueryMenus:
             {"> Restore DB?": "query_restore_db", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_help_menu(update: Update, query):
+    async def _query_help_menu(update: Update):
         user = update.effective_user
-        msg = (
+        effective_message = update.effective_message
+
+        text = (
             f"Hey, {user.full_name}! Welcome to the bot help section.\n"
             "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
             "/start - to start the bot\n"
@@ -33,12 +41,17 @@ class QueryMenus:
             {"» bot.info()": "query_help_bot_info", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
     
 
-    async def _query_chat_settings_menu(update: Update, query, find_chat):
+    async def _query_chat_settings_menu(update: Update, find_chat):
         chat = update.effective_chat
+        effective_message = update.effective_message
 
         if chat.type == ChatType.PRIVATE:
             user_mention = find_chat.get("mention")
@@ -46,7 +59,7 @@ class QueryMenus:
             echo = find_chat.get("echo", False)
             auto_tr = find_chat.get("auto_tr", False)
 
-            msg = (
+            text = (
                 "<u><b>Chat Settings</b></u>\n\n"
                 f"• User: {user_mention}\n"
                 f"• ID: <code>{chat.id}</code>\n\n"
@@ -61,7 +74,7 @@ class QueryMenus:
                 {"Echo": "query_chat_set_echo", "Close": "query_close"}
             ]
 
-            btn = await Button.cbutton(btn_data)
+            btn = ButtonMaker.cbutton(btn_data)
         
         else:
             title = find_chat.get("title")
@@ -79,7 +92,7 @@ class QueryMenus:
             if allowed_links:
                 allowed_links = ", ".join(allowed_links)
 
-            msg = (
+            text = (
                 "<u><b>Chat Settings</b></u>\n\n"
 
                 f"• Title: {title}\n"
@@ -105,6 +118,9 @@ class QueryMenus:
                 {"Links behave": "query_chat_links_behave", "Close": "query_close"}
             ]
 
-            btn = await Button.cbutton(btn_data)
-
-        await Message.edit_message(update, msg, query.message, btn)
+            btn = ButtonMaker.cbutton(btn_data)
+        
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)

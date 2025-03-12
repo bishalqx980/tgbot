@@ -1,7 +1,7 @@
 import os
 import requests
 
-def get_latest_commit(owner, repo):
+def fetch_latest_commit(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/commits"
     try:
         response = requests.get(url)
@@ -41,7 +41,7 @@ owner_id = int(os.getenv("OWNER_ID"))
 chat_id = int(os.getenv("CHAT_ID"))
 
 # call func's
-res = get_latest_commit(owner, repo)
+res = fetch_latest_commit(owner, repo)
 if not res:
     print("Error: error getting lastest commit.")
     exit()

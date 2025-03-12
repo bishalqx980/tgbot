@@ -1,58 +1,79 @@
 import json
 from bot import logger
 
-async def get_database():
-    DATBASE_PATH = "bot/modules/psndl/database.json"
+def fetch_database(database_path="database.json"):
+    """
+    :param database_path: `.json` file location
+    """
     try:
-        with open(DATBASE_PATH, "r") as f:
-            json_data = json.load(f)
-            return json_data
+        with open(database_path, "r") as f:
+            return json.load(f)
     except Exception as e:
         logger.error(e)
 
 class PSNDL:
-    async def search(keyword):
-        database = await get_database()
+    def search(game_name):
+        """
+        :param game_name: name of the game
+        """
+        database = fetch_database()
         if not database:
             return
         
         filtered_data = {}
-        for file_type in database:
-            collection = database.get(file_type)
-            for region in collection:
-                region_data_coll = collection.get(region)
 
-                for game_id in region_data_coll:
-                    game_data = region_data_coll.get(game_id)
-                    game_name = game_data.get("name")
-                    if keyword.lower() in game_name.lower():
-                        check_exist = filtered_data.get(file_type)
+        for game_type in database:
+            filtered_type = database.get(game_type)
+
+            for region in filtered_type:
+                filtered_region = filtered_type.get(region)
+
+                for game_id in filtered_region:
+                    filtered_game_data = filtered_region.get(game_id)
+
+                    if game_name.lower() in filtered_game_data.get("name").lower():
+                        check_exist = filtered_data.get(game_type)
+
                         if check_exist:
-                            check_exist.update({game_id: game_data})
+                            check_exist.update({game_id: filtered_game_data})
                         else:
-                            filtered_data.update({file_type: {game_id: game_data}})
-
-        if filtered_data == {}:
-            return
-        else:
-            return filtered_data
+                            filtered_data.update({game_type: {game_id: filtered_game_data}})
+        
+        return filtered_data if filtered_data else None
 
 
-    async def gen_rap(rap_data):
-        database = await get_database()
+    def gen_rap(hex_data):
+        """
+        :param rap_data: hex string e.g(`EE1E8B6E0A737C657A38780B138C403A`)\n
+        returns `dict` of data including `.rap` file path
+        """
+        database = fetch_database()
         if not database:
             return
         
-        for file_type in database:
-            collection = database.get(file_type)
-            for region in collection:
-                region_data_coll = collection.get(region)
+        for game_type in database:
+            filtered_type = database.get(game_type)
 
-                for game_id in region_data_coll:
-                    game_data = region_data_coll.get(game_id)
-                    db_rap_data = game_data.get("rap_data")
-                    if rap_data == db_rap_data:
-                        rap_name = game_data.get("rap_name")
-                        rap_location = f"downloads/{rap_name}"
-                        open(rap_location, "wb").write(bytes.fromhex(db_rap_data))
-                        return game_data, rap_name, rap_location
+            for region in filtered_type:
+                filtered_region = filtered_type.get(region)
+
+                for game_id in filtered_region:
+                    filtered_game_data = filtered_region.get(game_id)
+                    database_rap_data = filtered_game_data.get("rap_data")
+
+                    if hex_data.lower() == database_rap_data.lower():
+                        rap_name = filtered_game_data.get("rap_name")
+                        rap_path = f"downloads/{rap_name}"
+
+                        try:
+                            with open(rap_path, "wb") as f:
+                                f.write(bytes.fromhex(database_rap_data))
+                        except Exception as e:
+                            logger.error(e)
+                            return
+                        
+                        return {
+                            "game_data": filtered_game_data,
+                            "rap_name": rap_name,
+                            "rap_path": rap_path
+                        }

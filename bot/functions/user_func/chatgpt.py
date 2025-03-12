@@ -1,29 +1,29 @@
 from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.modules.ai_llm import LLM
 
-async def func_chatgpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    effective_message = update.effective_message
     prompt = " ".join(context.args)
 
     if not prompt:
-        await Message.reply_message(update, "Use <code>/gpt prompt</code>\nE.g. <code>/gpt make me laugh</code>")
+        await effective_message.reply_text("Use <code>/gpt prompt</code>\nE.g. <code>/gpt what is relativity? explain in simple and short way.</code>")
         return
     
-    sent_msg = await Message.reply_message(update, "💭 Generating...")
+    await effective_message.reply_text("💭 Generating...")
     start_time = time()
     response = await LLM.text_gen(prompt)
     response_time = int(time() - start_time)
     if response:
-        msg = (
+        text = (
             f"<b>💭 Prompt:</b> <code>{prompt}</code>\n"
             f"<b>⏳ R.time:</b> <code>{response_time}s</code>\n"
             f"<b>🗣 Req by:</b> {user.mention_html()} | <code>{user.id}</code>\n"
             f"<b>Response: <blockquote>{response}</blockquote></b>"
         )
     else:
-        msg = "Oops! Please try again or report the issue."
+        text = "Oops! Something went wrong!"
     
-    await Message.edit_message(update, msg, sent_msg)
+    await effective_message.edit_text(text)

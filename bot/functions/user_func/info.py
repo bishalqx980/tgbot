@@ -1,12 +1,12 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import MessageOriginType
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
-
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
 
 async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    re_msg = update.message.reply_to_message
+    effective_message = update.effective_message
+    re_msg = effective_message.reply_to_message
     victim = user
 
     if re_msg:
@@ -20,7 +20,7 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
             victim = from_user
         
         if not victim:
-            await Message.reply_message(update, f"<b>• Full name:</b> <code>{forward_origin.sender_user_name}</code>\n<i>Replied user account is hidden!</i>")
+            await effective_message.reply_text(f"<b>• Full name:</b> <code>{forward_origin.sender_user_name}</code>\n<i>Replied user account is hidden!</i>")
             return
     
     victim_photos = await victim.get_profile_photos()
@@ -29,7 +29,7 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         victim_pfp = victim_photos.photos[0][-1].file_id # returns victims latest pfp file id
     
     victim_username = f"@{victim.username}" if victim.username else None
-    msg = (
+    text = (
         f"<b>• Full name:</b> <code>{victim.full_name}</code>\n"
         f"<b>  » First name:</b> <code>{victim.first_name}</code>\n"
         f"<b>  » Last name:</b> <code>{victim.last_name}</code>\n"
@@ -41,9 +41,9 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>• Is premium:</b> <code>{victim.is_premium}</code>"
     )
 
-    btn = await Button.ubutton([{"User Profile": f"tg://user?id={victim.id}"}]) if victim.username else None
+    btn = ButtonMaker.ubutton([{"User Profile": f"tg://user?id={victim.id}"}]) if victim.username else None
 
     if victim_pfp:
-        await Message.reply_image(update, victim_pfp, msg, btn=btn)
+        await effective_message.reply_photo(victim_pfp, text, reply_markup=btn)
     else:
-        await Message.reply_message(update, msg, btn=btn)
+        await effective_message.reply_text(text, reply_markup=btn)

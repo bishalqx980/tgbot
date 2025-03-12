@@ -6,12 +6,18 @@ async def weather_info(location):
     weather_api = MemoryDB.bot_data.get("weather_api")
     if not weather_api:
         logger.error("weather_api not found!")
-        return False
+        return
+    
+    api_url = "https://api.weatherapi.com/v1/current.json"
+    params = {
+        "key": weather_api,
+        "q": location,
+        "aqi": "no"
+    }
     
     try:
-        url = f"https://api.weatherapi.com/v1/current.json?key={weather_api}&q={location}&aqi=no"
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
+            async with session.get(api_url, params=params) as response:
                 if response.status != 200:
                     return
 

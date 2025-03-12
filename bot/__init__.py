@@ -7,6 +7,8 @@ from bot.logger import setup_logging
 # constants
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "temp", "sys"]
+ORIGINAL_BOT_USERNAME = "MissCiri_bot"
+ORIGINAL_BOT_ID = 6845693976
 
 # Creating Required Folder/Directories
 try:
@@ -19,7 +21,7 @@ except Exception as e:
     exit()
 
 # logger & env config file
-logger = setup_logging()
+logger = setup_logging() # need to execute after creating Required folders
 ENV_CONFIG = load_config(CONFIG_FILE)
 
 # Main bot function

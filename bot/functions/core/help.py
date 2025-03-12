@@ -2,23 +2,22 @@ import random
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot import bot
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_add_user
-
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
+    effective_message = update.effective_message
 
     if chat.type != ChatType.PRIVATE:
-        btn = await Button.ubutton([{"Click here for help": f"{bot.link}?start=help"}])
-        await Message.reply_message(update, f"Hey, {user.first_name}\nContact me in PM for help!", btn=btn)
+        btn = ButtonMaker.ubutton([{"Click here for help": f"{context.bot.link}?start=help"}])
+        await effective_message.reply_text(f"Hey, {user.first_name}\nContact me in PM for help!", reply_markup=btn)
         return
     
-    msg = (
-        f"Hey, {user.full_name}! Welcome to the bot help section.\n"
+    text = (
+        f"Hey, {user.first_name}! Welcome to the bot help section.\n"
         "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
         "/start - to start the bot\n"
         "/help - to see this message\n\n"
@@ -31,16 +30,13 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         {"» bot.info()": "query_help_bot_info", "Close": "query_close"}
     ]
 
-    btn = await Button.cbutton(btn_data)
+    btn = ButtonMaker.cbutton(btn_data)
 
     images = MemoryDB.bot_data.get("images")
-    if images:
-        image = random.choice(images).strip()
+    photo = random.choice(images).strip() if images else MemoryDB.bot_data.get("bot_pic")
+    if photo:
+        await effective_message.reply_photo(photo, text, reply_markup=btn)
     else:
-        image = MemoryDB.bot_data.get("bot_pic")
-
-    sent_img = await Message.reply_image(update, image, msg, btn=btn) if image else None
-    if not sent_img:
-        await Message.reply_message(update, msg, btn=btn)
+        await effective_message.reply_text(text, reply_markup=btn)
     
     database_add_user(user)

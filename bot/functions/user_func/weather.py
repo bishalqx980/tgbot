@@ -1,24 +1,21 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.telegram_helpers.telegram_helper import Message
 from bot.modules.weather import weather_info
 
-
 async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    effective_message = update.effective_message
     location = " ".join(context.args)
+
     if not location:
-        await Message.reply_message(update, "Use <code>/weather location_name</code>\nE.g. <code>/weather london</code>")
+        await effective_message.reply_text("Use <code>/weather location name</code>\nE.g. <code>/weather los angeles</code>")
         return
     
     info = await weather_info(location)
-    if info == False:
-        await Message.reply_message(update, "weather_api not found!")
-        return
-    elif not info:
-        await Message.reply_message(update, "Oops! Please try again or report the issue. (invalid location name? 🤔)")
+    if not info:
+        await effective_message.reply_text("Oops! Something went wrong! (invalid location name? 🤔)")
         return
     
-    msg = (
+    text = (
         f"<b><u>Location info</u></b>\n\n"
         f"<b>City:</b> <code>{info['location']['name']}</code>\n"
         f"<b>Country:</b> <code>{info['location']['country']}</code>\n"
@@ -35,4 +32,4 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "<i>Note: ⚠ 8 or higher is harmful for skin!</i>"
     )
 
-    await Message.reply_message(update, msg)
+    await effective_message.reply_text(text)

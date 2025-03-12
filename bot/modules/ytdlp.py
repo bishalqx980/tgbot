@@ -1,7 +1,7 @@
 from bot import logger
 from yt_dlp import YoutubeDL
 
-async def youtube_download(url):
+def youtube_download(url):
     """
     Note: only `mp3` audio file download
     """

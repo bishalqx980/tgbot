@@ -1,10 +1,10 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot import bot
-from bot.helper.telegram_helpers.telegram_helper import Message
+
+
 from bot.functions.group_management.pm_error import _pm_error
-from bot.functions.del_command import func_del_command
+
 
 
 async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -14,7 +14,7 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await _pm_error(chat.id)
         return
 
-    await func_del_command(update, context)
+    
 
     owner_storage = "<b>Owner:</b>\n"
     admins_storage = ""
@@ -38,4 +38,4 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{owner_storage}{admins_storage}"
     )
 
-    await Message.reply_message(update, msg)
+    await effective_message.reply_text(msg)

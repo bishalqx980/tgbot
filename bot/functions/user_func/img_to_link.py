@@ -1,12 +1,12 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import bot
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.freeimagehost import upload_image
 
+async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    effective_message = update.effective_message
+    re_msg = effective_message.reply_to_message
 
-async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    re_msg = update.message.reply_to_message
     if re_msg:
         if re_msg.photo:
             photo = re_msg.photo[-1]
@@ -16,22 +16,18 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
             photo = None
 
     if not re_msg or not photo:
-        await Message.reply_message(update, "Reply a photo to get a public link for that photo!")
+        await effective_message.reply_text("Reply a photo to get a public link for that photo!")
         return
     
-    sent_msg = await Message.reply_message(update, f"💭 Generating...")
-    photo = await bot.get_file(photo.file_id)
+    await effective_message.reply_text(f"💭 Generating...")
+    photo = await context.bot.get_file(photo.file_id)
 
-    itl = await upload_image(photo.file_path)
-    if not itl:
-        await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
+    response = await upload_image(photo.file_path)
+    if not response:
+        await effective_message.edit_text("Timeout! Please try again or report the issue." if response is False else "Oops! Something went wrong!")
         return
     
-    if itl[0] == False:
-        await Message.edit_message(update, f"Timeout! Please try again or report the issue.", sent_msg)
-        return
-    
-    image_data = itl[1]["image"]
+    image_data = response["image"]
 
     img_url = image_data.get("url")
     img_width = image_data.get("width")
@@ -39,7 +35,7 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
     img_size = image_data.get("size_formatted")
     img_mime = image_data["image"]["mime"]
 
-    msg = (
+    text = (
         "↓ <u><b>Image Details</b></u> ↓\n"
         f"<b>- URL:</b> <a href='{img_url}'>◊ See Image ◊</a>\n"
         f"<b>- Width:</b> <code>{img_width}px</code>\n"
@@ -48,5 +44,5 @@ async def func_img_to_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>- Mime:</b> <code>{img_mime}</code>"
     )
 
-    btn = await Button.ubutton([{"View 👀": img_url}])
-    await Message.edit_message(update, msg, sent_msg, btn)
+    btn = ButtonMaker.ubutton([{"View 👀": img_url}])
+    await effective_message.edit_text(text, reply_markup=btn)

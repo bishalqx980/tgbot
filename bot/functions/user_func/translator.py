@@ -1,38 +1,39 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database.common import database_search
-from bot.modules.translator import LANG_CODE_LIST, translate
+from bot.modules.translator import fetch_lang_codes, translate
 
-
-async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    re_msg = update.message.reply_to_message
-    msg = (re_msg.text or re_msg.caption) if re_msg else None
-    input_text = " ".join(context.args)
+    effective_message = update.effective_message
+    re_msg = effective_message.reply_to_message
+    text = (re_msg.text or re_msg.caption) if re_msg else None
+    context_args = " ".join(context.args)
 
-    if not msg and not input_text:
-        btn = await Button.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
-        await Message.reply_message(update, "Use <code>/tr text</code> or <code>/tr lang_code text</code> or reply the text with <code>/tr</code> or <code>/tr lang_code</code>\n\nEnable auto translator mode for this chat from /settings", btn=btn)
+    if not text and not context_args:
+        btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
+        await effective_message.reply_text("Use <code>/tr text</code> or <code>/tr lang code text</code> or reply the text with <code>/tr</code> or <code>/tr lang code</code>\n\nEnable auto translator mode for this chat from /settings", reply_markup=btn)
         return
     
     to_translate = None
     lang_code = None
+    LANG_CODE_LIST = fetch_lang_codes()
     
-    if input_text:
-        words = input_text.split()
+    if context_args:
+        words = context_args.split()
         first_word = words[0]
         if first_word in LANG_CODE_LIST:
             lang_code = first_word
             to_translate = " ".join(words[1:])
     
-    if not msg and not to_translate and input_text: # /tr text and lang_code = get from db
-        to_translate = input_text
-    
-    if msg and not to_translate: # /tr (maybe lang_code or maybe not) and replied
-        to_translate = msg
+    if not text and not to_translate and context_args: # /tr text | lang_code = database
+        to_translate = context_args
+
+    elif text and not to_translate: # /tr (maybe lang_code or maybe not) and replied
+        to_translate = text
     
     if not lang_code:
         if chat.type == ChatType.PRIVATE:
@@ -44,20 +45,27 @@ async def func_translator(update: Update, context: ContextTypes.DEFAULT_TYPE):
             to_find = "chat_id"
             to_match = chat.id
 
-        database = database_search(collection_name, to_find, to_match)
-        if database[0] == False:
-            await Message.reply_message(update, database[1])
+        response, database_data = database_search(collection_name, to_find, to_match)
+        if response == False:
+            await effective_message.reply_text(database_data)
             return
         
-        find_chat = database[1]
-        lang_code = find_chat.get("lang")
+        lang_code = database_data.get("lang")
     
-    sent_msg = await Message.reply_message(update, "🌐 Translating...")
-    tr_msg = await translate(to_translate, lang_code)
-    if tr_msg:
-        edit_msg = await Message.edit_message(update, tr_msg, sent_msg)
-        if not edit_msg:
-            await Message.edit_message(update, "Oops! Please try again or report the issue.", sent_msg)
-    elif not lang_code or tr_msg == False:
-        btn = await Button.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
-        await Message.edit_message(update, "Chat language not found/invalid! Use /settings to set chat language.", sent_msg, btn)
+    if not lang_code:
+        btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
+        await effective_message.reply_text("Chat language code wasn't found! Use /tr to get more details or /settings to set chat language.", reply_markup=btn)
+        return
+    
+    await effective_message.reply_text("💭 Translating...")
+
+    translated_text = translate(to_translate, lang_code)
+    if translated_text == False:
+        btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
+        await effective_message.edit_text("Invalid language code was given! Use /tr to get more details or /settings to set chat language.", reply_markup=btn)
+
+    elif not translated_text:
+        await effective_message.edit_text("Oops! Something went wrong!")
+
+    else:
+        await effective_message.edit_text(translated_text)

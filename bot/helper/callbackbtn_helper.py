@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.helper.query_handlers.query_functions import QueryFunctions
 from bot.helper.query_handlers.func_help_query import QueryBotHelp
 from bot.helper.query_handlers.func_chat_settings_query import QueryChatSettings
@@ -60,18 +60,19 @@ async def get_chat_data(update, data_center):
     db_vlaue = data_center.get("db_vlaue")
     
     # Check on memory if not found check on mongodb if not found show error
-    database = database_search(collection_name, db_find, db_vlaue)
-    if database[0] == False:
-        await Message.reply_message(update, database[1])
+    response, database_data = database_search(collection_name, db_find, db_vlaue)
+    if response == False:
+        await update.effective_message.reply_text(database_data)
         return
     
-    return database[1]
+    return database_data
 
 # main function
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user = update.effective_user
     chat = update.effective_chat
+    effective_message = update.effective_message
 
     # query_none return
     if query.data == "query_none":
@@ -215,7 +216,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             is_forward = db_broadcast.get("is_forward", False)
             is_pin = db_broadcast.get("is_pin", False)
             
-            msg = (
+            text = (
                 "<b><u>Broadcast</u></b>\n\n"
                 f"Forward: <code>{is_forward}</code>\n"
                 f"Pin message: <code>{is_pin}</code>"
@@ -227,8 +228,12 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 {"Done": "query_broadcast_done", "Close": "query_close"}
             ]
 
-            btn = await Button.cbutton(btn_data)
-            await Message.edit_message(update, msg, query.message, btn)
+            btn = ButtonMaker.cbutton(btn_data)
+
+            if effective_message.text:
+                await effective_message.edit_text(text, reply_markup=btn)
+            elif effective_message.caption:
+                await effective_message.edit_caption(text, reply_markup=btn)
     
     elif query.data in query_dict_db_edit:
         handler = query_dict_db_edit[query.data]

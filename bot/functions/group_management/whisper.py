@@ -1,7 +1,6 @@
 from telegram import Update
 from telegram.constants import ChatType
 from telegram.ext import ContextTypes
-from bot.helper.telegram_helpers.telegram_helper import Message, Button
 from bot.modules.database import MemoryDB
 from bot.functions.group_management.pm_error import _pm_error
 
@@ -10,7 +9,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     e_msg = update.effective_message
-    re_msg = update.message.reply_to_message
+    re_msg = effective_message.reply_to_message
     msg = " ".join(context.args)
 
     if chat.type == ChatType.PRIVATE:
@@ -18,14 +17,14 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not msg:
-        await Message.reply_message(update, "Use <code>/whisper @mention_user message</code>\nor reply user by <code>/whisper message</code>\nE.g. <code>/whisper @bishalqx980 This is a secret message 😜</code>")
+        await effective_message.reply_text("Use <code>/whisper @mention_user message</code>\nor reply user by <code>/whisper message</code>\nE.g. <code>/whisper @bishalqx980 This is a secret message 😜</code>")
         return
     
     await Message.delete_message(chat.id, e_msg)
 
     if re_msg:
         if re_msg.from_user.is_bot:
-            await Message.reply_message(update, "Whisper isn't for bots...!")
+            await effective_message.reply_text("Whisper isn't for bots...!")
             return
         whisper_user = re_msg.from_user.id
     elif msg:
@@ -34,16 +33,16 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg = " ".join(msg_split[1:])
 
         if not whisper_user.startswith("@"):
-            await Message.reply_message(update, f"Give a valid username! <code>{whisper_user}</code> is an invalid username!\nor try to reply the user. /whisper for more details...")
+            await effective_message.reply_text(f"Give a valid username! <code>{whisper_user}</code> is an invalid username!\nor try to reply the user. /whisper for more details...")
             return
         
         # there is a problem > anonymous admin cant read this ...
         if whisper_user.endswith("bot"):
-            await Message.reply_message(update, "Whisper isn't for bots...!")
+            await effective_message.reply_text("Whisper isn't for bots...!")
             return
     
     if len(msg) > 100:
-        await Message.reply_message(update, "Whisper is too long... (max limit 100 character)")
+        await effective_message.reply_text("Whisper is too long... (max limit 100 character)")
         return
 
     data = {
@@ -86,5 +85,5 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if re_msg:
         whisper_user = re_msg.from_user.mention_html()
 
-    btn = await Button.cbutton([{"Check the message 👀": "query_whisper"}])
-    await Message.reply_message(update, f"Hey, {whisper_user} !! You got a message from {user.mention_html()}...", btn=btn)
+    btn = ButtonMaker.cbutton([{"Check the message 👀": "query_whisper"}])
+    await effective_message.reply_text(f"Hey, {whisper_user} !! You got a message from {user.mention_html()}...", reply_markup=btn)
