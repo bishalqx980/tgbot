@@ -13,8 +13,9 @@ from telegram.ext import (
     ContextTypes,
     Defaults
 )
+from telegram.error import BadRequest
 from telegram.constants import ParseMode
-from bot import ENV_CONFIG, bot, logger
+from bot import ENV_CONFIG, DEFAULT_ERROR_CHANNEL_ID, bot, logger
 from bot.alive import alive
 from bot.update_db import update_database
 from bot.helper.callbackbtn_helper import func_callbackbtn
@@ -141,7 +142,7 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
         query_data = query.data if query else None
         chat_title = chat.full_name or chat.title
 
-        message = (
+        text = (
             "<b>⚠️ An error occured: [/log]</b>\n\n"
             f"<b>User:</b> {user.mention_html()} | <code>{user.id}</code>\n"
             f"<b>Chat:</b> {chat_title} | <code>{chat.id}</code>\n"
@@ -150,13 +151,15 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
             f"<pre>{context.error}</pre>"
         )
     else:
-        message = (
+        text = (
             "<b>⚠️ An error occured: [/log]</b>\n\n"
             f"<pre>{context.error}</pre>"
         )
 
     try:
-        await context.bot.send_message(ENV_CONFIG["owner_id"], message)
+        await context.bot.send_message(DEFAULT_ERROR_CHANNEL_ID, text)
+    except BadRequest:
+        await context.bot.send_message(ENV_CONFIG["owner_id"], text)
     except Exception as e:
         logger.error(e)
 
@@ -261,7 +264,7 @@ def main():
     
     # filters
     # application.add_handler(MessageHandler(filters.COMMAND, func_del_command))
-    application.add_handler(MessageHandler(filters.TEXT & filters.CAPTION, func_filter_text_caption))
+    application.add_handler(MessageHandler(filters.TEXT | filters.CAPTION, func_filter_text_caption))
     # Chat Member Handler
     # application.add_handler(ChatMemberHandler(track_bot_chat_act, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking bot/private chat
     # application.add_handler(ChatMemberHandler(track_other_chat_act, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup/channel

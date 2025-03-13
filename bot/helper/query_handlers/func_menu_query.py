@@ -1,12 +1,34 @@
 from telegram import Update
 from telegram.constants import ChatType
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
+from bot.modules.database import MemoryDB
 
 class QueryMenus:
     async def _query_bot_settings_menu(update: Update):
         effective_message = update.effective_message
+        
+        bot_data = MemoryDB.bot_data
+        bot_pic = bot_data.get("bot_pic")
+        images = len(bot_data.get("images", []))
+        support_chat = bot_data.get("support_chat")
+        server_url = bot_data.get("server_url")
+        sudo_users = len(bot_data.get("sudo_users", []))
+        shrinkme_api = bot_data.get("shrinkme_api")
+        omdb_api = bot_data.get("omdb_api")
+        weather_api = bot_data.get("weather_api")
 
-        text = "<u><b>Bot Settings</b></u>"
+        text = (
+            "<u><b>Bot Settings</b></u>\n\n"
+            f"• Bot pic: <code>{bot_pic}</code>\n"
+            f"• Images: <code>{images}</code>\n"
+            f"• Support chat: <code>{support_chat}</code>\n"
+            f"• Server url: <code>{server_url}</code>\n"
+            f"• Sudo: <code>{sudo_users}</code>\n"
+            f"• Shrinkme API: <code>{shrinkme_api}</code>\n"
+            f"• OMDB API: <code>{omdb_api}</code>\n"
+            f"• Weather API: <code>{weather_api}</code>"
+        )
+
         btn_data = [
             {"Bot pic": "query_bot_pic", "Images": "query_images"},
             {"Support chat": "query_support_chat", "Server url": "query_server_url"},

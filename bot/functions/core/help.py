@@ -2,6 +2,8 @@ import random
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
+from telegram.error import BadRequest
+from bot import logger
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_add_user
@@ -34,9 +36,16 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     images = MemoryDB.bot_data.get("images")
     photo = random.choice(images).strip() if images else MemoryDB.bot_data.get("bot_pic")
+
     if photo:
-        await effective_message.reply_photo(photo, text, reply_markup=btn)
-    else:
+        try:
+            await effective_message.reply_photo(photo, text, reply_markup=btn)
+        except BadRequest:
+            photo = None
+        except Exception as e:
+            logger.error(e)
+    
+    if not photo:
         await effective_message.reply_text(text, reply_markup=btn)
     
     database_add_user(user)

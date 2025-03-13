@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, ENV_CONFIG
+from bot import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, ENV_CONFIG, logger
 from bot.functions.core.help import func_help
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB
@@ -48,7 +48,10 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     btn = ButtonMaker.ubutton(btn_data)
     if bot_pic:
-        await effective_message.reply_photo(bot_pic, text, reply_markup=btn)
+        try:
+            await effective_message.reply_photo(bot_pic, text, reply_markup=btn)
+        except Exception as e:
+            logger.error(e)
     else:
         await effective_message.reply_text(text, reply_markup=btn)
     

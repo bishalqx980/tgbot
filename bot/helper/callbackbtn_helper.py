@@ -259,7 +259,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             await handler(context, chat.id, query, is_list=is_list, is_int=is_int)
         elif query.data == "query_close":
-            await handler(update, context, chat.id, query)
+            await handler(context, chat.id, query)
         else:
             await handler(chat.id, query)
     

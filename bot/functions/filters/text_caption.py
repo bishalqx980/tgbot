@@ -8,14 +8,7 @@ from bot.modules.translator import translate
 from bot.modules.re_link import RE_LINK
 from bot.modules.base64 import BASE64
 
-async def func_filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
-    user = update.effective_user
-    effective_message = update.effective_message
-
-    if user.id == ChatID.SERVICE_CHAT:
-        return
-    
+def database_editing(chat, effective_message):
     data_center = MemoryDB.data_center.get(chat.id)
     if data_center and data_center.get("is_editing"):
         try:
@@ -28,8 +21,51 @@ async def func_filter_text_caption(update: Update, context: ContextTypes.DEFAULT
             "edit_data_value_msg_pointer_id": effective_message.id,
             "is_editing": False
         })
-        return
 
+    else:
+        return False
+
+
+async def chat_custom_filters(user, chat, effective_message, filters):
+    for keyword in filters:
+        message = effective_message.text or effective_message.caption
+
+        try:
+            filter_msg = message.lower()
+        except AttributeError:
+            filter_msg = message
+        
+        if keyword.lower() in filter_msg:
+            filtered_msg = filters.get(keyword)
+            formattings = {
+                "{first}": user.first_name,
+                "{last}": user.last_name,
+                "{fullname}": user.full_name,
+                "{username}": user.username,
+                "{mention}": user.mention_html(),
+                "{id}": user.id,
+                "{chatname}": chat.title
+            }
+
+            for key, value in formattings.items():
+                if not value:
+                    value = ""
+                filtered_msg = filtered_msg.replace(key, str(value))
+            await effective_message.reply_text(filtered_msg)
+
+
+async def func_filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat = update.effective_chat
+    user = update.effective_user
+    effective_message = update.effective_message
+
+    if user.id == ChatID.SERVICE_CHAT:
+        return
+    
+    is_editing = database_editing(chat, effective_message)
+    if is_editing != False:
+        return
+    
     if chat.type == ChatType.PRIVATE:
         response, database_data = database_search("users", "user_id", user.id)
         if response == False:
@@ -118,28 +154,4 @@ async def func_filter_text_caption(update: Update, context: ContextTypes.DEFAULT
                 await effective_message.reply_text("Chat language code wasn't found! Use /settings to set chat language.", reply_markup=btn)
 
         if filters:
-            for keyword in filters:
-                message = effective_message.text or effective_message.caption
-
-                try:
-                    filter_msg = message.lower()
-                except AttributeError:
-                    filter_msg = message
-                
-                if keyword.lower() in filter_msg:
-                    filtered_msg = filters.get(keyword)
-                    formattings = {
-                        "{first}": user.first_name,
-                        "{last}": user.last_name,
-                        "{fullname}": user.full_name,
-                        "{username}": user.username,
-                        "{mention}": user.mention_html(),
-                        "{id}": user.id,
-                        "{chatname}": chat.title
-                    }
-
-                    for key, value in formattings.items():
-                        if not value:
-                            value = ""
-                        filtered_msg = filtered_msg.replace(key, str(value))
-                    await effective_message.reply_text(filtered_msg)
+            await chat_custom_filters(user, chat, effective_message, filters) 
