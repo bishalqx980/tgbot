@@ -14,7 +14,7 @@ from bot.functions.group_management.check_permission import _check_permission
 async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    e_msg = update.effective_message
+    effective_message = update.effective_message
     reply = update.message.reply_to_message
     value = reply.text_html or reply.caption if reply else None
     keyword = " ".join(context.args).lower()
@@ -29,7 +29,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("I don't take permission from anonymous admins!")
         return
     
-    sent_msg = await effective_message.reply_text("💭")
+    sent_message = await effective_message.reply_text("💭")
     _chk_per = await _check_permission(update, user=user)
     if not _chk_per:
         await Message.edit_message(update, "Oops! Something went wrong!", sent_msg)

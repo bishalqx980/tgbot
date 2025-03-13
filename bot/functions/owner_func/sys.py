@@ -3,17 +3,15 @@ from time import time
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
-
-
 from bot.modules.database import MemoryDB
-from bot.functions.sudo_users import _power_users
-
+from bot.functions.sudo_users import fetch_sudos
 
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
+    effective_message = update.effective_message
 
-    power_users = fetch_sudos()
-    if user.id not in power_users:
+    sudo_users = fetch_sudos()
+    if user.id not in sudo_users:
         await effective_message.reply_text("Access denied!")
         return
     

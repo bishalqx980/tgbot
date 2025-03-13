@@ -2,39 +2,37 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
+from bot.functions.sudo_users import fetch_sudos
 
-
-from bot.functions.sudo_users import _power_users
-
-async def func_chat_admins(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def func_cadmins(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    e_msg = update.effective_message
+    effective_message = update.effective_message
     chat_id = " ".join(context.args)
 
-    power_users = fetch_sudos()
-    if user.id not in power_users:
+    sudo_users = fetch_sudos()
+    if user.id not in sudo_users:
         await effective_message.reply_text("Access denied!")
         return
     
     if chat.type != ChatType.PRIVATE:
-        await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
+        sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
-        await Message.delete_messages(chat.id, [e_msg.id, e_msg.id + 1])
+        await context.bot.delete_messages(chat.id, [effective_message.id, sent_message.id])
         return
     
     if not chat_id:
-        await effective_message.reply_text("<code>/chatadmins chat_id</code> to get specified chat adminlist.\n<i>Note: only works if this bot is in that chat!</i>")
+        await effective_message.reply_text("<code>/cadmins ChatID</code> to get specified chat admin list.\n<i>Note: only works if this bot is in that chat!</i>")
         return
     
-    sent_msg = await effective_message.reply_text("Please wait...")
+    sent_message = await effective_message.reply_text("Please wait...")
     owner_storage = "<b>Owner:</b>\n"
     admins_storage = ""
 
     try:
-        admins = await bot.get_chat_administrators(chat_id)
+        admins = await context.bot.get_chat_administrators(chat_id)
     except Exception as e:
-        await Message.edit_message(update, str(e), sent_msg)
+        await context.bot.edit_message_text(str(e), chat.id, sent_message.id)
         return
     
     for admin in admins:
@@ -49,9 +47,9 @@ async def func_chat_admins(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if admins_storage:
         admins_storage = f"\n<b>Admin's:</b>\n{admins_storage}"
     
-    msg = (
+    text = (
         f"Admins of <code>{chat_id}</code>\n\n"
         f"{owner_storage}{admins_storage}"
     )
 
-    await Message.edit_message(update, msg, sent_msg)
+    await context.bot.edit_message_text(text, chat.id, sent_message.id)

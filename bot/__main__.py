@@ -43,15 +43,15 @@ from bot.functions.user_func.psndl import func_psndl
 from bot.functions.user_func.gen_rap import func_rap
 from bot.functions.user_func.settings import func_settings
 from bot.functions.user_func.id import func_id
-# from bot.functions.owner_func.broadcast import func_broadcast
-# from bot.functions.owner_func.send import func_send
-# from bot.functions.owner_func.chat_admins import func_chat_admins
-# from bot.functions.owner_func.invitelink import func_get_invitelink
-# from bot.functions.owner_func.database import func_database
-# from bot.functions.owner_func.bsettings import func_bsettings
-# from bot.functions.owner_func.shell import func_shell
-# from bot.functions.owner_func.log import func_log
-# from bot.functions.owner_func.sys import func_sys
+from bot.functions.owner_func.broadcast import func_broadcast
+from bot.functions.owner_func.send import func_send
+from bot.functions.owner_func.chat_admins import func_cadmins
+from bot.functions.owner_func.invitelink import func_invitelink
+from bot.functions.owner_func.database import func_database
+from bot.functions.owner_func.bsettings import func_bsettings
+from bot.functions.owner_func.shell import func_shell
+from bot.functions.owner_func.log import func_log
+from bot.functions.owner_func.sys import func_sys
 # from bot.functions.group_management.invite_link import func_invite_link
 # from bot.functions.group_management.whisper import func_whisper
 # from bot.functions.group_management.promote import (
@@ -98,7 +98,11 @@ async def post_boot():
 
     # Send alive message to all sudo and bot owner
     sudo_users = fetch_sudos()
-    await asyncio.gather(*(bot.send_message(user_id, "<b>Bot Started!</b>", parse_mode=ParseMode.HTML) for user_id in sudo_users))
+
+    try:
+        await asyncio.gather(*(bot.send_message(user_id, "<b>Bot Started!</b>", parse_mode=ParseMode.HTML) for user_id in sudo_users))
+    except Exception as e:
+        logger.error(e)
 
 
 async def server_alive():
@@ -132,7 +136,7 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
     if update:
         user = update.effective_user
         chat = update.effective_chat
-        e_msg = update.effective_message
+        effective_message = update.effective_message
         query = update.callback_query
         query_data = query.data if query else None
         chat_title = chat.full_name or chat.title
@@ -141,7 +145,7 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
             "<b>⚠️ An error occured: [/log]</b>\n\n"
             f"<b>User:</b> {user.mention_html()} | <code>{user.id}</code>\n"
             f"<b>Chat:</b> {chat_title} | <code>{chat.id}</code>\n"
-            f"<b>Effective message:</b> <code>{e_msg.text}</code>\n"
+            f"<b>Effective message:</b> <code>{effective_message.text}</code>\n"
             f"<b>Query message:</b> <code>{query_data}</code>\n\n"
             f"<pre>{context.error}</pre>"
         )
@@ -235,15 +239,15 @@ def main():
         # "adminlist": func_adminlist,
         "help": func_help,
         # owner commands...
-        # "broadcast": func_broadcast,
-        # "send": func_send,
-        # "chatadmins": func_chat_admins,
-        # "invitelink": func_get_invitelink,
-        # "database": func_database,
-        # "bsettings": func_bsettings,
-        # "shell": func_shell,
-        # "log": func_log,
-        # "sys": func_sys
+        "broadcast": func_broadcast,
+        "send": func_send,
+        "cadmins": func_cadmins,
+        "invitelink": func_invitelink,
+        "database": func_database,
+        "bsettings": func_bsettings,
+        "shell": func_shell,
+        "log": func_log,
+        "sys": func_sys
     }
 
     storage = []

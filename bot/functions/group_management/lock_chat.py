@@ -24,7 +24,7 @@ async def func_lockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("I don't take permission from anonymous admins!")
         return
     
-    sent_msg = await effective_message.reply_text("💭")
+    sent_message = await effective_message.reply_text("💭")
     _chk_per = await _check_permission(update, user=user)
     if not _chk_per:
         await Message.edit_message(update, "Oops! Something went wrong!", sent_msg)

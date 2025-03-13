@@ -39,7 +39,7 @@ class QueryFunctions:
         if new_value != "default":
             edit_data_value = new_value
         else:
-            sent_msg = await context.bot.send_message(chat_id, "Now send a value:")
+            sent_message = await context.bot.send_message(chat_id, "Now send a value:")
 
             MemoryDB.insert_data("data_center", identifier, {"is_editing": True})
 

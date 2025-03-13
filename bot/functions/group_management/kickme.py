@@ -20,7 +20,7 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     
 
-    sent_msg = await effective_message.reply_text("💭")
+    sent_message = await effective_message.reply_text("💭")
     _chk_per = await _check_permission(update, victim, user)
     if not _chk_per:
         await Message.edit_message(update, "Oops! Something went wrong!", sent_msg)

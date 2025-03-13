@@ -8,7 +8,7 @@ from bot.functions.group_management.pm_error import _pm_error
 async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
-    e_msg = update.effective_message
+    effective_message = update.effective_message
     re_msg = effective_message.reply_to_message
     msg = " ".join(context.args)
 

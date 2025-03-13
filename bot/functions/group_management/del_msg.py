@@ -12,7 +12,7 @@ from bot.functions.group_management.check_permission import _check_permission
 async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
     chat = update.effective_chat
     user = update.effective_user
-    e_msg = update.effective_message
+    effective_message = update.effective_message
     reply = update.message.reply_to_message
     victim = reply.from_user if reply else None
     reason = " ".join(context.args)
@@ -27,7 +27,7 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
         await effective_message.reply_text("I don't take permission from anonymous admins!")
         return
     
-    sent_msg = await effective_message.reply_text("💭")
+    sent_message = await effective_message.reply_text("💭")
     _chk_per = await _check_permission(update, victim, user)
     if not _chk_per:
         await Message.edit_message(update, "Oops! Something went wrong!", sent_msg)
@@ -70,7 +70,7 @@ async def func_del(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent
 
 async def func_sdel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    e_msg = update.effective_message
+    effective_message = update.effective_message
     
     await Message.delete_message(chat.id, e_msg)
     await func_del(update, context, is_silent=True)

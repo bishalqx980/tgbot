@@ -26,7 +26,7 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
         await effective_message.reply_text("I don't take permission from anonymous admins!")
         return
     
-    sent_msg = await effective_message.reply_text("💭")
+    sent_message = await effective_message.reply_text("💭")
     _chk_per = await _check_permission(update, victim, user)
     if not _chk_per:
         await Message.edit_message(update, "Oops! Something went wrong!", sent_msg)
@@ -107,7 +107,7 @@ async def func_apromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_spromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    e_msg = update.effective_message
+    effective_message = update.effective_message
     
     await Message.delete_message(chat.id, e_msg)
     await func_promote(update, context, is_silent=True)
@@ -115,7 +115,7 @@ async def func_spromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_sapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    e_msg = update.effective_message
+    effective_message = update.effective_message
     
     await Message.delete_message(chat.id, e_msg)
     await func_promote(update, context, is_silent=True, is_anonymous=True)
@@ -131,7 +131,7 @@ async def func_fapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_sfpromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    e_msg = update.effective_message
+    effective_message = update.effective_message
 
     await Message.delete_message(chat.id, e_msg)
     await func_promote(update, context, is_silent=True, full_promote=True)
@@ -139,7 +139,7 @@ async def func_sfpromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_sfapromote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    e_msg = update.effective_message
+    effective_message = update.effective_message
 
     await Message.delete_message(chat.id, e_msg)
     await func_promote(update, context, is_silent=True, full_promote=True, is_anonymous=True)

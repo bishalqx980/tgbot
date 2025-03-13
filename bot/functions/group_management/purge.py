@@ -14,7 +14,7 @@ from bot.functions.group_management.check_permission import _check_permission
 async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None, purgefrom_id=None):
     chat = update.effective_chat
     user = update.effective_user
-    e_msg = update.effective_message
+    effective_message = update.effective_message
     reply = update.message.reply_to_message
     
     if chat.type == ChatType.PRIVATE:
@@ -27,7 +27,7 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
         await effective_message.reply_text("I don't take permission from anonymous admins!")
         return
     
-    sent_msg = await effective_message.reply_text("💭")
+    sent_message = await effective_message.reply_text("💭")
     _chk_per = await _check_permission(update, user=user)
     if not _chk_per:
         await Message.edit_message(update, "Oops! Something went wrong!", sent_msg)
@@ -72,7 +72,7 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
 
 async def func_spurge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    e_msg = update.effective_message
+    effective_message = update.effective_message
     
     await Message.delete_message(chat.id, e_msg)
     await func_purge(update, context, is_silent=True)
@@ -81,7 +81,7 @@ async def func_spurge(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     reply = update.message.reply_to_message
-    e_msg = update.effective_message
+    effective_message = update.effective_message
 
     if chat.type == ChatType.PRIVATE:
         await _pm_error(chat.id)
@@ -92,14 +92,14 @@ async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     MemoryDB.insert_data("data_center", chat.id, {"purgefrom_id": reply.id})
-    sent_msg = await effective_message.reply_text("<code>purgefrom</code> added...")
+    sent_message = await effective_message.reply_text("<code>purgefrom</code> added...")
     await asyncio.sleep(5)
     await Message.delete_messages(chat.id, [e_msg.id, sent_msg.id])
 
 
 async def func_purgeto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    e_msg = update.effective_message
+    effective_message = update.effective_message
 
     if chat.type == ChatType.PRIVATE:
         await _pm_error(chat.id)

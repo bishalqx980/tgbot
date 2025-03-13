@@ -25,7 +25,7 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sil
         await effective_message.reply_text("I don't take permission from anonymous admins!")
         return
     
-    sent_msg = await effective_message.reply_text("💭")
+    sent_message = await effective_message.reply_text("💭")
     _chk_per = await _check_permission(update, victim, user)
     if not _chk_per:
         await Message.edit_message(update, "Oops! Something went wrong!", sent_msg)
@@ -75,7 +75,7 @@ async def func_demote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sil
 
 async def func_sdemote(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    e_msg = update.effective_message
+    effective_message = update.effective_message
     
     await Message.delete_message(chat.id, e_msg)
     await func_demote(update, context, is_silent=True)
