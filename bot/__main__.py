@@ -70,7 +70,7 @@ from bot.functions.owner_func.sys import func_sys
 # from bot.functions.group_management.pin_msg import func_pin_msg, func_spin_msg
 # from bot.functions.group_management.unpin_msg import func_unpin_msg, func_sunpin_msg
 # from bot.functions.group_management.unpinall_msg import func_unpinall_msg, func_sunpinall_msg
-# from bot.functions.group_management.ban import func_ban, func_sban
+from bot.functions.group_management.ban import func_ban
 # from bot.functions.group_management.unban import func_unban, func_sunban
 # from bot.functions.group_management.kick import func_kick, func_skick
 # from bot.functions.group_management.kickme import func_kickme
@@ -217,7 +217,7 @@ def main():
         # "sunpin": func_sunpin_msg,
         # "unpinall": func_unpinall_msg,
         # "sunpinall": func_sunpinall_msg,
-        # "ban": func_ban,
+        "ban": func_ban,
         # "sban": func_sban,
         # "unban": func_unban,
         # "sunban": func_sunban,

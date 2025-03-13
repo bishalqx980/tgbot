@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 
 
-from bot.functions.group_management.pm_error import _pm_error
+from bot.functions.group_management.auxiliary_func.pm_error import _pm_error
 
 
 
@@ -11,7 +11,7 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     
     if chat.type == ChatType.PRIVATE:
-        await _pm_error(chat.id)
+        await pm_error(context, chat.id)
         return
 
     

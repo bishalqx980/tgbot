@@ -6,7 +6,7 @@ from telegram.constants import ChatType
 
 from bot.modules.database.common import database_search
 from bot.modules.database import MemoryDB, MongoDB
-from bot.functions.group_management.pm_error import _pm_error
+from bot.functions.group_management.auxiliary_func.pm_error import pm_error
 
 from bot.functions.group_management.check_permission import _check_permission
 
@@ -15,12 +15,12 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     effective_message = update.effective_message
-    reply = update.message.reply_to_message
+    re_msg = effective_message.reply_to_message
     value = reply.text_html or reply.caption if reply else None
     keyword = " ".join(context.args).lower()
     
     if chat.type == ChatType.PRIVATE:
-        await _pm_error(chat.id)
+        await pm(chat.id)
         return
     
     

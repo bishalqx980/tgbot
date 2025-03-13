@@ -5,7 +5,7 @@ from telegram.constants import ChatType
 
 
 from bot.modules.database import MemoryDB
-from bot.functions.group_management.pm_error import _pm_error
+from bot.functions.group_management.auxiliary_func.pm_error import _pm_error
 from bot.functions.group_management.log_channel import _log_channel
 
 from bot.functions.group_management.check_permission import _check_permission
@@ -15,10 +15,10 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
     chat = update.effective_chat
     user = update.effective_user
     effective_message = update.effective_message
-    reply = update.message.reply_to_message
+    re_msg = effective_message.reply_to_message
     
     if chat.type == ChatType.PRIVATE:
-        await _pm_error(chat.id)
+        await pm_error(context, chat.id)
         return
 
     
@@ -80,11 +80,11 @@ async def func_spurge(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    reply = update.message.reply_to_message
+    re_msg = effective_message.reply_to_message
     effective_message = update.effective_message
 
     if chat.type == ChatType.PRIVATE:
-        await _pm_error(chat.id)
+        await pm_error(context, chat.id)
         return
 
     if not reply:
@@ -102,7 +102,7 @@ async def func_purgeto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
 
     if chat.type == ChatType.PRIVATE:
-        await _pm_error(chat.id)
+        await pm_error(context, chat.id)
         return
 
     purgefrom_id = None

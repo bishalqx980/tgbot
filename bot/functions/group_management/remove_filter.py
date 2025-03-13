@@ -6,7 +6,7 @@ from bot import logger
 
 from bot.modules.database import MemoryDB, MongoDB
 from bot.modules.database.common import database_search
-from bot.functions.group_management.pm_error import _pm_error
+from bot.functions.group_management.auxiliary_func.pm_error import _pm_error
 
 from bot.functions.group_management.check_permission import _check_permission
 
@@ -17,7 +17,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyword = " ".join(context.args).lower()
     
     if chat.type == ChatType.PRIVATE:
-        await _pm_error(chat.id)
+        await pm_error(context, chat.id)
         return
 
     

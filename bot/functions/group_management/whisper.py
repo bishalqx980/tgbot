@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.constants import ChatType
 from telegram.ext import ContextTypes
 from bot.modules.database import MemoryDB
-from bot.functions.group_management.pm_error import _pm_error
+from bot.functions.group_management.auxiliary_func.pm_error import _pm_error
 
 
 async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -13,7 +13,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = " ".join(context.args)
 
     if chat.type == ChatType.PRIVATE:
-        await _pm_error(chat.id)
+        await pm_error(context, chat.id)
         return
     
     if not msg:

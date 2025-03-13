@@ -4,7 +4,7 @@ from telegram.constants import ChatType
 from bot import logger
 
 
-from bot.functions.group_management.pm_error import _pm_error
+from bot.functions.group_management.auxiliary_func.pm_error import _pm_error
 from bot.functions.group_management.log_channel import _log_channel
 
 from bot.functions.group_management.check_permission import _check_permission
@@ -15,7 +15,7 @@ async def func_unlockchat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     
     if chat.type == ChatType.PRIVATE:
-        await _pm_error(chat.id)
+        await pm_error(context, chat.id)
         return
 
     
