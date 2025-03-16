@@ -7,6 +7,7 @@ from bot.modules.database.common import database_search
 from bot.modules.translator import translate
 from bot.modules.re_link import RE_LINK
 from bot.modules.base64 import BASE64
+from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
 
 def database_editing(chat, effective_message):
     data_center = MemoryDB.data_center.get(chat.id)
@@ -111,8 +112,9 @@ async def func_filter_text_caption(update: Update, context: ContextTypes.DEFAULT
         is_text_contain_links = False
 
         if is_links_allowed:
-            chat_admins = await chat.get_administrators()
-            if user not in chat_admins:
+            chat_admins = await fetch_chat_admins(chat, user_id=user.id)
+            
+            if not (chat_admins["is_user_admin"] or chat_admins["is_user_owner"]):
                 links_list = RE_LINK.detect_link(effective_message.text or effective_message.caption)
                 if links_list:
                     filtered_text = effective_message.text or effective_message.caption # keeping as variable to replace links later

@@ -1,6 +1,6 @@
 from telegram import ChatMember, ChatMemberUpdated
 
-async def _chat_member_status(chat_member_update: ChatMemberUpdated):
+def chat_member_status(chat_member_update: ChatMemberUpdated):
     dif = chat_member_update.difference()
     status = dif.get("status")
     if not status:

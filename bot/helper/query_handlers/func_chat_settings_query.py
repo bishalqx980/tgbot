@@ -262,15 +262,15 @@ class QueryChatSettings:
         effective_message = update.effective_message
 
         MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
-        all_links = find_chat.get("all_links")
-        allowed_links = find_chat.get("allowed_links")
-        if allowed_links:
-            allowed_links = ", ".join(allowed_links)
+        is_links_allowed = find_chat.get("is_links_allowed")
+        allowed_links_list = find_chat.get("allowed_links_list")
+        if allowed_links_list:
+            allowed_links_list = ", ".join(allowed_links_list)
 
         text = (
             "<u><b>Chat Settings</b></u>\n\n"
-            f"All links: <code>{all_links}</code>\n"
-            f"Allowed links: <code>{allowed_links}</code>\n\n"
+            f"All links: <code>{is_links_allowed}</code>\n"
+            f"Allowed links: <code>{allowed_links_list}</code>\n\n"
             "<i><b>Note:</b> Select whether it will delete or convert the links into base64 or do nothing if links in message!</i>\n\n"
             "<i>Allowed links » these links won't be deleted!</i>\n"
             "<i>Delete links » replace the links with `forbidden link`</i>\n\n"
@@ -278,7 +278,7 @@ class QueryChatSettings:
         )
 
         btn_data = [
-            {"All links": "query_chat_all_links", "Allowed links": "query_chat_allowed_links"},
+            {"All links": "query_chat_is_links_allowed", "Allowed links": "query_chat_allowed_links_list"},
             {"Back": "query_chat_settings_menu", "Close": "query_close"}
         ]
 
@@ -290,16 +290,16 @@ class QueryChatSettings:
             await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_chat_all_links(update: Update, find_chat):
+    async def _query_chat_is_links_allowed(update: Update, find_chat):
         chat = update.effective_chat
         effective_message = update.effective_message
 
         MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
-        all_links = find_chat.get("all_links")
+        is_links_allowed = find_chat.get("is_links_allowed")
 
         text = (
             "<u><b>Chat Settings</b></u>\n\n"
-            f"All links: <code>{all_links}</code>\n\n"
+            f"All links: <code>{is_links_allowed}</code>\n\n"
             "<i><b>Note:</b> Select whether bot will delete the message or convert link into base64 or do nothing!</i>"
         )
 
@@ -320,14 +320,14 @@ class QueryChatSettings:
         chat = update.effective_chat
         effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "allowed_links"})
-        allowed_links = find_chat.get("allowed_links")
-        if allowed_links:
-            allowed_links = ", ".join(allowed_links)
+        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "allowed_links_list"})
+        allowed_links_list = find_chat.get("allowed_links_list")
+        if allowed_links_list:
+            allowed_links_list = ", ".join(allowed_links_list)
 
         text = (
             "<u><b>Chat Settings</b></u>\n\n"
-            f"Allowed links: <code>{allowed_links}</code>\n\n"
+            f"Allowed links: <code>{allowed_links_list}</code>\n\n"
             "<i><b>Note:</b> Send domain name of allowed links eg. <code>google.com</code> multiple domain will be separated by comma!</i>"
         )
 
@@ -347,17 +347,17 @@ class QueryChatSettings:
 
     async def _query_d_links(update: Update, query):
         chat = update.effective_chat
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "all_links"})
+        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "is_links_allowed"})
         await QueryFunctions.query_edit_value(chat.id, query, "delete")
 
 
     async def _query_c_links(update: Update, query):
         chat = update.effective_chat
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "all_links"})
+        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "is_links_allowed"})
         await QueryFunctions.query_edit_value(chat.id, query, "convert")
     
 
     async def _query_none_links(update: Update, query):
         chat = update.effective_chat
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "all_links"})
+        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "is_links_allowed"})
         await QueryFunctions.query_edit_value(chat.id, query, None)

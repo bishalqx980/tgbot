@@ -1,7 +1,7 @@
 import asyncio
 import aiohttp
 from time import time
-from telegram import Update, LinkPreviewOptions
+from telegram import Update, LinkPreviewOptions, BotCommand, BotCommandScope
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -53,47 +53,46 @@ from bot.functions.owner_func.bsettings import func_bsettings
 from bot.functions.owner_func.shell import func_shell
 from bot.functions.owner_func.log import func_log
 from bot.functions.owner_func.sys import func_sys
-# from bot.functions.group_management.invite_link import func_invite_link
+from bot.functions.group_management.invite import func_invite
 # from bot.functions.group_management.whisper import func_whisper
-# from bot.functions.group_management.promote import (
-#     func_promote,
-#     func_apromote,
-#     func_spromote,
-#     func_sapromote,
-#     func_fpromote,
-#     func_fapromote,
-#     func_sfpromote,
-#     func_sfapromote
-# )
-# from bot.functions.group_management.admin_title import func_admintitle, func_sadmintitle
-# from bot.functions.group_management.demote import func_demote, func_sdemote
-# from bot.functions.group_management.pin_msg import func_pin_msg, func_spin_msg
-# from bot.functions.group_management.unpin_msg import func_unpin_msg, func_sunpin_msg
-# from bot.functions.group_management.unpinall_msg import func_unpinall_msg, func_sunpinall_msg
-from bot.functions.group_management.ban import func_ban
-# from bot.functions.group_management.unban import func_unban, func_sunban
-# from bot.functions.group_management.kick import func_kick, func_skick
-# from bot.functions.group_management.kickme import func_kickme
-# from bot.functions.group_management.mute import func_mute, func_smute
-# from bot.functions.group_management.unmute import func_unmute, func_sunmute
-# from bot.functions.group_management.del_msg import func_del, func_sdel
-# from bot.functions.group_management.purge import func_purge, func_spurge, func_purgefrom, func_purgeto
-# from bot.functions.group_management.lock_chat import func_lockchat
-# from bot.functions.group_management.unlock_chat import func_unlockchat
+from bot.functions.group_management.promote import (
+    func_promote,
+    func_spromote
+)
+from bot.functions.group_management.demote import func_demote, func_sdemote
+from bot.functions.group_management.pin import func_pin, func_spin
+from bot.functions.group_management.unpin import func_unpin, func_sunpin
+from bot.functions.group_management.unpinall import func_unpinall, func_sunpinall
+from bot.functions.group_management.ban import func_ban, func_sban
+from bot.functions.group_management.unban import func_unban, func_sunban
+from bot.functions.group_management.kick import func_kick, func_skick
+from bot.functions.group_management.kickme import func_kickme
+from bot.functions.group_management.mute import func_mute, func_smute
+from bot.functions.group_management.unmute import func_unmute, func_sunmute
+from bot.functions.group_management.purge import func_purge, func_spurge
+from bot.functions.group_management.lock import func_lock
+from bot.functions.group_management.unlock import func_unlock
 # from bot.functions.group_management.add_filter import func_filter
 # from bot.functions.group_management.remove_filter import func_remove
 # from bot.functions.group_management.filters import func_filters
-# from bot.functions.group_management.adminlist import func_adminlist
-# from bot.functions.group_management.track_bot_chat import track_bot_chat_act
-# from bot.functions.group_management.track_other_chat import track_other_chat_act
+from bot.functions.group_management.adminlist import func_adminlist
+from bot.functions.bot_member_handler import bot_member_handler
+from bot.functions.chat_member_handler import chat_member_handler
 
 
 async def post_boot():
     # storing bot uptime
     MemoryDB.insert_data("bot_data", None, {"bot_uptime": str(time())})
-    # deleting bot commands set
+
+    # bot commands
+    bot_commands = [
+        BotCommand("start", "Introducing..."),
+        BotCommand("help", "Bots help section...")
+    ]
+    
     try:
-        await bot.delete_my_commands()
+        # bot commands only for PRIVATE chats
+        await bot.set_my_commands(bot_commands, BotCommandScope(BotCommandScope.ALL_PRIVATE_CHATS))
     except Exception as e:
         logger.error(e)
 
@@ -198,48 +197,38 @@ def main():
         "settings": func_settings,
         # Group management
         "id": func_id,
-        # "invite": func_invite_link,
-        # "promote": func_promote,
-        # "apromote": func_apromote,
-        # "spromote": func_spromote,
-        # "sapromote": func_sapromote,
-        # "fpromote": func_fpromote,
-        # "fapromote": func_fapromote,
-        # "sfpromote": func_sfpromote,
-        # "sfapromote": func_sfapromote,
-        # "admintitle": func_admintitle,
-        # "sadmintitle": func_sadmintitle,
-        # "demote": func_demote,
-        # "sdemote": func_sdemote,
-        # "pin": func_pin_msg,
-        # "spin": func_spin_msg,
-        # "unpin": func_unpin_msg,
-        # "sunpin": func_sunpin_msg,
-        # "unpinall": func_unpinall_msg,
-        # "sunpinall": func_sunpinall_msg,
+        "invite": func_invite,
+        "promote": func_promote,
+        "spromote": func_spromote,
+        "demote": func_demote,
+        "sdemote": func_sdemote,
+        "pin": func_pin,
+        "spin": func_spin,
+        "unpin": func_unpin,
+        "sunpin": func_sunpin,
+        "unpinall": func_unpinall,
+        "sunpinall": func_sunpinall,
         "ban": func_ban,
-        # "sban": func_sban,
-        # "unban": func_unban,
-        # "sunban": func_sunban,
-        # "kick": func_kick,
-        # "skick": func_skick,
-        # "kickme": func_kickme,
-        # "mute": func_mute,
-        # "smute": func_smute,
-        # "unmute": func_unmute,
-        # "sunmute": func_sunmute,
-        # "del": func_del,
-        # "sdel": func_sdel,
-        # "purge": func_purge,
-        # "spurge": func_spurge,
+        "sban": func_sban,
+        "unban": func_unban,
+        "sunban": func_sunban,
+        "kick": func_kick,
+        "skick": func_skick,
+        "kickme": func_kickme,
+        "mute": func_mute,
+        "smute": func_smute,
+        "unmute": func_unmute,
+        "sunmute": func_sunmute,
+        "purge": func_purge,
+        "spurge": func_spurge,
         # "purgefrom": func_purgefrom,
         # "purgeto": func_purgeto,
-        # "lock": func_lockchat,
-        # "unlock": func_unlockchat,
+        "lock": func_lock,
+        "unlock": func_unlock,
         # "filter": func_filter,
         # "remove": func_remove,
         # "filters": func_filters,
-        # "adminlist": func_adminlist,
+        "adminlist": func_adminlist,
         "help": func_help,
         # owner commands...
         "broadcast": func_broadcast,
@@ -266,8 +255,8 @@ def main():
     # application.add_handler(MessageHandler(filters.COMMAND, func_del_command))
     application.add_handler(MessageHandler(filters.TEXT | filters.CAPTION, func_filter_text_caption))
     # Chat Member Handler
-    # application.add_handler(ChatMemberHandler(track_bot_chat_act, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking bot/private chat
-    # application.add_handler(ChatMemberHandler(track_other_chat_act, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup/channel
+    application.add_handler(ChatMemberHandler(bot_member_handler, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking private chat
+    application.add_handler(ChatMemberHandler(chat_member_handler, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup/channel
     # Callback button
     application.add_handler(CallbackQueryHandler(func_callbackbtn))
     # Error handler

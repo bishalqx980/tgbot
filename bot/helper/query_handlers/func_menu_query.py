@@ -107,12 +107,12 @@ class QueryMenus:
             farewell_user = find_chat.get("farewell_user", False)
             antibot = find_chat.get("antibot", False)
             del_cmd = find_chat.get("del_cmd", False)
-            all_links = find_chat.get("all_links")
-            allowed_links = find_chat.get("allowed_links")
+            is_links_allowed = find_chat.get("is_links_allowed")
+            allowed_links_list = find_chat.get("allowed_links_list")
             log_channel = find_chat.get("log_channel")
             
-            if allowed_links:
-                allowed_links = ", ".join(allowed_links)
+            if allowed_links_list:
+                allowed_links_list = ", ".join(allowed_links_list)
 
             text = (
                 "<u><b>Chat Settings</b></u>\n\n"
@@ -128,8 +128,8 @@ class QueryMenus:
                 f"• Farewell user: <code>{farewell_user}</code>\n"
                 f"• Delete CMD: <code>{del_cmd}</code>\n"
                 f"• Log channel: <code>{log_channel}</code>\n"
-                f"• All links: <code>{all_links}</code>\n"
-                f"• Allowed links: <code>{allowed_links}</code>\n"
+                f"• All links: <code>{is_links_allowed}</code>\n"
+                f"• Allowed links: <code>{allowed_links_list}</code>\n"
             )
 
             btn_data = [

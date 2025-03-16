@@ -100,8 +100,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "query_chat_del_cmd": QueryChatSettings._query_chat_del_cmd,
         "query_chat_log_channel": QueryChatSettings._query_chat_log_channel,
         "query_chat_links_behave": QueryChatSettings._query_chat_links_behave,
-        "query_chat_all_links": QueryChatSettings._query_chat_all_links,
-        "query_chat_allowed_links": QueryChatSettings._query_chat_allowed_links
+        "query_chat_is_links_allowed": QueryChatSettings._query_chat_is_links_allowed,
+        "query_chat_allowed_links_list": QueryChatSettings._query_chat_allowed_links_list
     }
 
     query_dict_chat_settings_2 = {
@@ -249,7 +249,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             edit_data_key = data_center.get("edit_data_key")
 
-            if edit_data_key in ["images", "allowed_links"]:
+            if edit_data_key in ["images", "allowed_links_list"]:
                 is_list = True
             elif edit_data_key in ["log_channel"]:
                 is_int = True

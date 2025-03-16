@@ -6,6 +6,7 @@ from bot import logger
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
+from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
 
 async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """This function won't be in handler, instead it will be called in func_settings if chat.type isn't private"""
@@ -14,16 +15,19 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
 
     if user.is_bot:
-        await effective_message.reply_text("I don't take permission from anonymous admins!")
+        await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
         return
     
-    if user in await chat.get_administrators():
-        """Check can_change_info >> You don't have enough rights to manage this chat!"""
-        pass
-    else:
+    chat_admins = await fetch_chat_admins(chat, user_id=user.id)
+    
+    if not (chat_admins["is_user_admin"] or chat_admins["is_user_owner"]):
         await effective_message.reply_text("You aren't an admin in this chat!")
         return
-
+    
+    if chat_admins["is_user_admin"] and not chat_admins["is_user_admin"].can_restrict_members:
+        await effective_message.reply_text("You don't have enough permission to manage this chat!")
+        return
+    
     data = {
         "user_id": user.id,
         "chat_id": chat.id,
@@ -51,12 +55,12 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     farewell_user = database_data.get("farewell_user", False)
     antibot = database_data.get("antibot", False)
     del_cmd = database_data.get("del_cmd", False)
-    all_links = database_data.get("all_links", False)
-    allowed_links = database_data.get("allowed_links")
+    is_links_allowed = database_data.get("is_links_allowed", False)
+    allowed_links_list = database_data.get("allowed_links_list")
     log_channel = database_data.get("log_channel")
     
-    if allowed_links:
-        allowed_links = ", ".join(allowed_links)
+    if allowed_links_list:
+        allowed_links_list = ", ".join(allowed_links_list)
 
     text = (
         "<u><b>Chat Settings</b></u>\n\n"
@@ -72,8 +76,8 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"• Farewell user: <code>{farewell_user}</code>\n"
         f"• Delete CMD: <code>{del_cmd}</code>\n"
         f"• Log channel: <code>{log_channel}</code>\n"
-        f"• All links: <code>{all_links}</code>\n"
-        f"• Allowed links: <code>{allowed_links}</code>\n"
+        f"• All links: <code>{is_links_allowed}</code>\n"
+        f"• Allowed links: <code>{allowed_links_list}</code>\n"
     )
 
     btn_data = [
