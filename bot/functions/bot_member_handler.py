@@ -6,7 +6,6 @@ from bot.functions.group_management.auxiliary.chat_member_status import chat_mem
 
 async def bot_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    effective_message = update.effective_message
     my_chat_member = update.my_chat_member
     cause_user = my_chat_member.from_user
 
@@ -71,7 +70,7 @@ async def bot_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
                     "I wish I could help..."
                 )
 
-            await effective_message.reply_text(text)
+            await context.bot.send_message(chat.id, text)
     
     elif is_bot_exist and cause == "JOINED":
         await context.bot.send_message(cause_user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")

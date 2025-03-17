@@ -316,7 +316,7 @@ class QueryChatSettings:
             await effective_message.edit_caption(text, reply_markup=btn)
     
 
-    async def _query_chat_allowed_links(update: Update, find_chat):
+    async def _query_chat_allowed_links_list(update: Update, find_chat):
         chat = update.effective_chat
         effective_message = update.effective_message
 

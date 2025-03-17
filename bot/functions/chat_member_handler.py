@@ -7,14 +7,13 @@ from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_cha
 
 async def chat_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    effective_message = update.effective_message
     chat_member = update.chat_member
     cause_user = chat_member.from_user
     victim = chat_member.new_chat_member.user
 
     response, database_data = database_search("groups", "chat_id", chat.id)
     if response == False:
-        # await effective_message.reply_text(database_data)
+        # await context.bot.send_message(chat.id, database_data)
         return
 
     welcome_user = database_data.get("welcome_user")
@@ -39,29 +38,29 @@ async def chat_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 return
 
             if chat_admins["is_victim_admin"]:
-                await effective_message.reply_text(f"Antibot error: {victim.mention_html()} has been added as an admin!")
+                await context.bot.send_message(chat.id, f"Antibot error: {victim.mention_html()} has been added as an admin!")
                 return
             
             if not chat_admins["is_bot_admin"]:
-                await effective_message.reply_text("I'm not an admin in this chat!")
+                await context.bot.send_message(chat.id, "I'm not an admin in this chat!")
                 return
             
             if not chat_admins["is_bot_admin"].can_restrict_members:
-                await effective_message.reply_text("I don't have enough permission to restrict chat members!")
+                await context.bot.send_message(chat.id, "I don't have enough permission to restrict chat members!")
                 return
             
             try:
                 await chat.unban_member(victim.id)
             except Exception as e:
                 logger.error(e)
-                await effective_message.reply_text(str(e))
+                await context.bot.send_message(chat.id, str(e))
                 return
             
-            await effective_message.reply_text(f"Antibot: {victim.mention_html()} has been kicked from this chat!")
+            await context.bot.send_message(chat.id, f"Antibot: {victim.mention_html()} has been kicked from this chat!")
         
         elif welcome_user:
             if not custom_welcome_msg:
-                await effective_message.reply_text(f"Hi, {victim.mention_html()}! Welcome to {chat.title}!")
+                await context.bot.send_message(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}!")
 
             else:
                 formattings = {
@@ -79,7 +78,7 @@ async def chat_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                         value = ""
                     custom_welcome_msg = custom_welcome_msg.replace(key, str(value))
 
-                await effective_message.reply_text(custom_welcome_msg)
+                await context.bot.send_message(chat.id, custom_welcome_msg)
 
     elif not is_user_exist and cause == "LEFT" and farewell_user:
-        await effective_message.reply_text(f"Nice to see you! {victim.mention_html()} has left us!")
+        await context.bot.send_message(chat.id, f"Nice to see you! {victim.mention_html()} has left us!")
