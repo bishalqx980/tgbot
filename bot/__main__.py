@@ -72,9 +72,9 @@ from bot.functions.group_management.unmute import func_unmute, func_sunmute
 from bot.functions.group_management.purge import func_purge, func_spurge
 from bot.functions.group_management.lock import func_lock
 from bot.functions.group_management.unlock import func_unlock
-# from bot.functions.group_management.add_filter import func_filter
-# from bot.functions.group_management.remove_filter import func_remove
-# from bot.functions.group_management.filters import func_filters
+from bot.functions.group_management.custom_filters.filter import func_filter
+from bot.functions.group_management.custom_filters.remove import func_remove
+from bot.functions.group_management.custom_filters.filters import func_filters
 from bot.functions.group_management.adminlist import func_adminlist
 from bot.functions.bot_member_handler import bot_member_handler
 from bot.functions.chat_member_handler import chat_member_handler
@@ -231,9 +231,9 @@ def main():
         # "purgeto": func_purgeto,
         "lock": func_lock,
         "unlock": func_unlock,
-        # "filter": func_filter,
-        # "remove": func_remove,
-        # "filters": func_filters,
+        "filter": func_filter,
+        "remove": func_remove,
+        "filters": func_filters,
         "adminlist": func_adminlist,
         "help": func_help,
         # owner commands...

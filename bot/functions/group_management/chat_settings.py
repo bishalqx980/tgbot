@@ -25,7 +25,7 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("You aren't an admin in this chat!")
         return
     
-    if chat_admins["is_user_admin"] and not chat_admins["is_user_admin"].can_restrict_members:
+    if chat_admins["is_user_admin"] and not chat_admins["is_user_admin"].can_change_info:
         await effective_message.reply_text("You don't have enough permission to manage this chat!")
         return
     

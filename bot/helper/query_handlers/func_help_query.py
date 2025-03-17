@@ -139,15 +139,15 @@ class QueryBotHelp:
         text = (
             "<b>Bot owner functions</b>\n\n"
 
-            "/broadcast » Broadcast message to all active users\n"
-            "/send » Send message to specified ChatID\n"
-            "/cadmins » Get adminlist of specified ChatID\n"
-            "/invitelink » Get invite link of specified ChatID\n"
-            "/database » Get bot or specified chat database info\n"
-            "/bsettings » Get bot settings\n"
-            "/shell » Access/Use system shell\n"
-            "/log » Get log file (for error handling)\n"
-            "/sys » Get system info\n\n"
+            "• /broadcast » Broadcast message to all active users\n"
+            "• /send » Send message to specified ChatID\n"
+            "• /cadmins » Get adminlist of specified ChatID\n"
+            "• /invitelink » Get invite link of specified ChatID\n"
+            "• /database » Get bot or specified chat database info\n"
+            "• /bsettings » Get bot settings\n"
+            "• /shell » Access/Use system shell\n"
+            "• /log » Get log file (for error handling)\n"
+            "• /sys » Get system info\n\n"
 
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>\n"
         )
