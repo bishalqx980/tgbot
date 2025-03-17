@@ -6,6 +6,7 @@ from telegram.constants import ChatType
 from telegram.error import BadRequest
 from bot import logger
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
+from bot.helper.messages_storage import bot_settings_menu
 from bot.modules.database import MemoryDB
 from bot.functions.sudo_users import fetch_sudos
 
@@ -49,16 +50,15 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     omdb_api = bot_data.get("omdb_api")
     weather_api = bot_data.get("weather_api")
 
-    text = (
-        "<u><b>Bot Settings</b></u>\n\n"
-        f"• Bot pic: <code>{bot_pic}</code>\n"
-        f"• Images: <code>{images}</code>\n"
-        f"• Support chat: <code>{support_chat}</code>\n"
-        f"• Server url: <code>{server_url}</code>\n"
-        f"• Sudo: <code>{sudo_users}</code>\n"
-        f"• Shrinkme API: <code>{shrinkme_api}</code>\n"
-        f"• OMDB API: <code>{omdb_api}</code>\n"
-        f"• Weather API: <code>{weather_api}</code>"
+    text = bot_settings_menu.format(
+        bot_pic,
+        images,
+        support_chat,
+        server_url,
+        sudo_users,
+        shrinkme_api,
+        omdb_api,
+        weather_api
     )
 
     btn_data = [

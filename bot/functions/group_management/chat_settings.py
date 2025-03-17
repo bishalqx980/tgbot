@@ -4,6 +4,7 @@ from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import logger
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
+from bot.helper.messages_storage import chat_settings_menu_group
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
@@ -54,37 +55,29 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     welcome_user = database_data.get("welcome_user", False)
     farewell_user = database_data.get("farewell_user", False)
     antibot = database_data.get("antibot", False)
-    del_cmd = database_data.get("del_cmd", False)
-    is_links_allowed = database_data.get("is_links_allowed", False)
+    is_links_allowed = database_data.get("is_links_allowed")
     allowed_links_list = database_data.get("allowed_links_list")
-    log_channel = database_data.get("log_channel")
     
     if allowed_links_list:
         allowed_links_list = ", ".join(allowed_links_list)
 
-    text = (
-        "<u><b>Chat Settings</b></u>\n\n"
-
-        f"• Title: {title}\n"
-        f"• ID: <code>{chat.id}</code>\n\n"
-
-        f"• Lang: <code>{lang}</code>\n"
-        f"• Auto tr: <code>{auto_tr}</code>\n"
-        f"• Echo: <code>{echo}</code>\n"
-        f"• Antibot: <code>{antibot}</code>\n"
-        f"• Welcome user: <code>{welcome_user}</code>\n"
-        f"• Farewell user: <code>{farewell_user}</code>\n"
-        f"• Delete CMD: <code>{del_cmd}</code>\n"
-        f"• Log channel: <code>{log_channel}</code>\n"
-        f"• All links: <code>{is_links_allowed}</code>\n"
-        f"• Allowed links: <code>{allowed_links_list}</code>\n"
+    text = chat_settings_menu_group.format(
+        title,
+        chat.id,
+        lang,
+        auto_tr,
+        echo,
+        antibot,
+        welcome_user,
+        farewell_user,
+        is_links_allowed,
+        allowed_links_list
     )
 
     btn_data = [
         {"Language": "query_chat_lang", "Auto translate": "query_chat_auto_tr"},
         {"Echo": "query_chat_set_echo", "Anti bot": "query_chat_antibot"},
         {"Welcome": "query_chat_welcome_user", "Farewell": "query_chat_farewell_user"},
-        {"Delete CMD": "query_chat_del_cmd", "Log channel": "query_chat_log_channel"},
         {"Links behave": "query_chat_links_behave", "Close": "query_close"}
     ]
 

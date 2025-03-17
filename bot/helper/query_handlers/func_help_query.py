@@ -12,22 +12,22 @@ class QueryBotHelp:
 
         text = (
             "<b>Group Moderation Commands | p:1</b>\n\n"
-            "/id » Show chat/user id\n"
-            "/invite » Generate chat invite link\n"
-            "/promote | /fpromote » promote a member ('f' means with full privilege)\n"
-            "/apromote | /fapromote » <code>anonymously</code> promote/fpromote a member\n"
-            "/admintitle » set admin custom title\n"
-            "/demote » demote a member\n"
-            "/pin » pin replied message loudly\n"
-            "/unpin » unpin a pinned message\n"
-            "/unpinall » unpin all pinned messages"
-            "/ban » ban a member\n"
-            "/unban » unban a member\n"
-            "/kick » kick a member\n"
-            "/kickme » The easy way to out\n"
-            "/mute » restrict a member (member will be unable to send messages etc.)\n"
-            "/unmute » unrestrict a restricted member\n\n"
-            "<i><b>Note:</b> Send command to get more details about the command functions!\n"
+
+            "• /id » Show chat/user id\n"
+            "• /invite » Generate chat invite link\n"
+            "• /promote » Promote chat member\n"
+            "• /demote » Demote chat member\n"
+            "• /pin » Pin replied message\n"
+            "• /unpin » Unpin a pinned message\n"
+            "• /unpinall » Unpin all pinned messages\n"
+            "• /ban » Ban chat member\n"
+            "• /unban » Unban chat member\n"
+            "• /kick » Kick chat member\n"
+            "• /kickme » The easy way to out\n"
+            "• /mute » Restrict a member (member will be unable to send messages etc.)\n"
+            "• /unmute » Unrestrict a restricted member\n\n"
+
+            "<i><b>Note:</b> Send command to get more details about the command functions!"
             "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
         )
 
@@ -49,16 +49,18 @@ class QueryBotHelp:
 
         text = (
             "<b>Group Moderation Commands | p:2</b>\n\n"
-            "/del » delete the replied message with a warning!\n"
-            "/purge » delete every messages from replied to current message!\n"
-            "/purgefrom | /purgeto » delete every messages between <code>purgefrom</code> and <code>purgeto</code> replied message!\n"
-            "/lock » lock the chat (member will be unable to send messages etc.)\n"
-            "/unlock » unlock the chat (back to normal)\n"
-            "/filters | /filter | /remove » to see/set/remove custom message/command\n"
-            "/adminlist » to see chat admins list\n"
-            "/settings » settings of chat\n\n"
+
+            "• /purge » Delete all messages between replied to current message!\n"
+            "• /lock » Lock the chat (member will be unable to send messages etc.)\n"
+            "• /unlock » Unlock the chat (back to normal)\n"
+            "• /adminlist » Get chat admins list\n"
+            "• /settings » Settings of chat\n\n"
+
             "<i><b>Note:</b> Send command to get more details about the command functions!\n"
-            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
+            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>\n"
+
+            #• /purgefrom | /purgeto » delete every messages between <code>purgefrom</code> and <code>purgeto</code> replied message!
+            #• /filters | /filter | /remove » to see/set/remove custom message/command
         )
 
         btn_data = [
@@ -78,9 +80,11 @@ class QueryBotHelp:
         effective_message = update.effective_message
 
         text = (
-            "<b>Artificial intelligence</b>\n\n"
-            "/imagine » generate AI image\n"
-            "/gpt » ask any question to ChatGPT\n\n"
+            "<b>AI Tools</b>\n\n"
+
+            "• /imagine » Generate AI image\n"
+            "• /gpt » Ask any question to AI-LLM\n\n"
+
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
 
@@ -97,25 +101,27 @@ class QueryBotHelp:
 
         text = (
             "<b>Misc functions</b>\n\n"
-            "/movie » get any movie info by name or imdb id\n"
-            "/tr » translate any language\n"
-            "/decode » convert base64 into text\n"
-            "/encode » convert text into base64\n"
-            "/shorturl » short any url\n"
-            "/ping » ping any url\n"
-            "/calc » calculate any math (supported syntex: +, -, *, /)\n"
-            "/tts » convert text into speech\n"
-            "/weather » get weather info of any city\n"
-            "/qr » generate a QR code\n"
-            "/imgtolink » convert image into a public link\n"
-            "/paste » paste your text in telegraph & get public link\n"
-            "/whisper » secretly tell something to someone in group chat\n"
-            "/ytdl » download audio/song from youtube\n"
-            "/id » show chat/user id\n"
-            "/info » show user info\n"
-            "/psndl » search ps3 & some other playstation games link (mostly ps3)\n"
-            "/rap » generate rap from <code>rap_data</code> (use /psndl to get rap data)\n"
-            "/settings » settings of chat\n\n"
+
+            "• /movie » Get Movie info by name or IMDB ID\n"
+            "• /tr » Google translator\n"
+            "• /decode » Convert base64 into text\n"
+            "• /encode » Convert text into base64\n"
+            "• /shorturl » Short URL (shrinkme)\n"
+            "• /ping » Get response of website\n"
+            "• /calc » Normal calculator (supported syntex: +, -, *, /)\n"
+            "• /tts » Convert text into speech (voice)\n"
+            "• /weather » Get current weather info\n"
+            "• /qr » Generate QR code (image)\n"
+            "• /imgtolink » Get Image to public link\n"
+            "• /paste » Paste replied text in telegraph (returns link)\n"
+            # "• /whisper » Whisper someone in public chat (secretly)\n"
+            "• /ytdl » Download audio/song from youtube\n"
+            "• /id » Show chat/user id\n"
+            "• /info » Show user info\n"
+            "• /psndl » Get playstation (psn/.pkg) games/updates/dlc link (mostly ps3)\n"
+            "• /rap » Generate .rap file <code>hex_code</code> (LICENSE file for PSN file, /psndl to get hex code)\n"
+            "• /settings » Settings of chat\n\n"
+
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
         
@@ -132,16 +138,18 @@ class QueryBotHelp:
 
         text = (
             "<b>Bot owner functions</b>\n\n"
-            "/broadcast » broadcast message to all active users\n"
-            "/send » send message to specified chat_id\n"
-            "/cadmins » to get adminlist of specified chat_id\n"
-            "/invitelink » to get invite link of specified chat_id\n"
-            "/database » get bot/chat database\n"
-            "/bsettings » get bot settings\n"
-            "/shell » use system shell\n"
-            "/log » get log file (for error handling)\n"
-            "/sys » get system info\n\n"
-            "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
+
+            "/broadcast » Broadcast message to all active users\n"
+            "/send » Send message to specified ChatID\n"
+            "/cadmins » Get adminlist of specified ChatID\n"
+            "/invitelink » Get invite link of specified ChatID\n"
+            "/database » Get bot or specified chat database info\n"
+            "/bsettings » Get bot settings\n"
+            "/shell » Access/Use system shell\n"
+            "/log » Get log file (for error handling)\n"
+            "/sys » Get system info\n\n"
+
+            "<i><b>Note:</b> Send command to get more details about the command functions!</i>\n"
         )
         
         btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])

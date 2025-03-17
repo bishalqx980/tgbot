@@ -1,6 +1,12 @@
 from telegram import Update
 from telegram.constants import ChatType
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
+from bot.helper.messages_storage import (
+    help_menu,
+    bot_settings_menu,
+    chat_settings_menu_pvt,
+    chat_settings_menu_group
+)
 from bot.modules.database import MemoryDB
 
 class QueryMenus:
@@ -17,16 +23,15 @@ class QueryMenus:
         omdb_api = bot_data.get("omdb_api")
         weather_api = bot_data.get("weather_api")
 
-        text = (
-            "<u><b>Bot Settings</b></u>\n\n"
-            f"• Bot pic: <code>{bot_pic}</code>\n"
-            f"• Images: <code>{images}</code>\n"
-            f"• Support chat: <code>{support_chat}</code>\n"
-            f"• Server url: <code>{server_url}</code>\n"
-            f"• Sudo: <code>{sudo_users}</code>\n"
-            f"• Shrinkme API: <code>{shrinkme_api}</code>\n"
-            f"• OMDB API: <code>{omdb_api}</code>\n"
-            f"• Weather API: <code>{weather_api}</code>"
+        text = bot_settings_menu.format(
+            bot_pic,
+            images,
+            support_chat,
+            server_url,
+            sudo_users,
+            shrinkme_api,
+            omdb_api,
+            weather_api
         )
 
         btn_data = [
@@ -48,14 +53,7 @@ class QueryMenus:
     async def _query_help_menu(update: Update):
         user = update.effective_user
         effective_message = update.effective_message
-
-        text = (
-            f"Hey, {user.full_name}! Welcome to the bot help section.\n"
-            "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
-            "/start - to start the bot\n"
-            "/help - to see this message\n\n"
-            "<b>Note:</b> <i>The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</i>"
-        )
+        text = help_menu.format(user.full_name)
 
         btn_data = [
             {"Group Management": "query_help_group_management_p1", "AI": "query_help_ai"},
@@ -81,14 +79,12 @@ class QueryMenus:
             echo = find_chat.get("echo", False)
             auto_tr = find_chat.get("auto_tr", False)
 
-            text = (
-                "<u><b>Chat Settings</b></u>\n\n"
-                f"• User: {user_mention}\n"
-                f"• ID: <code>{chat.id}</code>\n\n"
-
-                f"• Lang: <code>{lang}</code>\n"
-                f"• Auto tr: <code>{auto_tr}</code>\n"
-                f"• Echo: <code>{echo}</code>\n"
+            text = chat_settings_menu_pvt.format(
+                user_mention,
+                chat.id,
+                lang,
+                auto_tr,
+                echo
             )
 
             btn_data = [
@@ -106,38 +102,30 @@ class QueryMenus:
             welcome_user = find_chat.get("welcome_user", False)
             farewell_user = find_chat.get("farewell_user", False)
             antibot = find_chat.get("antibot", False)
-            del_cmd = find_chat.get("del_cmd", False)
             is_links_allowed = find_chat.get("is_links_allowed")
             allowed_links_list = find_chat.get("allowed_links_list")
-            log_channel = find_chat.get("log_channel")
             
             if allowed_links_list:
                 allowed_links_list = ", ".join(allowed_links_list)
 
-            text = (
-                "<u><b>Chat Settings</b></u>\n\n"
-
-                f"• Title: {title}\n"
-                f"• ID: <code>{chat.id}</code>\n\n"
-
-                f"• Lang: <code>{lang}</code>\n"
-                f"• Auto tr: <code>{auto_tr}</code>\n"
-                f"• Echo: <code>{echo}</code>\n"
-                f"• Antibot: <code>{antibot}</code>\n"
-                f"• Welcome user: <code>{welcome_user}</code>\n"
-                f"• Farewell user: <code>{farewell_user}</code>\n"
-                f"• Delete CMD: <code>{del_cmd}</code>\n"
-                f"• Log channel: <code>{log_channel}</code>\n"
-                f"• All links: <code>{is_links_allowed}</code>\n"
-                f"• Allowed links: <code>{allowed_links_list}</code>\n"
+            text = chat_settings_menu_group.format(
+                title,
+                chat.id,
+                lang,
+                auto_tr,
+                echo,
+                antibot,
+                welcome_user,
+                farewell_user,
+                is_links_allowed,
+                allowed_links_list
             )
 
             btn_data = [
                 {"Language": "query_chat_lang", "Auto translate": "query_chat_auto_tr"},
                 {"Echo": "query_chat_set_echo", "Anti bot": "query_chat_antibot"},
                 {"Welcome": "query_chat_welcome_user", "Farewell": "query_chat_farewell_user"},
-                {"Delete CMD": "query_chat_del_cmd", "Log channel": "query_chat_log_channel"},
-                {"Links behave": "query_chat_links_behave", "Close": "query_close"}
+                {"Links": "query_chat_links_behave", "Close": "query_close"}
             ]
 
             btn = ButtonMaker.cbutton(btn_data)
