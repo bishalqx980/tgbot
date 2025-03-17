@@ -114,7 +114,7 @@ class QueryBotHelp:
             "• /qr » Generate QR code (image)\n"
             "• /imgtolink » Get Image to public link\n"
             "• /paste » Paste replied text in telegraph (returns link)\n"
-            # "• /whisper » Whisper someone in public chat (secretly)\n"
+            "• /whisper » Whisper someone in public chat (secretly)\n"
             "• /ytdl » Download audio/song from youtube\n"
             "• /id » Show chat/user id\n"
             "• /info » Show user info\n"
