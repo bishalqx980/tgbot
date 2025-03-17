@@ -1,4 +1,4 @@
-from telegram import Update, ChatMember
+from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot import logger

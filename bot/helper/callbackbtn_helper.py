@@ -270,7 +270,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         whisper_data = data_center.get("whisper_data")
 
-        user_whisper_data = whisper_data.get(f"@{user.username}") or whisper_data.get(str(user.id))
+        user_whisper_data = whisper_data.get(f"@{user.username}") or whisper_data.get(user.id)
         if not user_whisper_data:
             await popup(query, "This whisper isn't for you or whisper has expired!")
             return

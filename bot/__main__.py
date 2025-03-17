@@ -54,7 +54,7 @@ from bot.functions.owner_func.shell import func_shell
 from bot.functions.owner_func.log import func_log
 from bot.functions.owner_func.sys import func_sys
 from bot.functions.group_management.invite import func_invite
-# from bot.functions.group_management.whisper import func_whisper
+from bot.functions.group_management.whisper import func_whisper
 from bot.functions.group_management.promote import (
     func_promote,
     func_spromote
@@ -195,7 +195,7 @@ def main():
         "qr": func_qr,
         "imgtolink": func_imgtolink,
         "paste": func_paste,
-        # "whisper": func_whisper,
+        "whisper": func_whisper,
         "ytdl": func_ytdl,
         "info": func_info,
         "psndl": func_psndl,
