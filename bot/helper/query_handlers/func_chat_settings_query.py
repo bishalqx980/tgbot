@@ -203,60 +203,7 @@ class QueryChatSettings:
             await effective_message.edit_text(text, reply_markup=btn)
         elif effective_message.caption:
             await effective_message.edit_caption(text, reply_markup=btn)
-    
 
-    # async def _query_chat_del_cmd(update: Update, find_chat):
-    #     chat = update.effective_chat
-    #     effective_message = update.effective_message
-
-    #     MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "del_cmd"})
-    #     del_cmd = find_chat.get("del_cmd", False)
-
-    #     text = (
-    #         "<u><b>Chat Settings</b></u>\n\n"
-    #         f"Delete CMD: <code>{del_cmd}</code>\n\n"
-    #         "<i><b>Note:</b> This will delete bot commands when you will send a command in chat!</i>"
-    #     )
-
-    #     btn_data = [
-    #         {"Enable": "query_true", "Disable": "query_false"},
-    #         {"Back": "query_chat_settings_menu", "Close": "query_close"}
-    #     ]
-
-    #     btn = ButtonMaker.cbutton(btn_data)
-
-    #     if effective_message.text:
-    #         await effective_message.edit_text(text, reply_markup=btn)
-    #     elif effective_message.caption:
-    #         await effective_message.edit_caption(text, reply_markup=btn)
-    
-
-    # async def _query_chat_log_channel(update: Update, find_chat):
-    #     chat = update.effective_chat
-    #     effective_message = update.effective_message
-
-    #     MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "log_channel"})
-    #     log_channel = find_chat.get("log_channel")
-
-    #     text = (
-    #         "<u><b>Chat Settings</b></u>\n\n"
-    #         f"Log channel: <code>{log_channel}</code>\n\n"
-    #         "<i><b>Note:</b> This will log every actions occurred in your chat (ban, kick, mute, etc.) using bot!\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
-    #     )
-
-    #     btn_data = [
-    #         {"Edit Value": "query_edit_value"},
-    #         {"Remove Value": "query_rm_value"},
-    #         {"Back": "query_chat_settings_menu", "Close": "query_close"}
-    #     ]
-
-    #     btn = ButtonMaker.cbutton(btn_data)
-
-    #     if effective_message.text:
-    #         await effective_message.edit_text(text, reply_markup=btn)
-    #     elif effective_message.caption:
-    #         await effective_message.edit_caption(text, reply_markup=btn)
-    
 
     async def _query_chat_links_behave(update: Update, find_chat):
         chat = update.effective_chat

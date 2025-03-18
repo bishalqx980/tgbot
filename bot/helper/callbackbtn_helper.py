@@ -10,19 +10,6 @@ from bot.helper.query_handlers.func_menu_query import QueryMenus
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 
-# helpers
-async def popup(query, msg):
-    try:
-        await query.answer(msg, True)
-    except Exception as e:
-        logger.error(e)
-
-async def del_query(query):
-    try:
-        await query.delete_message()
-    except Exception as e:
-        logger.error(e)
-
 
 async def validate_user(query, chat, user, prevent_unauth_access=True):
     """
@@ -32,19 +19,19 @@ async def validate_user(query, chat, user, prevent_unauth_access=True):
     """
     data_center = MemoryDB.data_center.get(chat.id)
     if not data_center:
-        await popup(query, f"chat_id: {chat.id} wasn't found in data center!")
-        await del_query(query)
+        await query.answer(f"chat_id: {chat.id} wasn't found in data center!", True)
+        await query.delete_message()
         return
     
     user_id = data_center.get("user_id")
     if not user_id:
-        await popup(query, f"user_id: {user_id} wasn't found in data center!")
-        await del_query(query)
+        await query.answer(f"user_id: {user_id} wasn't found in data center!", True)
+        await query.delete_message()
         return
     
     if prevent_unauth_access:
         if user.id != user_id:
-            await popup(query, "Access Denied!")
+            await query.answer("Access Denied!", True)
             return
     
     return data_center
@@ -180,8 +167,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         if data_center.get("collection_name") != "bot_data":
-            await popup(query, "Session expired!")
-            await del_query(query)
+            await query.answer("Session expired!", True)
+            await query.delete_message()
             return
         
         database_data = await get_chat_data(update, data_center)
@@ -275,11 +262,11 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         user_whisper_data = whisper_data.get(f"@{user.username}") or whisper_data.get(user.id)
         if not user_whisper_data:
-            await popup(query, "This whisper isn't for you or whisper has expired!")
+            await query.answer("This whisper isn't for you or whisper has expired!", True)
             return
         
         if user_whisper_data.get("whisper_user") not in {user.id, f"@{user.username}"}:
-            await popup(query, "This whisper isn't for you!")
+            await query.answer("This whisper isn't for you!", True)
             return
         
-        await popup(query, user_whisper_data.get("whisper_msg"))
+        await query.answer(user_whisper_data.get("whisper_msg"), True)

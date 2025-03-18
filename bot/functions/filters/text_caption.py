@@ -22,7 +22,8 @@ def database_editing(chat, effective_message):
             "edit_data_value_msg_pointer_id": effective_message.id,
             "is_editing": False
         })
-
+        return True
+    
     else:
         return False
 
