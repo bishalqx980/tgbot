@@ -154,7 +154,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await handler(update)
     
-    elif query.data in (query_dict_chat_settings or query_dict_chat_settings_2):
+    elif (query.data in query_dict_chat_settings or
+          query.data in query_dict_chat_settings_2):
         data_center = await validate_user(query, chat, user)
         if not data_center:
             return
@@ -171,7 +172,9 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             handler = query_dict_chat_settings_2[query.data]
             await handler(update, context, query)
     
-    elif query.data in query_dict_bot_settings or query.data in query_dict_bot_settings_2 or query.data in query_dict_bot_settings_3:
+    elif (query.data in query_dict_bot_settings or
+          query.data in query_dict_bot_settings_2 or
+          query.data in query_dict_bot_settings_3):
         data_center = await validate_user(query, chat, user)
         if not data_center:
             return
