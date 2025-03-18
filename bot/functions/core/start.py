@@ -33,7 +33,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Hey, {user.first_name}! I'm {context.bot.first_name}!\n"
         "I can help you to manage your chat with lots of useful features!\n"
         "Feel free to add me to your chat.\n\n"
-        "/help - for bot help\n\n"
+        "• /help - Get bot help menu\n\n"
         "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
         "<b>• Report bug:</b> <a href='https://github.com/bishalqx980/tgbot/issues'>Report</a>\n"
         "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"

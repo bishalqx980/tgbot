@@ -4,8 +4,8 @@ help_menu = """
 Hey, {}! Welcome to the bot help section.
 I'm a Telegram bot that manages groups and handles various tasks effortlessly.
 
-/start - Start the bot
-/help - To see this message
+• /start - Start the bot
+• /help - To see this message
 
 <b>Note:</b> <i>The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</i>
 """

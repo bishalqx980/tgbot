@@ -1,4 +1,5 @@
 from telegram import Update
+from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.helper.query_handlers.query_functions import QueryFunctions
 from bot.modules.database import MemoryDB
@@ -204,57 +205,57 @@ class QueryChatSettings:
             await effective_message.edit_caption(text, reply_markup=btn)
     
 
-    async def _query_chat_del_cmd(update: Update, find_chat):
-        chat = update.effective_chat
-        effective_message = update.effective_message
+    # async def _query_chat_del_cmd(update: Update, find_chat):
+    #     chat = update.effective_chat
+    #     effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "del_cmd"})
-        del_cmd = find_chat.get("del_cmd", False)
+    #     MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "del_cmd"})
+    #     del_cmd = find_chat.get("del_cmd", False)
 
-        text = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Delete CMD: <code>{del_cmd}</code>\n\n"
-            "<i><b>Note:</b> This will delete bot commands when you will send a command in chat!</i>"
-        )
+    #     text = (
+    #         "<u><b>Chat Settings</b></u>\n\n"
+    #         f"Delete CMD: <code>{del_cmd}</code>\n\n"
+    #         "<i><b>Note:</b> This will delete bot commands when you will send a command in chat!</i>"
+    #     )
 
-        btn_data = [
-            {"Enable": "query_true", "Disable": "query_false"},
-            {"Back": "query_chat_settings_menu", "Close": "query_close"}
-        ]
+    #     btn_data = [
+    #         {"Enable": "query_true", "Disable": "query_false"},
+    #         {"Back": "query_chat_settings_menu", "Close": "query_close"}
+    #     ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+    #     btn = ButtonMaker.cbutton(btn_data)
 
-        if effective_message.text:
-            await effective_message.edit_text(text, reply_markup=btn)
-        elif effective_message.caption:
-            await effective_message.edit_caption(text, reply_markup=btn)
+    #     if effective_message.text:
+    #         await effective_message.edit_text(text, reply_markup=btn)
+    #     elif effective_message.caption:
+    #         await effective_message.edit_caption(text, reply_markup=btn)
     
 
-    async def _query_chat_log_channel(update: Update, find_chat):
-        chat = update.effective_chat
-        effective_message = update.effective_message
+    # async def _query_chat_log_channel(update: Update, find_chat):
+    #     chat = update.effective_chat
+    #     effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "log_channel"})
-        log_channel = find_chat.get("log_channel")
+    #     MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "log_channel"})
+    #     log_channel = find_chat.get("log_channel")
 
-        text = (
-            "<u><b>Chat Settings</b></u>\n\n"
-            f"Log channel: <code>{log_channel}</code>\n\n"
-            "<i><b>Note:</b> This will log every actions occurred in your chat (ban, kick, mute, etc.) using bot!\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
-        )
+    #     text = (
+    #         "<u><b>Chat Settings</b></u>\n\n"
+    #         f"Log channel: <code>{log_channel}</code>\n\n"
+    #         "<i><b>Note:</b> This will log every actions occurred in your chat (ban, kick, mute, etc.) using bot!\nAdd the bot in a channel as admin where you want to log, then you will get a message with chat_id from bot, pass the chat_id using edit value!</i>"
+    #     )
 
-        btn_data = [
-            {"Edit Value": "query_edit_value"},
-            {"Remove Value": "query_rm_value"},
-            {"Back": "query_chat_settings_menu", "Close": "query_close"}
-        ]
+    #     btn_data = [
+    #         {"Edit Value": "query_edit_value"},
+    #         {"Remove Value": "query_rm_value"},
+    #         {"Back": "query_chat_settings_menu", "Close": "query_close"}
+    #     ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+    #     btn = ButtonMaker.cbutton(btn_data)
 
-        if effective_message.text:
-            await effective_message.edit_text(text, reply_markup=btn)
-        elif effective_message.caption:
-            await effective_message.edit_caption(text, reply_markup=btn)
+    #     if effective_message.text:
+    #         await effective_message.edit_text(text, reply_markup=btn)
+    #     elif effective_message.caption:
+    #         await effective_message.edit_caption(text, reply_markup=btn)
     
 
     async def _query_chat_links_behave(update: Update, find_chat):
@@ -345,19 +346,19 @@ class QueryChatSettings:
             await effective_message.edit_caption(text, reply_markup=btn)
     
 
-    async def _query_d_links(update: Update, query):
+    async def _query_d_links(update: Update, context: ContextTypes.DEFAULT_TYPE, query):
         chat = update.effective_chat
         MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "is_links_allowed"})
-        await QueryFunctions.query_edit_value(chat.id, query, "delete")
+        await QueryFunctions.query_edit_value(context, chat.id, query, "delete")
 
 
-    async def _query_c_links(update: Update, query):
+    async def _query_c_links(update: Update, context: ContextTypes.DEFAULT_TYPE, query):
         chat = update.effective_chat
         MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "is_links_allowed"})
-        await QueryFunctions.query_edit_value(chat.id, query, "convert")
+        await QueryFunctions.query_edit_value(context, chat.id, query, "convert")
     
 
-    async def _query_none_links(update: Update, query):
+    async def _query_none_links(update: Update, context: ContextTypes.DEFAULT_TYPE, query):
         chat = update.effective_chat
         MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "is_links_allowed"})
-        await QueryFunctions.query_edit_value(chat.id, query, None)
+        await QueryFunctions.query_edit_value(context, chat.id, query, None)

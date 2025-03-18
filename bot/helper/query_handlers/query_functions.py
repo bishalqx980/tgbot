@@ -35,7 +35,7 @@ class QueryFunctions:
             btn = ButtonMaker.cbutton([{"Cancel": "query_close"}])
             sent_message = await context.bot.send_message(chat_id, text, reply_markup=btn)
 
-            for i in range(20):
+            for i in range(11):
                 data_center = MemoryDB.data_center.get(identifier)
                 edit_data_value = data_center.get("edit_data_value")
                 edit_data_value_msg_pointer_id = data_center.get("edit_data_value_msg_pointer_id")
@@ -43,12 +43,15 @@ class QueryFunctions:
                     break
                 
                 try:
-                    await context.bot.edit_message_text(f"{text} ({i}/20)", chat_id, sent_message.id, reply_markup=btn)
+                    await context.bot.edit_message_text(f"{text} ({i}/10)", chat_id, sent_message.id, reply_markup=btn)
                 except BadRequest:
-                    await query.answer("Operation cancelled!", True)
+                    try:
+                        await query.answer("Operation cancelled!", True)
+                    except:
+                        await context.bot.send_message(chat_id, "Operation cancelled!")
                     return
                 
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(1)
             
             MemoryDB.insert_data("data_center", identifier, {"edit_data_value": None, "is_editing": False})
 
@@ -96,7 +99,10 @@ class QueryFunctions:
             if len(edit_data_value) > 100:
                 text = "Data is too long, can't show! Check on message."
         
-        await query.answer(text, True)
+        try:
+            await query.answer(text, True)
+        except:
+            await context.bot.send_message(chat_id, text)
 
 
     async def query_rm_value(identifier, query):

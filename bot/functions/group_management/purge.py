@@ -55,7 +55,11 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
         await context.bot.edit_message_text(str(e), chat.id, sent_message.id)
         return
     
-    await context.bot.edit_message_text("Purge completed!", chat.id, sent_message.id)
+    if is_silent:
+        await context.bot.delete_message(chat.id, sent_message.id)
+    
+    else:
+        await context.bot.edit_message_text("Purge completed!", chat.id, sent_message.id)
 
 
 async def func_spurge(update: Update, context: ContextTypes.DEFAULT_TYPE):

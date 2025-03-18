@@ -97,8 +97,8 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "query_set_custom_welcome_msg": QueryChatSettings._query_set_custom_welcome_msg,
         "query_chat_farewell_user": QueryChatSettings._query_chat_farewell_user,
         "query_chat_antibot": QueryChatSettings._query_chat_antibot,
-        "query_chat_del_cmd": QueryChatSettings._query_chat_del_cmd,
-        "query_chat_log_channel": QueryChatSettings._query_chat_log_channel,
+        # "query_chat_del_cmd": QueryChatSettings._query_chat_del_cmd,
+        # "query_chat_log_channel": QueryChatSettings._query_chat_log_channel,
         "query_chat_links_behave": QueryChatSettings._query_chat_links_behave,
         "query_chat_is_links_allowed": QueryChatSettings._query_chat_is_links_allowed,
         "query_chat_allowed_links_list": QueryChatSettings._query_chat_allowed_links_list
@@ -169,7 +169,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         elif query.data in query_dict_chat_settings_2:
             handler = query_dict_chat_settings_2[query.data]
-            await handler(update, query)
+            await handler(update, context, query)
     
     elif query.data in query_dict_bot_settings or query.data in query_dict_bot_settings_2 or query.data in query_dict_bot_settings_3:
         data_center = await validate_user(query, chat, user)
