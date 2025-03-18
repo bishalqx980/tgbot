@@ -19,11 +19,11 @@ from bot import ENV_CONFIG, DEFAULT_ERROR_CHANNEL_ID, bot, logger
 from bot.alive import alive
 from bot.update_db import update_database
 from bot.helper.callbackbtn_helper import func_callbackbtn
+from bot.functions.filters.text_caption import func_filter_text_caption
 from bot.modules.database import MemoryDB
 from bot.functions.sudo_users import fetch_sudos
 from bot.functions.core.start import func_start
 from bot.functions.core.help import func_help
-from bot.functions.filters.text_caption import func_filter_text_caption
 from bot.functions.user_func.movieinfo import func_movie
 from bot.functions.user_func.translator import func_tr
 from bot.functions.user_func.b64decode import func_decode
@@ -227,8 +227,6 @@ def main():
         "sunmute": func_sunmute,
         "purge": func_purge,
         "spurge": func_spurge,
-        # "purgefrom": func_purgefrom,
-        # "purgeto": func_purgeto,
         "lock": func_lock,
         "unlock": func_unlock,
         "filter": func_filter,
@@ -258,7 +256,6 @@ def main():
     MemoryDB.insert_data("bot_data", None, {"bot_commands": storage})
     
     # filters
-    # application.add_handler(MessageHandler(filters.COMMAND, func_del_command))
     application.add_handler(MessageHandler(filters.TEXT | filters.CAPTION, func_filter_text_caption))
     # Chat Member Handler
     application.add_handler(ChatMemberHandler(bot_member_handler, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking private chat

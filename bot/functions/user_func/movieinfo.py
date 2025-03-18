@@ -58,4 +58,8 @@ async def func_movie(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>📝 Plot:</b>\n<blockquote>{movie_info['Plot']}</blockquote>\n"
     )
 
-    await effective_message.reply_text(text)
+    photo = movie_info["Poster"]
+    if photo:
+        await effective_message.reply_photo(photo, text)
+    else:
+        await effective_message.reply_text(text)
