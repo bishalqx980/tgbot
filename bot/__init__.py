@@ -10,6 +10,7 @@ REQUIRED_DIRS = ["downloads", "temp", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
 ORIGINAL_BOT_ID = 6845693976
 DEFAULT_ERROR_CHANNEL_ID = -1002675104487
+HANDLERS_DIR = "bot/functions"
 
 # Creating Required Folder/Directories
 try:

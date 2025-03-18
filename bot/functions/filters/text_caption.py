@@ -56,7 +56,7 @@ async def chat_custom_filters(user, chat, effective_message, filters):
             await effective_message.reply_text(filtered_msg)
 
 
-async def func_filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     effective_message = update.effective_message
