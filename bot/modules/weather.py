@@ -1,20 +1,23 @@
 import aiohttp
 from bot import logger
-from bot.modules.database.mongodb import MongoDB
-from bot.modules.database.local_database import LOCAL_DATABASE
+from bot.modules.database import MemoryDB
 
 async def weather_info(location):
-    weather_api = await LOCAL_DATABASE.get_data("bot_docs", "weather_api")
+    weather_api = MemoryDB.bot_data.get("weather_api")
     if not weather_api:
-        weather_api = await MongoDB.get_data("bot_docs", "weather_api")
-        if not weather_api:
-            logger.error("weather_api not found!")
-            return False
+        logger.error("weather_api not found!")
+        return
+    
+    api_url = "https://api.weatherapi.com/v1/current.json"
+    params = {
+        "key": weather_api,
+        "q": location,
+        "aqi": "no"
+    }
     
     try:
-        url = f"https://api.weatherapi.com/v1/current.json?key={weather_api}&q={location}&aqi=no"
         async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
+            async with session.get(api_url, params=params) as response:
                 if response.status != 200:
                     return
 

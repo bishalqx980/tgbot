@@ -1,27 +1,14 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
-from bot.helper.telegram_helper import Message, Button
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.helper.query_handlers.query_functions import QueryFunctions
 from bot.helper.query_handlers.func_help_query import QueryBotHelp
 from bot.helper.query_handlers.func_chat_settings_query import QueryChatSettings
 from bot.helper.query_handlers.func_bot_settings_query import QueryBotSettings
 from bot.helper.query_handlers.func_menu_query import QueryMenus
-from bot.modules.database.combined_db import global_search
-from bot.modules.database.local_database import LOCAL_DATABASE
-
-# helpers
-async def popup(query, msg):
-    try:
-        await query.answer(msg, True)
-    except Exception as e:
-        logger.error(e)
-
-async def del_query(query):
-    try:
-        await query.delete_message()
-    except Exception as e:
-        logger.error(e)
+from bot.modules.database import MemoryDB
+from bot.modules.database.common import database_search
 
 
 async def validate_user(query, chat, user, prevent_unauth_access=True):
@@ -30,21 +17,21 @@ async def validate_user(query, chat, user, prevent_unauth_access=True):
     prevents unauthorized access if `prevent_unauth_access` if true\n
     returns `data_center` of `chat.id` else shows error
     """
-    data_center = await LOCAL_DATABASE.find_one("data_center", chat.id)
+    data_center = MemoryDB.data_center.get(chat.id)
     if not data_center:
-        await popup(query, f"chat_id: {chat.id} wasn't found in data center!")
-        await del_query(query)
+        await query.answer(f"chat_id: {chat.id} wasn't found in data center!", True)
+        await query.delete_message()
         return
     
     user_id = data_center.get("user_id")
     if not user_id:
-        await popup(query, f"user_id: {user_id} wasn't found in data center!")
-        await del_query(query)
+        await query.answer(f"user_id: {user_id} wasn't found in data center!", True)
+        await query.delete_message()
         return
     
     if prevent_unauth_access:
         if user.id != user_id:
-            await popup(query, "Access Denied!")
+            await query.answer("Access Denied!", True)
             return
     
     return data_center
@@ -59,19 +46,20 @@ async def get_chat_data(update, data_center):
     db_find = data_center.get("db_find")
     db_vlaue = data_center.get("db_vlaue")
     
-    # Check on localdb if not found check on mongodb if not found show error
-    db = await global_search(collection_name, db_find, db_vlaue)
-    if db[0] == False:
-        await Message.reply_message(update, db[1])
+    # Check on memory if not found check on mongodb if not found show error
+    response, database_data = database_search(collection_name, db_find, db_vlaue)
+    if response == False:
+        await update.effective_message.reply_text(database_data)
         return
     
-    return db[1]
+    return database_data
 
 # main function
 async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user = update.effective_user
     chat = update.effective_chat
+    effective_message = update.effective_message
 
     # query_none return
     if query.data == "query_none":
@@ -96,11 +84,11 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "query_set_custom_welcome_msg": QueryChatSettings._query_set_custom_welcome_msg,
         "query_chat_farewell_user": QueryChatSettings._query_chat_farewell_user,
         "query_chat_antibot": QueryChatSettings._query_chat_antibot,
-        "query_chat_del_cmd": QueryChatSettings._query_chat_del_cmd,
-        "query_chat_log_channel": QueryChatSettings._query_chat_log_channel,
+        # "query_chat_del_cmd": QueryChatSettings._query_chat_del_cmd,
+        # "query_chat_log_channel": QueryChatSettings._query_chat_log_channel,
         "query_chat_links_behave": QueryChatSettings._query_chat_links_behave,
-        "query_chat_all_links": QueryChatSettings._query_chat_all_links,
-        "query_chat_allowed_links": QueryChatSettings._query_chat_allowed_links
+        "query_chat_is_links_allowed": QueryChatSettings._query_chat_is_links_allowed,
+        "query_chat_allowed_links_list": QueryChatSettings._query_chat_allowed_links_list
     }
 
     query_dict_chat_settings_2 = {
@@ -111,7 +99,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     query_dict_bot_settings = {
         "query_bot_pic": QueryBotSettings._query_bot_pic,
-        "query_welcome_img": QueryBotSettings._query_welcome_img,
         "query_images": QueryBotSettings._query_images,
         "query_support_chat": QueryBotSettings._query_support_chat,
         "query_server_url": QueryBotSettings._query_server_url,
@@ -128,7 +115,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     query_dict_bot_settings_3 = {
         "query_confirm_restore_db": QueryBotSettings._query_confirm_restore_db,
-        "query_clear_localdb_cache": QueryBotSettings._query_clear_localdb_cache,
+        "query_clear_memory_cache": QueryBotSettings._query_clear_memory_cache,
     }
 
     query_dict_broadcast = {
@@ -149,9 +136,13 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query.data in query_dict_help:
         handler = query_dict_help[query.data]
-        await handler(update, query)
+        if query.data == "query_help_bot_info":
+            await handler(update, context)
+        else:
+            await handler(update)
     
-    elif query.data in (query_dict_chat_settings or query_dict_chat_settings_2):
+    elif (query.data in query_dict_chat_settings or
+          query.data in query_dict_chat_settings_2):
         data_center = await validate_user(query, chat, user)
         if not data_center:
             return
@@ -162,37 +153,39 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         if query.data in query_dict_chat_settings:
             handler = query_dict_chat_settings[query.data]
-            await handler(update, query, find_chat)
+            await handler(update, find_chat)
         
         elif query.data in query_dict_chat_settings_2:
             handler = query_dict_chat_settings_2[query.data]
-            await handler(update, query)
+            await handler(update, context, query)
     
-    elif query.data in query_dict_bot_settings or query.data in query_dict_bot_settings_2 or query.data in query_dict_bot_settings_3:
+    elif (query.data in query_dict_bot_settings or
+          query.data in query_dict_bot_settings_2 or
+          query.data in query_dict_bot_settings_3):
         data_center = await validate_user(query, chat, user)
         if not data_center:
             return
         
-        if data_center.get("collection_name") != "bot_docs":
-            await popup(query, "Session expired!")
-            await del_query(query)
+        if data_center.get("collection_name") != "bot_data":
+            await query.answer("Session expired!", True)
+            await query.delete_message()
             return
         
-        find_chat = await get_chat_data(update, data_center)
-        if not find_chat:
+        database_data = await get_chat_data(update, data_center)
+        if not database_data:
             return
         
         if query.data in query_dict_bot_settings:
             handler = query_dict_bot_settings[query.data]
-            await handler(update, query, find_chat)
+            await handler(update, database_data)
         
         elif query.data in query_dict_bot_settings_2:
             handler = query_dict_bot_settings_2[query.data]
-            await handler(update, query)
+            await handler(update)
         
         elif query.data in query_dict_bot_settings_3:
             handler = query_dict_bot_settings_3[query.data]
-            await handler(update, data_center)
+            await handler(update)
     
     elif query.data in query_dict_broadcast:
         data_center = await validate_user(query, chat, user)
@@ -202,15 +195,21 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = data_center.get("user_id")
         data = query_dict_broadcast[query.data]
 
-        await LOCAL_DATABASE.insert_data("data_center", user_id, data, "broadcast")
+        data_center = MemoryDB.data_center.get(user_id)
+        if data_center:
+            broadcast_data = data_center.get("broadcast")
+            if broadcast_data:
+                broadcast_data.update(data)
+        else:
+            MemoryDB.insert_data("data_center", user_id, {"broadcast": data})
         
         if query.data != "query_broadcast_done":
-            localdb = await LOCAL_DATABASE.find_one("data_center", user.id)
-            db_broadcast = localdb.get("broadcast")
+            data_center = MemoryDB.data_center.get(user.id)
+            db_broadcast = data_center.get("broadcast")
             is_forward = db_broadcast.get("is_forward", False)
             is_pin = db_broadcast.get("is_pin", False)
             
-            msg = (
+            text = (
                 "<b><u>Broadcast</u></b>\n\n"
                 f"Forward: <code>{is_forward}</code>\n"
                 f"Pin message: <code>{is_pin}</code>"
@@ -222,8 +221,12 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 {"Done": "query_broadcast_done", "Close": "query_close"}
             ]
 
-            btn = await Button.cbutton(btn_data)
-            await Message.edit_message(update, msg, query.message, btn)
+            btn = ButtonMaker.cbutton(btn_data)
+
+            if effective_message.text:
+                await effective_message.edit_text(text, reply_markup=btn)
+            elif effective_message.caption:
+                await effective_message.edit_caption(text, reply_markup=btn)
     
     elif query.data in query_dict_db_edit:
         handler = query_dict_db_edit[query.data]
@@ -236,7 +239,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             edit_data_key = data_center.get("edit_data_key")
 
-            if edit_data_key in ["images", "allowed_links"]:
+            if edit_data_key in ["images", "allowed_links_list"]:
                 is_list = True
             elif edit_data_key in ["log_channel"]:
                 is_int = True
@@ -244,9 +247,9 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 is_list = True
                 is_int = True
             
-            await handler(chat.id, query, is_list=is_list, is_int=is_int)
+            await handler(context, chat.id, query, is_list=is_list, is_int=is_int)
         elif query.data == "query_close":
-            await handler(update, chat.id, query)
+            await handler(context, chat.id, query)
         else:
             await handler(chat.id, query)
     
@@ -257,13 +260,13 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         whisper_data = data_center.get("whisper_data")
 
-        user_whisper_data = whisper_data.get(f"@{user.username}") or whisper_data.get(str(user.id))
+        user_whisper_data = whisper_data.get(f"@{user.username}") or whisper_data.get(user.id)
         if not user_whisper_data:
-            await popup(query, "This whisper isn't for you or whisper has expired!")
+            await query.answer("This whisper isn't for you or whisper has expired!", True)
             return
         
         if user_whisper_data.get("whisper_user") not in {user.id, f"@{user.username}"}:
-            await popup(query, "This whisper isn't for you!")
+            await query.answer("This whisper isn't for you!", True)
             return
         
-        await popup(query, user_whisper_data.get("whisper_msg"))
+        await query.answer(user_whisper_data.get("whisper_msg"), True)

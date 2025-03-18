@@ -26,4 +26,4 @@ jobs:
           BOT_TOKEN: ${{secrets.BOT_TOKEN}}
           OWNER_ID: ${{secrets.OWNER_ID}}
           CHAT_ID: ${{secrets.CHAT_ID}}
-        run: python commit_notify.py
+        run: python notify.py

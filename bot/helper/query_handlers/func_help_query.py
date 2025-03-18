@@ -1,33 +1,33 @@
-import json
 import psutil
 from time import time
 from datetime import datetime, timedelta
 from telegram import Update
-from bot import bot
-from bot.helper.telegram_helper import Message, Button
-from bot.modules.database.mongodb import MongoDB
-
+from telegram.ext import ContextTypes
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
+from bot.modules.database import MemoryDB, MongoDB
 
 class QueryBotHelp:
-    async def _query_help_group_management_p1(update: Update, query):
-        msg = (
+    async def _query_help_group_management_p1(update: Update):
+        effective_message = update.effective_message
+
+        text = (
             "<b>Group Moderation Commands | p:1</b>\n\n"
-            "/id » Show chat/user id\n"
-            "/invite » Generate chat invite link\n"
-            "/promote | /fpromote » promote a member ('f' means with full privilege)\n"
-            "/apromote | /fapromote » <code>anonymously</code> promote/fpromote a member\n"
-            "/admintitle » set admin custom title\n"
-            "/demote » demote a member\n"
-            "/pin » pin replied message loudly\n"
-            "/unpin » unpin a pinned message\n"
-            "/unpinall » unpin all pinned messages"
-            "/ban » ban a member\n"
-            "/unban » unban a member\n"
-            "/kick » kick a member\n"
-            "/kickme » The easy way to out\n"
-            "/mute » restrict a member (member will be unable to send messages etc.)\n"
-            "/unmute » unrestrict a restricted member\n\n"
-            "<i><b>Note:</b> Send command to get more details about the command functions!\n"
+
+            "• /id » Show chat/user id\n"
+            "• /invite » Generate chat invite link\n"
+            "• /promote » Promote chat member\n"
+            "• /demote » Demote chat member\n"
+            "• /pin » Pin replied message\n"
+            "• /unpin » Unpin a pinned message\n"
+            "• /unpinall » Unpin all pinned messages\n"
+            "• /ban » Ban chat member\n"
+            "• /unban » Unban chat member\n"
+            "• /kick » Kick chat member\n"
+            "• /kickme » The easy way to out\n"
+            "• /mute » Restrict a member (member will be unable to send messages etc.)\n"
+            "• /unmute » Unrestrict a restricted member\n\n"
+
+            "<i><b>Note:</b> Send command to get more details about the command functions!"
             "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
         )
 
@@ -36,23 +36,31 @@ class QueryBotHelp:
             {"Back": "query_help_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_help_group_management_p2(update: Update, query):
-        msg = (
+    async def _query_help_group_management_p2(update: Update):
+        effective_message = update.effective_message
+
+        text = (
             "<b>Group Moderation Commands | p:2</b>\n\n"
-            "/del » delete the replied message with a warning!\n"
-            "/purge » delete every messages from replied to current message!\n"
-            "/purgefrom | /purgeto » delete every messages between <code>purgefrom</code> and <code>purgeto</code> replied message!\n"
-            "/lock » lock the chat (member will be unable to send messages etc.)\n"
-            "/unlock » unlock the chat (back to normal)\n"
-            "/filters | /filter | /remove » to see/set/remove custom message/command\n"
-            "/adminlist » to see chat admins list\n"
-            "/settings » settings of chat\n\n"
+
+            "• /purge » Delete all messages between replied to current message!\n"
+            "• /lock » Lock the chat (member will be unable to send messages etc.)\n"
+            "• /unlock » Unlock the chat (back to normal)\n"
+            "• /adminlist » Get chat admins list\n"
+            "• /settings » Settings of chat\n\n"
+
             "<i><b>Note:</b> Send command to get more details about the command functions!\n"
-            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
+            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>\n"
+
+            #• /purgefrom | /purgeto » delete every messages between <code>purgefrom</code> and <code>purgeto</code> replied message!
+            #• /filters | /filter | /remove » to see/set/remove custom message/command
         )
 
         btn_data = [
@@ -60,72 +68,102 @@ class QueryBotHelp:
             {"Back": "query_help_menu", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_help_ai(update: Update, query):
-        msg = (
-            "<b>Artificial intelligence</b>\n\n"
-            "/imagine » generate AI image\n"
-            "/gpt » ask any question to ChatGPT\n\n"
+    async def _query_help_ai(update: Update):
+        effective_message = update.effective_message
+
+        text = (
+            "<b>AI Tools</b>\n\n"
+
+            "• /imagine » Generate AI image\n"
+            "• /gpt » Ask any question to AI-LLM\n\n"
+
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
 
-        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_help_misc_functions(update: Update, query):
-        msg = (
+    async def _query_help_misc_functions(update: Update):
+        effective_message = update.effective_message
+
+        text = (
             "<b>Misc functions</b>\n\n"
-            "/movie » get any movie info by name or imdb id\n"
-            "/tr » translate any language\n"
-            "/decode » convert base64 into text\n"
-            "/encode » convert text into base64\n"
-            "/short » short any url\n"
-            "/ping » ping any url\n"
-            "/calc » calculate any math (supported syntex: +, -, *, /)\n"
-            "/tts » convert text into speech\n"
-            "/weather » get weather info of any city\n"
-            "/qr » generate a QR code\n"
-            "/itl » convert image into a public link\n"
-            "/paste » paste your text in telegraph & get public link\n"
-            "/whisper » secretly tell something to someone in group chat\n"
-            "/ytdl » download audio/song from youtube\n"
-            "/id » show chat/user id\n"
-            "/info » show user info\n"
-            "/psndl » search ps3 & some other playstation games link (mostly ps3)\n"
-            "/rap » generate rap from <code>rap_data</code> (use /psndl to get rap data)\n"
-            "/settings » settings of chat\n\n"
+
+            "• /movie » Get Movie info by name or IMDB ID\n"
+            "• /tr » Google translator\n"
+            "• /decode » Convert base64 into text\n"
+            "• /encode » Convert text into base64\n"
+            "• /shorturl » Short URL (shrinkme)\n"
+            "• /ping » Get response of website\n"
+            "• /calc » Normal calculator (supported syntex: +, -, *, /)\n"
+            "• /tts » Convert text into speech (voice)\n"
+            "• /weather » Get current weather info\n"
+            "• /qr » Generate QR code (image)\n"
+            "• /imgtolink » Get Image to public link\n"
+            "• /paste » Paste replied text in telegraph (returns link)\n"
+            "• /whisper » Whisper someone in public chat (secretly)\n"
+            "• /ytdl » Download audio/song from youtube\n"
+            "• /id » Show chat/user id\n"
+            "• /info » Show user info\n"
+            "• /psndl » Get playstation (psn/.pkg) games/updates/dlc link (mostly ps3)\n"
+            "• /rap » Generate .rap file <code>hex_code</code> (LICENSE file for PSN file, /psndl to get hex code)\n"
+            "• /settings » Settings of chat\n\n"
+
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
         
-        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_help_owner_functions(update: Update, query):
-        msg = (
+    async def _query_help_owner_functions(update: Update):
+        effective_message = update.effective_message
+
+        text = (
             "<b>Bot owner functions</b>\n\n"
-            "/broadcast » broadcast message to all active users\n"
-            "/send » send message to specified chat_id\n"
-            "/chatadmins » to get adminlist of specified chat_id\n"
-            "/invitelink » to get invite link of specified chat_id\n"
-            "/database » get bot/chat database\n"
-            "/bsettings » get bot settings\n"
-            "/shell » use system shell\n"
-            "/log » get log file (for error handling)\n"
-            "/sys » get system info\n\n"
-            "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
+
+            "• /broadcast » Broadcast message to all active users\n"
+            "• /send » Send message to specified ChatID\n"
+            "• /cadmins » Get adminlist of specified ChatID\n"
+            "• /invitelink » Get invite link of specified ChatID\n"
+            "• /database » Get bot or specified chat database info\n"
+            "• /bsettings » Get bot settings\n"
+            "• /shell » Access/Use system shell\n"
+            "• /log » Get log file (for error handling)\n"
+            "• /sys » Get system info\n\n"
+
+            "<i><b>Note:</b> Send command to get more details about the command functions!</i>\n"
         )
         
-        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
     
 
-    async def _query_help_bot_info(update: Update, query):
-        database_info = await MongoDB.info_db()
+    async def _query_help_bot_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        effective_message = update.effective_message
+
+        database_info = MongoDB.info_db()
         total_users = None
         total_groups = None
 
@@ -139,31 +177,30 @@ class QueryBotHelp:
             if total_users and total_groups:
                 break
         
-        active_status = await MongoDB.find("users", "active_status")
+        active_status = MongoDB.find("users", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
-        # Calculate the system uptime
+
         sys_uptime = timedelta(seconds=datetime.now().timestamp() - psutil.boot_time())
-        # Extracting system uptime in days, hours and minutes
+
         sys_days = sys_uptime.days
         sys_hours, remainder = divmod(sys_uptime.seconds, 3600)
         sys_minute = remainder / 60
-        # Getting bot uptime
-        bot_uptime = timedelta(seconds=time() - float(open("sys/bot_uptime.txt", "r").read()))
-        # Extracting bot uptime in days, hours and minutes
+
+        bot_uptime = timedelta(seconds=time() - float(MemoryDB.bot_data.get("bot_uptime", 0)))
+
         bot_days = bot_uptime.days
         bot_hours, remainder = divmod(bot_uptime.seconds, 3600)
         bot_minute = remainder / 60
-        # loading bot_commands file
-        bot_commands = json.load(open("sys/bot_commands.json", "r"))
-        bot_commands = bot_commands.get("bot_commands")
 
-        msg = (
+        bot_commands = MemoryDB.bot_data.get("bot_commands", [])
+
+        text = (
             "<blockquote><code><b>» bot.info()</b></code></blockquote>\n\n"
 
-            f"<b>• Name:</b> {bot.first_name}\n"
-            f"<b>• ID:</b> <code>{bot.id}</code>\n"
-            f"<b>• Username:</b> {bot.name}\n\n"
+            f"<b>• Name:</b> {context.bot.first_name}\n"
+            f"<b>• ID:</b> <code>{context.bot.id}</code>\n"
+            f"<b>• Username:</b> {context.bot.name}\n\n"
 
             f"<b>• Registered users:</b> <code>{total_users}</code>\n"
             f"<b>• Active users:</b> <code>{active_users}</code>\n"
@@ -179,5 +216,9 @@ class QueryBotHelp:
             "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
         )
         
-        btn = await Button.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)

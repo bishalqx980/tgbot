@@ -23,9 +23,9 @@ async def upload_image(image_path):
         async with aiohttp.ClientSession() as session:
             async with session.post(url, params=params) as response:
                 json_data = await response.json()
-                return True, json_data
+                return json_data
     except aiohttp.ServerTimeoutError as e:
         logger.error(e)
-        return False, e
+        return False
     except Exception as e:
         logger.error(e)

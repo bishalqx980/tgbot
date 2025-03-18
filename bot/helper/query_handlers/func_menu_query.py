@@ -1,32 +1,59 @@
 from telegram import Update
-from bot.helper.telegram_helper import Message, Button
-
+from telegram.constants import ChatType
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
+from bot.helper.messages_storage import (
+    help_menu,
+    bot_settings_menu,
+    chat_settings_menu_pvt,
+    chat_settings_menu_group
+)
+from bot.modules.database import MemoryDB
 
 class QueryMenus:
-    async def _query_bot_settings_menu(update: Update, query):
-        msg = "<u><b>Bot Settings</b></u>"
+    async def _query_bot_settings_menu(update: Update):
+        effective_message = update.effective_message
+        
+        bot_data = MemoryDB.bot_data
+        bot_pic = bot_data.get("bot_pic")
+        images = len(bot_data.get("images", []))
+        support_chat = bot_data.get("support_chat")
+        server_url = bot_data.get("server_url")
+        sudo_users = len(bot_data.get("sudo_users", []))
+        shrinkme_api = bot_data.get("shrinkme_api")
+        omdb_api = bot_data.get("omdb_api")
+        weather_api = bot_data.get("weather_api")
+
+        text = bot_settings_menu.format(
+            bot_pic,
+            images,
+            support_chat,
+            server_url,
+            sudo_users,
+            shrinkme_api,
+            omdb_api,
+            weather_api
+        )
+
         btn_data = [
-            {"Bot pic": "query_bot_pic", "Welcome img": "query_welcome_img"},
-            {"Images": "query_images", "Support chat": "query_support_chat"},
-            {"Server url": "query_server_url", "Sudo": "query_sudo"},
-            {"Shrinkme API": "query_shrinkme_api", "OMDB API": "query_omdb_api"},
-            {"Weather API": "query_weather_api"},
+            {"Bot pic": "query_bot_pic", "Images": "query_images"},
+            {"Support chat": "query_support_chat", "Server url": "query_server_url"},
+            {"Sudo": "query_sudo", "Shrinkme API": "query_shrinkme_api"},
+            {"OMDB API": "query_omdb_api", "Weather API": "query_weather_api"},
             {"> Restore DB?": "query_restore_db", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
 
 
-    async def _query_help_menu(update: Update, query):
+    async def _query_help_menu(update: Update):
         user = update.effective_user
-        msg = (
-            f"Hey, {user.full_name}! Welcome to the bot help section.\n"
-            "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
-            "/start - to start the bot\n"
-            "/help - to see this message\n\n"
-            "<b>Note:</b> <i>The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</i>"
-        )
+        effective_message = update.effective_message
+        text = help_menu.format(user.full_name)
 
         btn_data = [
             {"Group Management": "query_help_group_management_p1", "AI": "query_help_ai"},
@@ -34,27 +61,30 @@ class QueryMenus:
             {"» bot.info()": "query_help_bot_info", "Close": "query_close"}
         ]
 
-        btn = await Button.cbutton(btn_data)
-        await Message.edit_message(update, msg, query.message, btn)
+        btn = ButtonMaker.cbutton(btn_data)
+
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)
     
 
-    async def _query_chat_settings_menu(update: Update, query, find_chat):
+    async def _query_chat_settings_menu(update: Update, find_chat):
         chat = update.effective_chat
+        effective_message = update.effective_message
 
-        if chat.type == "private":
+        if chat.type == ChatType.PRIVATE:
             user_mention = find_chat.get("mention")
             lang = find_chat.get("lang")
             echo = find_chat.get("echo", False)
             auto_tr = find_chat.get("auto_tr", False)
 
-            msg = (
-                "<u><b>Chat Settings</b></u>\n\n"
-                f"• User: {user_mention}\n"
-                f"• ID: <code>{chat.id}</code>\n\n"
-
-                f"• Lang: <code>{lang}</code>\n"
-                f"• Auto tr: <code>{auto_tr}</code>\n"
-                f"• Echo: <code>{echo}</code>\n"
+            text = chat_settings_menu_pvt.format(
+                user_mention,
+                chat.id,
+                lang,
+                auto_tr,
+                echo
             )
 
             btn_data = [
@@ -62,7 +92,7 @@ class QueryMenus:
                 {"Echo": "query_chat_set_echo", "Close": "query_close"}
             ]
 
-            btn = await Button.cbutton(btn_data)
+            btn = ButtonMaker.cbutton(btn_data)
         
         else:
             title = find_chat.get("title")
@@ -72,40 +102,35 @@ class QueryMenus:
             welcome_user = find_chat.get("welcome_user", False)
             farewell_user = find_chat.get("farewell_user", False)
             antibot = find_chat.get("antibot", False)
-            del_cmd = find_chat.get("del_cmd", False)
-            all_links = find_chat.get("all_links")
-            allowed_links = find_chat.get("allowed_links")
-            log_channel = find_chat.get("log_channel")
+            is_links_allowed = find_chat.get("is_links_allowed")
+            allowed_links_list = find_chat.get("allowed_links_list")
             
-            if allowed_links:
-                allowed_links = ", ".join(allowed_links)
+            if allowed_links_list:
+                allowed_links_list = ", ".join(allowed_links_list)
 
-            msg = (
-                "<u><b>Chat Settings</b></u>\n\n"
-
-                f"• Title: {title}\n"
-                f"• ID: <code>{chat.id}</code>\n\n"
-
-                f"• Lang: <code>{lang}</code>\n"
-                f"• Auto tr: <code>{auto_tr}</code>\n"
-                f"• Echo: <code>{echo}</code>\n"
-                f"• Antibot: <code>{antibot}</code>\n"
-                f"• Welcome user: <code>{welcome_user}</code>\n"
-                f"• Farewell user: <code>{farewell_user}</code>\n"
-                f"• Delete CMD: <code>{del_cmd}</code>\n"
-                f"• Log channel: <code>{log_channel}</code>\n"
-                f"• All links: <code>{all_links}</code>\n"
-                f"• Allowed links: <code>{allowed_links}</code>\n"
+            text = chat_settings_menu_group.format(
+                title,
+                chat.id,
+                lang,
+                auto_tr,
+                echo,
+                antibot,
+                welcome_user,
+                farewell_user,
+                is_links_allowed,
+                allowed_links_list
             )
 
             btn_data = [
                 {"Language": "query_chat_lang", "Auto translate": "query_chat_auto_tr"},
                 {"Echo": "query_chat_set_echo", "Anti bot": "query_chat_antibot"},
                 {"Welcome": "query_chat_welcome_user", "Farewell": "query_chat_farewell_user"},
-                {"Delete CMD": "query_chat_del_cmd", "Log channel": "query_chat_log_channel"},
-                {"Links behave": "query_chat_links_behave", "Close": "query_close"}
+                {"Links": "query_chat_links_behave", "Close": "query_close"}
             ]
 
-            btn = await Button.cbutton(btn_data)
-
-        await Message.edit_message(update, msg, query.message, btn)
+            btn = ButtonMaker.cbutton(btn_data)
+        
+        if effective_message.text:
+            await effective_message.edit_text(text, reply_markup=btn)
+        elif effective_message.caption:
+            await effective_message.edit_caption(text, reply_markup=btn)

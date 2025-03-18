@@ -2,9 +2,10 @@ import qrcode
 from bot import logger
 
 class QR:
-    async def generate_qr(data, file_name="qrcode", size=50):
+    def generate_qr(data, file_name="qrcode", size=50):
         """
-        `size` multiply with (29 * size = image_pixels)
+        :param data: text, url etc.\n
+        Note: `size` multiply with (29 * size = image_pixels)
         """
         try:
             qr = qrcode.QRCode(
