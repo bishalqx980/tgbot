@@ -121,29 +121,26 @@ def load_handlers():
     bot_commands = {}
     
     for root, dirs, files in os.walk(HANDLERS_DIR):
-        if "__pycache__" in dirs:
-            dirs.remove("__pycache__")
-            
-            for file in files:
-                if file.endswith(".py") and not file.startswith("__"):
-                    # Constructing module path
-                    file_path = os.path.join(root, file)
-                    normalized_path = os.path.normpath(file_path)
-                    module_path = normalized_path.replace(os.sep, ".")
+        for file in files:
+            if file.endswith(".py") and not file.startswith("__"):
+                # Constructing module path
+                file_path = os.path.join(root, file)
+                normalized_path = os.path.normpath(file_path)
+                module_path = normalized_path.replace(os.sep, ".")
 
-                    if module_path.endswith(".py"):
-                        module_path = module_path[:-3]
-                    
-                    # Importing the module
-                    module = importlib.import_module(module_path)
-                    
-                    # Iterate over all attributes in the module
-                    for attr_name in dir(module):
-                        attr = getattr(module, attr_name)
+                if module_path.endswith(".py"):
+                    module_path = module_path[:-3]
+                
+                # Importing the module
+                module = importlib.import_module(module_path)
+                
+                # Iterate over all attributes in the module
+                for attr_name in dir(module):
+                    attr = getattr(module, attr_name)
 
-                        if callable(attr) and attr_name.startswith("func_"):
-                            command_name = attr_name[len("func_"):]
-                            bot_commands[command_name] = attr
+                    if callable(attr) and attr_name.startswith("func_"):
+                        command_name = attr_name[len("func_"):]
+                        bot_commands[command_name] = attr
     
     return bot_commands
 
@@ -159,6 +156,7 @@ def main():
     application = ApplicationBuilder().token(ENV_CONFIG["bot_token"]).defaults(default_param).build()
 
     bot_commands = load_handlers()
+    logger.info(f"Modules loaded: {len(bot_commands)}")
 
     storage = []
     for command, handler in bot_commands.items():
