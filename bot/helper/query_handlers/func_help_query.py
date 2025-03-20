@@ -51,6 +51,7 @@ class QueryBotHelp:
             "<b>Group Moderation Commands | p:2</b>\n\n"
 
             "• /purge » Delete all messages between replied to current message!\n"
+            "• /purgefrom - /purgeto » Delete all messages between purgefrom & purgeto.\n"
             "• /lock » Lock the chat (member will be unable to send messages etc.)\n"
             "• /unlock » Unlock the chat (back to normal)\n"
             "• /adminlist » Get chat admins list\n"
