@@ -206,10 +206,8 @@ class QueryChatSettings:
 
 
     async def _query_chat_links_behave(update: Update, find_chat):
-        chat = update.effective_chat
         effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
         is_links_allowed = find_chat.get("is_links_allowed")
         allowed_links_list = find_chat.get("allowed_links_list")
         if allowed_links_list:
@@ -239,10 +237,8 @@ class QueryChatSettings:
 
 
     async def _query_chat_is_links_allowed(update: Update, find_chat):
-        chat = update.effective_chat
         effective_message = update.effective_message
-
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "links_behave"})
+        
         is_links_allowed = find_chat.get("is_links_allowed")
 
         text = (

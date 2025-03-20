@@ -37,8 +37,8 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "db_vlaue": chat.id,
         "edit_data_key": None,
         "edit_data_value": None,
-        "del_msg_pointer_id": effective_message.id,
-        "edit_data_value_msg_pointer_id": None
+        "edit_value_message_id": None,
+        "effective_message_id": effective_message.id
     }
     
     MemoryDB.insert_data("data_center", chat.id, data)
