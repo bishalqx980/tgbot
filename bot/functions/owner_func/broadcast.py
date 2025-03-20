@@ -33,13 +33,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = {
         "user_id": user.id,
         "chat_id": chat.id,
-        "collection_name": "data_center",
-        "db_find": "user_id",
-        "db_vlaue": user.id,
-        "edit_data_key": None,
-        "edit_data_value": None,
-        "del_msg_pointer_id": effective_message.id,
-        "edit_data_value_msg_pointer_id": None,
+        "effective_message_id": effective_message.id,
         "broadcast": {
             "is_forward": False,
             "is_pin": False,

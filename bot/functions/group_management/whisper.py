@@ -68,13 +68,6 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = {
             "user_id": user.id,
             "chat_id": chat.id,
-            "collection_name": "groups",
-            "db_find": "chat_id",
-            "db_vlaue": chat.id,
-            "edit_data_key": None,
-            "edit_data_value": None,
-            "del_msg_pointer_id": effective_message.id,
-            "edit_data_value_msg_pointer_id": None,
             "whisper_data": {
                 whisper_user: {
                     "whisper_user": whisper_user,

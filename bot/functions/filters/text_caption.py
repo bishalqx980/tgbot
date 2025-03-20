@@ -19,7 +19,7 @@ def database_editing(chat, effective_message):
 
         MemoryDB.insert_data("data_center", chat.id, {
             "edit_data_value": data_value,
-            "edit_data_value_msg_pointer_id": effective_message.id,
+            "edit_value_message_id": effective_message.id,
             "is_editing": False
         })
         return True

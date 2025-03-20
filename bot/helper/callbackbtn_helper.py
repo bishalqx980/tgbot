@@ -196,10 +196,9 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = query_dict_broadcast[query.data]
 
         data_center = MemoryDB.data_center.get(user_id)
-        if data_center:
-            broadcast_data = data_center.get("broadcast")
-            if broadcast_data:
-                broadcast_data.update(data)
+        if data_center and data_center.get("broadcast"):
+            data_center["broadcast"].update(data)
+        
         else:
             MemoryDB.insert_data("data_center", user_id, {"broadcast": data})
         

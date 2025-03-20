@@ -38,7 +38,7 @@ class QueryFunctions:
             for i in range(11):
                 data_center = MemoryDB.data_center.get(identifier)
                 edit_data_value = data_center.get("edit_data_value")
-                edit_data_value_msg_pointer_id = data_center.get("edit_data_value_msg_pointer_id")
+                edit_value_message_id = data_center.get("edit_value_message_id")
                 if edit_data_value:
                     break
                 
@@ -59,7 +59,7 @@ class QueryFunctions:
                 await context.bot.edit_message_text("Oops! Timeout...", chat_id, sent_message.id)
                 return
             
-            await context.bot.delete_messages(chat_id, [edit_data_value_msg_pointer_id, sent_message.id])
+            await context.bot.delete_messages(chat_id, [edit_value_message_id, sent_message.id])
 
             if is_list:
                 if "," in str(edit_data_value):
@@ -233,7 +233,7 @@ class QueryFunctions:
         data_center = MemoryDB.data_center.get(identifier)
         if data_center:
             try:
-                await context.bot.delete_message(data_center.get("chat_id"), data_center.get("del_msg_pointer_id"))
+                await context.bot.delete_message(data_center.get("chat_id"), data_center.get("effective_message_id"))
             except Exception as e:
                 logger.error(e)
         

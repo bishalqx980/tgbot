@@ -37,13 +37,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = {
             "user_id": user.id,
             "chat_id": chat.id,
-            "collection_name": None,
-            "db_find": None,
-            "db_vlaue": None,
-            "edit_data_key": None,
-            "edit_data_value": None,
-            "del_msg_pointer_id": effective_message.id,
-            "edit_data_value_msg_pointer_id": None
+            "effective_message_id": effective_message.id
         }
 
         MemoryDB.insert_data("data_center", chat.id, data)
