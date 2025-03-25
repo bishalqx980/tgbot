@@ -15,10 +15,10 @@ class QueryMenus:
         
         bot_data = MemoryDB.bot_data
         bot_pic = bot_data.get("bot_pic")
-        images = len(bot_data.get("images", []))
+        images = len(bot_data.get("images") or [])
         support_chat = bot_data.get("support_chat")
         server_url = bot_data.get("server_url")
-        sudo_users = len(bot_data.get("sudo_users", []))
+        sudo_users = len(bot_data.get("sudo_users") or [])
         shrinkme_api = bot_data.get("shrinkme_api")
         omdb_api = bot_data.get("omdb_api")
         weather_api = bot_data.get("weather_api")
