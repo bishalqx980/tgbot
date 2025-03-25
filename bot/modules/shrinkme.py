@@ -17,7 +17,7 @@ async def shortener_url(url):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(api_url, params=params) as response:
-                if response.status != 200:
+                if not response.ok:
                     return
                 
                 data = await response.json()

@@ -30,7 +30,7 @@ async def fetch_movieinfo(movie_name=None, imdb_id=None, year=None):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(api_url, params=params) as response:
-                if response.status == 200:
+                if response.ok:
                     data = await response.json()
                     return data
     except Exception as e:

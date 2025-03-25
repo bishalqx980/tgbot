@@ -61,8 +61,14 @@ async def server_alive():
     # executing after updating database so getting data from memory...
     server_url = MemoryDB.bot_data.get("server_url")
     if not server_url:
-        logger.warning("⚠️ Server url not provided !!")
-        await bot.send_message(ENV_CONFIG["owner_id"], "⚠️ Server url not provided!\nGoto /bsettings and setup server url then restart bot...")
+        logger.warning("✕ Server URL wasn't found.")
+
+        text = (
+            "✕ <code>Server URL</code> wasn't found!\n"
+            "Bot may fall asleep. /bsettings to setup Server URL."
+        )
+
+        await bot.send_message(ENV_CONFIG["owner_id"], f"<b>{text}</b>", parse_mode=ParseMode.HTML)
         return
     
     while True:
@@ -75,8 +81,8 @@ async def server_alive():
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(server_url) as response:
-                    if response.status != 200:
-                        logger.warning(f"{server_url} is down or unreachable. ❌ - code - {response.status_code}")
+                    if not response.ok:
+                        logger.warning(f"{server_url} is down or unreachable. ❌ - code - {response.status}")
         except Exception as e:
             logger.error(f"{server_url} > {e}")
         await asyncio.sleep(180) # 3 min

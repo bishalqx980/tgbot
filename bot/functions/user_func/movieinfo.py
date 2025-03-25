@@ -35,7 +35,7 @@ async def func_movie(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     runtime = movie_info["Runtime"]
-    runtime = f"{int(runtime[0:3]) // 60} Hour {int(runtime[0:3]) % 60} Min"
+    runtime = f"{int(runtime[0:3]) // 60} Hour {int(runtime[0:3]) % 60} Min" if runtime != "N/A" else "N/A"
 
     text = (
         f"<b><a href='https://www.imdb.com/title/{movie_info['imdbID']}'>{movie_info['Title']} | {movie_info['imdbID']}</a></b>\n\n"
