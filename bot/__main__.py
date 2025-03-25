@@ -22,6 +22,7 @@ from bot.alive import alive
 from bot.update_db import update_database
 from bot.helper.callbackbtn_helper import func_callbackbtn
 from bot.functions.filters.text_caption import filter_text_caption
+from bot.modules import telegraph
 from bot.modules.database import MemoryDB
 from bot.functions.sudo_users import fetch_sudos
 from bot.functions.bot_member_handler import bot_member_handler
@@ -29,6 +30,9 @@ from bot.functions.chat_member_handler import chat_member_handler
 
 
 async def post_boot():
+    # initializing telegraph
+    await telegraph.initialize()
+
     # storing bot uptime
     MemoryDB.insert_data("bot_data", None, {"bot_uptime": str(time())})
 

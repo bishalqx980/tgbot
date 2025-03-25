@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.modules.psndl.psndl import PSNDL
-from bot.modules.telegraph import TELEGRAPH
+from bot.modules import telegraph
 
 async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -49,12 +49,12 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         msg += one_msg.replace("\n", "<br>")
         counter += 1
         if len(msg_list) > 50 and counter == 50:
-            link = TELEGRAPH.paste(msg, f"{user.full_name} | {user.id}")
+            link = await telegraph.paste(msg, f"{user.full_name} | {user.id}")
             links.append(link if link else "Missing link!")
             msg, counter = "", 0
     
     if counter != 0:
-        link = TELEGRAPH.paste(msg, f"{user.full_name} | {user.id}")
+        link = await telegraph.paste(msg, f"{user.full_name} | {user.id}")
         links.append(link if link else "Missing link!")
         msg, counter = "", 0
     

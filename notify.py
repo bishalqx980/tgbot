@@ -5,7 +5,7 @@ def fetch_latest_commit(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/commits"
     try:
         response = requests.get(url)
-        if response.status_code != 200:
+        if not response.ok:
             print(response.text)
             return
         
@@ -26,7 +26,7 @@ def send_message(bot_token, chat_id, text):
 
     try:
         response = requests.get(req_url, data)
-        if response.status_code == 200:
+        if response.ok:
             print("Message sent successfully.")
         else:
             print(f"Error: {response.status_code} - {response.text}")

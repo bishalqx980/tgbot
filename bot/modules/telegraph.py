@@ -1,31 +1,36 @@
 import requests
-from telegraph import Telegraph
+from telegraph.aio import Telegraph
 from bot import logger
 
-try:
-    domains = ["telegra.ph", "graph.org"]
-    for domain in domains:
-        try:
-            response = requests.get(f"https://{domain}", timeout=3)
-            if response.status_code == 200:
-                break
-        except Exception as e:
-            logger.error(e)
-    
-    telegraph = Telegraph(domain=domain)
-    telegraph.create_account("@MissCiri_bot")
-except Exception as e:
-    logger.error(e)
-
 class TELEGRAPH:
-    def paste(text, username="anonymous"):
+    def __init__(self):
+        self.telegraph = None
+        self.domain = "telegra.ph"
+
+
+    async def initialize(self):
+        domain_names = ["telegra.ph", "graph.org"]
+        for domain in domain_names:
+            try:
+                response = requests.get(f"https://{domain}", timeout=3)
+                if response.ok:
+                    logger.info(f"Telegraph initialized! Domain: https://{domain}")
+                    break
+            except Exception as e:
+                logger.error(e)
+        
+        self.telegraph = Telegraph(domain=domain)
+        await self.telegraph.create_account("@MissCiri_bot")
+
+
+    async def paste(self, text, username="anonymous"):
         """
-        use <br> instead of \.n
+        :param text: supports HTML format
         """
         try:
-            path = telegraph.create_page(
+            path = await self.telegraph.create_page(
                 f"{username} - @MissCiri_bot",
-                html_content=text,
+                html_content=text.replace("\n", "<br>"), # replacing \n with <br>
                 author_name=f"{username} using @MissCiri_bot",
                 author_url="https://t.me/MissCiri_bot"
             )
@@ -35,10 +40,10 @@ class TELEGRAPH:
             logger.error(e)
 
 
-    def upload_img(image_path):
+    async def upload_img(self, image_path):
         try:
-            path = telegraph.upload_file(image_path)[0]
-            link = f"https://telegra.ph{path.get('src')}"
+            path = await self.telegraph.upload_file(image_path)[0]
+            link = f"https://{self.domain}{path.get('src')}"
             return link
         except Exception as e:
             logger.error(e)

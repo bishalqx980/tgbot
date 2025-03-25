@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.modules.telegraph import TELEGRAPH
+from bot.modules import telegraph
 
 async def func_paste(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -14,7 +14,8 @@ async def func_paste(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     sent_message = await effective_message.reply_text(f"Creating...")
-    paste = TELEGRAPH.paste(text.replace("\n", "<br>"), user.full_name)
+
+    paste = await telegraph.paste(text, user.full_name)
     if not paste:
         await context.bot.edit_message_text("Oops! Something went wrong!", chat.id, sent_message.id)
         return
