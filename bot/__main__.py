@@ -25,8 +25,8 @@ from bot.functions.filters.text_caption import filter_text_caption
 from bot.modules import telegraph
 from bot.modules.database import MemoryDB
 from bot.functions.sudo_users import fetch_sudos
-from bot.functions.bot_member_handler import bot_member_handler
-from bot.functions.chat_member_handler import chat_member_handler
+from bot.functions.bot_chats_tracker import bot_chats_tracker
+from bot.functions.chat_status_update import chat_status_update
 
 
 async def post_boot():
@@ -165,6 +165,7 @@ def main():
     # Bot instance
     application = ApplicationBuilder().token(ENV_CONFIG["bot_token"]).defaults(default_param).build()
 
+    # Command handlers
     bot_commands = load_handlers()
     logger.info(f"Modules loaded: {len(bot_commands)}")
 
@@ -179,9 +180,9 @@ def main():
     
     # filters
     application.add_handler(MessageHandler(filters.TEXT | filters.CAPTION, filter_text_caption))
+    application.add_handler(MessageHandler(filters.StatusUpdate.ALL, chat_status_update))
     # Chat Member Handler
-    application.add_handler(ChatMemberHandler(bot_member_handler, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking private chat
-    application.add_handler(ChatMemberHandler(chat_member_handler, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup/channel
+    application.add_handler(ChatMemberHandler(bot_chats_tracker, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking private chat
     # Callback button
     application.add_handler(CallbackQueryHandler(callbackquery_handler))
     # Error handler

@@ -2,18 +2,18 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.modules.database.common import database_search
-from bot.functions.group_management.auxiliary.chat_member_status import chat_member_status
 from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
 
-async def chat_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    **Status updates of `effective_chat` >> Group/SuperGroup**
+    """
     chat = update.effective_chat
-    chat_member = update.chat_member
-    cause_user = chat_member.from_user
-    victim = chat_member.new_chat_member.user
+    cause_user = update.effective_user
+    effective_message = update.effective_message
 
     response, database_data = database_search("groups", "chat_id", chat.id)
     if response == False:
-        # await context.bot.send_message(chat.id, database_data)
         return
 
     welcome_user = database_data.get("welcome_user")
@@ -21,32 +21,26 @@ async def chat_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     farewell_user = database_data.get("farewell_user")
     antibot = database_data.get("antibot")
 
-    member_status = chat_member_status(chat_member) #True means user exist and False is not exist
-    if not member_status:
-        return
-    
-    is_user_exist, cause = member_status
+    # handling new chat member
+    if effective_message.new_chat_members:
+        victim = effective_message.new_chat_members
 
-    if is_user_exist and cause == "JOINED":
+        # Antibot
         if victim.is_bot and antibot:
-            chat_admins = await fetch_chat_admins(chat, context.bot.id, cause_user.id, victim.id)
+            chat_admins = await fetch_chat_admins(chat, context.bot.id, cause_user.id)
 
             if chat_admins["is_user_owner"]:
                 return
             
-            elif chat_admins["is_user_admin"] and chat_admins["is_user_admin"].can_invite_users:
-                return
-
-            if chat_admins["is_victim_admin"]:
-                await context.bot.send_message(chat.id, f"Antibot error: {victim.mention_html()} has been added as an admin!")
+            elif chat_admins["is_user_admin"] and (chat_admins["is_user_admin"].can_invite_users or chat_admins["is_user_admin"].can_promote_members):
                 return
             
             if not chat_admins["is_bot_admin"]:
-                await context.bot.send_message(chat.id, "I'm not an admin in this chat!")
+                await context.bot.send_message(chat.id, "Antibot Error: I'm not an admin in this chat!")
                 return
             
             if not chat_admins["is_bot_admin"].can_restrict_members:
-                await context.bot.send_message(chat.id, "I don't have enough permission to restrict chat members!")
+                await context.bot.send_message(chat.id, "Antibot Error: I don't have enough permission to restrict chat members!")
                 return
             
             try:
@@ -58,11 +52,9 @@ async def chat_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             
             await context.bot.send_message(chat.id, f"Antibot: {victim.mention_html()} has been kicked from this chat!")
         
+        # greeting new chat member
         elif welcome_user:
-            if not custom_welcome_msg:
-                await context.bot.send_message(chat.id, f"Hi, {victim.mention_html()}! Welcome to {chat.title}!")
-
-            else:
+            if custom_welcome_msg:
                 formattings = {
                     "{first}": victim.first_name,
                     "{last}": victim.last_name,
@@ -74,11 +66,18 @@ async def chat_member_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 }
 
                 for key, value in formattings.items():
-                    if not value:
-                        value = ""
-                    custom_welcome_msg = custom_welcome_msg.replace(key, str(value))
+                    greeting_message = custom_welcome_msg.replace(key, str(value) if value else "")
+            
+            else:
+                greeting_message = f"Hi, {victim.mention_html()}! Welcome to {chat.title}!"
 
-                await context.bot.send_message(chat.id, custom_welcome_msg)
+            await context.bot.send_message(chat.id, greeting_message)
+    
+    # farewell for left chat member
+    elif effective_message.left_chat_member and farewell_user:
+        await context.bot.send_message(chat.id, f"Nice to see you! {effective_message.left_chat_member.mention_html()} has left us!")
+    
 
-    elif not is_user_exist and cause == "LEFT" and farewell_user:
-        await context.bot.send_message(chat.id, f"Nice to see you! {victim.mention_html()} has left us!")
+
+
+
