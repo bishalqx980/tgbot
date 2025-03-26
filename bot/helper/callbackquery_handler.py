@@ -1,12 +1,11 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import logger
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.helper.query_handlers.query_functions import QueryFunctions
-from bot.helper.query_handlers.func_help_query import QueryBotHelp
-from bot.helper.query_handlers.func_chat_settings_query import QueryChatSettings
-from bot.helper.query_handlers.func_bot_settings_query import QueryBotSettings
-from bot.helper.query_handlers.func_menu_query import QueryMenus
+from bot.helper.query_handlers.query_help import QueryBotHelp
+from bot.helper.query_handlers.query_chat_settings import QueryChatSettings
+from bot.helper.query_handlers.query_bot_settings import QueryBotSettings
+from bot.helper.query_handlers.query_menu import QueryMenus
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 
@@ -55,7 +54,7 @@ async def get_chat_data(update, data_center):
     return database_data
 
 # main function
-async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def callbackquery_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user = update.effective_user
     chat = update.effective_chat
@@ -63,6 +62,7 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # query_none return
     if query.data == "query_none":
+        await query.answer()
         return
     
     query_dict_help = {
@@ -84,8 +84,6 @@ async def func_callbackbtn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "query_set_custom_welcome_msg": QueryChatSettings._query_set_custom_welcome_msg,
         "query_chat_farewell_user": QueryChatSettings._query_chat_farewell_user,
         "query_chat_antibot": QueryChatSettings._query_chat_antibot,
-        # "query_chat_del_cmd": QueryChatSettings._query_chat_del_cmd,
-        # "query_chat_log_channel": QueryChatSettings._query_chat_log_channel,
         "query_chat_links_behave": QueryChatSettings._query_chat_links_behave,
         "query_chat_is_links_allowed": QueryChatSettings._query_chat_is_links_allowed,
         "query_chat_allowed_links_list": QueryChatSettings._query_chat_allowed_links_list

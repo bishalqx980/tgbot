@@ -194,7 +194,7 @@ class QueryBotHelp:
         bot_hours, remainder = divmod(bot_uptime.seconds, 3600)
         bot_minute = remainder / 60
 
-        bot_commands = MemoryDB.bot_data.get("bot_commands", [])
+        bot_commands = MemoryDB.bot_data.get("bot_commands") or []
 
         text = (
             "<blockquote><code><b>» bot.info()</b></code></blockquote>\n\n"

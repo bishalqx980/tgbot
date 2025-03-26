@@ -119,7 +119,7 @@ class QueryChatSettings:
         custom_welcome_msg = find_chat.get("custom_welcome_msg") or "default message"
         is_sent_below = None
         if len(custom_welcome_msg) > 100:
-            custom_welcome_msg = "Sent below..."
+            custom_welcome_msg = "Sent below."
             is_sent_below = True
 
         text = (

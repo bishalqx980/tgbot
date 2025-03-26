@@ -20,7 +20,7 @@ from telegram.constants import ParseMode
 from bot import ENV_CONFIG, DEFAULT_ERROR_CHANNEL_ID, HANDLERS_DIR, bot, logger
 from bot.alive import alive
 from bot.update_db import update_database
-from bot.helper.callbackbtn_helper import func_callbackbtn
+from bot.helper.callbackquery_handler import callbackquery_handler
 from bot.functions.filters.text_caption import filter_text_caption
 from bot.modules import telegraph
 from bot.modules.database import MemoryDB
@@ -183,7 +183,7 @@ def main():
     application.add_handler(ChatMemberHandler(bot_member_handler, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking private chat
     application.add_handler(ChatMemberHandler(chat_member_handler, ChatMemberHandler.CHAT_MEMBER)) # for tacking group/supergroup/channel
     # Callback button
-    application.add_handler(CallbackQueryHandler(func_callbackbtn))
+    application.add_handler(CallbackQueryHandler(callbackquery_handler))
     # Error handler
     application.add_error_handler(default_error_handler)
     # Check Updates

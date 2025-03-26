@@ -1,6 +1,6 @@
 import requests
 from telegraph.aio import Telegraph
-from bot import logger
+from bot import ORIGINAL_BOT_USERNAME, logger
 
 class TELEGRAPH:
     def __init__(self):
@@ -20,7 +20,7 @@ class TELEGRAPH:
                 logger.error(e)
         
         self.telegraph = Telegraph(domain=domain)
-        await self.telegraph.create_account("@MissCiri_bot")
+        await self.telegraph.create_account(f"@{ORIGINAL_BOT_USERNAME}")
 
 
     async def paste(self, text, username="anonymous"):
@@ -29,10 +29,10 @@ class TELEGRAPH:
         """
         try:
             path = await self.telegraph.create_page(
-                f"{username} - @MissCiri_bot",
+                f"{username} - @{ORIGINAL_BOT_USERNAME}",
                 html_content=text.replace("\n", "<br>"), # replacing \n with <br>
-                author_name=f"{username} using @MissCiri_bot",
-                author_url="https://t.me/MissCiri_bot"
+                author_name=f"{username} using @{ORIGINAL_BOT_USERNAME}",
+                author_url=f"https://t.me/{ORIGINAL_BOT_USERNAME}"
             )
             
             return path.get("url")

@@ -103,7 +103,7 @@ async def filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE
             return
         
         is_links_allowed = database_data.get("is_links_allowed") # 3 values: delete; convert; None;
-        allowed_links_list = database_data.get("allowed_links_list", [])
+        allowed_links_list = database_data.get("allowed_links_list") or []
         allowed_links_list = [link.strip() for link in allowed_links_list]
 
         echo_status = database_data.get("echo", False)
