@@ -18,13 +18,13 @@ async def validate_user(query, chat, user, prevent_unauth_access=True):
     """
     data_center = MemoryDB.data_center.get(chat.id)
     if not data_center:
-        await query.answer(f"chat_id: {chat.id} wasn't found in data center!", True)
+        await query.answer(f"chat_id: {chat.id} wasn't found in data center!")
         await query.delete_message()
         return
     
     user_id = data_center.get("user_id")
     if not user_id:
-        await query.answer(f"user_id: {user_id} wasn't found in data center!", True)
+        await query.answer(f"user_id: {user_id} wasn't found in data center!")
         await query.delete_message()
         return
     
@@ -42,11 +42,11 @@ async def get_chat_data(update, data_center):
     usually made to work after `validate_user` function
     """
     collection_name = data_center.get("collection_name")
-    db_find = data_center.get("db_find")
-    db_vlaue = data_center.get("db_vlaue")
+    search_key = data_center.get("search_key")
+    match_value = data_center.get("match_value")
     
     # Check on memory if not found check on mongodb if not found show error
-    response, database_data = database_search(collection_name, db_find, db_vlaue)
+    response, database_data = database_search(collection_name, search_key, match_value)
     if response == False:
         await update.effective_message.reply_text(database_data)
         return
@@ -64,16 +64,6 @@ async def callbackquery_handler(update: Update, context: ContextTypes.DEFAULT_TY
     if query.data == "query_none":
         await query.answer()
         return
-    
-    query_dict_help = {
-        "query_help_menu": QueryMenus._query_help_menu,
-        "query_help_group_management_p1": QueryBotHelp._query_help_group_management_p1,
-        "query_help_group_management_p2": QueryBotHelp._query_help_group_management_p2,
-        "query_help_ai": QueryBotHelp._query_help_ai,
-        "query_help_misc_functions": QueryBotHelp._query_help_misc_functions,
-        "query_help_owner_functions": QueryBotHelp._query_help_owner_functions,
-        "query_help_bot_info": QueryBotHelp._query_help_bot_info
-    }
 
     query_dict_chat_settings = {
         "query_chat_settings_menu": QueryMenus._query_chat_settings_menu,
@@ -95,27 +85,6 @@ async def callbackquery_handler(update: Update, context: ContextTypes.DEFAULT_TY
         "query_none_links": QueryChatSettings._query_none_links
     }
 
-    query_dict_bot_settings = {
-        "query_bot_pic": QueryBotSettings._query_bot_pic,
-        "query_images": QueryBotSettings._query_images,
-        "query_support_chat": QueryBotSettings._query_support_chat,
-        "query_server_url": QueryBotSettings._query_server_url,
-        "query_sudo": QueryBotSettings._query_sudo,
-        "query_shrinkme_api": QueryBotSettings._query_shrinkme_api,
-        "query_omdb_api": QueryBotSettings._query_omdb_api,
-        "query_weather_api": QueryBotSettings._query_weather_api
-    }
-
-    query_dict_bot_settings_2 = {
-        "query_bot_settings_menu": QueryMenus._query_bot_settings_menu,
-        "query_restore_db": QueryBotSettings._query_restore_db
-    }
-
-    query_dict_bot_settings_3 = {
-        "query_confirm_restore_db": QueryBotSettings._query_confirm_restore_db,
-        "query_clear_memory_cache": QueryBotSettings._query_clear_memory_cache,
-    }
-
     query_dict_broadcast = {
         "query_broadcast_forward_true": {"is_forward": True},
         "query_broadcast_forward_false": {"is_forward": False},
@@ -132,12 +101,7 @@ async def callbackquery_handler(update: Update, context: ContextTypes.DEFAULT_TY
         "query_close": QueryFunctions.query_close
     }
 
-    if query.data in query_dict_help:
-        handler = query_dict_help[query.data]
-        if query.data == "query_help_bot_info":
-            await handler(update, context)
-        else:
-            await handler(update)
+
     
     elif (query.data in query_dict_chat_settings or
           query.data in query_dict_chat_settings_2):
@@ -198,7 +162,7 @@ async def callbackquery_handler(update: Update, context: ContextTypes.DEFAULT_TY
             data_center["broadcast"].update(data)
         
         else:
-            MemoryDB.insert_data("data_center", user_id, {"broadcast": data})
+            MemoryDB.insert("data_center", user_id, {"broadcast": data})
         
         if query.data != "query_broadcast_done":
             data_center = MemoryDB.data_center.get(user.id)
@@ -234,13 +198,13 @@ async def callbackquery_handler(update: Update, context: ContextTypes.DEFAULT_TY
             if not data_center:
                 return
             
-            edit_data_key = data_center.get("edit_data_key")
+            update_data_key = data_center.get("update_data_key")
 
-            if edit_data_key in ["images", "allowed_links_list"]:
+            if update_data_key in ["images", "allowed_links_list"]:
                 is_list = True
-            elif edit_data_key in ["log_channel"]:
+            elif update_data_key in ["log_channel"]:
                 is_int = True
-            elif edit_data_key in ["sudo_users"]:
+            elif update_data_key in ["sudo_users"]:
                 is_list = True
                 is_int = True
             

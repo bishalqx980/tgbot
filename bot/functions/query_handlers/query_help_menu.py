@@ -6,10 +6,34 @@ from telegram.ext import ContextTypes
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB, MongoDB
 
-class QueryBotHelp:
-    async def _query_help_group_management_p1(update: Update):
-        effective_message = update.effective_message
+async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    query = update.callback_query
 
+    # refined query data
+    query_data = query.data.removeprefix("help_menu_")
+
+    # memory access
+    data_center = MemoryDB.data_center.get(user.id)
+    if not data_center:
+        await query.answer("Session Expired.")
+        try:
+            message_id = query.message.message_id
+            await context.bot.delete_messages(user.id, [message_id, message_id - 1])
+        except:
+            pass
+        return
+    
+    # memory accessed data
+    text = data_center.get("text")
+    btn = data_center.get("btn")
+    is_caption = data_center.get("is_caption")
+
+    if query_data == "menu":
+        # Message/Button from memory
+        pass
+
+    elif query_data == "gm1":
         text = (
             "<b>Group Moderation Commands | p:1</b>\n\n"
 
@@ -32,74 +56,48 @@ class QueryBotHelp:
         )
 
         btn_data = [
-            {"Next page →": "query_help_group_management_p2"},
-            {"Back": "query_help_menu", "Close": "query_close"}
+            {"Next page ⇒": "help_menu_gm2"},
+            {"Back": "help_menu_menu", "Close": "help_menu_close"}
         ]
 
         btn = ButtonMaker.cbutton(btn_data)
-
-        if effective_message.text:
-            await effective_message.edit_text(text, reply_markup=btn)
-        elif effective_message.caption:
-            await effective_message.edit_caption(text, reply_markup=btn)
-
-
-    async def _query_help_group_management_p2(update: Update):
-        effective_message = update.effective_message
-
+    
+    elif query_data == "gm2":
         text = (
             "<b>Group Moderation Commands | p:2</b>\n\n"
 
             "• /purge » Delete all messages between replied to current message!\n"
-            "• /purgefrom - /purgeto » Delete all messages between purgefrom & purgeto.\n"
+            "• /purgefrom | /purgeto » Delete all messages between <code>purgefrom</code> and <code>purgeto</code>.\n"
             "• /lock » Lock the chat (member will be unable to send messages etc.)\n"
             "• /unlock » Unlock the chat (back to normal)\n"
-            "• /adminlist » Get chat admins list\n"
+            "• /adminlist » Get chat admins list.\n"
+            "• /filters | /filter | /remove » to see/set/remove custom message/command.\n"
             "• /settings » Settings of chat\n\n"
 
             "<i><b>Note:</b> Send command to get more details about the command functions!\n"
             "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>\n"
-
-            #• /purgefrom | /purgeto » delete every messages between <code>purgefrom</code> and <code>purgeto</code> replied message!
-            #• /filters | /filter | /remove » to see/set/remove custom message/command
         )
 
         btn_data = [
-            {"← Previous page": "query_help_group_management_p1"},
-            {"Back": "query_help_menu", "Close": "query_close"}
+            {"⇐ Previous page": "help_menu_gm1"},
+            {"Back": "help_menu_menu", "Close": "help_menu_close"}
         ]
 
         btn = ButtonMaker.cbutton(btn_data)
-
-        if effective_message.text:
-            await effective_message.edit_text(text, reply_markup=btn)
-        elif effective_message.caption:
-            await effective_message.edit_caption(text, reply_markup=btn)
-
-
-    async def _query_help_ai(update: Update):
-        effective_message = update.effective_message
-
+    
+    elif query_data == "ai":
         text = (
             "<b>AI Tools</b>\n\n"
 
-            "• /imagine » Generate AI image\n"
+            "• /imagine » Generate AI image.\n"
             "• /gpt » Ask any question to AI-LLM\n\n"
 
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
 
-        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-
-        if effective_message.text:
-            await effective_message.edit_text(text, reply_markup=btn)
-        elif effective_message.caption:
-            await effective_message.edit_caption(text, reply_markup=btn)
-
-
-    async def _query_help_misc_functions(update: Update):
-        effective_message = update.effective_message
-
+        btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
+    
+    elif query_data == "misc":
         text = (
             "<b>Misc functions</b>\n\n"
 
@@ -126,17 +124,9 @@ class QueryBotHelp:
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
         )
         
-        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-
-        if effective_message.text:
-            await effective_message.edit_text(text, reply_markup=btn)
-        elif effective_message.caption:
-            await effective_message.edit_caption(text, reply_markup=btn)
-
-
-    async def _query_help_owner_functions(update: Update):
-        effective_message = update.effective_message
-
+        btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
+    
+    elif query_data == "owner":
         text = (
             "<b>Bot owner functions</b>\n\n"
 
@@ -153,18 +143,12 @@ class QueryBotHelp:
             "<i><b>Note:</b> Send command to get more details about the command functions!</i>\n"
         )
         
-        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-
-        if effective_message.text:
-            await effective_message.edit_text(text, reply_markup=btn)
-        elif effective_message.caption:
-            await effective_message.edit_caption(text, reply_markup=btn)
+        btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
     
+    elif query_data == "botinfo":
+        await query.answer("Getting information...")
 
-    async def _query_help_bot_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        effective_message = update.effective_message
-
-        database_info = MongoDB.info_db()
+        database_info = MongoDB.info()
         total_users = None
         total_groups = None
 
@@ -188,7 +172,7 @@ class QueryBotHelp:
         sys_hours, remainder = divmod(sys_uptime.seconds, 3600)
         sys_minute = remainder / 60
 
-        bot_uptime = timedelta(seconds=time() - float(MemoryDB.bot_data.get("bot_uptime", 0)))
+        bot_uptime = timedelta(seconds=time() - float(MemoryDB.bot_data.get("bot_uptime") or 0))
 
         bot_days = bot_uptime.days
         bot_hours, remainder = divmod(bot_uptime.seconds, 3600)
@@ -217,9 +201,18 @@ class QueryBotHelp:
             "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
         )
         
-        btn = ButtonMaker.cbutton([{"Back": "query_help_menu", "Close": "query_close"}])
-
-        if effective_message.text:
-            await effective_message.edit_text(text, reply_markup=btn)
-        elif effective_message.caption:
-            await effective_message.edit_caption(text, reply_markup=btn)
+        btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
+    
+    elif query_data == "close":
+        try:
+            message_id = query.message.message_id
+            await context.bot.delete_messages(user.id, [message_id, message_id - 1])
+        except:
+            pass
+        return
+    
+    # global reply
+    if is_caption:
+        await query.edit_message_caption(text, reply_markup=btn)
+    else:
+        await query.edit_message_text(text, reply_markup=btn)

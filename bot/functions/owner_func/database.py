@@ -23,7 +23,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if not chat_id:
-        database_info = MongoDB.info_db()
+        database_info = MongoDB.info()
         msg_storage = "<b><u>Database</u></b>\n\n"
         for info in database_info:
             info = database_info[info]

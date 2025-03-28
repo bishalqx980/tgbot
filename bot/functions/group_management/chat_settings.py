@@ -4,7 +4,7 @@ from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import logger
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.helper.messages_storage import chat_settings_menu_group
+from bot.helper.messages_storage import chat_settings_menu_group_message
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
@@ -33,15 +33,15 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "user_id": user.id,
         "chat_id": chat.id,
         "collection_name": "groups",
-        "db_find": "chat_id",
-        "db_vlaue": chat.id,
-        "edit_data_key": None,
-        "edit_data_value": None,
+        "search_key": "chat_id",
+        "match_value": chat.id,
+        "update_data_key": None,
+        "update_data_value": None,
         "edit_value_message_id": None,
         "effective_message_id": effective_message.id
     }
     
-    MemoryDB.insert_data("data_center", chat.id, data)
+    MemoryDB.insert("data_center", chat.id, data)
 
     response, database_data = database_search("groups", "chat_id", chat.id)
     if response == False:
@@ -61,7 +61,7 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if allowed_links_list:
         allowed_links_list = ", ".join(allowed_links_list)
 
-    text = chat_settings_menu_group.format(
+    text = chat_settings_menu_group_message.format(
         title,
         chat.id,
         lang,

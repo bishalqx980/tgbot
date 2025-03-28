@@ -27,12 +27,12 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "lang": user.language_code
             }
 
-            MongoDB.insert_single_data("users", data)
-            MemoryDB.insert_data("user_data", user.id, data)
+            MongoDB.insert("users", data)
+            MemoryDB.insert("user_data", user.id, data)
         
         # checking member status & updating database
         active_status = new_status == ChatMember.MEMBER
-        MongoDB.update_db("users", "user_id", user.id, "active_status", active_status)
+        MongoDB.update_data("users", "user_id", user.id, "active_status", active_status)
     
     elif chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
         # checking database entry
@@ -43,8 +43,8 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "title": chat.title
             }
 
-            MongoDB.insert_single_data("groups", data)
-            MemoryDB.insert_data("chat_data", chat.id, data)
+            MongoDB.insert("groups", data)
+            MemoryDB.insert("chat_data", chat.id, data)
         
         if old_status in [ChatMember.LEFT, ChatMember.BANNED] and new_status == ChatMember.MEMBER:
             text = (

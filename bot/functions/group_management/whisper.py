@@ -77,7 +77,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }
         }
 
-        MemoryDB.insert_data("data_center", chat.id, data)
+        MemoryDB.insert("data_center", chat.id, data)
 
     if re_msg:
         whisper_user = re_msg.from_user.mention_html()

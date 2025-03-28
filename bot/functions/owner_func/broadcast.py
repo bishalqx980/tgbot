@@ -41,7 +41,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
     }
 
-    MemoryDB.insert_data("data_center", user.id, data)
+    MemoryDB.insert("data_center", user.id, data)
 
     data_center = MemoryDB.data_center.get(user.id)
     db_broadcast = data_center.get("broadcast")
@@ -148,7 +148,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Forbidden:
             except_count += 1
             exception_user_ids.append(f"Forbidden: <code>{user_id}</code>")
-            MongoDB.update_db("users", "user_id", int(user_id), "active_status", False)
+            MongoDB.update("users", "user_id", int(user_id), "active_status", False)
         
         except Exception as e:
             except_count += 1

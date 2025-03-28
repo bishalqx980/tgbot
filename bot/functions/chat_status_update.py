@@ -1,6 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
+from bot.modules.database import MongoDB
 from bot.modules.database.common import database_search
 from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
 
@@ -23,7 +24,11 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     # handling new chat member
     if effective_message.new_chat_members:
-        victim = effective_message.new_chat_members
+        if len(effective_message.new_chat_members) > 1:
+            await context.bot.send_message(chat.id, "I can't handle this! Too many members are joining at once!")
+            return
+        
+        victim = effective_message.new_chat_members[0]
 
         # Antibot
         if victim.is_bot and antibot:
@@ -66,7 +71,9 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 }
 
                 for key, value in formattings.items():
-                    greeting_message = custom_welcome_msg.replace(key, str(value) if value else "")
+                    custom_welcome_msg = custom_welcome_msg.replace(key, str(value) if value else "")
+                # needs to keep everything simple
+                greeting_message = custom_welcome_msg
             
             else:
                 greeting_message = f"Hi, {victim.mention_html()}! Welcome to {chat.title}!"
@@ -77,7 +84,6 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
     elif effective_message.left_chat_member and farewell_user:
         await context.bot.send_message(chat.id, f"Nice to see you! {effective_message.left_chat_member.mention_html()} has left us!")
     
-
-
-
-
+    # new chat title
+    elif effective_message.new_chat_title:
+        MongoDB.update("groups", "chat_id", chat.id, "title", effective_message.new_chat_title)

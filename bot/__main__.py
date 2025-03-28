@@ -20,10 +20,16 @@ from telegram.constants import ParseMode
 from bot import ENV_CONFIG, DEFAULT_ERROR_CHANNEL_ID, HANDLERS_DIR, bot, logger
 from bot.alive import alive
 from bot.update_db import update_database
-from bot.helper.callbackquery_handler import callbackquery_handler
-from bot.functions.filters.text_caption import filter_text_caption
 from bot.modules import telegraph
 from bot.modules.database import MemoryDB
+from bot.functions.filters.text_caption import filter_text_caption
+from bot.functions.query_handlers import (
+    query_bot_settings,
+    query_chat_settings,
+    query_help_menu,
+    query_misc,
+    query_db_editing
+)
 from bot.functions.sudo_users import fetch_sudos
 from bot.functions.bot_chats_tracker import bot_chats_tracker
 from bot.functions.chat_status_update import chat_status_update
@@ -34,7 +40,7 @@ async def post_boot():
     await telegraph.initialize()
 
     # storing bot uptime
-    MemoryDB.insert_data("bot_data", None, {"bot_uptime": str(time())})
+    MemoryDB.insert("bot_data", None, {"bot_uptime": str(time())})
 
     # bot commands
     bot_commands = [
@@ -176,15 +182,19 @@ def main():
         application.add_handler(PrefixHandler(["!", ".", "-"], command, handler)) # for other prefix command
     
     # storing bot commands
-    MemoryDB.insert_data("bot_data", None, {"bot_commands": storage})
+    MemoryDB.insert("bot_data", None, {"bot_commands": storage})
     
     # filters
     application.add_handler(MessageHandler(filters.TEXT | filters.CAPTION, filter_text_caption))
-    application.add_handler(MessageHandler(filters.StatusUpdate.ALL, chat_status_update))
-    # Chat Member Handler
+    application.add_handler(MessageHandler(filters.StatusUpdate.ALL, chat_status_update)) # chat status update
+    # Bot chat tracker
     application.add_handler(ChatMemberHandler(bot_chats_tracker, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking private chat
-    # Callback button
-    application.add_handler(CallbackQueryHandler(callbackquery_handler))
+    # Callback query handlers
+    application.add_handler(CallbackQueryHandler(query_help_menu.query_help_menu, "help_menu_[A-Za-z0-9]+"))
+    application.add_handler(CallbackQueryHandler(query_bot_settings.query_bot_settings, "bsettings_[A-Za-z0-9]+"))
+    application.add_handler(CallbackQueryHandler(query_chat_settings.query_chat_settings, "csettings_[A-Za-z0-9]+"))
+    # application.add_handler(CallbackQueryHandler(query_misc.query_misc, "misc_query_[A-Za-z0-9]+"))
+    application.add_handler(CallbackQueryHandler(query_db_editing.query_db_editing, "database_[A-Za-z0-9]+"))
     # Error handler
     application.add_error_handler(default_error_handler)
     # Check Updates

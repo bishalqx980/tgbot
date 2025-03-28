@@ -16,16 +16,14 @@ def database_editing(chat, effective_message):
             data_value = int(effective_message.text)
         except ValueError:
             data_value = effective_message.text
+        
+        data = {
+            "update_data_value": data_value,
+            "message_id": effective_message.id
+        }
 
-        MemoryDB.insert_data("data_center", chat.id, {
-            "edit_data_value": data_value,
-            "edit_value_message_id": effective_message.id,
-            "is_editing": False
-        })
+        MemoryDB.insert("data_center", chat.id, data)
         return True
-    
-    else:
-        return False
 
 
 async def chat_custom_filters(user, chat, effective_message, filters):
@@ -65,7 +63,7 @@ async def filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE
         return
     
     is_editing = database_editing(chat, effective_message)
-    if is_editing != False:
+    if is_editing:
         return
     
     if chat.type == ChatType.PRIVATE:

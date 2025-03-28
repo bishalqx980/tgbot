@@ -9,7 +9,7 @@ class QueryChatSettings:
         chat = update.effective_chat
         effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "lang"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "lang"})
         lang = find_chat.get("lang")
 
         text = (
@@ -36,7 +36,7 @@ class QueryChatSettings:
         chat = update.effective_chat
         effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "auto_tr"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "auto_tr"})
         auto_tr = find_chat.get("auto_tr", False)
 
         text = (
@@ -62,7 +62,7 @@ class QueryChatSettings:
         chat = update.effective_chat
         effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "echo"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "echo"})
         echo = find_chat.get("echo", False)
 
         text = (
@@ -88,7 +88,7 @@ class QueryChatSettings:
         chat = update.effective_chat
         effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "welcome_user"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "welcome_user"})
         welcome_user = find_chat.get("welcome_user", False)
 
         text = (
@@ -115,7 +115,7 @@ class QueryChatSettings:
         chat = update.effective_chat
         effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "custom_welcome_msg"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "custom_welcome_msg"})
         custom_welcome_msg = find_chat.get("custom_welcome_msg") or "default message"
         is_sent_below = None
         if len(custom_welcome_msg) > 100:
@@ -157,7 +157,7 @@ class QueryChatSettings:
         chat = update.effective_chat
         effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "farewell_user"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "farewell_user"})
         farewell_user = find_chat.get("farewell_user", False)
 
         text = (
@@ -183,7 +183,7 @@ class QueryChatSettings:
         chat = update.effective_chat
         effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "antibot"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "antibot"})
         antibot = find_chat.get("antibot", False)
 
         text = (
@@ -264,7 +264,7 @@ class QueryChatSettings:
         chat = update.effective_chat
         effective_message = update.effective_message
 
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "allowed_links_list"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "allowed_links_list"})
         allowed_links_list = find_chat.get("allowed_links_list")
         if allowed_links_list:
             allowed_links_list = ", ".join(allowed_links_list)
@@ -291,17 +291,17 @@ class QueryChatSettings:
 
     async def _query_d_links(update: Update, context: ContextTypes.DEFAULT_TYPE, query):
         chat = update.effective_chat
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "is_links_allowed"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "is_links_allowed"})
         await QueryFunctions.query_edit_value(context, chat.id, query, "delete")
 
 
     async def _query_c_links(update: Update, context: ContextTypes.DEFAULT_TYPE, query):
         chat = update.effective_chat
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "is_links_allowed"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "is_links_allowed"})
         await QueryFunctions.query_edit_value(context, chat.id, query, "convert")
     
 
     async def _query_none_links(update: Update, context: ContextTypes.DEFAULT_TYPE, query):
         chat = update.effective_chat
-        MemoryDB.insert_data("data_center", chat.id, {"edit_data_key": "is_links_allowed"})
+        MemoryDB.insert("data_center", chat.id, {"update_data_key": "is_links_allowed"})
         await QueryFunctions.query_edit_value(context, chat.id, query, None)

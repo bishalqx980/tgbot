@@ -7,145 +7,133 @@ class MongoDatabase:
         self.database = self.client[ENV_CONFIG["db_name"]] # for only accessing bot database
     
 
-    def insert_single_data(self, collection_name, data):
+    def insert(self, collection_name, data: dict):
         """
-        `collection_name` example `users` | `data` type: dict
+        :param collection_name: Name of collection. e.g. `users`
+        :param data: `dict` if data
+        :return bool: `True` | `False` | `None`
         """
         try:
-            collection = self.database[collection_name]
-            inserted_data = collection.insert_one(data)
-            if not inserted_data.acknowledged:
-                logger.error(f"{collection_name} wasn't inserted.")
+            coll_data = self.database[collection_name]
+            response = coll_data.insert_one(data)
+
+            return response.acknowledged
         except Exception as e:
             logger.error(e)
 
 
-    def insert_multiple_data(self, collection_name, data):
+    def find_one(self, collection_name, search_key, match_value):
         """
-        `collection_name` example `users` | `data` type: list of dict
+        :param collection_name: Name of collection. e.g. `users`
+        :param search_key: Key to search. e.g. `user_id`
+        :param match_value: Value to match. e.g. `2134776547`
+        :return dict: Speficied search data | `None`
         """
         try:
-            collection = self.database[collection_name]
-            inserted_data = collection.insert_many(data)
-            if not inserted_data.acknowledged:
-                logger.error(f"{collection_name} wasn't inserted.")
-        except Exception as e:
-            logger.error(e)
+            coll_data = self.database[collection_name]
+            document = coll_data.find_one({search_key: match_value})
 
-    def find_one(self, collection_name, search, match):
-        """
-        `collection_name` example `users` | `search` example `user_id` | `match` example `2134776547`\n
-        returns `data` | `None`
-        """
-        try:
-            collection = self.database[collection_name]
-            document = collection.find_one({search: match})
-            if document:
-                return document
+            return document
         except Exception as e:
             logger.error(e)
 
 
-    def find(self, collection_name, search):
+    def find(self, collection_name, search_key):
         """
-        `collection_name` example `users` | `search` example `user_id`\n
-        returns `list` of matched data
+        :param collection_name: Name of collection. e.g. `users`
+        :param search_key: Key to search. e.g. `user_id`
+        :return list: Value `list` of speficied search key | `None`
         """
         try:
-            collection = self.database[collection_name]
-            documents = collection.find({})
-            if not documents:
-                return
-            
+            coll_data = self.database[collection_name]
+            documents = coll_data.find({})
             storage = []
-            for document in documents:
-                doc_value = document.get(search)
+
+            for doc in documents:
+                doc_value = doc.get(search_key)
                 storage.append(doc_value)
+            
             return storage
         except Exception as e:
             logger.error(e)
 
 
-    def get_data(self, collection_name, data):
+    def get(self, collection_name, key):
         """
-        Gets data from single document, which doesn't have multiple documents\n
-        `collection_name` example `bot_data` | `data` example `owner_id`\n
-        returns `data` | `None`
+        *Note: Get data from single doc, which doesn't contain any `sub_collection`*\n
+        :param collection_name: Name of collection. e.g. `bot_data`
+        :param key: Key name to get value. e.g. `owner_id`
+        :return str: Value of specified key | `None`
         """
         try:
-            collection = self.database[collection_name]
-            documents = collection.find_one()
-            doc_data = documents.get(data)
-            if doc_data:
-                return doc_data
+            coll_data = self.database[collection_name]
+            documents = coll_data.find_one()
+            doc_value = documents.get(key)
+            return doc_value
         except Exception as e:
             logger.error(e)
 
 
-    def update_db(self, collection_name, search, match, update_data_key, update_data_value):
+    def update(self, collection_name, search_key, match_value, update_data_key, update_data_value):
         """
-        `collection_name` example `users` | `search` example `user_id` | `match` example `2134776547` |\
-        `update_data_key` example `name` | `update_data_value` example `Bishal`
+        :param collection_name: Name of collection. e.g. `users`
+        :param search_key: Key to search. e.g. `user_id`
+        :param match_value: Value to match. e.g. `2134776547`
+        :param update_data_key: Key of data to update. e.g. `name`
+        :param update_data_value: New `value` of specified key. e.g. `Bishal`
+        :return bool: `True` | `False` | `None`
         """
         try:
-            collection = self.database[collection_name]
-            updated_data = collection.update_one(
-                {search: match},
+            coll_data = self.database[collection_name]
+            response = coll_data.update_one(
+                {search_key: match_value},
                 {"$set": {update_data_key: update_data_value}}
             )
-            if not updated_data.acknowledged:
-                logger.error(f"{collection_name} wasn't updated.")
+
+            return response.acknowledged
         except Exception as e:
             logger.error(e)
 
 
-    def update_db_remove(self, collection_name, search, match, remove_field_key):
+    def info(self, collection_name=None):
         """
-        `collection_name` example `users` | `search` example `user_id` | `match` example `2134776547` |\
-        `remove_field_key` example `name`
+        :param collection_name: Name of collection. e.g. `users`
+        :return dict: Information about whole database or specified `collection` | `None`
         """
         try:
-            collection = self.database[collection_name]
-            updated_data = collection.update_one(
-                {search: match},
-                {"$unset": {remove_field_key: ""}}
-            )
-            if not updated_data.acknowledged:
-                logger.error(f"{collection_name} wasn't updated.")
+            doc_names = self.database.list_collection_names() if not collection_name else [collection_name]
+            all_data = {}
+
+            for coll_name in doc_names:
+                doc_stats = self.database.command("collstats", coll_name)
+
+                data = {
+                    coll_name: {
+                        "name": coll_name,
+                        "quantity": doc_stats['count'],
+                        "size": f"{doc_stats['storageSize'] / (1024 * 1024):.2f} MB",
+                        "acsize": f"{doc_stats['size'] / (1024 * 1024):.2f} MB"
+                    }
+                }
+
+                all_data.update(data)
+            
+            return all_data
         except Exception as e:
             logger.error(e)
 
 
-    def info_db(self, collection_name=None):
+    def delete_collection(self, collection_name):
         """
-        `collection_name`: optional\n
-        returns `dict`
-        """
-        docs_name = self.database.list_collection_names()
-        data_dict = {}
-        for collection_name in docs_name:
-            doc_stats = self.database.command("collstats", collection_name)
-            # stats
-            doc_name = collection_name
-            doc_count = doc_stats['count']
-            doc_size = f"{doc_stats['storageSize'] / (1024 * 1024):.2f} MB"
-            doc_acsize = f"{doc_stats['size'] / (1024 * 1024):.2f} MB"
-
-            data_dict.update({doc_name: {"name": doc_name, "quantity": doc_count, "size": doc_size, "acsize": doc_acsize}})
-        return data_dict
-
-
-    def delete_all_doc(self, collection_name):
-        """
-        delete all data from `collection_name`
+        ***Note: Task can't be undone.***\n
+        :param collection_name: Name of the collection to delete. e.g. `bot_data`
+        :return bool: `True` | `False` | `None`
         """
         try:
-            collection = self.database[collection_name]
-            deleted_data = collection.delete_many({})
-            if not deleted_data.acknowledged:
-                logger.error(f"{collection_name} wasn't deleted.")
-                return False
-            return True
+            coll_data = self.database[collection_name]
+            response = coll_data.delete_many({})
+
+            return response.acknowledged
         except Exception as e:
             logger.error(e)
     

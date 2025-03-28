@@ -1,28 +1,6 @@
 # Commonly used messages storage
 
-help_menu = """
-Hey, {}! Welcome to the bot help section.
-I'm a Telegram bot that manages groups and handles various tasks effortlessly.
-
-• /start - Start the bot
-• /help - To see this message
-
-<b>Note:</b> <i>The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</i>
-"""
-
-bot_settings_menu = """
-<u><b>Bot Settings</b></u>
-• Bot photo: <code>{}</code>
-• Images: <code>{}</code>
-• Support chat: <code>{}</code>
-• Server url: <code>{}</code>
-• Sudo: <code>{}</code>
-• Shrinkme API: <code>{}</code>
-• OMDB API: <code>{}</code>
-• Weather API: <code>{}</code>
-"""
-
-chat_settings_menu_pvt = """
+chat_settings_menu_pvt_message = """
 <u><b>Chat Settings</b></u>
 
 • User: {}
@@ -33,7 +11,7 @@ chat_settings_menu_pvt = """
 • Echo: <code>{}</code>
 """
 
-chat_settings_menu_group = """
+chat_settings_menu_group_message = """
 <u><b>Chat Settings</b></u>
 
 • Title: {}
