@@ -46,9 +46,9 @@ async def get_chat_data(update, data_center):
     match_value = data_center.get("match_value")
     
     # Check on memory if not found check on mongodb if not found show error
-    response, database_data = database_search(collection_name, search_key, match_value)
-    if response == False:
-        await update.effective_message.reply_text(database_data)
+    database_data = database_search(collection_name, search_key, match_value)
+    if not database_data:
+        await update.effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
     return database_data
@@ -66,12 +66,6 @@ async def callbackquery_handler(update: Update, context: ContextTypes.DEFAULT_TY
         return
 
     query_dict_chat_settings = {
-        "query_chat_settings_menu": QueryMenus._query_chat_settings_menu,
-        "query_chat_lang": QueryChatSettings._query_chat_lang,
-        "query_chat_auto_tr": QueryChatSettings._query_chat_auto_tr,
-        "query_chat_set_echo": QueryChatSettings._query_chat_set_echo,
-        "query_chat_welcome_user": QueryChatSettings._query_chat_welcome_user,
-        "query_set_custom_welcome_msg": QueryChatSettings._query_set_custom_welcome_msg,
         "query_chat_farewell_user": QueryChatSettings._query_chat_farewell_user,
         "query_chat_antibot": QueryChatSettings._query_chat_antibot,
         "query_chat_links_behave": QueryChatSettings._query_chat_links_behave,

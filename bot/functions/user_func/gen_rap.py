@@ -10,7 +10,7 @@ async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     hex_data = " ".join(context.args)
 
     if not hex_data:
-        await effective_message.reply_text("Use <code>/rap rap data (hex)</code>\nE.g. <code>/rap D78710F4C0979FAD9CDB40C612C94F60</code>\n<i><b>Note:</b> You will get the rap data after searching content/game using /psndl command.</i>")
+        await effective_message.reply_text("Use <code>/rap rap data (hex)</code>\nE.g. <code>/rap D78710F4C0979FAD9CDB40C612C94F60</code>\n<blockquote><b>Note:</b> You will get the rap data after searching content/game using /psndl command.</blockquote>")
         return
 
     sent_message = await effective_message.reply_text("Creating...")

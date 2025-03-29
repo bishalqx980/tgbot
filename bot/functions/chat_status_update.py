@@ -13,8 +13,8 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
     cause_user = update.effective_user
     effective_message = update.effective_message
 
-    response, database_data = database_search("groups", "chat_id", chat.id)
-    if response == False:
+    database_data = database_search("groups", "chat_id", chat.id)
+    if not database_data:
         return
 
     welcome_user = database_data.get("welcome_user")

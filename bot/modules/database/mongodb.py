@@ -60,7 +60,7 @@ class MongoDatabase:
 
     def get(self, collection_name, key):
         """
-        *Note: Get data from single doc, which doesn't contain any `sub_collection`*\n
+        ***Note: Get data from single doc, which doesn't contain any `sub_collection`***\n
         :param collection_name: Name of collection. e.g. `bot_data`
         :param key: Key name to get value. e.g. `owner_id`
         :return str: Value of specified key | `None`

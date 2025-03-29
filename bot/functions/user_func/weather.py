@@ -29,7 +29,7 @@ async def func_weather(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>Wind:</b> <code>{info['current']['wind_mph']}mph</code> | <code>{info['current']['wind_kph']}kph</code>\n"
         f"<b>Wind (Angle):</b> <code>{info['current']['wind_degree']}°</code>\n"
         f"<b>UV Ray:</b> <code>{info['current']['uv']}</code>\n\n"
-        "<i>Note: ⚠ 8 or higher is harmful for skin!</i>"
+        "<blockquote><b>Note:</b> ⚠ 8 or higher is harmful for skin!</blockquote>"
     )
 
     await effective_message.reply_text(text)

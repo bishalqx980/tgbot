@@ -3,6 +3,8 @@ from time import time
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.error import BadRequest
+from bot import logger
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB, MongoDB
 
@@ -13,26 +15,23 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # refined query data
     query_data = query.data.removeprefix("help_menu_")
 
-    # memory access
-    data_center = MemoryDB.data_center.get(user.id)
-    if not data_center:
-        await query.answer("Session Expired.")
-        try:
-            message_id = query.message.message_id
-            await context.bot.delete_messages(user.id, [message_id, message_id - 1])
-        except:
-            pass
-        return
-    
-    # memory accessed data
-    text = data_center.get("text")
-    btn = data_center.get("btn")
-    is_caption = data_center.get("is_caption")
-
     if query_data == "menu":
-        # Message/Button from memory
-        pass
+        text = (
+            "Hey! Welcome to the bot help section.\n"
+            "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
+            "• /start - Start the bot\n"
+            "• /help - To see this message\n\n"
+            "<blockquote><b>Note:</b> The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</blockquote>"
+        )
 
+        btn_data = [
+            {"Group Management": "help_menu_gm1", "AI": "help_menu_ai"},
+            {"Misc": "help_menu_misc", "Bot owner": "help_menu_owner"},
+            {"» bot.info()": "help_menu_botinfo", "Close": "help_menu_close"}
+        ]
+
+        btn = ButtonMaker.cbutton(btn_data)
+    
     elif query_data == "gm1":
         text = (
             "<b>Group Moderation Commands | p:1</b>\n\n"
@@ -51,8 +50,8 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /mute » Restrict a member (member will be unable to send messages etc.)\n"
             "• /unmute » Unrestrict a restricted member\n\n"
 
-            "<i><b>Note:</b> Send command to get more details about the command functions!"
-            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>"
+            "<blockquote><b>Note:</b> Send command to get more details about the command functions!"
+            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</blockquote>"
         )
 
         btn_data = [
@@ -74,8 +73,8 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /filters | /filter | /remove » to see/set/remove custom message/command.\n"
             "• /settings » Settings of chat\n\n"
 
-            "<i><b>Note:</b> Send command to get more details about the command functions!\n"
-            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</i>\n"
+            "<blockquote><b>Note:</b> Send command to get more details about the command functions!\n"
+            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</blockquote>\n"
         )
 
         btn_data = [
@@ -92,7 +91,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /imagine » Generate AI image.\n"
             "• /gpt » Ask any question to AI-LLM\n\n"
 
-            "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
+            "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
 
         btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
@@ -121,7 +120,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /rap » Generate .rap file <code>hex_code</code> (LICENSE file for PSN file, /psndl to get hex code)\n"
             "• /settings » Settings of chat\n\n"
 
-            "<i><b>Note:</b> Send command to get more details about the command functions!</i>"
+            "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
         
         btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
@@ -140,7 +139,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /log » Get log file (for error handling)\n"
             "• /sys » Get system info\n\n"
 
-            "<i><b>Note:</b> Send command to get more details about the command functions!</i>\n"
+            "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>\n"
         )
         
         btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
@@ -212,7 +211,9 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     # global reply
-    if is_caption:
+    try:
         await query.edit_message_caption(text, reply_markup=btn)
-    else:
+    except BadRequest:
         await query.edit_message_text(text, reply_markup=btn)
+    except Exception as e:
+        logger.error(e)

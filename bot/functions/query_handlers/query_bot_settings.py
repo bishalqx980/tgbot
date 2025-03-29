@@ -1,6 +1,8 @@
 import json
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.error import BadRequest
+from bot import logger
 from bot.update_db import update_database
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB, MongoDB
@@ -12,37 +14,34 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
     # refined query data
     query_data = query.data.removeprefix("bsettings_")
 
-    # memory access
-    data_center = MemoryDB.data_center.get(user.id)
-    if not data_center:
-        await query.answer("Session Expired.")
-        try:
-            message_id = query.message.message_id
-            await context.bot.delete_messages(user.id, [message_id, message_id - 1])
-        except:
-            pass
-        return
-    
-    # memory accessed data
-    text = data_center.get("text") # main menu text
-    btn = data_center.get("btn") # main menu btn
-    is_caption = data_center.get("is_caption")
+    # accessing bot_data
+    bot_data = MemoryDB.bot_data
+
+    # variable required for global reply
     is_editing_btn = None
 
     if query_data == "menu":
-        # accessing bot data
-        bot_data = MemoryDB.bot_data
-        # formatting the message
-        text = text.format(
-            bot_data.get("bot_pic"),
-            len(bot_data.get("images") or []),
-            bot_data.get("support_chat"),
-            bot_data.get("server_url"),
-            len(bot_data.get("sudo_users") or []),
-            bot_data.get("shrinkme_api"),
-            bot_data.get("omdb_api"),
-            bot_data.get("weather_api")
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n"
+            f"• Bot photo: <code>{bot_data.get('bot_pic')}</code>\n"
+            f"• Images: <code>{len(bot_data.get('images') or [])}</code>\n"
+            f"• Support chat: <code>{bot_data.get('support_chat')}</code>\n"
+            f"• Server url: <code>{bot_data.get('server_url')}</code>\n"
+            f"• Sudo: <code>{len(bot_data.get('sudo_users') or [])}</code>\n"
+            f"• Shrinkme API: <code>{bot_data.get('shrinkme_api')}</code>\n"
+            f"• OMDB API: <code>{bot_data.get('omdb_api')}</code>\n"
+            f"• Weather API: <code>{bot_data.get('weather_api')}</code>"
         )
+
+        btn_data = [
+            {"Bot Photo": "bsettings_bot_pic", "Images": "bsettings_images"},
+            {"Support Chat": "bsettings_support_chat", "Server URL": "bsettings_server_url"},
+            {"Sudo": "bsettings_sudo", "Shrinkme API": "bsettings_shrinkme_api"},
+            {"OMDB API": "bsettings_omdb_api", "Weather API": "bsettings_weather_api"},
+            {"> ⁅ Restore DB ⁆": "bsettings_restoredb", "Close": "bsettings_close"}
+        ]
+
+        btn = ButtonMaker.cbutton(btn_data)
     
     elif query_data == "bot_pic":
         MemoryDB.insert("data_center", user.id, {
@@ -54,10 +53,10 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         is_editing_btn = True
 
         text = (
-            "<u><b>Bot Settings</b></u>\n\n"
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Bot Photo (link): <code>{}</code>\n\n"
-            "<i><b>Note:</b> Send an image link to set bot pic!</i>"
-        ).format(MemoryDB.bot_data.get("bot_pic"))
+            "<blockquote><b>Note:</b> Send an image link to set bot pic!</blockquote>"
+        ).format(bot_data.get("bot_pic"))
     
     elif query_data == "images":
         MemoryDB.insert("data_center", user.id, {
@@ -66,13 +65,13 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "is_int": False
         })
 
-        images = MemoryDB.bot_data.get("images")
+        images = bot_data.get("images")
         is_editing_btn = True
 
         text = (
-            "<u><b>Bot Settings</b></u>\n\n"
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Images (link): <code>{}</code>\n\n"
-            "<i><b>Note:</b> Multiple links should be separated by comma.</i>"
+            "<blockquote><b>Note:</b> Multiple links should be separated by comma.</blockquote>"
         ).format(len(images or []))
 
         if images:
@@ -96,10 +95,10 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         is_editing_btn = True
 
         text = (
-            "<u><b>Bot Settings</b></u>\n\n"
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Support Chat (link): <code>{}</code>\n"
-            "<i><b>Note:</b> Group chat link for bot support (optional)</i>"
-        ).format(MemoryDB.bot_data.get("support_chat"))
+            "<blockquote><b>Note:</b> Group chat link for bot support (optional)</blockquote>"
+        ).format(bot_data.get("support_chat"))
     
     elif query_data == "server_url":
         MemoryDB.insert("data_center", user.id, {
@@ -111,10 +110,10 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         is_editing_btn = True
 
         text = (
-            "<u><b>Bot Settings</b></u>\n\n"
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Server URL: <code>{}</code>\n\n"
-            "<i><b>Note:</b> If <code>Server URL</code> isn't provided and bot is deployed on render (free) then bot will fall asleep. (Server Reboot Required)</i>"
-        ).format(MemoryDB.bot_data.get("server_url"))
+            "<blockquote><b>Note:</b> If <code>Server URL</code> isn't provided and bot is deployed on render (free) then bot will fall asleep. (Server Reboot Required)</blockquote>"
+        ).format(bot_data.get("server_url"))
 
     elif query_data == "sudo":
         MemoryDB.insert("data_center", user.id, {
@@ -126,10 +125,10 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         is_editing_btn = True
 
         text = (
-            "<u><b>Bot Settings</b></u>\n\n"
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Sudo users: <code>{}</code>\n\n"
-            "<i><b>Note: (Warning)</b> Sudo users have owner functions access!\nAdd UserID eg. <code>2134776547</code>\nMultiple ID should be separated by comma.</i>"
-        ).format(", ".join(MemoryDB.bot_data.get("sudo_users") or []))
+            "<blockquote><b>Note: (Warning)</b> Sudo users have owner functions access!\nAdd UserID eg. <code>2134776547</code>\nMultiple ID should be separated by comma.</blockquote>"
+        ).format(", ".join(bot_data.get("sudo_users") or []))
 
     elif query_data == "shrinkme_api":
         MemoryDB.insert("data_center", user.id, {
@@ -137,13 +136,14 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "is_list": False,
             "is_int": False
         })
+        
         is_editing_btn = True
 
         text = (
-            "<u><b>Bot Settings</b></u>\n\n"
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Shrinkme API: <code>{}</code>\n\n"
-            "<i><b>Note:</b> This API is for /shorturl command.</i>"
-        ).format(MemoryDB.bot_data.get("shrinkme_api"))
+            "<blockquote><b>Note:</b> This API is for /shorturl command.</blockquote>"
+        ).format(bot_data.get("shrinkme_api"))
     
     elif query_data == "omdb_api":
         MemoryDB.insert("data_center", user.id, {
@@ -155,10 +155,10 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         is_editing_btn = True
 
         text = (
-            "<u><b>Bot Settings</b></u>\n\n"
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "OMDB API: <code>{}</code>\n\n"
-            "<i><b>Note:</b> This API is for /movie command.</i>"
-        ).format(MemoryDB.bot_data.get("omdb_api"))
+            "<blockquote><b>Note:</b> This API is for /movie command.</blockquote>"
+        ).format(bot_data.get("omdb_api"))
     
     elif query_data == "weather_api":
         MemoryDB.insert("data_center", user.id, {
@@ -170,14 +170,14 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         is_editing_btn = True
 
         text = (
-            "<u><b>Bot Settings</b></u>\n\n"
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Weather API: <code>{}</code>\n\n"
-            "<i><b>Note:</b> This API is for /weather command.</i>"
-        ).format(MemoryDB.bot_data.get("weather_api"))
+            "<blockquote><b>Note:</b> This API is for /weather command.</blockquote>"
+        ).format(bot_data.get("weather_api"))
     
     elif query_data == "restoredb":
         text = (
-            "<u><b>Bot Settings</b></u>\n\n"
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             
             "<b>• Restore Database</b>\n"
             "- <i>Delete MongoDB's <code>bot_data</code> and restore from backup in <code>config.env</code></i>\n\n"
@@ -185,7 +185,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "<b>• Wipe Memory Cache</b>\n"
             "- <i>This will clean memory cache.</i>\n\n"
 
-            "<i><b>Note:</b> Use <code>Restore Database</code> with caution!</i>"
+            "<blockquote><b>Note:</b> Use <code>Restore Database</code> with caution!</blockquote>"
         )
 
         btn_data = [
@@ -198,8 +198,6 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
     elif query_data == "restoredb_confirm":
         await query.answer("Restoring Bot Data...")
 
-        # sending backup files
-        bot_data = MemoryDB.bot_data
         # removing unnecessary files
         bot_data.pop("_id", "") # deleteing _id object
         bot_data.pop("bot_commands", "")
@@ -221,8 +219,12 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         # process of deleting...
         response = MongoDB.delete_collection("bot_data")
         if response:
+            bot_data.clear()
             update_database()
-            text = "Database has been restored successfully from <code>config.env</code>"
+            text = (
+                "Database has been restored successfully from <code>config.env</code>\n"
+                "<blockquote><b>Note:</b> Reboot is recommended.</blockquote>"
+            )
         else:
             text = "Something went wrong! Check /log"
         
@@ -257,7 +259,9 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         btn = ButtonMaker.cbutton(btn_data)
     
     # global reply
-    if is_caption:
+    try:
         await query.edit_message_caption(text, reply_markup=btn)
-    else:
+    except BadRequest:
         await query.edit_message_text(text, reply_markup=btn)
+    except Exception as e:
+        logger.error(e)

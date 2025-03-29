@@ -39,9 +39,9 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text(text)
         return
 
-    response, database_data = database_search("groups", "chat_id", chat.id)
-    if response == False:
-        await effective_message.reply_text(database_data)
+    database_data = database_search("groups", "chat_id", chat.id)
+    if not database_data:
+        await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
     filters = database_data.get("filters")

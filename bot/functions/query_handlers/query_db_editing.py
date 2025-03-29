@@ -46,9 +46,14 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sent_message = await context.bot.send_message(chat.id, "Waiting for a new value:", reply_markup=btn)
 
         for i in range(10):
-            # to check is operation cancelled
-            await asyncio.sleep(1)
             data_center = MemoryDB.data_center[chat.id]
+            # to check > is operation cancelled
+            is_editing = data_center.get("is_editing")
+            if not is_editing:
+                await query.answer()
+                return
+            
+            await asyncio.sleep(1)
             update_data_value = data_center.get("update_data_value")
             if update_data_value:
                 break

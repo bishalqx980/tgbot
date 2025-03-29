@@ -5,7 +5,7 @@ class QR:
     def generate_qr(data, file_name="qrcode", size=50):
         """
         :param data: text, url etc.\n
-        Note: `size` multiply with (29 * size = image_pixels)
+        ***Note: `size` multiply with (29 * size = image_pixels)***
         """
         try:
             qr = qrcode.QRCode(

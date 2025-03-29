@@ -67,9 +67,9 @@ async def filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE
         return
     
     if chat.type == ChatType.PRIVATE:
-        response, database_data = database_search("users", "user_id", user.id)
-        if response == False:
-            await effective_message.reply_text(database_data)
+        database_data = database_search("users", "user_id", user.id)
+        if not database_data:
+            await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
             return
         
         echo_status = database_data.get("echo")
@@ -95,9 +95,9 @@ async def filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE
                 await effective_message.reply_text("Chat language code wasn't found! Use /settings to set chat language.", reply_markup=btn)
 
     elif chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
-        response, database_data = database_search("groups", "chat_id", chat.id)
-        if response == False:
-            await effective_message.reply_text(database_data)
+        database_data = database_search("groups", "chat_id", chat.id)
+        if not database_data:
+            await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
             return
         
         is_links_allowed = database_data.get("is_links_allowed") # 3 values: delete; convert; None;

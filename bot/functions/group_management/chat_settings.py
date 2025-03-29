@@ -4,7 +4,6 @@ from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import logger
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.helper.messages_storage import chat_settings_menu_group_message
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
@@ -34,18 +33,14 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "chat_id": chat.id,
         "collection_name": "groups",
         "search_key": "chat_id",
-        "match_value": chat.id,
-        "update_data_key": None,
-        "update_data_value": None,
-        "edit_value_message_id": None,
-        "effective_message_id": effective_message.id
+        "match_value": chat.id
     }
     
     MemoryDB.insert("data_center", chat.id, data)
 
-    response, database_data = database_search("groups", "chat_id", chat.id)
-    if response == False:
-        await effective_message.reply_text(database_data)
+    database_data = database_search("groups", "chat_id", chat.id)
+    if not database_data:
+        await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
     title = database_data.get("title")
@@ -89,10 +84,11 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if photo:
         try:
             await effective_message.reply_photo(photo, text, reply_markup=btn)
+            return
         except BadRequest:
-            photo = None
+            pass
         except Exception as e:
             logger.error(e)
     
-    if not photo:
-        await effective_message.reply_text(text, reply_markup=btn)
+    # if BadRequest or No Photo
+    await effective_message.reply_text(text, reply_markup=btn)

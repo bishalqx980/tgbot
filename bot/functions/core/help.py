@@ -19,11 +19,11 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     text = (
-        f"Hey, {user.first_name}! Welcome to the bot help section.\n"
+        "Hey! Welcome to the bot help section.\n"
         "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
         "• /start - Start the bot\n"
         "• /help - To see this message\n\n"
-        "<b>Note:</b> <i>The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</i>"
+        "<blockquote><b>Note:</b> The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</blockquote>"
     )
 
     btn_data = [
@@ -40,19 +40,14 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if photo:
         try:
             await effective_message.reply_photo(photo, text, reply_markup=btn)
+            return
         except BadRequest:
-            photo = None
+            pass
         except Exception as e:
             logger.error(e)
     
-    if not photo:
-        await effective_message.reply_text(text, reply_markup=btn)
+    # if BadRequest or No Photo
+    await effective_message.reply_text(text, reply_markup=btn)
     
-    data = {
-        "text": text,
-        "btn": btn,
-        "is_caption": bool(photo)
-    }
-
-    MemoryDB.insert("data_center", user.id, data)
-    database_add_user(user) # database entry checking if user is registered.
+    # database entry checking if user is registered.
+    database_add_user(user)

@@ -42,7 +42,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"{msg_storage}" # already has 2 escapes
             f"<b>• Active users:</b> <code>{active_users}</code>\n"
             f"<b>• Inactive users:</b> <code>{inactive_users}</code>\n\n"
-            f"<i>Note: <code>/database chat_id</code> to get specific chat database information.</i>"
+            f"<blockquote><b>Note:</b> <code>/database ChatID</code> to get specific chat database information.</blockquote>"
         )
 
         await effective_message.reply_text(text)
