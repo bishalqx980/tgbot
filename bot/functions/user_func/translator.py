@@ -45,9 +45,9 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
             to_find = "chat_id"
             to_match = chat.id
 
-        response, database_data = database_search(collection_name, to_find, to_match)
-        if response == False:
-            await effective_message.reply_text(database_data)
+        database_data = database_search(collection_name, to_find, to_match)
+        if not database_data:
+            await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
             return
         
         lang_code = database_data.get("lang")

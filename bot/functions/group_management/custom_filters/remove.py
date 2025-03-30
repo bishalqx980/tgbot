@@ -39,18 +39,18 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text(text)
         return
 
-    response, database_data = database_search("groups", "chat_id", chat.id)
-    if response == False:
-        await effective_message.reply_text(database_data)
+    database_data = database_search("groups", "chat_id", chat.id)
+    if not database_data:
+        await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
     filters = database_data.get("filters")
 
     if filters and keyword:
         if keyword == "clear_all":
-            MongoDB.update_db("groups", "chat_id", chat.id, "filters", None)
+            MongoDB.update("groups", "chat_id", chat.id, "filters", None)
             group_data = MongoDB.find_one("groups", "chat_id", chat.id)
-            MemoryDB.insert_data("chat_data", chat.id, group_data)
+            MemoryDB.insert("chat_data", chat.id, group_data)
 
             await effective_message.reply_text("All filters of this chat has been removed!")
             return
@@ -58,7 +58,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             if keyword.lower() in filters:
                 del filters[keyword]
-                MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
+                MongoDB.update("groups", "chat_id", chat.id, "filters", filters)
                 await effective_message.reply_text(f"Filter <code>{keyword}</code> has been removed!")
             
             else:
@@ -66,7 +66,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
             
             group_data = MongoDB.find_one("groups", "chat_id", chat.id)
-            MemoryDB.insert_data("chat_data", chat.id, group_data)
+            MemoryDB.insert("chat_data", chat.id, group_data)
         except Exception as e:
             logger.error(e)
             await effective_message.reply_text(str(e))

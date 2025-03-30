@@ -55,7 +55,7 @@ async def func_movie(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>📊 IMDB Votes:</b> {movie_info.get('imdbVotes')}\n"
         f"<b>🏷 IMDB ID:</b> <code>{movie_info.get('imdbID')}</code>\n"
         f"<b>💰 BoxOffice:</b> {movie_info.get('BoxOffice')}\n\n"
-        f"<b>📝 Plot:</b>\n<blockquote>{movie_info.get('Plot')}</blockquote>\n"
+        f"<b>📝 Plot:</b>\n<blockquote>{movie_info.get('Plot')}</blockquote>"
     )
 
     photo = movie_info["Poster"]

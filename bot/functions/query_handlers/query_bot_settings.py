@@ -1,0 +1,266 @@
+import json
+from telegram import Update
+from telegram.ext import ContextTypes
+from telegram.error import BadRequest
+from bot import logger
+from bot.update_db import update_database
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
+from bot.modules.database import MemoryDB, MongoDB
+
+async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    query = update.callback_query
+
+    # refined query data
+    query_data = query.data.removeprefix("bsettings_")
+
+    # accessing bot_data
+    bot_data = MemoryDB.bot_data
+
+    # variable required for global reply
+    is_editing_btn = None
+
+    if query_data == "menu":
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            f"• Bot photo: <code>{bot_data.get('bot_pic')}</code>\n"
+            f"• Images: <code>{len(bot_data.get('images') or [])}</code>\n"
+            f"• Support chat: <code>{bot_data.get('support_chat')}</code>\n"
+            f"• Server url: <code>{bot_data.get('server_url')}</code>\n"
+            f"• Sudo: <code>{len(bot_data.get('sudo_users') or [])}</code>\n"
+            f"• Shrinkme API: <code>{bot_data.get('shrinkme_api')}</code>\n"
+            f"• OMDB API: <code>{bot_data.get('omdb_api')}</code>\n"
+            f"• Weather API: <code>{bot_data.get('weather_api')}</code>"
+        )
+
+        btn_data = [
+            {"Bot Photo": "bsettings_bot_pic", "Images": "bsettings_images"},
+            {"Support Chat": "bsettings_support_chat", "Server URL": "bsettings_server_url"},
+            {"Sudo": "bsettings_sudo", "Shrinkme API": "bsettings_shrinkme_api"},
+            {"OMDB API": "bsettings_omdb_api", "Weather API": "bsettings_weather_api"},
+            {"> ⁅ Restore DB ⁆": "bsettings_restoredb", "Close": "bsettings_close"}
+        ]
+
+        btn = ButtonMaker.cbutton(btn_data)
+    
+    elif query_data == "bot_pic":
+        MemoryDB.insert("data_center", user.id, {
+            "update_data_key": "bot_pic",
+            "is_list": False,
+            "is_int": False
+        })
+
+        is_editing_btn = True
+
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            "Bot Photo (link): <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> Send an image link to set bot pic!</blockquote>"
+        ).format(bot_data.get("bot_pic"))
+    
+    elif query_data == "images":
+        MemoryDB.insert("data_center", user.id, {
+            "update_data_key": "images",
+            "is_list": True,
+            "is_int": False
+        })
+
+        images = bot_data.get("images")
+        is_editing_btn = True
+
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            "Images (link): <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> Multiple links should be separated by comma.</blockquote>"
+        ).format(len(images or []))
+
+        if images:
+            await query.answer("Sending images links...")
+
+            with open("temp/images.txt", "w") as f:
+                f.write("\n".join(images))
+            
+            with open("temp/images.txt", "rb") as f:
+                images_binary = f.read()
+        
+            await context.bot.send_document(user.id, images_binary, f"Total images: {len(images)}", filename="images.txt")
+    
+    elif query_data == "support_chat":
+        MemoryDB.insert("data_center", user.id, {
+            "update_data_key": "support_chat",
+            "is_list": False,
+            "is_int": False
+        })
+
+        is_editing_btn = True
+
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            "Support Chat (link): <code>{}</code>\n"
+            "<blockquote><b>Note:</b> Group chat link for bot support (optional)</blockquote>"
+        ).format(bot_data.get("support_chat"))
+    
+    elif query_data == "server_url":
+        MemoryDB.insert("data_center", user.id, {
+            "update_data_key": "server_url",
+            "is_list": False,
+            "is_int": False
+        })
+
+        is_editing_btn = True
+
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            "Server URL: <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> If <code>Server URL</code> isn't provided and bot is deployed on render (free) then bot will fall asleep. (Server Reboot Required)</blockquote>"
+        ).format(bot_data.get("server_url"))
+
+    elif query_data == "sudo":
+        MemoryDB.insert("data_center", user.id, {
+            "update_data_key": "sudo_users",
+            "is_list": True,
+            "is_int": True
+        })
+
+        is_editing_btn = True
+
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            "Sudo users: <code>{}</code>\n\n"
+            "<blockquote><b>Note: (Warning)</b> Sudo users have owner functions access!\nAdd UserID eg. <code>2134776547</code>\nMultiple ID should be separated by comma.</blockquote>"
+        ).format(", ".join(bot_data.get("sudo_users") or []))
+
+    elif query_data == "shrinkme_api":
+        MemoryDB.insert("data_center", user.id, {
+            "update_data_key": "shrinkme_api",
+            "is_list": False,
+            "is_int": False
+        })
+        
+        is_editing_btn = True
+
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            "Shrinkme API: <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> This API is for /shorturl command.</blockquote>"
+        ).format(bot_data.get("shrinkme_api"))
+    
+    elif query_data == "omdb_api":
+        MemoryDB.insert("data_center", user.id, {
+            "update_data_key": "omdb_api",
+            "is_list": False,
+            "is_int": False
+        })
+        
+        is_editing_btn = True
+
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            "OMDB API: <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> This API is for /movie command.</blockquote>"
+        ).format(bot_data.get("omdb_api"))
+    
+    elif query_data == "weather_api":
+        MemoryDB.insert("data_center", user.id, {
+            "update_data_key": "weather_api",
+            "is_list": False,
+            "is_int": False
+        })
+        
+        is_editing_btn = True
+
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            "Weather API: <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> This API is for /weather command.</blockquote>"
+        ).format(bot_data.get("weather_api"))
+    
+    elif query_data == "restoredb":
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            "<b>• Restore Database</b>\n"
+            "- <i>Delete MongoDB's <code>bot_data</code> and restore from backup in <code>config.env</code></i>\n\n"
+
+            "<b>• Wipe Memory Cache</b>\n"
+            "- <i>This will clean memory cache.</i>\n\n"
+
+            "<blockquote><b>Note:</b> Use <code>Restore Database</code> with caution!</blockquote>"
+        )
+
+        btn_data = [
+            {"Restore Database": "bsettings_restoredb_confirm", "Wipe Memory Cache": "bsettings_wipe_memory"},
+            {"Back": "bsettings_menu", "Close": "bsettings_close"}
+        ]
+
+        btn = ButtonMaker.cbutton(btn_data)
+    
+    elif query_data == "restoredb_confirm":
+        await query.answer("Restoring Bot Data...")
+
+        # removing unnecessary files
+        bot_data.pop("_id", "") # deleteing _id object
+        bot_data.pop("bot_commands", "")
+        bot_data.pop("bot_uptime", "")
+
+        with open("temp/backup_database.json", "w") as f:
+            json.dump(bot_data, f, indent=4)
+        
+        with open("temp/backup_database.json", "rb") as f:
+            db_backup = f.read()
+        
+        await context.bot.send_document(
+            user.id,
+            db_backup,
+            "Database Backup File",
+            filename="backup_database.json"
+        )
+
+        # process of deleting...
+        response = MongoDB.delete_collection("bot_data")
+        if response:
+            bot_data.clear()
+            update_database()
+            text = (
+                "Database has been restored successfully from <code>config.env</code>\n"
+                "<blockquote><b>Note:</b> Reboot is recommended.</blockquote>"
+            )
+        else:
+            text = "Something went wrong! Check /log"
+        
+        await context.bot.send_message(user.id, text)
+        return # don't want to edit message by global reply
+    
+    elif query_data == "wipe_memory":
+        await query.answer("Cleaning Memory Cache...")
+
+        MemoryDB.clear_all()
+        update_database()
+
+        await context.bot.send_message(user.id, "Memory Cache has been cleaned!")
+        return # don't want to edit message by global reply
+    
+    elif query_data == "close":
+        try:
+            message_id = query.message.message_id
+            await context.bot.delete_messages(user.id, [message_id, message_id - 1])
+        except:
+            pass
+        return # don't want to edit message by global reply
+    
+    # common editing keyboard buttons
+    if is_editing_btn:
+        btn_data = [
+            {"Edit Value": "database_edit_value"},
+            {"Remove Value": "database_rm_value"},
+            {"Back": "bsettings_menu", "Close": "bsettings_close"}
+        ]
+
+        btn = ButtonMaker.cbutton(btn_data)
+    
+    # global reply
+    try:
+        await query.edit_message_caption(text, reply_markup=btn)
+    except BadRequest:
+        await query.edit_message_text(text, reply_markup=btn)
+    except Exception as e:
+        logger.error(e)

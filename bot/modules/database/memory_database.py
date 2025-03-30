@@ -8,7 +8,7 @@ class MemoryDatabase:
         self.data_center = {}
     
 
-    def insert_data(self, collection_name, identifier=None, data=None):
+    def insert(self, collection_name, identifier=None, data=None):
         """
         Available `collection_name`'s:\n
         (`bot_data`, `user_data`, `chat_data`, `data_center`)

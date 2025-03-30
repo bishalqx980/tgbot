@@ -40,13 +40,13 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     if context.bot.id != ORIGINAL_BOT_ID:
-        text += f"\n\n<i>Cloned bot of @{ORIGINAL_BOT_USERNAME}</i>"
+        text += f"\n\n<blockquote>Cloned bot of @{ORIGINAL_BOT_USERNAME}</blockquote>"
 
-    btn_data = [{"Add me to your chat": f"{context.bot.link}?startgroup=help"}]
+    btn_data = {"Add me to your chat": f"{context.bot.link}?startgroup=help"}
     if support_chat:
-        btn_data.append({"Support Chat": support_chat})
+        btn_data.update({"Support Chat": support_chat})
     
-    btn = ButtonMaker.ubutton(btn_data)
+    btn = ButtonMaker.ubutton([btn_data])
     if bot_pic:
         try:
             await effective_message.reply_photo(bot_pic, text, reply_markup=btn)

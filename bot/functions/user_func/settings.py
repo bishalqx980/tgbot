@@ -19,42 +19,33 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     data = {
-        "user_id": user.id,
-        "chat_id": chat.id,
+        "user_id": user.id, # authorization
         "collection_name": "users",
-        "db_find": "user_id",
-        "db_vlaue": user.id,
-        "edit_data_key": None,
-        "edit_data_value": None,
-        "edit_value_message_id": None,
-        "effective_message_id": effective_message.id
+        "search_key": "user_id",
+        "match_value": user.id
     }
 
-    MemoryDB.insert_data("data_center", chat.id, data)
+    MemoryDB.insert("data_center", user.id, data)
 
-    response, database_data = database_search("users", "user_id", user.id)
-    if response == False:
-        await effective_message.reply_text(database_data)
+    database_data = database_search("users", "user_id", user.id)
+    if not database_data:
+        await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
-    user_mention = database_data.get("mention")
-    lang = database_data.get("lang")
-    echo = database_data.get("echo", False)
-    auto_tr = database_data.get("auto_tr", False)
-
     text = (
-        "<u><b>Chat Settings</b></u>\n\n"
-        f"• User: {user_mention}\n"
-        f"• ID: <code>{chat.id}</code>\n\n"
+        "<blockquote><b>Chat Settings</b></blockquote>\n\n"
 
-        f"• Lang: <code>{lang}</code>\n"
-        f"• Echo: <code>{echo}</code>\n"
-        f"• Auto tr: <code>{auto_tr}</code>\n\n"
+        f"• Name: {user.mention_html()}\n"
+        f"• ID: <code>{user.id}</code>\n\n"
+
+        f"• Language: <code>{database_data.get('lang')}</code>\n"
+        f"• Auto translate: <code>{database_data.get('auto_tr') or False}</code>\n"
+        f"• Echo: <code>{database_data.get('echo') or False}</code>"
     )
 
     btn_data = [
-        {"Language": "query_chat_lang", "Auto translate": "query_chat_auto_tr"},
-        {"Echo": "query_chat_set_echo", "Close": "query_close"}
+        {"Language": "csettings_lang", "Auto translate": "csettings_auto_tr"},
+        {"Echo": "csettings_echo", "Close": "csettings_close"}
     ]
 
     btn = ButtonMaker.cbutton(btn_data)
@@ -65,10 +56,11 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if photo:
         try:
             await effective_message.reply_photo(photo, text, reply_markup=btn)
+            return
         except BadRequest:
-            photo = None
+            pass
         except Exception as e:
             logger.error(e)
     
-    if not photo:
-        await effective_message.reply_text(text, reply_markup=btn)
+    # if BadRequest or No Photo
+    await effective_message.reply_text(text, reply_markup=btn)

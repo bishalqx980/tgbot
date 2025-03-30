@@ -41,7 +41,7 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"<b>• Rap data »</b> <code>/rap {game_data.get('rap_data')}</code>\n"
                 f"<b>• Desc:</b> <code>{game_data.get('desc')}</code>\n"
                 f"<b>• Author:</b> <code>{game_data.get('author')}</code>\n\n"
-                "<i><b>Note:</b> To get rap file send the rap data with command /rap</i>\n\n"
+                "<blockquote><b>Note:</b> To get rap file send the rap data with command /rap</blockquote>\n\n"
             )
     
     msg, counter, links = "", 0, []

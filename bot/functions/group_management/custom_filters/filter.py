@@ -40,7 +40,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "effective_message_id": effective_message.id
         }
 
-        MemoryDB.insert_data("data_center", chat.id, data)
+        MemoryDB.insert("data_center", chat.id, data)
 
         text = (
             "To set filters for this chat follow the instruction below...\n"
@@ -63,9 +63,9 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text(text, reply_markup=btn)
         return
 
-    response, database_data = database_search("groups", "chat_id", chat.id)
-    if response == False:
-        await effective_message.reply_text(database_data)
+    database_data = database_search("groups", "chat_id", chat.id)
+    if not database_data:
+        await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
     filters = database_data.get("filters")
@@ -79,15 +79,15 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = {}
         for keyword in keywords:
             data.update({keyword: value})
-        MongoDB.update_db("groups", "chat_id", chat.id, "filters", data)
+        MongoDB.update("groups", "chat_id", chat.id, "filters", data)
     
     else:
         for keyword in keywords:
             filters[keyword] = value
-        MongoDB.update_db("groups", "chat_id", chat.id, "filters", filters)
+        MongoDB.update("groups", "chat_id", chat.id, "filters", filters)
     
     group_data = MongoDB.find_one("groups", "chat_id", chat.id)
-    MemoryDB.insert_data("chat_data", chat.id, group_data)
+    MemoryDB.insert("chat_data", chat.id, group_data)
     msg_keywords = ", ".join(keywords)
     
     await effective_message.reply_text(f"{msg_keywords} filters added!")

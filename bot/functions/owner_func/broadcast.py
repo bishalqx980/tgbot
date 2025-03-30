@@ -29,46 +29,59 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not re_msg:
         await effective_message.reply_text("Reply a message to broadcast!")
         return
-    
-    data = {
-        "user_id": user.id,
-        "chat_id": chat.id,
-        "effective_message_id": effective_message.id,
-        "broadcast": {
-            "is_forward": False,
-            "is_pin": False,
-            "is_done": False
-        }
-    }
 
-    MemoryDB.insert_data("data_center", user.id, data)
-
-    data_center = MemoryDB.data_center.get(user.id)
-    db_broadcast = data_center.get("broadcast")
-    is_forward = db_broadcast.get("is_forward", False)
-    is_pin = db_broadcast.get("is_pin", False)
-    
     text = (
-        "<b><u>Broadcast</u></b>\n\n"
-        f"Forward: <code>{is_forward}</code>\n"
-        f"Pin message: <code>{is_pin}</code>"
+        "<blockquote><b>Broadcast</b></blockquote>\n\n"
+
+        "Forward Message: <code>{}</code>\n"
+        "Pin Message: <code>{}</code>"
     )
 
     btn_data = [
-        {"Forward?": "query_none", "YES": "query_broadcast_forward_true", "NO": "query_broadcast_forward_false"},
-        {"Pin message?": "query_none", "YES": "query_broadcast_pin_true", "NO": "query_broadcast_pin_false"},
-        {"Done": "query_broadcast_done", "Close": "query_close"}
+        {"Forward Message?": "misc_none", "YES": "misc_broadcast_forward_true", "NO": "misc_broadcast_forward_false"},
+        {"Pin Message?": "misc_none", "YES": "misc_broadcast_pin_true", "NO": "misc_broadcast_pin_false"},
+        {"Done": "misc_broadcast_done", "Cancel": "misc_broadcast_cancel"}
     ]
 
     btn = ButtonMaker.cbutton(btn_data)
+
+    # storing required data in datacenter
+    data = {
+        "broadcast": {
+            "text": text,
+            "btn": btn,
+            "is_forward": False,
+            "is_pin": False,
+            "is_done": False,
+            "is_cancelled": False
+        }
+    }
+
+    MemoryDB.insert("data_center", user.id, data)
+
+    # accessing datacenter broadcast_data
+    broadcast_data = MemoryDB.data_center[user.id]["broadcast"]
+
+    # formatting message
+    text = text.format(
+        broadcast_data.get("is_forward") or False,
+        broadcast_data.get("is_pin") or False
+    )
+    
     sent_message = await effective_message.reply_text(text, reply_markup=btn)
 
     for i in range(30):
         await asyncio.sleep(1)
         data_center = MemoryDB.data_center.get(user.id)
         is_done = data_center["broadcast"]["is_done"]
+        is_cancelled = data_center["broadcast"]["is_cancelled"]
+
         if is_done:
             break
+
+        elif is_cancelled:
+            await context.bot.edit_message_text("<blockquote><b>Broadcast cancelled!</b></blockquote>", chat.id, sent_message.id)
+            return
     
     if not is_done:
         await context.bot.edit_message_text("Oops, Timeout!", chat.id, sent_message.id)
@@ -90,19 +103,30 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 active_users.append(active_user_id)
 
     else:
-        logger.error(f"UserID: {len(users_id)} and ActiveStatus: {len(active_status)}")
+        logger.error(f"Error: UserID {len(users_id)} and ActiveStatus {len(active_status)} aren't equal.")
         active_users = users_id
     
     sent_count, except_count, pin_except_count = 0, 0, 0
     exception_user_ids = []
 
-    notify_btn = ButtonMaker.cbutton([{"Cancel": "query_close"}])
+    notify_btn = ButtonMaker.cbutton([{"Cancel": "misc_broadcast_cancel"}])
     notify_message = await effective_message.reply_text(f"Total users: {len(users_id)}\nActive users: {len(active_users)}", reply_markup=notify_btn)
 
     start_time = time()
 
     for user_id in active_users:
         sent_message = None
+        is_cancelled = data_center["broadcast"]["is_cancelled"]
+
+        if is_cancelled:
+            text = (
+                "<blockquote><b>Broadcast Cancelled</b></blockquote>\n\n"
+                f"{notify_message.text_html}"
+            )
+
+            await context.bot.edit_message_text(text, chat.id, notify_message.id)
+            return
+        
         try:
             if is_forward:
                 sent_message = await context.bot.forward_message(user_id, chat.id, re_msg.id)
@@ -147,14 +171,14 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         except Forbidden:
             except_count += 1
-            exception_user_ids.append(f"Forbidden: <code>{user_id}</code>")
-            MongoDB.update_db("users", "user_id", int(user_id), "active_status", False)
+            exception_user_ids.append(f"Forbidden: {user_id}")
+            MongoDB.update("users", "user_id", int(user_id), "active_status", False)
         
         except Exception as e:
             except_count += 1
-            exception_user_ids.append(f"{str(e)}: <code>{user_id}</code>")
+            exception_user_ids.append(f"{str(e)}: {user_id}")
         
-        if is_pin:
+        if is_pin and sent_message:
             try:
                 await context.bot.pin_chat_message(user_id, sent_message.id)
             except Exception as e:
@@ -171,21 +195,11 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<b>Pin exception:</b> <code>{pin_except_count}</code>\n"
             f"<b>Progress:</b> <code>{(progress):.2f}%</code>"
         )
-
+        # cancel btn will be removed if broadcast done
         btn = None if (sent_count + except_count) == len(active_users) else notify_btn
-
-        try:
-            await context.bot.edit_message_text(updated_text, chat.id, notify_message.id, reply_markup=btn)
-        except BadRequest:
-            text = (
-                "<b>⚠️ Operation cancelled!</b>\n\n"
-                "<b>• Progress</b>\n"
-                f"{updated_text}"
-            )
-            await effective_message.reply_text(text)
-            return
-        
-        await asyncio.sleep(0.5) # sleep for 0.5 sec       
+        # update notify message
+        notify_message = await context.bot.edit_message_text(updated_text, chat.id, notify_message.id, reply_markup=btn)
+        await asyncio.sleep(0.5) # sleep for 0.5 sec
     
     end_time = time()
     if (end_time - start_time) > 60:
@@ -193,8 +207,20 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         time_took = f"{(end_time - start_time):.2f} sec"
     
-    text = f"✅ Broadcast Done!\nTime took: <code>{time_took}</code>"
-    if len(exception_user_ids) > 0:
-        text += f"\nException UserID's: {exception_user_ids}"
     
-    await effective_message.reply_text(f"<b>{text}</b>")
+    text = (
+        f"<blockquote><b>Broadcast Done</b> [<code>{time_took}</code>]</blockquote>\n\n"
+        f"{notify_message.text_html}"
+    )
+
+    await context.bot.edit_message_text(text, chat.id, notify_message.id)
+
+    if exception_user_ids:
+        with open("temp/exception_user_ids.txt", "w") as f:
+            f.write(", ".join(exception_user_ids))
+        
+        with open("temp/exception_user_ids.txt", "rb") as f:
+            exception_file = f.read()
+        
+        file_name = f"Exception Users ID: {len(exception_user_ids)}" # used for caption too
+        await context.bot.send_document(chat.id, exception_file, file_name, filename=f"{file_name}.txt")
