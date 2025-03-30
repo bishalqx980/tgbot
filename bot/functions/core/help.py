@@ -3,6 +3,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import BadRequest
+from telegram.helpers import create_deep_linked_url
 from bot import logger
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB
@@ -14,7 +15,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
 
     if chat.type != ChatType.PRIVATE:
-        btn = ButtonMaker.ubutton([{"Click here for help": f"{context.bot.link}?start=help"}])
+        btn = ButtonMaker.ubutton([{"Click here for help": create_deep_linked_url(context.bot.username, "help")}])
         await effective_message.reply_text(f"Hey, {user.first_name}\nContact me in PM for help!", reply_markup=btn)
         return
     

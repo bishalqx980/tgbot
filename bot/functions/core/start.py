@@ -1,6 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
+from telegram.helpers import create_deep_linked_url
 from bot import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, ENV_CONFIG, logger
 from bot.functions.core.help import func_help
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
@@ -22,7 +23,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if chat.type != ChatType.PRIVATE:
-        btn = ButtonMaker.ubutton([{"Start me in PM": f"{context.bot.link}?start=start"}])
+        btn = ButtonMaker.ubutton([{"Start me in PM": create_deep_linked_url(context.bot.username, "start")}])
         await effective_message.reply_text(f"Hey, {user.first_name}\nStart me in PM!", reply_markup=btn)
         return
 
@@ -42,7 +43,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.bot.id != ORIGINAL_BOT_ID:
         text += f"\n\n<blockquote>Cloned bot of @{ORIGINAL_BOT_USERNAME}</blockquote>"
 
-    btn_data = {"Add me to your chat": f"{context.bot.link}?startgroup=help"}
+    btn_data = {"Add me to your chat": create_deep_linked_url(context.bot.username, "help", True)}
     if support_chat:
         btn_data.update({"Support Chat": support_chat})
     
