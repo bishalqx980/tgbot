@@ -22,7 +22,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     if query_data == "menu":
         text = (
-            "<blockquote><b>Bot Settings</b></blockquote>\n"
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             f"• Bot photo: <code>{bot_data.get('bot_pic')}</code>\n"
             f"• Images: <code>{len(bot_data.get('images') or [])}</code>\n"
             f"• Support chat: <code>{bot_data.get('support_chat')}</code>\n"
@@ -178,7 +178,6 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
     elif query_data == "restoredb":
         text = (
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
-            
             "<b>• Restore Database</b>\n"
             "- <i>Delete MongoDB's <code>bot_data</code> and restore from backup in <code>config.env</code></i>\n\n"
 

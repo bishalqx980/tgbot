@@ -22,7 +22,10 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             message_id = query.message.message_id
             await context.bot.delete_messages(chat.id, [message_id, message_id - 1])
         except:
-            pass
+            try:
+                await query.delete_message()
+            except:
+                pass
         return
     
     # verifying user
@@ -60,7 +63,31 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             btn = ButtonMaker.cbutton(btn_data)
         
         else:
-            pass
+            text = (
+                "<blockquote><b>Chat Settings</b></blockquote>\n\n"
+
+                f"• Title: {chat.title}\n"
+                f"• ID: <code>{chat.id}</code>\n\n"
+
+                f"• Language: <code>{memory_data.get('lang')}</code>\n"
+                f"• Auto translate: <code>{memory_data.get('auto_tr') or False}</code>\n"
+                f"• Echo: <code>{memory_data.get('echo') or False}</code>\n"
+                f"• Antibot: <code>{memory_data.get('antibot') or False}</code>\n"
+                f"• Welcome Members: <code>{memory_data.get('welcome_user') or False}</code>\n"
+                f"• Farewell Members: <code>{memory_data.get('farewell_user') or False}</code>\n"
+                f"• Links Behave: <code>{memory_data.get('links_behave')}</code>\n"
+                f"• Allowed Links: <code>{', '.join(memory_data.get('allowed_links') or [])}</code>"
+            )
+
+            btn_data = [
+                {"Language": "csettings_lang", "Auto translate": "csettings_auto_tr"},
+                {"Echo": "csettings_echo", "Antibot": "csettings_antibot"},
+                {"Welcome Members": "csettings_welcome_user", "Farewell Members": "csettings_farewell_user"},
+                {"Links Behave": "csettings_links_behave", "Allowed Links": "csettings_allowed_links"},
+                {"Close": "csettings_close"}
+            ]
+
+            btn = ButtonMaker.cbutton(btn_data)
     
     elif query_data == "lang":
         MemoryDB.insert("data_center", chat.id, {
@@ -107,6 +134,21 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Note:</b> This will echo user messages.</blockquote>"
         ).format(memory_data.get("echo") or False)
     
+    elif query_data == "antibot":
+        MemoryDB.insert("data_center", chat.id, {
+            "update_data_key": "antibot",
+            "is_list": False,
+            "is_int": False
+        })
+
+        is_boolean_btn = True
+
+        text = (
+            "<blockquote><b>Chat Settings</b></blockquote>\n\n"
+            "Antibot: <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> If someone try to add bots in chat, this will kick the bot, if enabled.</blockquote>"
+        ).format(memory_data.get("antibot"))
+    
     elif query_data == "welcome_user":
         MemoryDB.insert("data_center", chat.id, {
             "update_data_key": "welcome_user",
@@ -135,7 +177,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "is_int": False
         })
 
-        custom_message = memory_data.get("custom_welcome_msg")
+        custom_message = memory_data.get("custom_welcome_msg") or ""
 
         if len(custom_message) > 500:
             await context.bot.send_message(chat.id, f"Custom Greeting Message:\n\n{custom_message}")
@@ -143,7 +185,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         
         text = (
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
-            "Custom Welcome Message:\n<code>{}</code>\n\n"
+            "Custom Welcome Message:\n<code>{}</code>\n"
             "<blockquote><b>Note:</b> Custom welcome message to greet new chat members. (supports telegram formatting)</blockquote>"
         ).format(custom_message)
 
@@ -184,67 +226,52 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Note:</b> This will send a farewell message to chat when a member left, if enabled.\n</blockquote>"
         ).format(memory_data.get("farewell_user"))
     
-    elif query_data == "antibot":
+    elif query_data == "links_behave":
         MemoryDB.insert("data_center", chat.id, {
-            "update_data_key": "antibot",
+            "update_data_key": "links_behave",
             "is_list": False,
             "is_int": False
         })
 
-        is_boolean_btn = True
+        text = (
+            "<blockquote><b>Chat Settings</b></blockquote>\n\n"
+            "Links Behave: <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> Links has 3 behaves: [ Delete / Convert to base64 / Do Nothing ]\n"
+            "The Links Behave action will be triggered if any non-admin member shares a link in the chat.</blockquote>"
+        ).format(memory_data.get("links_behave"))
+
+        btn_data = [
+            {"Delete": "database_value_delete", "Convert to base64": "database_value_convert", "Do Nothing": "database_value_none"},
+            {"Back": "csettings_menu", "Close": "csettings_close"}
+        ]
+
+        btn = ButtonMaker.cbutton(btn_data)
+    
+    elif query_data == "allowed_links":
+        MemoryDB.insert("data_center", chat.id, {
+            "update_data_key": "allowed_links",
+            "is_list": True,
+            "is_int": False
+        })
+
+        is_editing_btn = True
 
         text = (
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
-            "Antibot: <code>{}</code>\n\n"
-            "<blockquote><b>Note:</b> If someone try to add bots in chat, this will kick the bot, if enabled.</blockquote>"
-        ).format(memory_data.get("antibot"))
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            "Allowed links: <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> Send domain name of allowed links. Example: <code>google.com</code> ! Multiple domain should be separated by comma."
+            "Allowed links won't be affected by <code>Links Behave</code></blockquote>"
+        ).format(", ".join(memory_data.get("allowed_links") or []))
+    
     elif query_data == "close":
         try:
             message_id = query.message.message_id
-            await context.bot.delete_messages(user.id, [message_id, message_id - 1])
+            await context.bot.delete_messages(chat.id, [message_id, message_id - 1])
         except:
-            pass
+            try:
+                await query.delete_message()
+            except:
+                pass
         return # don't want to edit message by global reply
     
     # common editing keyboard buttons
@@ -272,92 +299,3 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         await query.edit_message_text(text, reply_markup=btn)
     except Exception as e:
         logger.error(e)
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-#         else:
-#             text = """
-# <blockquote><b>Chat Settings</b></blockquote>
-
-# • Title: {}
-# • ID: <code>{}</code>
-
-# • Lang: <code>{}</code>
-# • Auto tr: <code>{}</code>
-# • Echo: <code>{}</code>
-# • Antibot: <code>{}</code>
-# • Welcome user: <code>{}</code>
-# • Farewell user: <code>{}</code>
-# • Links: <code>{}</code>
-# • Allowed links: <code>{}</code>
-# """
-
-
-#                 title = find_chat.get("title")
-#             lang = find_chat.get("lang")
-#             echo = find_chat.get("echo", False)
-#             auto_tr = find_chat.get("auto_tr", False)
-#             welcome_user = find_chat.get("welcome_user", False)
-#             farewell_user = find_chat.get("farewell_user", False)
-#             antibot = find_chat.get("antibot", False)
-#             is_links_allowed = find_chat.get("is_links_allowed")
-#             allowed_links_list = find_chat.get("allowed_links_list")
-            
-#             if allowed_links_list:
-#                 allowed_links_list = ", ".join(allowed_links_list)
-
-#             text = chat_settings_menu_group.format(
-#                 title,
-#                 chat.id,
-#                 lang,
-#                 auto_tr,
-#                 echo,
-#                 antibot,
-#                 welcome_user,
-#                 farewell_user,
-#                 is_links_allowed,
-#                 allowed_links_list
-#             )
-
-#             btn_data = [
-#                 {"Language": "query_chat_lang", "Auto translate": "query_chat_auto_tr"},
-#                 {"Echo": "query_chat_set_echo", "Anti bot": "query_chat_antibot"},
-#                 {"Welcome": "query_chat_welcome_user", "Farewell": "query_chat_farewell_user"},
-#                 {"Links": "query_chat_links_behave", "Close": "query_close"}
-#             ]
-
-#             btn = ButtonMaker.cbutton(btn_data)
-        
-#         if effective_message.text:
-#             await effective_message.edit_text(text, reply_markup=btn)
-#         elif effective_message.caption:
-#             await effective_message.edit_caption(text, reply_markup=btn)
-
-
-

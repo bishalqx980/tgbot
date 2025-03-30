@@ -24,6 +24,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.delete()
     except Exception as e:
         await effective_message.reply_text(str(e))
+        return
 
     if re_msg and re_msg.from_user.is_bot:
         await effective_message.reply_text("Whisper isn't for bots...!")
@@ -33,9 +34,9 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         whisper_user = re_msg.from_user.id
 
     elif secret_message:
-        msg_split = secret_message.split()
-        whisper_user = msg_split[0]
-        secret_message = " ".join(msg_split[1:])
+        splitted_message = secret_message.split()
+        whisper_user = splitted_message[0]
+        secret_message = " ".join(splitted_message[1:])
 
         if not whisper_user.startswith("@"):
             await effective_message.reply_text(f"Give a valid username! <code>{whisper_user}</code> is an invalid username!\nor try to reply the user. /whisper for more details...")
@@ -47,7 +48,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
     
     if len(secret_message) > 100:
-        await effective_message.reply_text("Whisper is too long... (max limit 100 character)")
+        await effective_message.reply_text("Whisper message is too long. (Max limit: 100 Characters)")
         return
     
     sent_message = await effective_message.reply_text("Processing...")
@@ -58,21 +59,17 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if whisper_data:
             whisper_data.update({
                 whisper_user: {
-                    "whisper_user": whisper_user,
-                    "whisper_msg": f"{user.first_name}: {secret_message}",
-                    "msg_id": sent_message.id
+                    "user": whisper_user,
+                    "message": f"{user.first_name}: {secret_message}"
                 }
             })
     
     else:
         data = {
-            "user_id": user.id,
-            "chat_id": chat.id,
             "whisper_data": {
                 whisper_user: {
-                    "whisper_user": whisper_user,
-                    "whisper_msg": f"{user.first_name}: {secret_message}",
-                    "msg_id": sent_message.id
+                    "user": whisper_user,
+                    "message": f"{user.first_name}: {secret_message}"
                 }
             }
         }
@@ -82,5 +79,5 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if re_msg:
         whisper_user = re_msg.from_user.mention_html()
 
-    btn = ButtonMaker.cbutton([{"Check the message 👀": "query_whisper"}])
-    await context.bot.edit_message_text(f"Hey, {whisper_user} !! You got a message from {user.mention_html()}...", chat.id, sent_message.id, reply_markup=btn)
+    btn = ButtonMaker.cbutton([{"Check the message 👀": "misc_whisper"}])
+    await context.bot.edit_message_text(f"Hey, {whisper_user} !! You got a whisper message from {user.mention_html()}.", chat.id, sent_message.id, reply_markup=btn)

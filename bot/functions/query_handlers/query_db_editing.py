@@ -20,7 +20,10 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_id = query.message.message_id
             await context.bot.delete_messages(chat.id, [message_id, message_id - 1])
         except:
-            pass
+            try:
+                await query.delete_message()
+            except:
+                pass
         return
     
     # verifying user
@@ -105,6 +108,28 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.delete_message()
         except:
             pass
+    
+    elif query_data.startswith("value"): # expecting value_ > a fixed value which is update_data_value
+        # Updating Database
+        update_data_value = query_data.removeprefix("value_")
+        response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
+        if response:
+            mem_coll_names = {
+                "bot_data": "bot_data",
+                "users": "user_data",
+                "groups": "chat_data"
+            }
+            # bcz there are naming diff between mongodb and memory
+            collection_name = mem_coll_names[collection_name]
+            identifier = None if collection_name == "bot_data" else chat.id
+            data = {update_data_key: update_data_value}
+
+            MemoryDB.insert(collection_name, identifier, data)
+
+            await query.answer("Database Updated Successfully.")
+
+        else:
+            await query.answer("Something went wrong.")
     
     elif query_data == "rm_value":
         # Updating Database (removing values)

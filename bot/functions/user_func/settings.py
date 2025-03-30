@@ -19,8 +19,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     data = {
-        "user_id": user.id,
-        "chat_id": chat.id,
+        "user_id": user.id, # authorization
         "collection_name": "users",
         "search_key": "user_id",
         "match_value": user.id

@@ -193,7 +193,7 @@ def main():
     application.add_handler(CallbackQueryHandler(query_help_menu.query_help_menu, "help_menu_[A-Za-z0-9]+"))
     application.add_handler(CallbackQueryHandler(query_bot_settings.query_bot_settings, "bsettings_[A-Za-z0-9]+"))
     application.add_handler(CallbackQueryHandler(query_chat_settings.query_chat_settings, "csettings_[A-Za-z0-9]+"))
-    # application.add_handler(CallbackQueryHandler(query_misc.query_misc, "misc_query_[A-Za-z0-9]+"))
+    application.add_handler(CallbackQueryHandler(query_misc.query_misc, "misc_[A-Za-z0-9]+"))
     application.add_handler(CallbackQueryHandler(query_db_editing.query_db_editing, "database_[A-Za-z0-9]+"))
     # Error handler
     application.add_error_handler(default_error_handler)

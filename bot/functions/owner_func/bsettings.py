@@ -39,7 +39,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_data = MemoryDB.bot_data
 
     text = (
-        "<blockquote><b>Bot Settings</b></blockquote>\n"
+        "<blockquote><b>Bot Settings</b></blockquote>\n\n"
         f"• Bot photo: <code>{bot_data.get('bot_pic')}</code>\n"
         f"• Images: <code>{len(bot_data.get('images') or [])}</code>\n"
         f"• Support chat: <code>{bot_data.get('support_chat')}</code>\n"

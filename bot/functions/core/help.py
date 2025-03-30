@@ -19,6 +19,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     text = (
+        "<blockquote><b>Help Menu</b></blockquote>\n\n"
         "Hey! Welcome to the bot help section.\n"
         "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
         "• /start - Start the bot\n"
@@ -28,7 +29,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn_data = [
         {"Group Management": "help_menu_gm1", "AI": "help_menu_ai"},
-        {"Misc": "help_menu_misc", "Bot owner": "help_menu_owner"},
+        {"Misc": "help_menu_misc", "Owner/Sudo": "help_menu_owner"},
         {"» bot.info()": "help_menu_botinfo", "Close": "help_menu_close"}
     ]
 

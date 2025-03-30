@@ -71,13 +71,13 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<b>• Farewell user:</b> <code>{database_data.get('farewell_user', False)}</code>\n"
             f"<b>• Anti bot:</b> <code>{database_data.get('antibot', False)}</code>\n"
             f"<b>• Delete cmd:</b> <code>{database_data.get('del_cmd', False)}</code>\n"
-            f"<b>• Is links allowed:</b> <code>{database_data.get('is_links_allowed')}</code>\n"
-            f"<b>• Allowed links:</b> <code>{database_data.get('allowed_links_list')}</code>\n"
+            f"<b>• Is links allowed:</b> <code>{database_data.get('links_behave')}</code>\n"
+            f"<b>• Allowed links:</b> <code>{database_data.get('allowed_links')}</code>\n"
             f"<b>• Log channel:</b> <code>{database_data.get('log_channel')}</code>\n"
             f"<b>• Chat filters:</b>\n"
             f"<blockquote>{database_data.get('filters')}</blockquote>\n"
             f"<b>• Custom welcome message:</b>\n"
-            f"<blockquote>{database_data.get('custom_welcome_msg')}</blockquote>\n"
+            f"<blockquote>{database_data.get('custom_welcome_msg')}</blockquote>"
         )
     else:
         database_data = MongoDB.find_one("users", "user_id", chat_id) # chat_id as int

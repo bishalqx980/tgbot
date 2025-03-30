@@ -100,9 +100,9 @@ async def filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE
             await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
             return
         
-        is_links_allowed = database_data.get("is_links_allowed") # 3 values: delete; convert; None;
-        allowed_links_list = database_data.get("allowed_links_list") or []
-        allowed_links_list = [link.strip() for link in allowed_links_list]
+        links_behave = None if database_data.get("links_behave") == "none" else database_data.get("links_behave") # 3 values: delete; convert; none: str;
+        allowed_links = database_data.get("allowed_links") or []
+        allowed_links = [link.strip() for link in allowed_links]
 
         echo_status = database_data.get("echo", False)
         auto_tr_status = database_data.get("auto_tr", False)
@@ -110,7 +110,7 @@ async def filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE
         filters = database_data.get("filters")
         is_text_contain_links = False
 
-        if is_links_allowed:
+        if links_behave:
             chat_admins = await fetch_chat_admins(chat, user_id=user.id)
             
             if not (chat_admins["is_user_admin"] or chat_admins["is_user_owner"]):
@@ -120,12 +120,12 @@ async def filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE
                     allowed_links_count = 0
                     for link in links_list:
                         domain = RE_LINK.get_domain(link)
-                        if domain in allowed_links_list:
+                        if domain in allowed_links:
                             allowed_links_count += 1
                         else:
-                            if is_links_allowed == "delete":
+                            if links_behave == "delete":
                                 filtered_text = filtered_text.replace(link, f"<code>forbidden link</code>")
-                            if is_links_allowed == "convert":
+                            if links_behave == "convert":
                                 b64_link = BASE64.encode(link)
                                 filtered_text = filtered_text.replace(link, f"<code>{b64_link}</code>")
                     if allowed_links_count != len(links_list):
@@ -146,7 +146,12 @@ async def filter_text_caption(update: Update, context: ContextTypes.DEFAULT_TYPE
                         f"{translated_text}\n\n"
                         f"• <a href='{effective_message.link}'>{effective_message.id}</a> | {user.mention_html()}"
                     )
-                    await effective_message.reply_text(text)
+
+                    try:
+                        await effective_message.reply_text(text)
+                    except:
+                        pass
+                
                 elif translated_text == False:
                     btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
                     await effective_message.reply_text("Invalid language code was given! Use /settings to set chat language.", reply_markup=btn)

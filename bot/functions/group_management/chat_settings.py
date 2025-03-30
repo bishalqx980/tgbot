@@ -18,7 +18,7 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
         return
     
-    chat_admins = await fetch_chat_admins(chat, user_id=user.id)
+    chat_admins = await fetch_chat_admins(chat, context.bot.id, user.id)
     
     if not (chat_admins["is_user_admin"] or chat_admins["is_user_owner"]):
         await effective_message.reply_text("You aren't an admin in this chat!")
@@ -28,9 +28,17 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("You don't have enough permission to manage this chat!")
         return
     
+    if not chat_admins["is_bot_admin"]:
+        await effective_message.reply_text("I'm not an admin in this chat!")
+        return
+    
+    database_data = database_search("groups", "chat_id", chat.id)
+    if not database_data:
+        await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
+        return
+    
     data = {
-        "user_id": user.id,
-        "chat_id": chat.id,
+        "user_id": user.id, # authorization
         "collection_name": "groups",
         "search_key": "chat_id",
         "match_value": chat.id
@@ -38,42 +46,28 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     MemoryDB.insert("data_center", chat.id, data)
 
-    database_data = database_search("groups", "chat_id", chat.id)
-    if not database_data:
-        await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
-        return
-    
-    title = database_data.get("title")
-    lang = database_data.get("lang")
-    echo = database_data.get("echo", False)
-    auto_tr = database_data.get("auto_tr", False)
-    welcome_user = database_data.get("welcome_user", False)
-    farewell_user = database_data.get("farewell_user", False)
-    antibot = database_data.get("antibot", False)
-    is_links_allowed = database_data.get("is_links_allowed")
-    allowed_links_list = database_data.get("allowed_links_list")
-    
-    if allowed_links_list:
-        allowed_links_list = ", ".join(allowed_links_list)
+    text = (
+        "<blockquote><b>Chat Settings</b></blockquote>\n\n"
 
-    text = chat_settings_menu_group_message.format(
-        title,
-        chat.id,
-        lang,
-        auto_tr,
-        echo,
-        antibot,
-        welcome_user,
-        farewell_user,
-        is_links_allowed,
-        allowed_links_list
+        f"• Title: {chat.title}\n"
+        f"• ID: <code>{chat.id}</code>\n\n"
+
+        f"• Language: <code>{database_data.get('lang')}</code>\n"
+        f"• Auto translate: <code>{database_data.get('auto_tr') or False}</code>\n"
+        f"• Echo: <code>{database_data.get('echo') or False}</code>\n"
+        f"• Antibot: <code>{database_data.get('antibot') or False}</code>\n"
+        f"• Welcome Members: <code>{database_data.get('welcome_user') or False}</code>\n"
+        f"• Farewell Members: <code>{database_data.get('farewell_user') or False}</code>\n"
+        f"• Links Behave: <code>{database_data.get('links_behave')}</code>\n"
+        f"• Allowed Links: <code>{', '.join(database_data.get('allowed_links') or [])}</code>"
     )
 
     btn_data = [
-        {"Language": "query_chat_lang", "Auto translate": "query_chat_auto_tr"},
-        {"Echo": "query_chat_set_echo", "Anti bot": "query_chat_antibot"},
-        {"Welcome": "query_chat_welcome_user", "Farewell": "query_chat_farewell_user"},
-        {"Links behave": "query_chat_links_behave", "Close": "query_close"}
+        {"Language": "csettings_lang", "Auto translate": "csettings_auto_tr"},
+        {"Echo": "csettings_echo", "Antibot": "csettings_antibot"},
+        {"Welcome Members": "csettings_welcome_user", "Farewell Members": "csettings_farewell_user"},
+        {"Links Behave": "csettings_links_behave", "Allowed Links": "csettings_allowed_links"},
+        {"Close": "csettings_close"}
     ]
 
     btn = ButtonMaker.cbutton(btn_data)

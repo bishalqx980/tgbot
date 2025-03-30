@@ -17,6 +17,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query_data == "menu":
         text = (
+            "<blockquote><b>Help Menu</b></blockquote>\n\n"
             "Hey! Welcome to the bot help section.\n"
             "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
             "• /start - Start the bot\n"
@@ -26,7 +27,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn_data = [
             {"Group Management": "help_menu_gm1", "AI": "help_menu_ai"},
-            {"Misc": "help_menu_misc", "Bot owner": "help_menu_owner"},
+            {"Misc": "help_menu_misc", "Owner/Sudo": "help_menu_owner"},
             {"» bot.info()": "help_menu_botinfo", "Close": "help_menu_close"}
         ]
 
@@ -34,7 +35,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif query_data == "gm1":
         text = (
-            "<b>Group Moderation Commands | p:1</b>\n\n"
+            "<blockquote><b>Group Management</b></blockquote>\n\n"
 
             "• /id » Show chat/user id\n"
             "• /invite » Generate chat invite link\n"
@@ -63,7 +64,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif query_data == "gm2":
         text = (
-            "<b>Group Moderation Commands | p:2</b>\n\n"
+            "<blockquote><b>Group Management</b></blockquote>\n\n"
 
             "• /purge » Delete all messages between replied to current message!\n"
             "• /purgefrom | /purgeto » Delete all messages between <code>purgefrom</code> and <code>purgeto</code>.\n"
@@ -74,7 +75,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /settings » Settings of chat\n\n"
 
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!\n"
-            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</blockquote>\n"
+            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</blockquote>"
         )
 
         btn_data = [
@@ -86,7 +87,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif query_data == "ai":
         text = (
-            "<b>AI Tools</b>\n\n"
+            "<blockquote><b>AI Functions</b></blockquote>\n\n"
 
             "• /imagine » Generate AI image.\n"
             "• /gpt » Ask any question to AI-LLM\n\n"
@@ -98,7 +99,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif query_data == "misc":
         text = (
-            "<b>Misc functions</b>\n\n"
+            "<blockquote><b>Misc Functions</b></blockquote>\n\n"
 
             "• /movie » Get Movie info by name or IMDB ID\n"
             "• /tr » Google translator\n"
@@ -127,7 +128,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     elif query_data == "owner":
         text = (
-            "<b>Bot owner functions</b>\n\n"
+            "<blockquote><b>Owner/Sudo Functions</b></blockquote>\n\n"
 
             "• /broadcast » Broadcast message to all active users\n"
             "• /send » Send message to specified ChatID\n"
@@ -139,7 +140,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /log » Get log file (for error handling)\n"
             "• /sys » Get system info\n\n"
 
-            "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>\n"
+            "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
         
         btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
@@ -207,7 +208,10 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message_id = query.message.message_id
             await context.bot.delete_messages(user.id, [message_id, message_id - 1])
         except:
-            pass
+            try:
+                await query.delete_message()
+            except:
+                pass
         return
     
     # global reply
