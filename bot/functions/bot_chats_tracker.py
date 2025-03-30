@@ -32,7 +32,7 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         # checking member status & updating database
         active_status = new_status == ChatMember.MEMBER
-        MongoDB.update_data("users", "user_id", user.id, "active_status", active_status)
+        MongoDB.update("users", "user_id", user.id, "active_status", active_status)
     
     elif chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
         # checking database entry
