@@ -130,6 +130,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = (
             "<blockquote><b>Owner/Sudo Functions</b></blockquote>\n\n"
 
+            "• /say » Send message as bot\n"
             "• /broadcast » Broadcast message to all active users\n"
             "• /send » Send message to specified ChatID\n"
             "• /cadmins » Get adminlist of specified ChatID\n"

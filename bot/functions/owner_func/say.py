@@ -24,4 +24,3 @@ async def func_say(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     await effective_message.reply_text(speech, reply_to_message_id=re_msg.message_id if re_msg else None)
-    
