@@ -24,9 +24,9 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     caption = (
-        f"<b>💭 Prompt:</b> <code>{prompt}</code>\n"
-        f"<b>⏳ R.time:</b> <code>{response_time}s</code>\n"
-        f"<b>🗣 Req by:</b> {user.mention_html()} | <code>{user.id}</code>"
+        f"<blockquote>{user.mention_html()}: {prompt}</blockquote>"
+        f"<b>Process time:</b> <code>{response_time}s</code>\n"
+        f"<b>UserID:</b> <code>{user.id}</code>"
     )
 
     await context.bot.delete_message(chat.id, sent_message.id)

@@ -97,7 +97,7 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # verifying user
         elif (whisper_user_id and whisper_user_id != user.id) or (whisper_username and whisper_username != f"@{user.username}"):
-            await query.answer("This whisper isn't for you.")
+            await query.answer("This whisper isn't for you.", True)
             return
         
         await query.answer(whisper_message, True)
