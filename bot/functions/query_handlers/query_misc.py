@@ -14,7 +14,7 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer()
         return
 
-    elif query_data.startswith("broadcast"):
+    elif query_data.startswith("broadcast_"):
         # memory access
         data_center = MemoryDB.data_center.get(user.id)
         if not data_center:
@@ -58,10 +58,12 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             await query.edit_message_text(text, reply_markup=btn)
     
-    elif query_data == "whisper":
+    elif query_data.startswith("whisper_"):
         # memory access
         data_center = MemoryDB.data_center.get(chat.id)
-        if not data_center:
+        whisper_data = data_center.get("whisper_data") if data_center else None
+
+        if not data_center or not whisper_data:
             await query.answer("Session Expired.")
             try:
                 message_id = query.message.message_id
@@ -73,25 +75,32 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     pass
             return
         
-        whisper_data = data_center.get("whisper_data")
-        if not whisper_data:
+        whisper_key = query_data.removeprefix("whisper_")
+        whisper_user_data = whisper_data.get(whisper_key)
+
+        if not whisper_user_data:
+            await query.answer("Whisper Expired.", True)
             try:
                 await query.delete_message()
             except:
                 pass
             return
         
-        whisper_user_data = whisper_data.get(f"@{user.username}") or whisper_data.get(user.id)
+        whisper_from_user_id = whisper_user_data.get("from_user_id")
+        whisper_user_id = whisper_user_data.get("user_id")
+        whisper_username = whisper_user_data.get("username") # contains @ prefix
+        whisper_message = whisper_user_data.get("message")
 
-        if not whisper_user_data:
-            await query.answer("This whisper isn't for you or whisper has expired!", True)
+        if whisper_from_user_id == user.id:
+            # access granted for message sender
+            pass
+
+        # verifying user
+        elif (whisper_user_id and whisper_user_id != user.id) or (whisper_username and whisper_username != f"@{user.username}"):
+            await query.answer("This whisper isn't for you.")
             return
         
-        if whisper_user_data.get("user") not in {user.id, f"@{user.username}"}:
-            await query.answer("This whisper isn't for you!", True)
-            return
-        
-        await query.answer(whisper_user_data.get("message"), True)
+        await query.answer(whisper_message, True)
     
     elif query_data == "close":
         try:

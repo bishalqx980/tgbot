@@ -2,6 +2,7 @@ from telegram import Update
 from telegram.constants import ChatType
 from telegram.ext import ContextTypes
 from bot.modules.database import MemoryDB
+from bot.modules.base64 import BASE64
 from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.functions.group_management.auxiliary.pm_error import pm_error
 
@@ -27,57 +28,57 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if re_msg and re_msg.from_user.is_bot:
-        await effective_message.reply_text("Whisper isn't for bots...!")
+        await effective_message.reply_text("Whisper isn't for bots!")
         return
     
     elif re_msg:
-        whisper_user = re_msg.from_user.id
+        whisper_username = f"@{re_msg.from_user.username}" if re_msg.from_user.username else None
+        whisper_user_id = re_msg.from_user.id
+        # secret_message is already taken as context args
 
     elif secret_message:
         splitted_message = secret_message.split()
-        whisper_user = splitted_message[0]
+
+        whisper_username = splitted_message[0]
+        whisper_user_id = None
         secret_message = " ".join(splitted_message[1:])
 
-        if not whisper_user.startswith("@"):
-            await effective_message.reply_text(f"Give a valid username! <code>{whisper_user}</code> is an invalid username!\nor try to reply the user. /whisper for more details...")
+        if not whisper_username.startswith("@"):
+            await effective_message.reply_text(f"<code>{whisper_username}</code> isn't a valid username!\nTry to reply the user. /whisper for more details.")
             return
         
-        # there is a problem > anonymous admin cant read this ...
-        if whisper_user.endswith("bot"):
-            await effective_message.reply_text("Whisper isn't for bots...!")
+        if whisper_username.endswith("bot"):
+            await effective_message.reply_text("Whisper isn't for bots!")
             return
     
-    if len(secret_message) > 100:
-        await effective_message.reply_text("Whisper message is too long. (Max limit: 100 Characters)")
+    if len(secret_message) > 150:
+        await effective_message.reply_text("Whisper message is too long. (Max limit: 150 Characters)")
         return
     
     sent_message = await effective_message.reply_text("Processing...")
-    
+
     data_center = MemoryDB.data_center.get(chat.id)
-    if data_center:
+    whisper_data = data_center.get("whisper_data") if data_center else None
+
+    if not data_center or not whisper_data:
+        MemoryDB.insert("data_center", chat.id, {"whisper_data": {}})
+        # getting data again bcz data_center can be None
+        data_center = MemoryDB.data_center.get(chat.id)
         whisper_data = data_center.get("whisper_data")
-        if whisper_data:
-            whisper_data.update({
-                whisper_user: {
-                    "user": whisper_user,
-                    "message": f"{user.first_name}: {secret_message}"
-                }
-            })
     
-    else:
-        data = {
-            "whisper_data": {
-                whisper_user: {
-                    "user": whisper_user,
-                    "message": f"{user.first_name}: {secret_message}"
-                }
-            }
+    whsiper_key = BASE64.encode(f"to_{whisper_username or whisper_user_id}_from_{user.id}") # prefering username over user_id
+
+    whisper_data.update({
+        whsiper_key: {
+            "from_user_id": user.id,
+            "user_id": whisper_user_id,
+            "username": whisper_username, # contains @ prefix
+            "message": secret_message
         }
+    })
 
-        MemoryDB.insert("data_center", chat.id, data)
+    if re_msg and whisper_username is None:
+        whisper_username = re_msg.from_user.mention_html()
 
-    if re_msg:
-        whisper_user = re_msg.from_user.mention_html()
-
-    btn = ButtonMaker.cbutton([{"Check the message 👀": "misc_whisper"}])
-    await context.bot.edit_message_text(f"Hey, {whisper_user} !! You got a whisper message from {user.mention_html()}.", chat.id, sent_message.id, reply_markup=btn)
+    btn = ButtonMaker.cbutton([{"Check the message 👀": f"misc_whisper_{whsiper_key}"}])
+    await context.bot.edit_message_text(f"Hey, {whisper_username}. You got a whisper message from {user.first_name}.", chat.id, sent_message.id, reply_markup=btn)

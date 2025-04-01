@@ -109,7 +109,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except:
             pass
     
-    elif query_data.startswith("value"): # expecting value_ > a fixed value which is update_data_value
+    elif query_data.startswith("value_"): # expecting value_ > a fixed value which is update_data_value
         # Updating Database
         update_data_value = query_data.removeprefix("value_")
         response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
@@ -153,7 +153,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await query.answer("Something went wrong.")
     
-    elif query_data.startswith("bool"): # expecting bool_true or bool_false
+    elif query_data.startswith("bool_"): # expecting bool_true or bool_false
         # Updating Database (boolean)
         update_data_value = query_data.strip("bool_") == "true"
         response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
