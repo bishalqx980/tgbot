@@ -24,7 +24,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     caption = (
-        f"<blockquote>{user.mention_html()}: {prompt}</blockquote>"
+        f"<blockquote>{user.mention_html()}: {prompt}</blockquote>\n"
         f"<b>Process time:</b> <code>{response_time}s</code>\n"
         f"<b>UserID:</b> <code>{user.id}</code>"
     )

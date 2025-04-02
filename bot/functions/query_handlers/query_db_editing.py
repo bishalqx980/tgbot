@@ -15,7 +15,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # memory access
     data_center = MemoryDB.data_center.get(chat.id) # using chat_id bcz it could be chat settings too
     if not data_center:
-        await query.answer("Session Expired.")
+        await query.answer("Session Expired.", True)
         try:
             message_id = query.message.message_id
             await context.bot.delete_messages(chat.id, [message_id, message_id - 1])
@@ -74,7 +74,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         MemoryDB.insert("data_center", chat.id, {"update_data_value": None, "is_editing": False})
 
         if not update_data_value:
-            await query.answer("Timeout.")
+            await query.answer("Timeout.", True)
             return
         
         if is_list:
@@ -99,11 +99,11 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.answer("Database Updated Successfully.")
 
         else:
-            await query.answer("Something went wrong.")
+            await query.answer("Something went wrong.", True)
     
     elif query_data == "cancel_editing":
         MemoryDB.insert("data_center", chat.id, {"update_data_value": None, "is_editing": False})
-        await query.answer("Operation cancelled.")
+        await query.answer("Operation cancelled.", True)
         try:
             await query.delete_message()
         except:
@@ -129,7 +129,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.answer("Database Updated Successfully.")
 
         else:
-            await query.answer("Something went wrong.")
+            await query.answer("Something went wrong.", True)
     
     elif query_data == "rm_value":
         # Updating Database (removing values)
@@ -151,7 +151,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.answer("Database Updated Successfully.")
 
         else:
-            await query.answer("Something went wrong.")
+            await query.answer("Something went wrong.", True)
     
     elif query_data.startswith("bool_"): # expecting bool_true or bool_false
         # Updating Database (boolean)
@@ -173,4 +173,4 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.answer("Database Updated Successfully.")
 
         else:
-            await query.answer("Something went wrong.")
+            await query.answer("Something went wrong.", True)

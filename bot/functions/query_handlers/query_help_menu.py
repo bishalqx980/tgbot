@@ -26,7 +26,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         btn_data = [
-            {"Group Management": "help_menu_gm1", "AI": "help_menu_ai"},
+            {"Group Management": "help_menu_gm1", "AI/Info": "help_menu_ai_knowledge"},
             {"Misc": "help_menu_misc", "Owner/Sudo": "help_menu_owner"},
             {"» bot.info()": "help_menu_botinfo", "Close": "help_menu_close"}
         ]
@@ -85,10 +85,11 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn = ButtonMaker.cbutton(btn_data)
     
-    elif query_data == "ai":
+    elif query_data == "ai_knowledge":
         text = (
-            "<blockquote><b>AI Functions</b></blockquote>\n\n"
+            "<blockquote><b>AI/Info Functions</b></blockquote>\n\n"
 
+            "• /wiki » Get information from wikipedia.\n"
             "• /imagine » Generate AI image.\n"
             "• /gpt » Ask any question to AI-LLM\n\n"
 

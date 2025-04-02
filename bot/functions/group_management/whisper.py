@@ -32,7 +32,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     elif re_msg:
-        whisper_username = f"@{re_msg.from_user.username}" if re_msg.from_user.username else None
+        whisper_username = re_msg.from_user.name if re_msg.from_user.username else None
         whisper_user_id = re_msg.from_user.id
         # secret_message is already taken as context args
 
@@ -66,11 +66,12 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data_center = MemoryDB.data_center.get(chat.id)
         whisper_data = data_center.get("whisper_data")
     
-    whsiper_key = BASE64.encode(f"to_{whisper_username or whisper_user_id}_from_{user.id}") # prefering username over user_id
+    # if replied then it will be user_id else it will be username
+    whsiper_key = BASE64.encode(f"to_{whisper_username or whisper_user_id}_from_{user.id}")
 
     whisper_data.update({
         whsiper_key: {
-            "from_user_id": user.id,
+            "sender_user_id": user.id,
             "user_id": whisper_user_id,
             "username": whisper_username, # contains @ prefix
             "message": secret_message
@@ -79,6 +80,6 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if re_msg and whisper_username is None:
         whisper_username = re_msg.from_user.mention_html()
-
-    btn = ButtonMaker.cbutton([{"Check the message 👀": f"misc_whisper_{whsiper_key}"}])
-    await context.bot.edit_message_text(f"Hey, {whisper_username}. You got a whisper message from {user.first_name}.", chat.id, sent_message.id, reply_markup=btn)
+    
+    btn = ButtonMaker.cbutton([{"See the message 💭": f"misc_whisper_{whsiper_key}"}])
+    await context.bot.edit_message_text(f"Hey, {whisper_username}. You got a whisper message from {user.name}.", chat.id, sent_message.id, reply_markup=btn)

@@ -38,7 +38,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             {"Support Chat": "bsettings_support_chat", "Server URL": "bsettings_server_url"},
             {"Sudo": "bsettings_sudo", "Shrinkme API": "bsettings_shrinkme_api"},
             {"OMDB API": "bsettings_omdb_api", "Weather API": "bsettings_weather_api"},
-            {"> ⁅ Restore DB ⁆": "bsettings_restoredb", "Close": "bsettings_close"}
+            {"> ⁅ Database ⁆": "bsettings_database", "Close": "bsettings_close"}
         ]
 
         btn = ButtonMaker.cbutton(btn_data)
@@ -175,7 +175,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "<blockquote><b>Note:</b> This API is for /weather command.</blockquote>"
         ).format(bot_data.get("weather_api"))
     
-    elif query_data == "restoredb":
+    elif query_data == "database":
         text = (
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "<b>• Restore Database</b>\n"
@@ -188,8 +188,21 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         )
 
         btn_data = [
-            {"Restore Database": "bsettings_restoredb_confirm", "Wipe Memory Cache": "bsettings_wipe_memory"},
+            {"Restore Database": "bsettings_restoredb", "Wipe Memory Cache": "bsettings_wipe_memory"},
             {"Back": "bsettings_menu", "Close": "bsettings_close"}
+        ]
+
+        btn = ButtonMaker.cbutton(btn_data)
+    
+    elif query_data == "restoredb":
+        text = (
+            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+            "<b>• Restore MongoDB Database?</b>"
+        )
+
+        btn_data = [
+            {"YES": "bsettings_restoredb_confirm", "NO": "bsettings_database"},
+            {"Back": "bsettings_database"}
         ]
 
         btn = ButtonMaker.cbutton(btn_data)

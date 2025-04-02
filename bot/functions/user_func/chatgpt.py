@@ -20,7 +20,7 @@ async def func_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if response:
         text = (
             f"<blockquote expandable>{user.mention_html()}: {prompt}</blockquote>\n"
-            f"<blockquote expandable><b>AI:</b> {response}</blockquote>"
+            f"<blockquote expandable><b>{context.bot.first_name}:</b> {response}</blockquote>\n"
             f"<b>Process time:</b> <code>{response_time}s</code>\n"
             f"<b>UserID:</b> <code>{user.id}</code>"
         )

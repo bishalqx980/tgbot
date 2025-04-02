@@ -17,7 +17,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
     # memory access
     data_center = MemoryDB.data_center.get(chat.id) # ChatID bcz its for both Private & Public Chat
     if not data_center:
-        await query.answer("Session Expired.")
+        await query.answer("Session Expired.", True)
         try:
             message_id = query.message.message_id
             await context.bot.delete_messages(chat.id, [message_id, message_id - 1])

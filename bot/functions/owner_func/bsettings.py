@@ -55,7 +55,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         {"Support Chat": "bsettings_support_chat", "Server URL": "bsettings_server_url"},
         {"Sudo": "bsettings_sudo", "Shrinkme API": "bsettings_shrinkme_api"},
         {"OMDB API": "bsettings_omdb_api", "Weather API": "bsettings_weather_api"},
-        {"> ⁅ Restore DB ⁆": "bsettings_restoredb", "Close": "bsettings_close"}
+        {"> ⁅ Database ⁆": "bsettings_database", "Close": "bsettings_close"}
     ]
 
     btn = ButtonMaker.cbutton(btn_data)

@@ -18,7 +18,7 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # memory access
         data_center = MemoryDB.data_center.get(user.id)
         if not data_center:
-            await query.answer("Session Expired.")
+            await query.answer("Session Expired.", True)
             try:
                 message_id = query.message.message_id
                 await context.bot.delete_messages(user.id, [message_id, message_id - 1])
@@ -64,15 +64,7 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         whisper_data = data_center.get("whisper_data") if data_center else None
 
         if not data_center or not whisper_data:
-            await query.answer("Session Expired.")
-            try:
-                message_id = query.message.message_id
-                await context.bot.delete_messages(chat.id, [message_id, message_id - 1])
-            except:
-                try:
-                    await query.delete_message()
-                except:
-                    pass
+            await query.answer("Session Expired.", True)
             return
         
         whisper_key = query_data.removeprefix("whisper_")
@@ -80,18 +72,14 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if not whisper_user_data:
             await query.answer("Whisper Expired.", True)
-            try:
-                await query.delete_message()
-            except:
-                pass
             return
         
-        whisper_from_user_id = whisper_user_data.get("from_user_id")
+        whisper_sender_user_id = whisper_user_data.get("sender_user_id")
         whisper_user_id = whisper_user_data.get("user_id")
         whisper_username = whisper_user_data.get("username") # contains @ prefix
         whisper_message = whisper_user_data.get("message")
 
-        if whisper_from_user_id == user.id:
+        if whisper_sender_user_id == user.id:
             # access granted for message sender
             pass
 
