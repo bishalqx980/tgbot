@@ -84,7 +84,7 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
             pass
 
         # verifying user
-        elif (whisper_user_id and whisper_user_id != user.id) or (whisper_username and whisper_username != f"@{user.username}"):
+        elif (whisper_user_id and whisper_user_id != user.id) or (whisper_username and whisper_username != user.name):
             await query.answer("This whisper isn't for you.", True)
             return
         

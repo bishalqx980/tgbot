@@ -26,9 +26,9 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     victim_photos = await victim.get_profile_photos()
     victim_pfp = None
     if victim_photos.photos:
-        victim_pfp = victim_photos.photos[0][-1].file_id # returns victims latest pfp file id
+        victim_pfp = victim_photos.photos[0][-1].file_id # returns victims latest and best quality pfp file id
     
-    victim_username = f"@{victim.username}" if victim.username else None
+    victim_username = victim.name if victim.username else None
     text = (
         f"<b>• Full name:</b> <code>{victim.full_name}</code>\n"
         f"<b>  » First name:</b> <code>{victim.first_name}</code>\n"

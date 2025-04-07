@@ -16,7 +16,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyword = " ".join(context.args).lower()
     
     if chat.type == ChatType.PRIVATE:
-        await pm_error(chat.id)
+        await pm_error(context, chat.id)
         return
     
     if user.is_bot:

@@ -30,7 +30,7 @@ async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
         admins = f"\n<b>Admin's:</b>\n{admins}"
     
     text = (
-        f"<b><u>{chat.title}</u></b>\n\n"
+        f"<blockquote>{chat.title}</blockquote>\n\n"
         f"{owner}{admins}"
     )
 

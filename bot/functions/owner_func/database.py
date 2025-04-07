@@ -1,15 +1,17 @@
+import json
 import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot.modules.database import MongoDB
+from bot.helper.telegram_helpers.button_maker import ButtonMaker
 from bot.functions.sudo_users import fetch_sudos
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     effective_message = update.effective_message
-    chat_id = " ".join(context.args)
+    victim_id = " ".join(context.args)
 
     sudo_users = fetch_sudos()
     if user.id not in sudo_users:
@@ -22,7 +24,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.delete_messages(chat.id, [effective_message.id, sent_message.id])
         return
     
-    if not chat_id:
+    if not victim_id:
         database_info = MongoDB.info()
         msg_storage = "<b><u>Database</u></b>\n\n"
         for info in database_info:
@@ -49,51 +51,92 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     try:
-        chat_id = int(chat_id)
+        victim_id = int(victim_id)
     except ValueError:
         await effective_message.reply_text("Invalid ChatID!")
         return
 
     # if chat_id given
-    if "-100" in str(chat_id):
-        database_data = MongoDB.find_one("groups", "chat_id", chat_id) # chat_id as int
+    if "-100" in str(victim_id):
+        database_data = MongoDB.find_one("groups", "chat_id", victim_id) # victim_id as int
         if not database_data:
             await effective_message.reply_text("Chat not found!")
             return
         
+        try:
+            victim_info = await context.bot.get_chat(victim_id)
+        except:
+            victim_info = None
+            btn = None
+        
+        chat_title = victim_info.title if victim_info else database_data.get('title')
+        chat_invite_link = victim_info.invite_link if victim_info else None
+
         text = (
-            f"<b><u>Database info:</u> <code>{chat_id}</code></b>\n\n"
-            f"<b>• Title:</b> <i>{database_data.get('title')}</i>\n"
-            f"<b>• Lang:</b> <code>{database_data.get('lang', False)}</code>\n"
-            f"<b>• Echo:</b> <code>{database_data.get('echo', False)}</code>\n"
-            f"<b>• Auto tr:</b> <code>{database_data.get('auto_tr', False)}</code>\n"
-            f"<b>• Welcome user:</b> <code>{database_data.get('welcome_user', False)}</code>\n"
-            f"<b>• Farewell user:</b> <code>{database_data.get('farewell_user', False)}</code>\n"
-            f"<b>• Anti bot:</b> <code>{database_data.get('antibot', False)}</code>\n"
-            f"<b>• Delete cmd:</b> <code>{database_data.get('del_cmd', False)}</code>\n"
-            f"<b>• Is links allowed:</b> <code>{database_data.get('links_behave')}</code>\n"
-            f"<b>• Allowed links:</b> <code>{database_data.get('allowed_links')}</code>\n"
-            f"<b>• Log channel:</b> <code>{database_data.get('log_channel')}</code>\n"
-            f"<b>• Chat filters:</b>\n"
-            f"<blockquote>{database_data.get('filters')}</blockquote>\n"
-            f"<b>• Custom welcome message:</b>\n"
-            f"<blockquote>{database_data.get('custom_welcome_msg')}</blockquote>"
+            "<blockquote><b>Database information</b></blockquote>\n\n"
+
+            f"• Title: {chat_title}\n"
+            f"• ID: <code>{victim_id}</code>\n\n"
+
+            f"• Language: <code>{database_data.get('lang')}</code>\n"
+            f"• Auto translate: <code>{database_data.get('auto_tr') or False}</code>\n"
+            f"• Echo: <code>{database_data.get('echo') or False}</code>\n"
+            f"• Antibot: <code>{database_data.get('antibot') or False}</code>\n"
+            f"• Welcome Members: <code>{database_data.get('welcome_user') or False}</code>\n"
+            f"• Farewell Members: <code>{database_data.get('farewell_user') or False}</code>\n"
+            f"• Links Behave: <code>{database_data.get('links_behave')}</code>\n"
+            f"• Allowed Links: <code>{', '.join(database_data.get('allowed_links') or [])}</code>"
         )
+
+        btn = ButtonMaker.ubutton([{"Invite Link": chat_invite_link}]) if chat_invite_link else None
+        
+        custom_welcome_msg = database_data.get('custom_welcome_msg')
+        if custom_welcome_msg:
+            text += (
+                "\n\n<blockquote><b>Custom Welcome message</b></blockquote>\n\n"
+                f"<blockquote>{custom_welcome_msg}</blockquote>"
+            )
+        
+        chat_filters = database_data.get('filters')
+        if chat_filters:
+            with open(f"temp/filters_{victim_id}.json", "w") as f:
+                json.dump(chat_filters, f, indent=4)
+            
+            with open(f"temp/filters_{victim_id}.json", "rb") as f:
+                filters_file = f.read()
+            
+            await effective_message.reply_document(filters_file, f"filters of <code>{victim_id}</code>", filename=f"filters_{victim_id}.json")
+    
     else:
-        database_data = MongoDB.find_one("users", "user_id", chat_id) # chat_id as int
+        database_data = MongoDB.find_one("users", "user_id", victim_id) # victim_id as int
         if not database_data:
             await effective_message.reply_text("User not found!")
             return
         
-        text = (
-            f"<b><u>Database info:</u> <code>{chat_id}</code></b>\n\n"
-            f"<b>• Name:</b> <i>{database_data.get('name')}</i>\n"
-            f"<b>• Username:</b> @{database_data.get('username')}\n"
-            f"<b>• Mention:</b> {database_data.get('mention')}\n"
-            f"<b>• Lang:</b> <code>{database_data.get('lang')}</code>\n"
-            f"<b>• Echo:</b> <code>{database_data.get('echo')}</code>\n"
-            f"<b>• Active status:</b> <code>{database_data.get('active_status')}</code>\n"
+        try:
+            victim_info = await context.bot.get_chat(victim_id)
+        except:
+            victim_info = None
+            btn = None
+        
+        victim_name = victim_info.mention_html() if victim_info else database_data.get('mention')
+        victim_username = victim_info.username if victim_info else database_data.get('username')
+        text = "<blockquote><b>Database information</b></blockquote>\n\n"
+
+        text += (
+            f"• Name: {victim_name}\n"
+            f"• ID: <code>{victim_id}</code>\n"
+            f"• Username: @{victim_username or 'username'}\n\n"
+
+            f"• Language: <code>{database_data.get('lang')}</code>\n"
+            f"• Auto translate: <code>{database_data.get('auto_tr') or False}</code>\n"
+            f"• Echo: <code>{database_data.get('echo') or False}</code>\n\n"
+
+            f"• Active status: <code>{database_data.get('active_status')}</code>"
         )
+
+        if victim_info:
+            btn = ButtonMaker.ubutton([{"User Profile": f"tg://user?id={victim_info.id}"}]) if victim_info.username else None
     
     # common message sender for both group chat & private chat database info
-    await effective_message.reply_text(text)
+    await effective_message.reply_text(text, reply_markup=btn)
