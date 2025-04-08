@@ -2,11 +2,11 @@ import random
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
-from bot import logger
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.modules.database import MemoryDB
-from bot.modules.database.common import database_search
-from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
+from ... import logger
+from ...helper.button_maker import ButtonMaker
+from ...modules.database import MemoryDB
+from ...modules.database.common import database_search
+from .auxiliary.fetch_chat_admins import fetch_chat_admins
 
 async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """This function won't be in handler, instead it will be called in func_settings if chat.type isn't private"""

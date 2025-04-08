@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from bot import ENV_CONFIG, logger
+from ... import ENV_CONFIG, logger
 
 class MongoDatabase:
     def __init__(self):

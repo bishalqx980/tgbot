@@ -1,11 +1,14 @@
 import qrcode
-from bot import logger
+from io import BytesIO
+from .. import logger
 
 class QR:
-    def generate_qr(data, file_name="qrcode", size=50):
+    def generate_qr(data, size=50):
         """
-        :param data: text, url etc.\n
-        ***Note: `size` multiply with (29 * size = image_pixels)***
+        Generate a QR code and return it as bytes (PNG format).\n
+        :param data: Text, URL, etc.
+        :param size: Box size (multiplies to determine final image size).
+        :returns: Bytes of the QR code image (PNG format).
         """
         try:
             qr = qrcode.QRCode(
@@ -19,8 +22,10 @@ class QR:
 
             img = qr.make_image(fill_color="black", back_color="white")
 
-            file_path = f"temp/{file_name}.png"
-            img.save(file_path)
-            return file_path
+            img_buffer = BytesIO()
+            img.save(img_buffer, "PNG")
+            img_buffer.seek(0)
+
+            return img_buffer.read()
         except Exception as e:
             logger.error(e)

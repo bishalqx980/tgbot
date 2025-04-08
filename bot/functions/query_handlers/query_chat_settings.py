@@ -2,9 +2,9 @@ from telegram import Update
 from telegram.constants import ChatType
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
-from bot import logger
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.modules.database import MemoryDB
+from ... import logger
+from ...helper.button_maker import ButtonMaker
+from ...modules.database import MemoryDB
 
 async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

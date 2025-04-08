@@ -1,7 +1,7 @@
 from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.modules.ai_llm import LLM
+from ...modules.ai_llm import LLM
 
 async def func_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -14,9 +14,11 @@ async def func_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     sent_message = await effective_message.reply_text("💭 Generating...")
+    
     start_time = time()
     response = await LLM.text_gen(prompt)
     response_time = int(time() - start_time)
+
     if response:
         text = (
             f"<blockquote expandable>{user.mention_html()}: {prompt}</blockquote>\n"

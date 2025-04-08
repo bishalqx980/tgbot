@@ -3,8 +3,8 @@ from time import time
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.modules.database import MemoryDB
-from bot.functions.sudo_users import fetch_sudos
+from ... import BOT_UPTIME
+from ..sudo_users import fetch_sudos
 
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -21,7 +21,7 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sys_hours, remainder = divmod(sys_uptime.seconds, 3600)
     sys_minute = remainder / 60
 
-    bot_uptime = timedelta(seconds=time() - float(MemoryDB.bot_data.get("bot_uptime", 0)))
+    bot_uptime = timedelta(seconds=time() - BOT_UPTIME)
     
     bot_days = bot_uptime.days
     bot_hours, remainder = divmod(bot_uptime.seconds, 3600)

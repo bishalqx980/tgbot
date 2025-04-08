@@ -1,4 +1,4 @@
-from bot.modules.database import MemoryDB, MongoDB
+from . import MemoryDB, MongoDB
 
 def database_search(collection_name, search_key, match_value):
     """

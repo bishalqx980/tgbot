@@ -22,12 +22,12 @@ async def func_wiki(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.edit_message_text(str(e), chat.id, sent_message.id)
         return
     
-    response_time = int(time() - start_time)
+    response_time = f"{(time() - start_time):.2f}s"
 
     text = (
         f"<blockquote expandable>{user.mention_html()}: {query}</blockquote>\n"
         f"<blockquote expandable><b>{context.bot.first_name}:</b> {response}</blockquote>\n"
-        f"<b>Process time:</b> <code>{response_time}s</code>\n"
+        f"<b>Process time:</b> <code>{response_time}</code>\n"
         f"<b>UserID:</b> <code>{user.id}</code>"
     )
 

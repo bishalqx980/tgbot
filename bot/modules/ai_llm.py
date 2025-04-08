@@ -1,6 +1,7 @@
 import json
 import aiohttp
-from bot import logger
+from io import BytesIO
+from .. import logger
 
 async def fetch_ai_models(ai_models_url="https://gist.githubusercontent.com/bishalqx980/204d6dfa707a8d573bdbf9c2928e6296/raw/data.json"):
     try:
@@ -39,9 +40,9 @@ class LLM:
             logger.error(e)
     
 
-    async def imagine(prompt, file_name="imagine"):
+    async def imagine(prompt):
         """
-        :param file_name: file name without `file extention`
+        :returns: image byte | `None`
         """
         ai_models = await fetch_ai_models()
         if not ai_models:
@@ -56,10 +57,10 @@ class LLM:
             async with aiohttp.ClientSession() as session:
                 async with session.get(imagine_api, params=data) as response:
                     result = await response.read()
-                    file_path = f"downloads/{file_name}.png"
-                    with open(file_path, "wb") as f:
-                        f.write(result)
-                    
-                    return file_path
+
+                    image_bytes = BytesIO(result)
+                    image_bytes.name = "imagine.png"
+
+                    return image_bytes
         except Exception as e:
             logger.error(e)

@@ -1,11 +1,11 @@
 import requests
 from telegraph.aio import Telegraph
-from bot import ORIGINAL_BOT_USERNAME, logger
+from .. import ORIGINAL_BOT_USERNAME, logger
 
 class TELEGRAPH:
     def __init__(self):
         self.telegraph = None
-        self.domain = "telegra.ph"
+        self.domain = None
 
 
     async def initialize(self):
@@ -14,19 +14,28 @@ class TELEGRAPH:
             try:
                 response = requests.get(f"https://{domain}", timeout=3)
                 if response.ok:
-                    logger.info(f"Telegraph initialized! Domain: https://{domain}")
+                    self.domain = domain
+                    logger.info(f"Telegraph initialized! Domain: https://{self.domain}")
                     break
             except Exception as e:
                 logger.error(e)
         
-        self.telegraph = Telegraph(domain=domain)
-        await self.telegraph.create_account(f"@{ORIGINAL_BOT_USERNAME}")
+        if self.domain:
+            try:
+                self.telegraph = Telegraph(domain=self.domain)
+                await self.telegraph.create_account(f"@{ORIGINAL_BOT_USERNAME}")
+            except Exception as e:
+                logger.error(e)
 
 
     async def paste(self, text, username="anonymous"):
         """
         :param text: supports HTML format
         """
+        if not (self.domain or self.telegraph):
+            logger.error("Telegraph isn't initialized!")
+            return
+        
         try:
             path = await self.telegraph.create_page(
                 f"{username} - @{ORIGINAL_BOT_USERNAME}",
@@ -36,14 +45,5 @@ class TELEGRAPH:
             )
             
             return path.get("url")
-        except Exception as e:
-            logger.error(e)
-
-
-    async def upload_img(self, image_path):
-        try:
-            path = await self.telegraph.upload_file(image_path)[0]
-            link = f"https://{self.domain}{path.get('src')}"
-            return link
         except Exception as e:
             logger.error(e)

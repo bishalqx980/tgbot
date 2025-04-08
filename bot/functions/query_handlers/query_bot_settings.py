@@ -1,11 +1,12 @@
 import json
+from io import BytesIO
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
-from bot import logger
-from bot.update_db import update_database
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.modules.database import MemoryDB, MongoDB
+from ... import logger
+from ...update_db import update_database
+from ...helper.button_maker import ButtonMaker
+from ...modules.database import MemoryDB, MongoDB
 
 async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -77,13 +78,10 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         if images:
             await query.answer("Sending images links...")
 
-            with open("temp/images.txt", "w") as f:
-                f.write("\n".join(images))
-            
-            with open("temp/images.txt", "rb") as f:
-                images_binary = f.read()
-        
-            await context.bot.send_document(user.id, images_binary, f"Total images: {len(images)}", filename="images.txt")
+            images_binary = BytesIO(",\n".join(images).encode())
+            images_binary.name = "images.txt"
+
+            await context.bot.send_document(user.id, images_binary, f"Total images: {len(images)}")
     
     elif query_data == "support_chat":
         MemoryDB.insert("data_center", user.id, {
@@ -212,20 +210,14 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         # removing unnecessary files
         bot_data.pop("_id", "") # deleteing _id object
-        bot_data.pop("bot_commands", "")
-        bot_data.pop("bot_uptime", "")
+        
+        db_backup = BytesIO(json.dumps(bot_data, indent=4).encode())
+        db_backup.name = "backup_database.json"
 
-        with open("temp/backup_database.json", "w") as f:
-            json.dump(bot_data, f, indent=4)
-        
-        with open("temp/backup_database.json", "rb") as f:
-            db_backup = f.read()
-        
         await context.bot.send_document(
             user.id,
             db_backup,
-            "Database Backup File",
-            filename="backup_database.json"
+            "Database Backup File"
         )
 
         # process of deleting...

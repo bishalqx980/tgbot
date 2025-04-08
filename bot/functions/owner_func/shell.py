@@ -1,18 +1,18 @@
 import asyncio
 import subprocess
+from io import BytesIO
 from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot import logger
-from bot.functions.sudo_users import fetch_sudos
+from ... import logger
+from ..sudo_users import fetch_sudos
 
 async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     effective_message = update.effective_message
-    command = " ".join(context.args)
-    command = command.replace("'", "")
+    command = " ".join(context.args).replace("'", "")
 
     sudo_users = fetch_sudos()
     if user.id not in sudo_users:
@@ -50,13 +50,8 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await context.bot.edit_message_text(f"<pre>{result}</pre>", chat.id, sent_message.id)
     except:
-        try:
-            open("sys/shell.txt", "w").write(result)
-            shell = open("sys/shell.txt", "rb").read()
-        except Exception as e:
-            logger.error(e)
-            await context.bot.edit_message_text(str(e), chat.id, sent_message.id)
-            return
-        
+        shell = BytesIO(result.encode())
+        shell.name = "shell.txt"
+
         await context.bot.delete_message(chat.id, sent_message.id)
-        await effective_message.reply_document(shell, f"<b>Command</b>: {command}\n<b>Execute time</b>: {(time_executed - time_executing):.2f}s", filename="shell.txt")
+        await effective_message.reply_document(shell, f"<b>Command</b>: {command}\n<b>Execute time</b>: {(time_executed - time_executing):.2f}s")

@@ -1,4 +1,4 @@
-from bot import logger
+from ... import logger
 
 class MemoryDatabase:
     def __init__(self):

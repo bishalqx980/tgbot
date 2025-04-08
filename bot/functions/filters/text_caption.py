@@ -1,13 +1,13 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatID, ChatType
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.modules.database import MemoryDB
-from bot.modules.database.common import database_search
-from bot.modules.translator import translate
-from bot.modules.re_link import RE_LINK
-from bot.modules.base64 import BASE64
-from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
+from ...helper.button_maker import ButtonMaker
+from ...modules.database import MemoryDB
+from ...modules.database.common import database_search
+from ...modules.translator import translate
+from ...modules.re_link import RE_LINK
+from ...modules.base64 import BASE64
+from ..group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
 
 def database_editing(chat, effective_message):
     data_center = MemoryDB.data_center.get(chat.id)

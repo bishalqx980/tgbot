@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.modules.psndl.psndl import PSNDL
-from bot.modules import telegraph
+from ...modules.psndl.psndl_func import PSNDL
+from ...modules import telegraph
 
 async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

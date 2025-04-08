@@ -17,30 +17,27 @@ from telegram.ext import (
 )
 from telegram.error import BadRequest
 from telegram.constants import ParseMode
-from bot import ENV_CONFIG, DEFAULT_ERROR_CHANNEL_ID, HANDLERS_DIR, bot, logger
-from bot.alive import alive
-from bot.update_db import update_database
-from bot.modules import telegraph
-from bot.modules.database import MemoryDB
-from bot.functions.filters.text_caption import filter_text_caption
-from bot.functions.query_handlers import (
+from . import ENV_CONFIG, DEFAULT_ERROR_CHANNEL_ID, HANDLERS_DIR, BOT_HANDLERS_COUNT, bot, logger
+from .alive import alive
+from .update_db import update_database
+from .modules import telegraph
+from .modules.database import MemoryDB
+from .functions.filters.text_caption import filter_text_caption
+from .functions.query_handlers import (
     query_bot_settings,
     query_chat_settings,
     query_help_menu,
     query_misc,
     query_db_editing
 )
-from bot.functions.sudo_users import fetch_sudos
-from bot.functions.bot_chats_tracker import bot_chats_tracker
-from bot.functions.chat_status_update import chat_status_update
+from .functions.sudo_users import fetch_sudos
+from .functions.bot_chats_tracker import bot_chats_tracker
+from .functions.chat_status_update import chat_status_update
 
 
 async def post_boot():
     # initializing telegraph
     await telegraph.initialize()
-
-    # storing bot uptime
-    MemoryDB.insert("bot_data", None, {"bot_uptime": str(time())})
 
     # bot commands
     bot_commands = [
@@ -173,16 +170,15 @@ def main():
 
     # Command handlers
     bot_commands = load_handlers()
+
+    global BOT_HANDLERS_COUNT
+    BOT_HANDLERS_COUNT.update({"bot_handlers_count": len(bot_commands)})
+
     logger.info(f"Modules loaded: {len(bot_commands)}")
 
-    storage = []
     for command, handler in bot_commands.items():
-        storage.append(f"/{command}")
         application.add_handler(CommandHandler(command, handler)) # for /command
         application.add_handler(PrefixHandler(["!", ".", "-"], command, handler)) # for other prefix command
-    
-    # storing bot commands
-    MemoryDB.insert("bot_data", None, {"bot_commands": storage})
     
     # filters
     application.add_handler(MessageHandler(filters.TEXT | filters.CAPTION, filter_text_caption))

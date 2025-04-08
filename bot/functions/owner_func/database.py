@@ -1,11 +1,12 @@
 import json
 import asyncio
+from io import BytesIO
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.modules.database import MongoDB
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.functions.sudo_users import fetch_sudos
+from ...modules.database import MongoDB
+from ...helper.button_maker import ButtonMaker
+from ..sudo_users import fetch_sudos
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -99,13 +100,10 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         chat_filters = database_data.get('filters')
         if chat_filters:
-            with open(f"temp/filters_{victim_id}.json", "w") as f:
-                json.dump(chat_filters, f, indent=4)
-            
-            with open(f"temp/filters_{victim_id}.json", "rb") as f:
-                filters_file = f.read()
-            
-            await effective_message.reply_document(filters_file, f"filters of <code>{victim_id}</code>", filename=f"filters_{victim_id}.json")
+            filters_file = BytesIO(json.dumps(chat_filters, indent=4).encode())
+            filters_file.name = f"filters_{victim_id}.json"
+
+            await effective_message.reply_document(filters_file, f"ChatID: <code>{victim_id}</code>")
     
     else:
         database_data = MongoDB.find_one("users", "user_id", victim_id) # victim_id as int

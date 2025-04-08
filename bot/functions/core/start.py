@@ -2,11 +2,11 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.helpers import create_deep_linked_url
-from bot import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, ENV_CONFIG, logger
-from bot.functions.core.help import func_help
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.modules.database import MemoryDB
-from bot.modules.database.common import database_add_user
+from ... import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, ENV_CONFIG, logger
+from .help import func_help
+from ...helper.button_maker import ButtonMaker
+from ...modules.database import MemoryDB
+from ...modules.database.common import database_add_user
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

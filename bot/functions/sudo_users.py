@@ -1,5 +1,5 @@
-from bot import ENV_CONFIG
-from bot.modules.database import MemoryDB
+from .. import ENV_CONFIG
+from ..modules.database import MemoryDB
 
 def fetch_sudos():
     """retuns `list` of `sudo's` including **owner_id**"""

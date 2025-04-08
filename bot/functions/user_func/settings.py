@@ -3,11 +3,11 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import BadRequest
-from bot import logger
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.modules.database import MemoryDB
-from bot.modules.database.common import database_search
-from bot.functions.group_management.chat_settings import chat_settings
+from ... import logger
+from ...helper.button_maker import ButtonMaker
+from ...modules.database import MemoryDB
+from ...modules.database.common import database_search
+from ..group_management.chat_settings import chat_settings
 
 async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

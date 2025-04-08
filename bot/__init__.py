@@ -1,16 +1,19 @@
 import os
 import shutil
+from time import time
 from telegram import Bot
-from bot.config import load_config
-from bot.logger import setup_logging
+from .config import load_config
+from .logger import setup_logging
 
 # constants
 CONFIG_FILE = "config.env"
-REQUIRED_DIRS = ["downloads", "temp", "sys"]
+REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
 ORIGINAL_BOT_ID = 6845693976
 DEFAULT_ERROR_CHANNEL_ID = -1002675104487
 HANDLERS_DIR = "bot/functions"
+BOT_UPTIME = time()
+BOT_HANDLERS_COUNT = {}
 
 # Creating Required Folder/Directories
 try:

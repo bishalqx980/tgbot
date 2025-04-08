@@ -1,7 +1,7 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.functions.group_management.auxiliary.pm_error import pm_error
+from .auxiliary.pm_error import pm_error
 
 async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

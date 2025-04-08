@@ -1,6 +1,6 @@
 import aiohttp
-from bot import logger
-from bot.modules.database import MemoryDB
+from .. import logger
+from .database import MemoryDB
 
 async def fetch_movieinfo(movie_name=None, imdb_id=None, year=None):
     """

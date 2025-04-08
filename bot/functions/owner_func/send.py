@@ -3,7 +3,7 @@ from telegram import Update, ReactionTypeEmoji
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import Forbidden
-from bot.functions.sudo_users import fetch_sudos
+from ..sudo_users import fetch_sudos
 
 async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

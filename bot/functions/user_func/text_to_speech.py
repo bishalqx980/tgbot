@@ -1,9 +1,7 @@
-import os
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import logger
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.modules.gtts import text_to_speech
+from ...helper.button_maker import ButtonMaker
+from ...modules.gtts import text_to_speech
 
 async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -27,9 +25,3 @@ async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await context.bot.delete_message(chat.id, sent_message.id)
     await effective_message.reply_audio(response, title=file_name, filename=file_name)
-
-    # Removing the audio file
-    try:
-        os.remove(response)
-    except Exception as e:
-        logger.error(e)

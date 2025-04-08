@@ -2,7 +2,7 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.functions.sudo_users import fetch_sudos
+from ..sudo_users import fetch_sudos
 
 async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -20,6 +20,4 @@ async def func_log(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.delete_messages(chat.id, [effective_message.id, sent_message.id])
         return
     
-    log = open("sys/log.txt", "rb").read()
-
-    await effective_message.reply_document(log, filename="log.txt")
+    await effective_message.reply_document(open("sys/log.txt", "rb"), filename="log.txt")

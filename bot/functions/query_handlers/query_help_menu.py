@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
-from bot import logger
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.modules.database import MemoryDB, MongoDB
+from ... import BOT_UPTIME, BOT_HANDLERS_COUNT, logger
+from ...helper.button_maker import ButtonMaker
+from ...modules.database import MongoDB
 
 async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -174,13 +174,11 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sys_hours, remainder = divmod(sys_uptime.seconds, 3600)
         sys_minute = remainder / 60
 
-        bot_uptime = timedelta(seconds=time() - float(MemoryDB.bot_data.get("bot_uptime") or 0))
+        bot_uptime = timedelta(seconds=time() - BOT_UPTIME)
 
         bot_days = bot_uptime.days
         bot_hours, remainder = divmod(bot_uptime.seconds, 3600)
         bot_minute = remainder / 60
-
-        bot_commands = MemoryDB.bot_data.get("bot_commands") or []
 
         text = (
             "<blockquote><code><b>» bot.info()</b></code></blockquote>\n\n"
@@ -196,7 +194,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             f"<b>• System uptime:</b> <code>{int(sys_days)}d {int(sys_hours)}h {int(sys_minute)}m</code>\n"
             f"<b>• Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n"
-            f"<b>• Total commands:</b> <code>{len(bot_commands)}</code>\n\n"
+            f"<b>• Total commands:</b> <code>{BOT_HANDLERS_COUNT.get('bot_handlers_count') or 0}</code>\n\n"
 
             "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
             "<b>• Report bug:</b> <a href='https://github.com/bishalqx980/tgbot/issues'>Report</a>\n"

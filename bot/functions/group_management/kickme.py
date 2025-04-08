@@ -1,9 +1,9 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot import logger
-from bot.functions.group_management.auxiliary.pm_error import pm_error
-from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
+from ... import logger
+from .auxiliary.pm_error import pm_error
+from .auxiliary.fetch_chat_admins import fetch_chat_admins
 
 async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

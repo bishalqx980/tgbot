@@ -1,10 +1,10 @@
 from telegram import Update
 from telegram.constants import ChatType
 from telegram.ext import ContextTypes
-from bot.modules.database import MemoryDB
-from bot.modules.base64 import BASE64
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.functions.group_management.auxiliary.pm_error import pm_error
+from ...modules.database import MemoryDB
+from ...modules.base64 import BASE64
+from ...helper.button_maker import ButtonMaker
+from .auxiliary.pm_error import pm_error
 
 async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

@@ -1,3 +1,3 @@
-from bot.modules.telegraph import TELEGRAPH
+from .telegraph import TELEGRAPH
 
 telegraph = TELEGRAPH()

@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.modules.shrinkme import shortener_url
+from ...modules.shrinkme import shortener_url
 
 async def func_shorturl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message

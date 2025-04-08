@@ -1,5 +1,6 @@
 import json
-from bot import logger
+from io import BytesIO
+from ... import logger
 
 def fetch_database(database_path="bot/modules/psndl/database.json"):
     """
@@ -63,17 +64,11 @@ class PSNDL:
 
                     if hex_data.lower() == database_rap_data.lower():
                         rap_name = filtered_game_data.get("rap_name")
-                        rap_path = f"downloads/{rap_name}"
-
-                        try:
-                            with open(rap_path, "wb") as f:
-                                f.write(bytes.fromhex(database_rap_data))
-                        except Exception as e:
-                            logger.error(e)
-                            return
                         
+                        rap_bytes = BytesIO(bytes.fromhex(database_rap_data))
+                        rap_bytes.name = rap_name
+
                         return {
                             "game_data": filtered_game_data,
-                            "rap_name": rap_name,
-                            "rap_path": rap_path
+                            "rap_bytes": rap_bytes
                         }

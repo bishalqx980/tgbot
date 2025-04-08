@@ -1,8 +1,8 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.modules.database.common import database_search
-from bot.functions.group_management.auxiliary.pm_error import pm_error
+from ....modules.database.common import database_search
+from ..auxiliary.pm_error import pm_error
 
 async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

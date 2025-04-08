@@ -1,11 +1,11 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.modules.database.common import database_search
-from bot.modules.database import MemoryDB, MongoDB
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.functions.group_management.auxiliary.pm_error import pm_error
-from bot.functions.group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
+from ....modules.database.common import database_search
+from ....modules.database import MemoryDB, MongoDB
+from ....helper.button_maker import ButtonMaker
+from ..auxiliary.pm_error import pm_error
+from ..auxiliary.fetch_chat_admins import fetch_chat_admins
 
 async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

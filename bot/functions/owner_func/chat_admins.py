@@ -2,7 +2,7 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.functions.sudo_users import fetch_sudos
+from ..sudo_users import fetch_sudos
 
 async def func_cadmins(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

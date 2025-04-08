@@ -1,5 +1,5 @@
-from bot import CONFIG_FILE, ENV_CONFIG, logger
-from bot.modules.database import MemoryDB, MongoDB
+from . import CONFIG_FILE, ENV_CONFIG, logger
+from .modules.database import MemoryDB, MongoDB
 
 def update_database():
     bot_data = MongoDB.find("bot_data", "_id")

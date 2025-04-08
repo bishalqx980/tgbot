@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.modules.omdb_info import fetch_movieinfo
+from ...modules.omdb_info import fetch_movieinfo
 
 async def func_movie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
@@ -55,7 +55,7 @@ async def func_movie(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>📊 IMDB Votes:</b> {movie_info.get('imdbVotes')}\n"
         f"<b>🏷 IMDB ID:</b> <code>{movie_info.get('imdbID')}</code>\n"
         f"<b>💰 BoxOffice:</b> {movie_info.get('BoxOffice')}\n\n"
-        f"<b>📝 Plot:</b>\n<blockquote>{movie_info.get('Plot')}</blockquote>"
+        f"<blockquote expandable><b>📝 Plot:</b> {movie_info.get('Plot')}</blockquote>"
     )
 
     photo = movie_info["Poster"]

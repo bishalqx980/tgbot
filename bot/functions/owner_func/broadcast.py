@@ -1,13 +1,14 @@
 import asyncio
 from time import time
+from io import BytesIO
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from telegram.error import Forbidden, BadRequest
-from bot import logger
-from bot.helper.telegram_helpers.button_maker import ButtonMaker
-from bot.modules.database import MemoryDB, MongoDB
-from bot.functions.sudo_users import fetch_sudos
+from telegram.error import Forbidden
+from ... import logger
+from ...helper.button_maker import ButtonMaker
+from ...modules.database import MemoryDB, MongoDB
+from ..sudo_users import fetch_sudos
 
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -216,11 +217,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.edit_message_text(text, chat.id, notify_message.id)
 
     if exception_user_ids:
-        with open("temp/exception_user_ids.txt", "w") as f:
-            f.write(", ".join(exception_user_ids))
-        
-        with open("temp/exception_user_ids.txt", "rb") as f:
-            exception_file = f.read()
-        
-        file_name = f"Exception Users ID: {len(exception_user_ids)}" # used for caption too
-        await context.bot.send_document(chat.id, exception_file, file_name, filename=f"{file_name}.txt")
+        exception_file = BytesIO(", ".join(exception_user_ids).encode())
+        exception_file.name = "Exception.txt"
+
+        await context.bot.send_document(chat.id, exception_file, f"Total Exception: {len(exception_user_ids)}")
