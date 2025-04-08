@@ -126,7 +126,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Sudo users: <code>{}</code>\n\n"
             "<blockquote><b>Note: (Warning)</b> Sudo users have owner functions access!\nAdd UserID eg. <code>2134776547</code>\nMultiple ID should be separated by comma.</blockquote>"
-        ).format(", ".join(bot_data.get("sudo_users") or []))
+        ).format(", ".join(str(user_id) for user_id in (bot_data.get("sudo_users") or [])))
 
     elif query_data == "shrinkme_api":
         MemoryDB.insert("data_center", user.id, {
