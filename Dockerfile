@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.11
 
 WORKDIR /usr/src/app
 RUN chmod 777 /usr/src/app
