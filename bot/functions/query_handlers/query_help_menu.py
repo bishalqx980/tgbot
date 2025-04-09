@@ -88,8 +88,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query_data == "ai_knowledge":
         text = (
             "<blockquote><b>AI/Info Functions</b></blockquote>\n\n"
-
-            "• /wiki » Get information from wikipedia.\n"
+            
             "• /imagine » Generate AI image.\n"
             "• /gpt » Ask any question to AI-LLM\n\n"
 
