@@ -2,8 +2,13 @@ from .. import ENV_CONFIG
 from ..modules.database import MemoryDB
 
 def fetch_sudos():
-    """retuns `list` of `sudo's` including **owner_id**"""
+    """
+    :returns list: list of sudo's including **owner_id**
+    """
+    owner_id = int(ENV_CONFIG["owner_id"])
     sudo_users = MemoryDB.bot_data.get("sudo_users") or []
-    sudo_users.append(int(ENV_CONFIG["owner_id"]))
 
+    if owner_id not in sudo_users:
+        sudo_users.append(owner_id)
+    
     return sudo_users

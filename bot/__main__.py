@@ -2,7 +2,6 @@ import os
 import asyncio
 import aiohttp
 import importlib
-from time import time
 from telegram import Update, LinkPreviewOptions, BotCommand, BotCommandScope
 from telegram.ext import (
     ApplicationBuilder,
@@ -16,13 +15,16 @@ from telegram.ext import (
     Defaults
 )
 from telegram.error import BadRequest
-from telegram.constants import ParseMode
+from telegram.constants import ChatID, ParseMode
 from . import ENV_CONFIG, DEFAULT_ERROR_CHANNEL_ID, HANDLERS_DIR, BOT_HANDLERS_COUNT, bot, logger
 from .alive import alive
 from .update_db import update_database
 from .modules import telegraph
 from .modules.database import MemoryDB
-from .functions.filters.text_caption import filter_text_caption
+from .functions.filters import (
+    filter_private_chat,
+    filter_public_chat
+)
 from .functions.query_handlers import (
     query_bot_settings,
     query_chat_settings,
@@ -35,7 +37,7 @@ from .functions.bot_chats_tracker import bot_chats_tracker
 from .functions.chat_status_update import chat_status_update
 
 
-async def post_boot():
+async def post_init():
     # initializing telegraph
     await telegraph.initialize()
 
@@ -180,8 +182,19 @@ def main():
         application.add_handler(CommandHandler(command, handler)) # for /command
         application.add_handler(PrefixHandler(["!", ".", "-"], command, handler)) # for other prefix command
     
-    # filters
-    application.add_handler(MessageHandler(filters.TEXT | filters.CAPTION, filter_text_caption))
+    # filter private chat
+    application.add_handler(MessageHandler(
+        # SERVICE_CHAT is Linked channel with Group
+        ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.PRIVATE & (filters.TEXT | filters.CAPTION),
+        filter_private_chat.filter_private_chat
+    ))
+    # filter public chat
+    application.add_handler(MessageHandler(
+        # SERVICE_CHAT is Linked channel with Group
+        ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.GROUPS & (filters.TEXT | filters.CAPTION),
+        filter_public_chat.filter_public_chat
+    ))
+    # filter Chat Status Updates
     application.add_handler(MessageHandler(filters.StatusUpdate.ALL, chat_status_update)) # chat status update
     # Bot chat tracker
     application.add_handler(ChatMemberHandler(bot_chats_tracker, ChatMemberHandler.MY_CHAT_MEMBER)) # for tacking private chat
@@ -197,16 +210,16 @@ def main():
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
-async def start_up_work():
+async def app_init():
     alive() # Server breathing
     update_database()
-    await post_boot()
+    await post_init()
     await server_alive()
 
 
 if __name__ == "__main__":
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.create_task(start_up_work())
+    loop.create_task(app_init())
     loop.create_task(main())
     loop.run_forever()
