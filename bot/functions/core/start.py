@@ -2,8 +2,8 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.helpers import create_deep_linked_url
-from ... import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, ENV_CONFIG, logger
-from .help import func_help
+from telegram.error import BadRequest
+from ... import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, logger
 from ...helper.button_maker import ButtonMaker
 from ...modules.database import MemoryDB
 from ...modules.database.common import database_add_user
@@ -12,15 +12,6 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     effective_message = update.effective_message
-    context_args = " ".join(context.args)
-
-    if context_args == "help":
-        await func_help(update, context)
-        return
-    
-    if not ENV_CONFIG["owner_id"]:
-        await effective_message.reply_text("Warning: Bot OwnerID wasn't provided!")
-        return
 
     if chat.type != ChatType.PRIVATE:
         btn = ButtonMaker.ubutton([{"Start me in PM": create_deep_linked_url(context.bot.username, "start")}])
@@ -48,12 +39,18 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_data.update({"Support Chat": support_chat})
     
     btn = ButtonMaker.ubutton([btn_data])
+
     if bot_pic:
         try:
             await effective_message.reply_photo(bot_pic, text, reply_markup=btn)
+            return
+        except BadRequest:
+            pass
         except Exception as e:
             logger.error(e)
-    else:
-        await effective_message.reply_text(text, reply_markup=btn)
     
+    # if BadRequest or No Photo
+    await effective_message.reply_text(text, reply_markup=btn)
+
+    # database entry checking if user is registered.
     database_add_user(user)

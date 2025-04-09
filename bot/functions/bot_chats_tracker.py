@@ -54,7 +54,7 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         
         # promotion
-        elif new_status == ChatMember.ADMINISTRATOR:
+        elif old_status != ChatMember.ADMINISTRATOR and new_status == ChatMember.ADMINISTRATOR:
             text = (
                 "Thanks for adding me as an admin!\n"
                 "Don't forget to checkout /help section..."

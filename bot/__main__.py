@@ -35,6 +35,7 @@ from .functions.query_handlers import (
 from .functions.sudo_users import fetch_sudos
 from .functions.bot_chats_tracker import bot_chats_tracker
 from .functions.chat_status_update import chat_status_update
+from .functions.core.help import func_help
 
 
 async def post_init():
@@ -178,6 +179,10 @@ def main():
 
     logger.info(f"Modules loaded: {len(bot_commands)}")
 
+    # registering deeplinking command handler (and this need to register before main handler)
+    application.add_handler(CommandHandler("start", func_help, filters.Regex("help")))
+
+    # registering main handlers
     for command, handler in bot_commands.items():
         application.add_handler(CommandHandler(command, handler)) # for /command
         application.add_handler(PrefixHandler(["!", ".", "-"], command, handler)) # for other prefix command
