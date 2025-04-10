@@ -22,7 +22,7 @@ async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
-    links_behave = None if database_data.get("links_behave") == "none" else database_data.get("links_behave") # 3 values: delete; convert; none: str;
+    links_behave = database_data.get("links_behave") # 3 values: delete; convert; None;
     allowed_links = database_data.get("allowed_links") or []
     allowed_links = [link.strip() for link in allowed_links]
 

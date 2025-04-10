@@ -75,6 +75,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
                 f"• Antibot: <code>{memory_data.get('antibot') or False}</code>\n"
                 f"• Welcome Members: <code>{memory_data.get('welcome_user') or False}</code>\n"
                 f"• Farewell Members: <code>{memory_data.get('farewell_user') or False}</code>\n"
+                f"• Join Request: <code>{memory_data.get('chat_join_req')}</code>\n"
                 f"• Links Behave: <code>{memory_data.get('links_behave')}</code>\n"
                 f"• Allowed Links: <code>{', '.join(memory_data.get('allowed_links') or [])}</code>"
             )
@@ -84,7 +85,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
                 {"Echo": "csettings_echo", "Antibot": "csettings_antibot"},
                 {"Welcome Members": "csettings_welcome_user", "Farewell Members": "csettings_farewell_user"},
                 {"Links Behave": "csettings_links_behave", "Allowed Links": "csettings_allowed_links"},
-                {"Close": "csettings_close"}
+                {"Join Request": "csettings_chat_join_req", "Close": "csettings_close"}
             ]
 
             btn = ButtonMaker.cbutton(btn_data)
@@ -226,6 +227,26 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Note:</b> This will send a farewell message to chat when a member left, if enabled.\n</blockquote>"
         ).format(memory_data.get("farewell_user"))
     
+    elif query_data == "chat_join_req":
+        MemoryDB.insert("data_center", chat.id, {
+            "update_data_key": "chat_join_req",
+            "is_list": False,
+            "is_int": False
+        })
+
+        text = (
+            "<blockquote><b>Chat Settings</b></blockquote>\n\n"
+            "Join Request: <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> This will auto Approve or Decline or Do Nothing while a member request to join this Group. Bot should have invite member permissions.\n</blockquote>"
+        ).format(memory_data.get("chat_join_req"))
+
+        btn_data = [
+            {"Approve": "database_value_approve", "Decline": "database_value_decline", "Do Nothing": "database_rm_value"},
+            {"Back": "csettings_menu", "Close": "csettings_close"}
+        ]
+
+        btn = ButtonMaker.cbutton(btn_data)
+    
     elif query_data == "links_behave":
         MemoryDB.insert("data_center", chat.id, {
             "update_data_key": "links_behave",
@@ -241,7 +262,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(memory_data.get("links_behave"))
 
         btn_data = [
-            {"Delete": "database_value_delete", "Convert to base64": "database_value_convert", "Do Nothing": "database_value_none"},
+            {"Delete": "database_value_delete", "Convert to base64": "database_value_convert", "Do Nothing": "database_rm_value"},
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 

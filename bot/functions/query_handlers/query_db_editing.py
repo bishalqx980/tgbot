@@ -5,6 +5,12 @@ from ...helper.button_maker import ButtonMaker
 from ...modules.database import MemoryDB, MongoDB
 
 async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    This function accepts (`edit_value`, `cancel_editing`, `value_`, `rm_value`, "bool_") callback query data's\n
+    `value_`: The data given after value_ takes as `update_data_value`\n
+    `bool_`: Expects `bool_true` or `bool_false`\n
+    `rm_value`: Sets `update_data_value` as None
+    """
     chat = update.effective_chat
     user = update.effective_user
     query = update.callback_query

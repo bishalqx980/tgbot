@@ -5,7 +5,7 @@ def database_search(collection_name, search_key, match_value):
     :param collection_name: Name of collection. e.g. `users`
     :param search_key: Key to search. e.g. `user_id`
     :param match_value: Value to match. e.g. `2134776547`
-    :return: Speficied search data | `Error: Chat isn't registered.`
+    :return: Speficied search data | `Error: None; Which means chat isn't registered.`
     """
     data = None
 

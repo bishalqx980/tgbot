@@ -8,6 +8,7 @@ from telegram.ext import (
     CommandHandler,
     PrefixHandler,
     MessageHandler,
+    ChatJoinRequestHandler,
     filters,
     CallbackQueryHandler,
     ChatMemberHandler,
@@ -36,6 +37,7 @@ from .functions.sudo_users import fetch_sudos
 from .functions.bot_chats_tracker import bot_chats_tracker
 from .functions.chat_status_update import chat_status_update
 from .functions.core.help import func_help
+from .functions.group_management.chat_join_req import join_request_handler
 
 
 async def post_init():
@@ -187,6 +189,8 @@ def main():
         application.add_handler(CommandHandler(command, handler)) # for /command
         application.add_handler(PrefixHandler(["!", ".", "-"], command, handler)) # for other prefix command
     
+    # Chat Join Request Handler
+    application.add_handler(ChatJoinRequestHandler(join_request_handler))
     # filter private chat
     application.add_handler(MessageHandler(
         # SERVICE_CHAT is Linked channel with Group
