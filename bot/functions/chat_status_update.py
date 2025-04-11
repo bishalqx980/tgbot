@@ -7,7 +7,7 @@ from .group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
 
 async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    **Status updates of `effective_chat` >> Group/SuperGroup**
+    **Status update of Group/SuperGroup**
     """
     chat = update.effective_chat
     cause_user = update.effective_user
@@ -83,7 +83,3 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
     # farewell for left chat member
     elif effective_message.left_chat_member and farewell_user:
         await context.bot.send_message(chat.id, f"Nice to see you! {effective_message.left_chat_member.mention_html()} has left us!")
-    
-    # new chat title
-    elif effective_message.new_chat_title:
-        MongoDB.update("groups", "chat_id", chat.id, "title", effective_message.new_chat_title)

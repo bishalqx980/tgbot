@@ -237,7 +237,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         text = (
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Join Request: <code>{}</code>\n\n"
-            "<blockquote><b>Note:</b> This will auto Approve or Decline or Do Nothing while a member request to join this Group. Bot should have invite member permissions.\n</blockquote>"
+            "<blockquote><b>Note:</b> This will auto Approve or Decline or Do Nothing while a member request to join this Group. (Bot should have add/invite member permission.)\n</blockquote>"
         ).format(memory_data.get("chat_join_req"))
 
         btn_data = [

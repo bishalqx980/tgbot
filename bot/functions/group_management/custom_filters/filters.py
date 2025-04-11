@@ -20,7 +20,7 @@ async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     filters = database_data.get("filters")
 
     if filters:
-        text = "<b><u>Chat filters</u></b>\n\n"
+        text = "<blockquote>Chat filters</blockquote>\n\n"
         for keyword in filters:
             text += f"• <code>{keyword}</code>\n"
     
