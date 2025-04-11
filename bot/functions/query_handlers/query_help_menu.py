@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
-from ... import BOT_UPTIME, BOT_HANDLERS_COUNT, logger
+from ... import __version__, BOT_UPTIME, BOT_HANDLERS_COUNT, logger
 from ...helper.button_maker import ButtonMaker
 from ...modules.database import MongoDB
 
@@ -193,14 +193,17 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             f"<b>• System uptime:</b> <code>{int(sys_days)}d {int(sys_hours)}h {int(sys_minute)}m</code>\n"
             f"<b>• Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n"
-            f"<b>• Total commands:</b> <code>{BOT_HANDLERS_COUNT.get('bot_handlers_count') or 0}</code>\n\n"
-
-            "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
-            "<b>• Report bug:</b> <a href='https://github.com/bishalqx980/tgbot/issues'>Report</a>\n"
-            "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
+            f"<b>• Total commands:</b> <code>{BOT_HANDLERS_COUNT.get('bot_handlers_count') or 0}</code>\n"
+            f"<b>• Version (stable):</b> <code>{__version__}</code>"
         )
+
+        btn_data = [
+            {"Source code": "https://github.com/bishalqx980/tgbot", "Report bug": "https://github.com/bishalqx980/tgbot/issues"},
+            {"Developer": "https://t.me/bishalqx680/22"},
+            {"Back": "help_menu_menu", "Close": "help_menu_close"}
+        ]
         
-        btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
+        btn = ButtonMaker.cbutton(btn_data)
     
     elif query_data == "close":
         try:

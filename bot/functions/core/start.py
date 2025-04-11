@@ -28,17 +28,17 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• /help - Get bot help menu\n\n"
         "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
         "<b>• Report bug:</b> <a href='https://github.com/bishalqx980/tgbot/issues'>Report</a>\n"
-        "<b>• Developer:</b> <a href='https://t.me/bishalqx980'>bishalqx980</a>"
+        "<b>• Developer:</b> <a href='https://t.me/bishalqx680/22'>bishalqx980</a>"
     )
 
     if context.bot.id != ORIGINAL_BOT_ID:
         text += f"\n\n<blockquote>Cloned bot of @{ORIGINAL_BOT_USERNAME}</blockquote>"
 
-    btn_data = {"Add me to your chat": create_deep_linked_url(context.bot.username, "help", True)}
+    btn_data = [{"Add me to your chat": create_deep_linked_url(context.bot.username, "help", True)}]
     if support_chat:
-        btn_data.update({"Support Chat": support_chat})
+        btn_data.append({"Support Chat": support_chat})
     
-    btn = ButtonMaker.ubutton([btn_data])
+    btn = ButtonMaker.ubutton(btn_data)
 
     if bot_pic:
         try:

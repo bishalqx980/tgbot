@@ -6,6 +6,7 @@ from .config import load_config
 from .logger import setup_logging
 
 # constants
+__version__ = "1.0.0.482" # major.minor.patch.commits
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
@@ -32,7 +33,7 @@ ENV_CONFIG = load_config(CONFIG_FILE)
 # Main bot function
 bot = Bot(ENV_CONFIG["bot_token"])
 
-logger.info("""
+logger.info(f"""
 Developed by
  ______     __     ______     __  __     ______     __        
 /\  == \   /\ \   /\  ___\   /\ \_\ \   /\  __ \   /\ \       
@@ -40,6 +41,7 @@ Developed by
  \ \_____\  \ \_\  \/\_____\  \ \_\ \_\  \ \_\ \_\  \ \_____\ 
   \/_____/   \/_/   \/_____/   \/_/\/_/   \/_/\/_/   \/_____/ 
    
-                            Library: python-telegram-bot
-                            GitHub: https://github.com/bishalqx980
+    Version: {__version__}
+    Library: python-telegram-bot
+    GitHub: https://github.com/bishalqx980
 """)

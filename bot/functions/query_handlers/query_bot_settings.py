@@ -94,7 +94,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         text = (
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
-            "Support Chat (link): <code>{}</code>\n"
+            "Support Chat (link): <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> Group chat link for bot support (optional)</blockquote>"
         ).format(bot_data.get("support_chat"))
     

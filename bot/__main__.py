@@ -72,7 +72,7 @@ async def server_alive():
         logger.warning("Server URL wasn't found.")
         await bot.send_message(
             ENV_CONFIG["owner_id"],
-            "<b>Error:</b> `Server URL` wasn't found. Bot may fall asleep if deployed on Render (free instance). /bsettings to set Server URL.",
+            "<b>Error:</b> <code>Server URL</code> wasn't found. Bot may fall asleep if deployed on Render (free instance). /bsettings to set Server URL.",
             parse_mode=ParseMode.HTML
         )
         return
@@ -124,13 +124,18 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
             "<b>⚠️ An error occured:</b>\n\n"
             f"<pre>{context.error}</pre>"
         )
-
-    try:
-        await context.bot.send_message(DEFAULT_ERROR_CHANNEL_ID, text)
-    except BadRequest:
-        await context.bot.send_message(ENV_CONFIG["owner_id"], text)
-    except Exception as e:
-        logger.error(e)
+    
+    if DEFAULT_ERROR_CHANNEL_ID:
+        try:
+            await context.bot.send_message(DEFAULT_ERROR_CHANNEL_ID, text)
+            return
+        except BadRequest:
+            pass
+        except Exception as e:
+            logger.error(e)
+            return
+    # if not DEFAULT_ERROR_CHANNEL_ID or BadRequest
+    await context.bot.send_message(ENV_CONFIG["owner_id"], text)
 
 
 def load_handlers():
