@@ -58,7 +58,7 @@ async def post_init():
 
     # Send alive message to all sudo and bot owner
     sudo_users = fetch_sudos()
-
+    
     try:
         await asyncio.gather(*(bot.send_message(user_id, "<b>Bot Started!</b>", parse_mode=ParseMode.HTML) for user_id in sudo_users))
     except Exception as e:
@@ -69,14 +69,12 @@ async def server_alive():
     # executing after updating database so getting data from memory...
     server_url = MemoryDB.bot_data.get("server_url")
     if not server_url:
-        logger.warning("✕ Server URL wasn't found.")
-
-        text = (
-            "✕ <code>Server URL</code> wasn't found!\n"
-            "Bot may fall asleep. /bsettings to setup Server URL."
+        logger.warning("Server URL wasn't found.")
+        await bot.send_message(
+            ENV_CONFIG["owner_id"],
+            "<b>Error:</b> `Server URL` wasn't found. Bot may fall asleep if deployed on Render (free instance). /bsettings to set Server URL.",
+            parse_mode=ParseMode.HTML
         )
-
-        await bot.send_message(ENV_CONFIG["owner_id"], f"<b>{text}</b>", parse_mode=ParseMode.HTML)
         return
     
     while True:
@@ -205,7 +203,7 @@ def main():
     ))
     # filter Chat Status Updates (for chat welcome & farewell message)
     application.add_handler(MessageHandler(
-        filters.StatusUpdate.NEW_CHAT_MEMBERS or filters.StatusUpdate.LEFT_CHAT_MEMBER,
+        filters.StatusUpdate.NEW_CHAT_MEMBERS | filters.StatusUpdate.LEFT_CHAT_MEMBER,
         chat_status_update
     ))
     # Bot chat tracker

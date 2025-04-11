@@ -1,31 +1,43 @@
 import os
 import requests
 
-def fetch_latest_commit(owner, repo):
-    url = f"https://api.github.com/repos/{owner}/{repo}/commits"
+GITHUB_OWNER_USERNAME = "bishalqx980"
+REPO_NAME = "tgbot"
+# telegram variables
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+CHAT_ID = int(os.getenv("CHAT_ID")) # chat_id to send update message; could be owner_id
+
+def main():
+    # get commit
     try:
-        response = requests.get(url)
+        response = requests.get(f"https://api.github.com/repos/{GITHUB_OWNER_USERNAME}/{REPO_NAME}/commits")
         if not response.ok:
             print(response.text)
             return
         
         commits_data = response.json()
         latest_commit = commits_data[0]
-        return latest_commit
-    except Exception as e:
-        print(e)
 
-def send_message(bot_token, chat_id, text):
-    req_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    data = {
-        "chat_id": chat_id,
-        "text": text,
-        "disable_web_page_preview": True,
-        "parse_mode": "HTML"
-    }
+        committer = latest_commit['commit']['committer']
+        latest_commit_url = latest_commit['html_url']
+        commit_message = latest_commit['commit']['message']
 
-    try:
-        response = requests.get(req_url, data)
+        message = (
+            f"A new <b><a href='{latest_commit_url}'>commit {latest_commit['sha'][:7]}</a></b> has been made to <a href='https://github.com/{GITHUB_OWNER_USERNAME}/{REPO_NAME}'>{REPO_NAME}</a>\n\n"
+
+            f"<blockquote>{commit_message}</blockquote>\n\n"
+
+            f"<b>Signed by:</b> <i>{committer['name']}</i>"
+        )
+
+        data = {
+            "chat_id": CHAT_ID,
+            "text": message,
+            "disable_web_page_preview": True,
+            "parse_mode": "HTML"
+        }
+
+        response = requests.get(f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage", data)
         if response.ok:
             print("Message sent successfully.")
         else:
@@ -33,29 +45,5 @@ def send_message(bot_token, chat_id, text):
     except Exception as e:
         print(e)
 
-# Variables 
-owner = "bishalqx980"
-repo = "tgbot"
-bot_token = os.getenv("BOT_TOKEN")
-owner_id = int(os.getenv("OWNER_ID"))
-chat_id = int(os.getenv("CHAT_ID"))
-
-# call func's
-res = fetch_latest_commit(owner, repo)
-if not res:
-    print("Error: error getting lastest commit.")
-    exit()
-
-committer = res['commit']['committer']
-lastest_commit_url = res['html_url']
-commit_message = res['commit']['message']
-
-msg = (
-    f"A new commit has been made to <a href='https://github.com/{owner}/{repo}'>{repo}</a>\n\n"
-    f"<b>Latest commit:</b> <a href='{lastest_commit_url}'>{res['sha'][:7]}</a>\n"
-    f"<b>Commit message:</b>\n\n"
-    f"<blockquote>{commit_message}</blockquote>\n\n"
-    f"<b>Committed by:</b> <i>{committer['name']}</i>"
-)
-
-sent_msg = send_message(bot_token, chat_id, f"<b>{msg}</b>")
+# calling the function
+main()
