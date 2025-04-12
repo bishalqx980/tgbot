@@ -17,7 +17,10 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = ButtonMaker.ubutton([{"Start me in PM": create_deep_linked_url(context.bot.username, "start")}])
         await effective_message.reply_text(f"Hey, {user.first_name}\nStart me in PM!", reply_markup=btn)
         return
-
+    
+    # database entry checking if user is registered.
+    database_add_user(user)
+    
     bot_pic = MemoryDB.bot_data.get("bot_pic")
     support_chat = MemoryDB.bot_data.get("support_chat")
 
@@ -51,6 +54,3 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # if BadRequest or No Photo
     await effective_message.reply_text(text, reply_markup=btn)
-
-    # database entry checking if user is registered.
-    database_add_user(user)

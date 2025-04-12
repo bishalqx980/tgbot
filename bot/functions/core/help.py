@@ -19,6 +19,9 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text(f"Hey, {user.first_name}\nContact me in PM for help!", reply_markup=btn)
         return
     
+    # database entry checking if user is registered.
+    database_add_user(user)
+    
     text = (
         "<blockquote><b>Help Menu</b></blockquote>\n\n"
         "Hey! Welcome to the bot help section.\n"
@@ -50,6 +53,3 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # if BadRequest or No Photo
     await effective_message.reply_text(text, reply_markup=btn)
-    
-    # database entry checking if user is registered.
-    database_add_user(user)
