@@ -40,7 +40,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     text = (
         "<blockquote><b>Bot Settings</b></blockquote>\n\n"
-        f"• Bot photo: <code>{bot_data.get('bot_pic')}</code>\n"
+        f"• Show Bot Photo: <code>{bot_data.get('show_bot_pic') or False}</code>\n"
         f"• Images: <code>{len(bot_data.get('images') or [])}</code>\n"
         f"• Support chat: <code>{bot_data.get('support_chat')}</code>\n"
         f"• Server url: <code>{bot_data.get('server_url')}</code>\n"
@@ -51,7 +51,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     
     btn_data = [
-        {"Bot Photo": "bsettings_bot_pic", "Images": "bsettings_images"},
+        {"Show Bot Photo": "bsettings_show_bot_pic", "Images": "bsettings_images"},
         {"Support Chat": "bsettings_support_chat", "Server URL": "bsettings_server_url"},
         {"Sudo": "bsettings_sudo", "Shrinkme API": "bsettings_shrinkme_api"},
         {"OMDB API": "bsettings_omdb_api", "Weather API": "bsettings_weather_api"},
@@ -60,17 +60,28 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn = ButtonMaker.cbutton(btn_data)
     
-    images = bot_data.get("images")
-    photo = random.choice(images).strip() if images else bot_data.get("bot_pic")
+    show_bot_pic = MemoryDB.bot_data.get("show_bot_pic")
+    images = MemoryDB.bot_data.get("images")
+    photo = None
+    photo_file_id = None
 
-    if photo:
+    if images:
+        photo = random.choice(images).strip()
+    elif show_bot_pic:
         try:
-            await effective_message.reply_photo(photo, text, reply_markup=btn)
+            bot_photos = await context.bot.get_user_profile_photos(context.bot.id)
+            photo_file_id = bot_photos.photos[0][-1].file_id # the high quality photo file_id
+        except:
+            pass
+    
+    if photo or photo_file_id:
+        try:
+            await effective_message.reply_photo(photo or photo_file_id, text, reply_markup=btn)
             return
         except BadRequest:
             pass
         except Exception as e:
             logger.error(e)
     
-    # if BadRequest or No Photo
+    # if BadRequest or No Photo or Other error
     await effective_message.reply_text(text, reply_markup=btn)

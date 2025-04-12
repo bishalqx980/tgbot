@@ -13,7 +13,7 @@ def load_config(config_file):
         "bot_token": os.getenv("BOT_TOKEN"),
         "owner_id": os.getenv("OWNER_ID"),
         "owner_username": os.getenv("OWNER_USERNAME"),
-        "bot_pic": os.getenv("BOT_PIC"),
+        "show_bot_pic": os.getenv("SHOW_BOT_PIC"),
         #database
         "mongodb_uri": os.getenv("MONGODB_URI"),
         "db_name": os.getenv("DB_NAME"),

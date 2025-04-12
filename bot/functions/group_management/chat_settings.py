@@ -1,8 +1,5 @@
-import random
 from telegram import Update
 from telegram.ext import ContextTypes
-from telegram.error import BadRequest
-from ... import logger
 from ...helper.button_maker import ButtonMaker
 from ...modules.database import MemoryDB
 from ...modules.database.common import database_search
@@ -72,18 +69,4 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     ]
 
     btn = ButtonMaker.cbutton(btn_data)
-
-    images = MemoryDB.bot_data.get("images")
-    photo = random.choice(images).strip() if images else MemoryDB.bot_data.get("bot_pic")
-
-    if photo:
-        try:
-            await effective_message.reply_photo(photo, text, reply_markup=btn)
-            return
-        except BadRequest:
-            pass
-        except Exception as e:
-            logger.error(e)
-    
-    # if BadRequest or No Photo
     await effective_message.reply_text(text, reply_markup=btn)

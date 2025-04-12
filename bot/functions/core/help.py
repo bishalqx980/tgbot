@@ -39,17 +39,28 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     btn = ButtonMaker.cbutton(btn_data)
 
+    show_bot_pic = MemoryDB.bot_data.get("show_bot_pic")
     images = MemoryDB.bot_data.get("images")
-    photo = random.choice(images).strip() if images else MemoryDB.bot_data.get("bot_pic")
+    photo = None
+    photo_file_id = None
 
-    if photo:
+    if images:
+        photo = random.choice(images).strip()
+    elif show_bot_pic:
         try:
-            await effective_message.reply_photo(photo, text, reply_markup=btn)
+            bot_photos = await context.bot.get_user_profile_photos(context.bot.id)
+            photo_file_id = bot_photos.photos[0][-1].file_id # the high quality photo file_id
+        except:
+            pass
+    
+    if photo or photo_file_id:
+        try:
+            await effective_message.reply_photo(photo or photo_file_id, text, reply_markup=btn)
             return
         except BadRequest:
             pass
         except Exception as e:
             logger.error(e)
     
-    # if BadRequest or No Photo
+    # if BadRequest or No Photo or Other error
     await effective_message.reply_text(text, reply_markup=btn)

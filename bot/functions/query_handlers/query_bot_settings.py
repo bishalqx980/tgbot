@@ -24,7 +24,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
     if query_data == "menu":
         text = (
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
-            f"• Bot photo: <code>{bot_data.get('bot_pic')}</code>\n"
+            f"• Show Bot Photo: <code>{bot_data.get('show_bot_pic') or False}</code>\n"
             f"• Images: <code>{len(bot_data.get('images') or [])}</code>\n"
             f"• Support chat: <code>{bot_data.get('support_chat')}</code>\n"
             f"• Server url: <code>{bot_data.get('server_url')}</code>\n"
@@ -35,7 +35,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         )
 
         btn_data = [
-            {"Bot Photo": "bsettings_bot_pic", "Images": "bsettings_images"},
+            {"Show Bot Photo": "bsettings_show_bot_pic", "Images": "bsettings_images"},
             {"Support Chat": "bsettings_support_chat", "Server URL": "bsettings_server_url"},
             {"Sudo": "bsettings_sudo", "Shrinkme API": "bsettings_shrinkme_api"},
             {"OMDB API": "bsettings_omdb_api", "Weather API": "bsettings_weather_api"},
@@ -44,20 +44,25 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         btn = ButtonMaker.cbutton(btn_data)
     
-    elif query_data == "bot_pic":
+    elif query_data == "show_bot_pic":
         MemoryDB.insert("data_center", user.id, {
-            "update_data_key": "bot_pic",
+            "update_data_key": "show_bot_pic",
             "is_list": False,
             "is_int": False
         })
 
-        is_editing_btn = True
-
         text = (
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
-            "Bot Photo (link): <code>{}</code>\n\n"
-            "<blockquote><b>Note:</b> Send an image link to set bot pic!</blockquote>"
-        ).format(bot_data.get("bot_pic"))
+            "Show Bot Photo: <code>{}</code>\n\n"
+            "<blockquote><b>Note:</b> Send's /start message or other supported message with Bot photo.</blockquote>"
+        ).format(bot_data.get("show_bot_pic"))
+
+        btn_data = [
+            {"YES": "database_bool_true", "NO": "database_bool_false"},
+            {"Back": "bsettings_menu", "Close": "bsettings_close"}
+        ]
+
+        btn = ButtonMaker.cbutton(btn_data)
     
     elif query_data == "images":
         MemoryDB.insert("data_center", user.id, {
@@ -72,7 +77,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         text = (
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Images (link): <code>{}</code>\n\n"
-            "<blockquote><b>Note:</b> Multiple links should be separated by comma.</blockquote>"
+            "<blockquote><b>Note:</b> Images that will be randomly shown with various command messages. Multiple links should be separated by comma.</blockquote>"
         ).format(len(images or []))
 
         if images:
