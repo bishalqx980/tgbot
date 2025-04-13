@@ -67,7 +67,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         whisper_data = data_center.get("whisper_data")
     
     # if replied then it will be user_id else it will be username
-    whsiper_key = BASE64.encode(f"to_{whisper_username or whisper_user_id}_from_{user.id}")
+    whsiper_key = BASE64.encode(f"{whisper_username or whisper_user_id}_{user.id}_{effective_message.id}")
 
     whisper_data.update({
         whsiper_key: {
