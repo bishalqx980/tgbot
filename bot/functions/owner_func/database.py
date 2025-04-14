@@ -85,6 +85,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Antibot: <code>{database_data.get('antibot') or False}</code>\n"
             f"• Welcome Members: <code>{database_data.get('welcome_user') or False}</code>\n"
             f"• Farewell Members: <code>{database_data.get('farewell_user') or False}</code>\n"
+            f"• Join Request: <code>{database_data.get('chat_join_req')}</code>\n"
             f"• Links Behave: <code>{database_data.get('links_behave')}</code>\n"
             f"• Allowed Links: <code>{', '.join(database_data.get('allowed_links') or [])}</code>"
         )

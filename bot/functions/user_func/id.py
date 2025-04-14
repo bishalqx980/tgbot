@@ -12,9 +12,11 @@ async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if re_msg:
         forward_origin = re_msg.forward_origin
         from_user = re_msg.from_user
-    
+        
         if forward_origin and forward_origin.type == MessageOriginType.USER:
             victim = forward_origin.sender_user
+        elif forward_origin and forward_origin.type == MessageOriginType.CHANNEL:
+            victim = forward_origin.chat
         
         if from_user and not forward_origin:
             victim = from_user
@@ -31,7 +33,7 @@ async def func_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text = (
                 f"• {user.full_name}\n"
                 f"  » <b>ID:</b> <code>{user.id}</code>\n"
-                f"• {victim.full_name}\n"
+                f"• {victim.full_name or victim.title}\n" # this title could cause error (title for channel)
                 f"  » <b>ID:</b> <code>{victim.id}</code>\n"
                 f"• <b>ChatID:</b> <code>{chat.id}</code>"
             )

@@ -2,7 +2,7 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from .. import logger
 
 class ButtonMaker:
-    def ubutton(data: list):
+    def ubutton(data):
         """
         **url button maker**\n
         :param data: `list` of `dict`\n
@@ -19,7 +19,7 @@ class ButtonMaker:
             logger.error(e)
 
 
-    def cbutton(data: list):
+    def cbutton(data):
         """
         **callback button maker (also works for url btn)**\n
         > **This function work for both url and callback button maker if `data` starts with `http` otherwise you can use `ubutton` function to make url btn**\n
