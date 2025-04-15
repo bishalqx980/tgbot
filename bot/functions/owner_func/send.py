@@ -56,27 +56,28 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
             document = re_msg.document
             voice = re_msg.voice
             video_note = re_msg.video_note
+            btn = re_msg.reply_markup
 
             if text:
-                await context.bot.send_message(victim_id, text)
+                await context.bot.send_message(victim_id, text, reply_markup=btn)
 
             elif photo:
-                await context.bot.send_photo(victim_id, photo[-1].file_id, caption)
+                await context.bot.send_photo(victim_id, photo[-1].file_id, caption, reply_markup=btn)
 
             elif audio:
-                await context.bot.send_audio(victim_id, audio.file_id, title=audio.file_name, caption=caption, filename=audio.file_name)
+                await context.bot.send_audio(victim_id, audio.file_id, title=audio.file_name, caption=caption, reply_markup=btn, filename=audio.file_name)
 
             elif video:
-                await context.bot.send_video(victim_id, video.file_id, caption=caption)
+                await context.bot.send_video(victim_id, video.file_id, caption=caption, reply_markup=btn)
 
             elif document:
-                await context.bot.send_document(victim_id, document.file_id, caption, filename=document.file_name)
+                await context.bot.send_document(victim_id, document.file_id, caption, reply_markup=btn, filename=document.file_name)
             
             elif voice:
-                await context.bot.send_voice(victim_id, voice.file_id, caption=caption)
+                await context.bot.send_voice(victim_id, voice.file_id, caption=caption, reply_markup=btn)
             
             elif video_note:
-                await context.bot.send_video_note(victim_id, video_note.file_id)
+                await context.bot.send_video_note(victim_id, video_note.file_id, reply_markup=btn)
             
             else:
                 await effective_message.reply_text("Replied content isn't added yet. Stay tuned for future update.")

@@ -56,6 +56,7 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"• Welcome Members: <code>{database_data.get('welcome_user') or False}</code>\n"
         f"• Farewell Members: <code>{database_data.get('farewell_user') or False}</code>\n"
         f"• Join Request: <code>{database_data.get('chat_join_req')}</code>\n"
+        f"• Service Messages: <code>{database_data.get('service_messages')}</code>\n"
         f"• Links Behave: <code>{database_data.get('links_behave')}</code>\n"
         f"• Allowed Links: <code>{', '.join(database_data.get('allowed_links') or [])}</code>"
     )
@@ -65,7 +66,8 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         {"Echo": "csettings_echo", "Antibot": "csettings_antibot"},
         {"Welcome Members": "csettings_welcome_user", "Farewell Members": "csettings_farewell_user"},
         {"Links Behave": "csettings_links_behave", "Allowed Links": "csettings_allowed_links"},
-        {"Join Request": "csettings_chat_join_req", "Close": "csettings_close"}
+        {"Join Request": "csettings_chat_join_req", "Service Messages": "csettings_service_messages"},
+        {"Close": "csettings_close"}
     ]
 
     btn = ButtonMaker.cbutton(btn_data)

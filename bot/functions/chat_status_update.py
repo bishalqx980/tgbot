@@ -1,7 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from .. import logger
-from ..modules.database import MongoDB
 from ..modules.database.common import database_search
 from .group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
 
@@ -18,10 +17,17 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
         return
 
     welcome_user = database_data.get("welcome_user")
-    custom_welcome_msg = database_data.get("custom_welcome_msg")
+    custom_welcome_msg = database_data.get("custom_welcome_msg") # related to new_chat_members
     farewell_user = database_data.get("farewell_user")
-    antibot = database_data.get("antibot")
+    antibot = database_data.get("antibot") # related to new_chat_members
+    service_messages = database_data.get("service_messages") # boolean (delete service messages)
 
+    if service_messages:
+        try:
+            await effective_message.delete()
+        except Exception as e:
+            logger.error(e)
+    
     # handling new chat member
     if effective_message.new_chat_members:
         if len(effective_message.new_chat_members) > 1:

@@ -206,11 +206,8 @@ def main():
         ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.GROUPS & (filters.TEXT | filters.CAPTION),
         filter_public_chat.filter_public_chat
     ))
-    # filter Chat Status Updates (for chat welcome & farewell message)
-    application.add_handler(MessageHandler(
-        filters.StatusUpdate.NEW_CHAT_MEMBERS | filters.StatusUpdate.LEFT_CHAT_MEMBER,
-        chat_status_update
-    ))
+    # filter Chat Status Updates
+    application.add_handler(MessageHandler(filters.StatusUpdate.ALL, chat_status_update))
     # Bot chat tracker (PRIVATE: only if bot is blocked or unblocked; PIUBLIC: any)
     application.add_handler(ChatMemberHandler(bot_chats_tracker, ChatMemberHandler.MY_CHAT_MEMBER))
     # Callback query handlers
