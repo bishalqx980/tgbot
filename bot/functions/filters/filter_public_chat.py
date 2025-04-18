@@ -1,10 +1,10 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...helper.button_maker import ButtonMaker
-from ...modules.database.common import database_search
-from ...modules.translator import translate
-from ...modules.re_link import RE_LINK
-from ...modules.base64 import BASE64
+from bot.helper.button_maker import ButtonMaker
+from bot.modules.database.common import database_search
+from bot.modules.translator import translate
+from bot.modules.re_link import RE_LINK
+from bot.modules.base64 import BASE64
 from ..group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
 from .edit_database import edit_database
 

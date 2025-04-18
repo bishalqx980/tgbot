@@ -1,4 +1,4 @@
-from .. import logger
+from bot import logger
 
 class Utils:
     def calculator(math):

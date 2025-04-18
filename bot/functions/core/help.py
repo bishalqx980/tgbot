@@ -4,10 +4,10 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import BadRequest
 from telegram.helpers import create_deep_linked_url
-from ... import logger
-from ...helper.button_maker import ButtonMaker
-from ...modules.database import MemoryDB
-from ...modules.database.common import database_add_user
+from bot import logger
+from bot.helper.button_maker import ButtonMaker
+from bot.modules.database import MemoryDB
+from bot.modules.database.common import database_add_user
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

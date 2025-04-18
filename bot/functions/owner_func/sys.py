@@ -3,7 +3,7 @@ from time import time
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
-from ... import BOT_UPTIME
+from bot import BOT_UPTIME
 from ..sudo_users import fetch_sudos
 
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):

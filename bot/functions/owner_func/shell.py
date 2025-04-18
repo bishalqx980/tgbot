@@ -5,7 +5,7 @@ from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from ... import logger
+from bot import logger
 from ..sudo_users import fetch_sudos
 
 async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):

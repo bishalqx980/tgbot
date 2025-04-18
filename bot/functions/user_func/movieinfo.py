@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...modules.omdb_info import fetch_movieinfo
+from bot.modules.omdb_info import fetch_movieinfo
 
 async def func_movie(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message

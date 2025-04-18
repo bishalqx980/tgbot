@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...modules import telegraph
+from bot.modules import telegraph
 
 async def func_paste(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

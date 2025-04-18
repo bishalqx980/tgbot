@@ -1,7 +1,7 @@
 from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...modules.qr import QR
+from bot.modules.qr import QR
 
 async def func_qr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

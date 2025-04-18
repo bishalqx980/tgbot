@@ -1,6 +1,6 @@
 import qrcode
 from io import BytesIO
-from .. import logger
+from bot import logger
 
 class QR:
     def generate_qr(data, size=50):

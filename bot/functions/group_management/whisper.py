@@ -1,9 +1,9 @@
 from telegram import Update
 from telegram.constants import ChatType
 from telegram.ext import ContextTypes
-from ...modules.database import MemoryDB
-from ...modules.base64 import BASE64
-from ...helper.button_maker import ButtonMaker
+from bot.modules.database import MemoryDB
+from bot.modules.base64 import BASE64
+from bot.helper.button_maker import ButtonMaker
 from .auxiliary.pm_error import pm_error
 
 async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):

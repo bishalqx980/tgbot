@@ -1,7 +1,7 @@
 import json
 import aiohttp
 from io import BytesIO
-from .. import logger
+from bot import logger
 
 async def fetch_ai_models(ai_models_url="https://gist.githubusercontent.com/bishalqx980/204d6dfa707a8d573bdbf9c2928e6296/raw/data.json"):
     try:

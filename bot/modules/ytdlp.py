@@ -1,4 +1,4 @@
-from .. import logger
+from bot import logger
 from yt_dlp import YoutubeDL
 
 def youtube_download(url):

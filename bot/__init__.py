@@ -2,11 +2,11 @@ import os
 import shutil
 from time import time
 from telegram import Bot
-from .config import load_config
+from .config import CONFIG
 from .logger import setup_logging
 
 # constants
-__version__ = "1.0.6.488" # major.minor.patch.commits
+__version__ = "1.0.7.489" # major.minor.patch.commits
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
@@ -26,12 +26,16 @@ except Exception as e:
     print(e)
     exit()
 
-# logger & env config file
+# logger & .env config file
 logger = setup_logging() # need to execute after creating Required folders
-ENV_CONFIG = load_config(CONFIG_FILE)
+config = CONFIG()
+config.load_config(CONFIG_FILE)
+
+if not config.validate():
+    raise ValueError("Missing required configuration.")
 
 # Main bot function
-bot = Bot(ENV_CONFIG["bot_token"])
+bot = Bot(config.bot_token)
 
 logger.info(f"""
 Developed by

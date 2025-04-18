@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...modules.psndl.psndl_func import PSNDL
+from bot.modules.psndl.psndl_func import PSNDL
 
 async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message

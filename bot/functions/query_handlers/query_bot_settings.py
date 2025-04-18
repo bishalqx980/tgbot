@@ -3,10 +3,10 @@ from io import BytesIO
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
-from ... import logger
-from ...update_db import update_database
-from ...helper.button_maker import ButtonMaker
-from ...modules.database import MemoryDB, MongoDB
+from bot import logger
+from bot.update_db import update_database
+from bot.helper.button_maker import ButtonMaker
+from bot.modules.database import MemoryDB, MongoDB
 
 async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

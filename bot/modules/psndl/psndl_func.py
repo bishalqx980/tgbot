@@ -1,6 +1,6 @@
 import json
 from io import BytesIO
-from ... import logger
+from bot import logger
 
 def fetch_database(database_path="bot/modules/psndl/database.json"):
     """

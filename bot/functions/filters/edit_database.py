@@ -1,4 +1,4 @@
-from ...modules.database import MemoryDB
+from bot.modules.database import MemoryDB
 
 def edit_database(chat_id, user_id, text, message_id):
     """

@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...modules.utils import Utils
+from bot.modules.utils import Utils
 
 async def func_calc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message

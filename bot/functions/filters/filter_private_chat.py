@@ -1,8 +1,8 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...helper.button_maker import ButtonMaker
-from ...modules.database.common import database_search
-from ...modules.translator import translate
+from bot.helper.button_maker import ButtonMaker
+from bot.modules.database.common import database_search
+from bot.modules.translator import translate
 from .edit_database import edit_database
 
 async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):

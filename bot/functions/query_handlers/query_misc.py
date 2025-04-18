@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...modules.database import MemoryDB
+from bot.modules.database import MemoryDB
 
 async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

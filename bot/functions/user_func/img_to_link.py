@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...helper.button_maker import ButtonMaker
-from ...modules.freeimagehost import upload_image
+from bot.helper.button_maker import ButtonMaker
+from bot.modules.freeimagehost import upload_image
 
 async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

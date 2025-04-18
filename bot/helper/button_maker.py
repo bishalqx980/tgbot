@@ -1,5 +1,5 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
-from .. import logger
+from bot import logger
 
 class ButtonMaker:
     def ubutton(data):

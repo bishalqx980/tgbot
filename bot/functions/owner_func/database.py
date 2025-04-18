@@ -4,8 +4,8 @@ from io import BytesIO
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from ...modules.database import MongoDB
-from ...helper.button_maker import ButtonMaker
+from bot.modules.database import MongoDB
+from bot.helper.button_maker import ButtonMaker
 from ..sudo_users import fetch_sudos
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):

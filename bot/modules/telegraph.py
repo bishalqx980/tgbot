@@ -1,6 +1,6 @@
 import requests
 from telegraph.aio import Telegraph
-from .. import ORIGINAL_BOT_USERNAME, logger
+from bot import ORIGINAL_BOT_USERNAME, logger
 
 class TELEGRAPH:
     def __init__(self):

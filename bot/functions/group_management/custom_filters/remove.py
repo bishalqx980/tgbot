@@ -1,9 +1,9 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from .... import logger
-from ....modules.database import MemoryDB, MongoDB
-from ....modules.database.common import database_search
+from bot import logger
+from bot.modules.database import MemoryDB, MongoDB
+from bot.modules.database.common import database_search
 from ..auxiliary.pm_error import pm_error
 from ..auxiliary.fetch_chat_admins import fetch_chat_admins
 

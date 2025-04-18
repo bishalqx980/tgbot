@@ -5,9 +5,9 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import Forbidden
-from ... import logger
-from ...helper.button_maker import ButtonMaker
-from ...modules.database import MemoryDB, MongoDB
+from bot import logger
+from bot.helper.button_maker import ButtonMaker
+from bot.modules.database import MemoryDB, MongoDB
 from ..sudo_users import fetch_sudos
 
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):

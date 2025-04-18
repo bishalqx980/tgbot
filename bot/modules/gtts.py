@@ -1,6 +1,6 @@
 from gtts import gTTS
 from io import BytesIO
-from .. import logger
+from bot import logger
 
 def text_to_speech(text, lang_code="en"):
     """

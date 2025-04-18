@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...helper.button_maker import ButtonMaker
-from ...modules.gtts import text_to_speech
+from bot.helper.button_maker import ButtonMaker
+from bot.modules.gtts import text_to_speech
 
 async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

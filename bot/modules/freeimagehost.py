@@ -1,5 +1,5 @@
 import aiohttp
-from .. import logger
+from bot import logger
 
 async def upload_image(image_path):
     """

@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...modules.base64 import BASE64
+from bot.modules.base64 import BASE64
 
 async def func_encode(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message

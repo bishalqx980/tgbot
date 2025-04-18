@@ -17,7 +17,7 @@ from telegram.ext import (
 )
 from telegram.error import BadRequest
 from telegram.constants import ChatID, ParseMode
-from . import ENV_CONFIG, DEFAULT_ERROR_CHANNEL_ID, HANDLERS_DIR, BOT_HANDLERS_COUNT, bot, logger
+from . import DEFAULT_ERROR_CHANNEL_ID, HANDLERS_DIR, BOT_HANDLERS_COUNT, bot, logger, config
 from .alive import alive
 from .update_db import update_database
 from .modules import telegraph
@@ -44,15 +44,22 @@ async def post_init():
     # initializing telegraph
     await telegraph.initialize()
 
-    # bot commands
-    bot_commands = [
+    # bot pvt commands
+    bot_pvt_commands = [
         BotCommand("start", "Introducing..."),
         BotCommand("help", "Bots help section...")
+    ]
+
+    # bot cadmin commands
+    bot_cadmin_commands = [
+        BotCommand("settings", "Chat settings...")
     ]
     
     try:
         # bot commands only for PRIVATE chats
-        await bot.set_my_commands(bot_commands, BotCommandScope(BotCommandScope.ALL_PRIVATE_CHATS))
+        await bot.set_my_commands(bot_pvt_commands, BotCommandScope(BotCommandScope.ALL_PRIVATE_CHATS))
+        # bot commands only for Chat admins
+        await bot.set_my_commands(bot_cadmin_commands, BotCommandScope(BotCommandScope.ALL_CHAT_ADMINISTRATORS))
     except Exception as e:
         logger.error(e)
 
@@ -71,7 +78,7 @@ async def server_alive():
     if not server_url:
         logger.warning("Server URL wasn't found.")
         await bot.send_message(
-            ENV_CONFIG["owner_id"],
+            config.owner_id,
             "<b>Error:</b> <code>Server URL</code> wasn't found. Bot may fall asleep if deployed on Render (free instance). /bsettings to set Server URL.",
             parse_mode=ParseMode.HTML
         )
@@ -135,7 +142,7 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
             logger.error(e)
             return
     # if not DEFAULT_ERROR_CHANNEL_ID or BadRequest
-    await context.bot.send_message(ENV_CONFIG["owner_id"], text)
+    await context.bot.send_message(config.owner_id, text)
 
 
 def load_handlers():
@@ -174,7 +181,7 @@ def main():
         allow_sending_without_reply=True
     )
     # Bot instance
-    application = ApplicationBuilder().token(ENV_CONFIG["bot_token"]).defaults(default_param).build()
+    application = ApplicationBuilder().token(config.bot_token).defaults(default_param).build()
 
     # Command handlers
     bot_commands = load_handlers()

@@ -1,7 +1,7 @@
 from telegram import Update, ChatPermissions
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from ... import logger
+from bot import logger
 from .auxiliary.pm_error import pm_error
 from .auxiliary.fetch_chat_admins import fetch_chat_admins
 

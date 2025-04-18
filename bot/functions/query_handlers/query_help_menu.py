@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
-from ... import __version__, BOT_UPTIME, BOT_HANDLERS_COUNT, logger
-from ...helper.button_maker import ButtonMaker
-from ...modules.database import MongoDB
+from bot import __version__, BOT_UPTIME, BOT_HANDLERS_COUNT, logger
+from bot.helper.button_maker import ButtonMaker
+from bot.modules.database import MongoDB
 
 async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

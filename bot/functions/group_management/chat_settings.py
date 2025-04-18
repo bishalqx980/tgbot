@@ -1,8 +1,8 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ...helper.button_maker import ButtonMaker
-from ...modules.database import MemoryDB
-from ...modules.database.common import database_search
+from bot.helper.button_maker import ButtonMaker
+from bot.modules.database import MemoryDB
+from bot.modules.database.common import database_search
 from .auxiliary.fetch_chat_admins import fetch_chat_admins
 
 async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):

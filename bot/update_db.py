@@ -1,4 +1,4 @@
-from . import CONFIG_FILE, ENV_CONFIG, logger
+from . import CONFIG_FILE, logger, config
 from .modules.database import MemoryDB, MongoDB
 
 def update_database():
@@ -9,9 +9,24 @@ def update_database():
         logger.info("MongoDB database exist! Skiping update process!")
         return
     
+    config_data = {
+        "bot_token": config.bot_token,
+        "owner_id": config.owner_id,
+        "owner_username": config.owner_username,
+        "show_bot_pic": config.show_bot_pic,
+        "server_url": config.server_url,
+
+        "mongodb_uri": config.mongodb_uri,
+        "db_name": config.db_name,
+
+        "shrinkme_api": config.shrinkme_api,
+        "omdb_api": config.omdb_api,
+        "weather_api": config.weather_api
+    }
+    
     try:
-        MongoDB.insert("bot_data", ENV_CONFIG)
-        MemoryDB.insert("bot_data", None, ENV_CONFIG)
+        MongoDB.insert("bot_data", config_data)
+        MemoryDB.insert("bot_data", None, config_data)
         logger.info(f"Database has been updated from `{CONFIG_FILE}` file.")
     except Exception as e:
         logger.warning(e)
