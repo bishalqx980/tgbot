@@ -1,6 +1,7 @@
 from bot import logger
 
 class Utils:
+    @staticmethod
     def calculator(math):
         """
         solves normal maths: supported syntax: (+, -, *, /)

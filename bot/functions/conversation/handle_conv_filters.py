@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
 from bot import config
 
-async def conv_filters(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def conv_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     effective_message = update.effective_message

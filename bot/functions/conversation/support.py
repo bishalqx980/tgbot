@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper.button_maker import ButtonMaker
 
-async def conv_support(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+async def conv_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
 
     text = (

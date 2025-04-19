@@ -2,6 +2,7 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from bot import logger
 
 class ButtonMaker:
+    @staticmethod
     def ubutton(data):
         """
         **url button maker**\n
@@ -18,7 +19,7 @@ class ButtonMaker:
         except Exception as e:
             logger.error(e)
 
-
+    @staticmethod
     def cbutton(data):
         """
         **callback button maker (also works for url btn)**\n

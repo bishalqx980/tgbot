@@ -3,6 +3,7 @@ from io import BytesIO
 from bot import logger
 
 class QR:
+    @staticmethod
     def generate_qr(data, size=50):
         """
         Generate a QR code and return it as bytes (PNG format).\n
