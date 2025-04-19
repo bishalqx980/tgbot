@@ -12,7 +12,6 @@ def update_database():
     config_data = {
         "bot_token": config.bot_token,
         "owner_id": config.owner_id,
-        "owner_username": config.owner_username,
         "show_bot_pic": config.show_bot_pic,
         "server_url": config.server_url,
 

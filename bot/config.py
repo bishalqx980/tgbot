@@ -7,7 +7,6 @@ class CONFIG:
         """Initialize with None values"""
         self.bot_token: Optional[str] = None
         self.owner_id: Optional[int] = None
-        self.owner_username: Optional[str] = None
         self.show_bot_pic: bool = False # Default Value
         self.server_url: Optional[str] = None
 
@@ -29,7 +28,6 @@ class CONFIG:
         # ----- BOT CONFIGURATION -----
         self.bot_token = os.getenv("BOT_TOKEN")
         self.owner_id = int(os.getenv("OWNER_ID") or 0)
-        self.owner_username = os.getenv("OWNER_USERNAME")
         
         # ----- DATABASE -----
         self.mongodb_uri = os.getenv("MONGODB_URI")

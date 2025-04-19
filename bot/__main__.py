@@ -9,6 +9,7 @@ from telegram.ext import (
     PrefixHandler,
     MessageHandler,
     ChatJoinRequestHandler,
+    ConversationHandler,
     filters,
     CallbackQueryHandler,
     ChatMemberHandler,
@@ -37,6 +38,9 @@ from .functions.sudo_users import fetch_sudos
 from .functions.bot_chats_tracker import bot_chats_tracker
 from .functions.chat_status_update import chat_status_update
 from .functions.core.help import func_help
+from .functions.conversation.support import conv_support
+from .functions.conversation.handle_conv_query import conv_query
+from .functions.conversation.handle_conv_filters import conv_filters
 from .functions.group_management.chat_join_req import join_request_handler
 
 
@@ -47,7 +51,8 @@ async def post_init():
     # bot pvt commands
     bot_pvt_commands = [
         BotCommand("start", "Introducing..."),
-        BotCommand("help", "Bots help section...")
+        BotCommand("help", "Bots help section..."),
+        BotCommand("support", "Get Support or Report any bug related to bot...")
     ]
 
     # bot cadmin commands
@@ -194,6 +199,17 @@ def main():
     # registering deeplinking command handler (and this need to register before main handler)
     application.add_handler(CommandHandler("start", func_help, filters.Regex("help")))
 
+    # Conversation handlers
+    application.add_handler(
+        ConversationHandler(
+            [CommandHandler("support", conv_support)],
+            {
+                "NEXT_STEP": [MessageHandler(filters.TEXT, conv_filters)]
+            },
+            [CallbackQueryHandler(conv_query, "conv_cancel")]
+        )
+    )
+
     # registering main handlers
     for command, handler in bot_commands.items():
         application.add_handler(CommandHandler(command, handler)) # for /command
@@ -201,6 +217,7 @@ def main():
     
     # Chat Join Request Handler
     application.add_handler(ChatJoinRequestHandler(join_request_handler))
+
     # filter private chat
     application.add_handler(MessageHandler(
         # SERVICE_CHAT is Linked channel with Group
@@ -215,16 +232,20 @@ def main():
     ))
     # filter Chat Status Updates
     application.add_handler(MessageHandler(filters.StatusUpdate.ALL, chat_status_update))
+
     # Bot chat tracker (PRIVATE: only if bot is blocked or unblocked; PIUBLIC: any)
     application.add_handler(ChatMemberHandler(bot_chats_tracker, ChatMemberHandler.MY_CHAT_MEMBER))
+
     # Callback query handlers
     application.add_handler(CallbackQueryHandler(query_help_menu.query_help_menu, "help_menu_[A-Za-z0-9]+"))
     application.add_handler(CallbackQueryHandler(query_bot_settings.query_bot_settings, "bsettings_[A-Za-z0-9]+"))
     application.add_handler(CallbackQueryHandler(query_chat_settings.query_chat_settings, "csettings_[A-Za-z0-9]+"))
     application.add_handler(CallbackQueryHandler(query_misc.query_misc, "misc_[A-Za-z0-9]+"))
     application.add_handler(CallbackQueryHandler(query_db_editing.query_db_editing, "database_[A-Za-z0-9]+"))
+
     # Error handler
     application.add_error_handler(default_error_handler)
+
     # Check Updates
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
