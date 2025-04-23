@@ -1,11 +1,14 @@
 import asyncio
 from telegram import Update
-from telegram.ext import ContextTypes
+from telegram.ext import ContextTypes, ConversationHandler
 from telegram.constants import ChatType
-from bot.helper.button_maker import ButtonMaker
-from bot.modules.database import MemoryDB
+from bot import logger, config
 
-async def conv_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
+class SUPPORT_STATES:
+    STATE_ONE = range(1)
+
+
+async def init_support_conv(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     effective_message = update.effective_message
 
@@ -16,14 +19,30 @@ async def conv_support(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     text = (
-        "Hey, please send your request/report in one message.\n\n"
+        "Hey, please send your request/report in one message.\n"
+        "• /cancel to cancel conversation.\n\n"
         "<blockquote><b>Note:</b> Request/Report should be related to this bot. And we don't provide any support for ban, mute or other things related to groups managed by this bot.</blockquote>"
     )
 
-    btn = ButtonMaker.cbutton([{"Cancel": "conv_cancel"}])
-    sent_message = await effective_message.reply_text(text, reply_markup=btn)
+    await effective_message.reply_text(text)
+    return SUPPORT_STATES.STATE_ONE
 
-    # chat.id is actually userID
-    MemoryDB.insert("data_center", chat.id, {"support_message": text, "support_message_id": sent_message.id})
 
-    return "NEXT_STEP"
+async def support_state_one(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    effective_message = update.effective_message
+
+    try:
+        await context.bot.send_message(config.owner_id, f"UserID: <code>{user.id}</code>\n\n<blockquote>{effective_message.text_html}</blockquote>")
+        text = "Report has been submitted. Support team will contact you as soon as possible."
+    except Exception as e:
+        logger.error(e)
+        text = "Oops, Something went wrong. Please try again."
+
+    await effective_message.reply_text(text)
+    return ConversationHandler.END
+
+
+async def cancel_support_conv(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.effective_message.reply_text("Okay, Reporting cancelled.")
+    return ConversationHandler.END

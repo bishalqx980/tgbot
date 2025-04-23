@@ -38,9 +38,7 @@ from .functions.sudo_users import fetch_sudos
 from .functions.bot_chats_tracker import bot_chats_tracker
 from .functions.chat_status_update import chat_status_update
 from .functions.core.help import func_help
-from .functions.conversation.support import conv_support
-from .functions.conversation.handle_conv_query import conv_query
-from .functions.conversation.handle_conv_filters import conv_filters
+from .functions.conversation.support import SUPPORT_STATES, init_support_conv, support_state_one, cancel_support_conv
 from .functions.group_management.chat_join_req import join_request_handler
 
 
@@ -202,14 +200,14 @@ def main():
     # Conversation handlers
     application.add_handler(
         ConversationHandler(
-            [CommandHandler("support", conv_support)],
+            [CommandHandler("support", init_support_conv)],
             {
-                "NEXT_STEP": [MessageHandler(filters.TEXT, conv_filters)]
+                SUPPORT_STATES.STATE_ONE: [MessageHandler(filters.TEXT & ~filters.COMMAND, support_state_one)]
             },
-            [CallbackQueryHandler(conv_query, "conv_cancel")]
+            [CommandHandler("cancel", cancel_support_conv)]
         )
     )
-
+    
     # registering main handlers
     for command, handler in bot_commands.items():
         application.add_handler(CommandHandler(command, handler)) # for /command

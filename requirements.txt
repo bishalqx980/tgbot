@@ -11,4 +11,3 @@ yt-dlp==2025.1.12
 qrcode[pil]==8.0
 aiohttp[speedups]
 requests
-TgCrypto

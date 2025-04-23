@@ -54,9 +54,11 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
 <h6>⚠️ Don't share or upload the `config.env` any public place or repository</h6>
 
 - `BOT_TOKEN` Get from [https://t.me/BotFather](https://t.me/BotFather) E.g. `123456:abcdefGHIJK...`
+
 - `OWNER_ID` Get from bot by /id command E.g. `2134776547`
-- `OWNER_USERNAME` Your Username E.g. paste like ✅ `bishalqx980` not ❌ `@bishalqx980`
+
 - `MONGODB_URI` Get from [https://www.mongodb.com/](https://www.mongodb.com/) (Check Below for instruction)
+
 - `DB_NAME` anything E.g. `MissCiri_db`
 
 <h3>Creating MongoDB URI</h3>
@@ -97,13 +99,13 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
 <center><h3>🖥️ <u>Local deploy</u></h3></center>
 
 ----- **Windows** -----
-- Required `python 3.11` or later
+- Required `python 3.11` (also tested on `3.13`)
 - Open `tgbot` directory on cmd
 - Run on cmd `pip install -r requirements.txt`
 - Finally `python -m bot`
 
 ----- **Linux** -----
-- Required `python 3.11` or later
+- Required `python 3.11` (also tested on `3.13`)
 - Open `tgbot` directory on shell
 - Run on shell `pip install -r requirements.txt`
 - Finally `python -m bot`
