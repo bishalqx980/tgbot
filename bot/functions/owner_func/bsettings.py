@@ -9,6 +9,28 @@ from bot.helper.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB
 from ..sudo_users import fetch_sudos
 
+class BotSettingsData:
+    TEXT = (
+        "<blockquote><b>Bot Settings</b></blockquote>\n\n"
+        "• Show Bot Photo: <code>{}</code>\n"
+        "• Images: <code>{}</code>\n"
+        "• Support chat: <code>{}</code>\n"
+        "• Server url: <code>{}</code>\n"
+        "• Sudo: <code>{}</code>\n"
+        "• Shrinkme API: <code>{}</code>\n"
+        "• OMDB API: <code>{}</code>\n"
+        "• Weather API: <code>{}</code>"
+    )
+
+    BUTTONS = [
+        {"Show Bot Photo": "bsettings_show_bot_pic", "Images": "bsettings_images"},
+        {"Support Chat": "bsettings_support_chat", "Server URL": "bsettings_server_url"},
+        {"Sudo": "bsettings_sudo", "Shrinkme API": "bsettings_shrinkme_api"},
+        {"OMDB API": "bsettings_omdb_api", "Weather API": "bsettings_weather_api"},
+        {"> ⁅ Database ⁆": "bsettings_database", "Close": "bsettings_close"}
+    ]
+
+
 async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
@@ -38,27 +60,18 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # accessing bot data
     bot_data = MemoryDB.bot_data
 
-    text = (
-        "<blockquote><b>Bot Settings</b></blockquote>\n\n"
-        f"• Show Bot Photo: <code>{bot_data.get('show_bot_pic') or False}</code>\n"
-        f"• Images: <code>{len(bot_data.get('images') or [])}</code>\n"
-        f"• Support chat: <code>{bot_data.get('support_chat')}</code>\n"
-        f"• Server url: <code>{bot_data.get('server_url')}</code>\n"
-        f"• Sudo: <code>{len(bot_data.get('sudo_users') or [])}</code>\n"
-        f"• Shrinkme API: <code>{bot_data.get('shrinkme_api')}</code>\n"
-        f"• OMDB API: <code>{bot_data.get('omdb_api')}</code>\n"
-        f"• Weather API: <code>{bot_data.get('weather_api')}</code>"
+    text = BotSettingsData.TEXT.format(
+        bot_data.get('show_bot_pic') or False,
+        len(bot_data.get('images') or []),
+        bot_data.get('support_chat'),
+        bot_data.get('server_url'),
+        len(bot_data.get('sudo_users') or []),
+        bot_data.get('shrinkme_api'),
+        bot_data.get('omdb_api'),
+        bot_data.get('weather_api')
     )
-    
-    btn_data = [
-        {"Show Bot Photo": "bsettings_show_bot_pic", "Images": "bsettings_images"},
-        {"Support Chat": "bsettings_support_chat", "Server URL": "bsettings_server_url"},
-        {"Sudo": "bsettings_sudo", "Shrinkme API": "bsettings_shrinkme_api"},
-        {"OMDB API": "bsettings_omdb_api", "Weather API": "bsettings_weather_api"},
-        {"> ⁅ Database ⁆": "bsettings_database", "Close": "bsettings_close"}
-    ]
 
-    btn = ButtonMaker.cbutton(btn_data)
+    btn = ButtonMaker.cbutton(BotSettingsData.BUTTONS)
     
     show_bot_pic = MemoryDB.bot_data.get("show_bot_pic")
     images = MemoryDB.bot_data.get("images")

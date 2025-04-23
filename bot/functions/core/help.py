@@ -9,6 +9,24 @@ from bot.helper.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_add_user
 
+class HelpMenuData:
+    TEXT = (
+        "<blockquote><b>Help Menu</b></blockquote>\n\n"
+        "Hey! Welcome to the bot help section.\n"
+        "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
+        "• /start - Start the bot\n"
+        "• /help - To see this message\n"
+        "• /support - Get Support or Report any bug related to bot\n\n"
+        "<blockquote><b>Note:</b> The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</blockquote>"
+    )
+
+    BUTTONS = [
+        {"Group Management": "help_menu_gm1", "AI/Info": "help_menu_ai_knowledge"},
+        {"Misc": "help_menu_misc", "Owner/Sudo": "help_menu_owner"},
+        {"» bot.info()": "help_menu_botinfo", "Close": "help_menu_close"}
+    ]
+
+
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
@@ -21,24 +39,6 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # database entry checking if user is registered.
     database_add_user(user)
-    
-    text = (
-        "<blockquote><b>Help Menu</b></blockquote>\n\n"
-        "Hey! Welcome to the bot help section.\n"
-        "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
-        "• /start - Start the bot\n"
-        "• /help - To see this message\n"
-        "• /support - Get Support or Report any bug related to bot\n\n"
-        "<blockquote><b>Note:</b> The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</blockquote>"
-    )
-
-    btn_data = [
-        {"Group Management": "help_menu_gm1", "AI/Info": "help_menu_ai_knowledge"},
-        {"Misc": "help_menu_misc", "Owner/Sudo": "help_menu_owner"},
-        {"» bot.info()": "help_menu_botinfo", "Close": "help_menu_close"}
-    ]
-
-    btn = ButtonMaker.cbutton(btn_data)
 
     show_bot_pic = MemoryDB.bot_data.get("show_bot_pic")
     images = MemoryDB.bot_data.get("images")
@@ -54,9 +54,11 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except:
             pass
     
+    btn = ButtonMaker.cbutton(HelpMenuData.BUTTONS)
+    
     if photo or photo_file_id:
         try:
-            await effective_message.reply_photo(photo or photo_file_id, text, reply_markup=btn)
+            await effective_message.reply_photo(photo or photo_file_id, HelpMenuData.TEXT, reply_markup=btn)
             return
         except BadRequest:
             pass
@@ -64,4 +66,4 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.error(e)
     
     # if BadRequest or No Photo or Other error
-    await effective_message.reply_text(text, reply_markup=btn)
+    await effective_message.reply_text(HelpMenuData.TEXT, reply_markup=btn)

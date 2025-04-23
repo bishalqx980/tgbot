@@ -7,6 +7,7 @@ from telegram.error import BadRequest
 from bot import __version__, BOT_UPTIME, BOT_HANDLERS_COUNT, logger
 from bot.helper.button_maker import ButtonMaker
 from bot.modules.database import MongoDB
+from ..core.help import HelpMenuData
 
 async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -16,23 +17,8 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query_data = query.data.removeprefix("help_menu_")
 
     if query_data == "menu":
-        text = (
-            "<blockquote><b>Help Menu</b></blockquote>\n\n"
-            "Hey! Welcome to the bot help section.\n"
-            "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
-            "• /start - Start the bot\n"
-            "• /help - To see this message\n"
-            "• /support - Get Support or Report any bug related to bot\n\n"
-            "<blockquote><b>Note:</b> The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</blockquote>"
-        )
-
-        btn_data = [
-            {"Group Management": "help_menu_gm1", "AI/Info": "help_menu_ai_knowledge"},
-            {"Misc": "help_menu_misc", "Owner/Sudo": "help_menu_owner"},
-            {"» bot.info()": "help_menu_botinfo", "Close": "help_menu_close"}
-        ]
-
-        btn = ButtonMaker.cbutton(btn_data)
+        text = HelpMenuData.TEXT
+        btn = ButtonMaker.cbutton(HelpMenuData.BUTTONS)
     
     elif query_data == "gm1":
         text = (

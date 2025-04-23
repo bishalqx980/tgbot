@@ -5,6 +5,8 @@ from telegram.error import BadRequest
 from bot import logger
 from bot.helper.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB
+from ..user_func.settings import PvtChatSettingsData
+from ..group_management.chat_settings import GroupChatSettingsData
 
 async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -44,53 +46,33 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
     if query_data == "menu":
         # Handling PRIVATE chat setting
         if chat.type == ChatType.PRIVATE:
-            text = (
-                "<blockquote><b>Chat Settings</b></blockquote>\n\n"
-
-                f"• Name: {user.mention_html()}\n"
-                f"• ID: <code>{user.id}</code>\n\n"
-
-                f"• Language: <code>{memory_data.get('lang')}</code>\n"
-                f"• Auto translate: <code>{memory_data.get('auto_tr') or False}</code>\n"
-                f"• Echo: <code>{memory_data.get('echo') or False}</code>"
+            text = PvtChatSettingsData.TEXT.format(
+                user.mention_html(),
+                user.id,
+                memory_data.get('lang'),
+                memory_data.get('auto_tr') or False,
+                memory_data.get('echo') or False
             )
 
-            btn_data = [
-                {"Language": "csettings_lang", "Auto translate": "csettings_auto_tr"},
-                {"Echo": "csettings_echo", "Close": "csettings_close"}
-            ]
-
-            btn = ButtonMaker.cbutton(btn_data)
+            btn = ButtonMaker.cbutton(PvtChatSettingsData.BUTTONS)
         
         else:
-            text = (
-                "<blockquote><b>Chat Settings</b></blockquote>\n\n"
-
-                f"• Title: {chat.title}\n"
-                f"• ID: <code>{chat.id}</code>\n\n"
-
-                f"• Language: <code>{memory_data.get('lang')}</code>\n"
-                f"• Auto translate: <code>{memory_data.get('auto_tr') or False}</code>\n"
-                f"• Echo: <code>{memory_data.get('echo') or False}</code>\n"
-                f"• Antibot: <code>{memory_data.get('antibot') or False}</code>\n"
-                f"• Welcome Members: <code>{memory_data.get('welcome_user') or False}</code>\n"
-                f"• Farewell Members: <code>{memory_data.get('farewell_user') or False}</code>\n"
-                f"• Join Request: <code>{memory_data.get('chat_join_req')}</code>\n"
-                f"• Service Messages: <code>{memory_data.get('service_messages')}</code>\n"
-                f"• Links Behave: <code>{memory_data.get('links_behave')}</code>\n"
-                f"• Allowed Links: <code>{', '.join(memory_data.get('allowed_links') or [])}</code>"
+            text = GroupChatSettingsData.TEXT.format(
+                chat.title,
+                chat.id,
+                memory_data.get('lang'),
+                memory_data.get('auto_tr') or False,
+                memory_data.get('echo') or False,
+                memory_data.get('antibot') or False,
+                memory_data.get('welcome_user') or False,
+                memory_data.get('farewell_user') or False,
+                memory_data.get('chat_join_req'),
+                memory_data.get('service_messages'),
+                memory_data.get('links_behave'),
+                ', '.join(memory_data.get('allowed_links') or [])
             )
 
-            btn_data = [
-                {"Language": "csettings_lang", "Auto translate": "csettings_auto_tr"},
-                {"Echo": "csettings_echo", "Antibot": "csettings_antibot"},
-                {"Welcome Members": "csettings_welcome_user", "Farewell Members": "csettings_farewell_user"},
-                {"Links Behave": "csettings_links_behave", "Allowed Links": "csettings_allowed_links"},
-                {"Join Request": "csettings_chat_join_req", "Service Messages": "csettings_service_messages"},
-                {"Close": "csettings_close"}
-            ]
-
-            btn = ButtonMaker.cbutton(btn_data)
+            btn = ButtonMaker.cbutton(GroupChatSettingsData.BUTTONS)
     
     elif query_data == "lang":
         MemoryDB.insert("data_center", chat.id, {

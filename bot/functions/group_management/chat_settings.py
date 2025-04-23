@@ -5,6 +5,35 @@ from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 from .auxiliary.fetch_chat_admins import fetch_chat_admins
 
+class GroupChatSettingsData:
+    TEXT = (
+        "<blockquote><b>Chat Settings</b></blockquote>\n\n"
+
+        "• Title: {}\n"
+        "• ID: <code>{}</code>\n\n"
+
+        "• Language: <code>{}</code>\n"
+        "• Auto translate: <code>{}</code>\n"
+        "• Echo: <code>{}</code>\n"
+        "• Antibot: <code>{}</code>\n"
+        "• Welcome Members: <code>{}</code>\n"
+        "• Farewell Members: <code>{}</code>\n"
+        "• Join Request: <code>{}</code>\n"
+        "• Service Messages: <code>{}</code>\n"
+        "• Links Behave: <code>{}</code>\n"
+        "• Allowed Links: <code>{}</code>"
+    )
+
+    BUTTONS = [
+        {"Language": "csettings_lang", "Auto translate": "csettings_auto_tr"},
+        {"Echo": "csettings_echo", "Antibot": "csettings_antibot"},
+        {"Welcome Members": "csettings_welcome_user", "Farewell Members": "csettings_farewell_user"},
+        {"Links Behave": "csettings_links_behave", "Allowed Links": "csettings_allowed_links"},
+        {"Join Request": "csettings_chat_join_req", "Service Messages": "csettings_service_messages"},
+        {"Close": "csettings_close"}
+    ]
+
+
 async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """This function won't be in handler, instead it will be called in func_settings if chat.type isn't private"""
     chat = update.effective_chat
@@ -43,32 +72,21 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     MemoryDB.insert("data_center", chat.id, data)
 
-    text = (
-        "<blockquote><b>Chat Settings</b></blockquote>\n\n"
-
-        f"• Title: {chat.title}\n"
-        f"• ID: <code>{chat.id}</code>\n\n"
-
-        f"• Language: <code>{database_data.get('lang')}</code>\n"
-        f"• Auto translate: <code>{database_data.get('auto_tr') or False}</code>\n"
-        f"• Echo: <code>{database_data.get('echo') or False}</code>\n"
-        f"• Antibot: <code>{database_data.get('antibot') or False}</code>\n"
-        f"• Welcome Members: <code>{database_data.get('welcome_user') or False}</code>\n"
-        f"• Farewell Members: <code>{database_data.get('farewell_user') or False}</code>\n"
-        f"• Join Request: <code>{database_data.get('chat_join_req')}</code>\n"
-        f"• Service Messages: <code>{database_data.get('service_messages')}</code>\n"
-        f"• Links Behave: <code>{database_data.get('links_behave')}</code>\n"
-        f"• Allowed Links: <code>{', '.join(database_data.get('allowed_links') or [])}</code>"
+    text = GroupChatSettingsData.TEXT.format(
+        chat.title,
+        chat.id,
+        database_data.get('lang'),
+        database_data.get('auto_tr') or False,
+        database_data.get('echo') or False,
+        database_data.get('antibot') or False,
+        database_data.get('welcome_user') or False,
+        database_data.get('farewell_user') or False,
+        database_data.get('chat_join_req'),
+        database_data.get('service_messages'),
+        database_data.get('links_behave'),
+        ', '.join(database_data.get('allowed_links') or [])
     )
 
-    btn_data = [
-        {"Language": "csettings_lang", "Auto translate": "csettings_auto_tr"},
-        {"Echo": "csettings_echo", "Antibot": "csettings_antibot"},
-        {"Welcome Members": "csettings_welcome_user", "Farewell Members": "csettings_farewell_user"},
-        {"Links Behave": "csettings_links_behave", "Allowed Links": "csettings_allowed_links"},
-        {"Join Request": "csettings_chat_join_req", "Service Messages": "csettings_service_messages"},
-        {"Close": "csettings_close"}
-    ]
+    btn = ButtonMaker.cbutton(GroupChatSettingsData.BUTTONS)
 
-    btn = ButtonMaker.cbutton(btn_data)
     await effective_message.reply_text(text, reply_markup=btn)
