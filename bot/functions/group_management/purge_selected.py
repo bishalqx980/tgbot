@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot import logger
 from .auxiliary.pm_error import pm_error
-from .auxiliary.fetch_chat_admins import fetch_chat_admins
+from .auxiliary.chat_admins import ChatAdmins
 from bot.modules.database import MemoryDB
 
 async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -27,21 +27,22 @@ async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
     
-    chat_admins = await fetch_chat_admins(chat, context.bot.id, user.id)
+    chat_admins = ChatAdmins()
+    await chat_admins.fetch_admins(chat, context.bot.id, user.id)
     
-    if not (chat_admins["is_user_admin"] or chat_admins["is_user_owner"]):
+    if not (chat_admins.is_user_admin or chat_admins.is_user_owner):
         await effective_message.reply_text("You aren't an admin in this chat!")
         return
     
-    if chat_admins["is_user_admin"] and not chat_admins["is_user_admin"].can_delete_messages:
+    if chat_admins.is_user_admin and not chat_admins.is_user_admin.can_delete_messages:
         await effective_message.reply_text("You don't have enough permission to delete chat messages!")
         return
     
-    if not chat_admins["is_bot_admin"]:
+    if not chat_admins.is_bot_admin:
         await effective_message.reply_text("I'm not an admin in this chat!")
         return
     
-    if not chat_admins["is_bot_admin"].can_delete_messages:
+    if not chat_admins.is_bot_admin.can_delete_messages:
         await effective_message.reply_text("I don't have enough permission to delete chat messages!")
         return
     

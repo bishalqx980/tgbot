@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot import logger
 from bot.modules.database.common import database_search
-from .group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
+from .group_management.auxiliary.chat_admins import ChatAdmins
 
 async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -38,19 +38,20 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         # Antibot
         if victim.is_bot and antibot:
-            chat_admins = await fetch_chat_admins(chat, context.bot.id, cause_user.id)
+            chat_admins = ChatAdmins()
+            await chat_admins.fetch_admins(chat, context.bot.id, cause_user.id)
 
-            if chat_admins["is_user_owner"]:
+            if chat_admins.is_user_owner:
                 return
             
-            elif chat_admins["is_user_admin"] and (chat_admins["is_user_admin"].can_invite_users or chat_admins["is_user_admin"].can_promote_members):
+            elif chat_admins.is_user_admin and (chat_admins.is_user_admin.can_invite_users or chat_admins.is_user_admin.can_promote_members):
                 return
             
-            if not chat_admins["is_bot_admin"]:
+            if not chat_admins.is_bot_admin:
                 await context.bot.send_message(chat.id, "Antibot Error: I'm not an admin in this chat!")
                 return
             
-            if not chat_admins["is_bot_admin"].can_restrict_members:
+            if not chat_admins.is_bot_admin.can_restrict_members:
                 await context.bot.send_message(chat.id, "Antibot Error: I don't have enough permission to restrict chat members!")
                 return
             

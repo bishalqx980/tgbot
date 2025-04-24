@@ -5,7 +5,7 @@ from bot import logger
 from bot.modules.database import MemoryDB, MongoDB
 from bot.modules.database.common import database_search
 from ..auxiliary.pm_error import pm_error
-from ..auxiliary.fetch_chat_admins import fetch_chat_admins
+from ..auxiliary.chat_admins import ChatAdmins
 
 async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -21,13 +21,14 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
         return
     
-    chat_admins = await fetch_chat_admins(chat, user_id=user.id)
+    chat_admins = ChatAdmins()
+    await chat_admins.fetch_admins(chat, user_id=user.id)
     
-    if not (chat_admins["is_user_admin"] or chat_admins["is_user_owner"]):
+    if not (chat_admins.is_user_admin or chat_admins.is_user_owner):
         await effective_message.reply_text("You aren't an admin in this chat!")
         return
     
-    if chat_admins["is_user_admin"] and not chat_admins["is_user_admin"].can_change_info:
+    if chat_admins.is_user_admin and not chat_admins.is_user_admin.can_change_info:
         await effective_message.reply_text("You don't have enough permission to manage this chat!")
         return
     

@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot import logger
 from .auxiliary.pm_error import pm_error
-from .auxiliary.fetch_chat_admins import fetch_chat_admins
+from .auxiliary.chat_admins import ChatAdmins
 
 async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=False):
     chat = update.effective_chat
@@ -29,25 +29,26 @@ async def func_promote(update: Update, context: ContextTypes.DEFAULT_TYPE, is_si
         await effective_message.reply_text("I wish I could promote myself!")
         return
     
-    chat_admins = await fetch_chat_admins(chat, context.bot.id, user.id, victim.id)
+    chat_admins = ChatAdmins()
+    await chat_admins.fetch_admins(chat, context.bot.id, user.id, victim.id)
     
-    if not (chat_admins["is_user_admin"] or chat_admins["is_user_owner"]):
+    if not (chat_admins.is_user_admin or chat_admins.is_user_owner):
         await effective_message.reply_text("You aren't an admin in this chat!")
         return
 
-    if chat_admins["is_victim_admin"] or chat_admins["is_victim_owner"]:
+    if chat_admins.is_victim_admin or chat_admins.is_victim_owner:
         await effective_message.reply_text(f"{victim.mention_html()} is already an admin of this chat!")
         return
     
-    if chat_admins["is_user_admin"] and not chat_admins["is_user_admin"].can_promote_members:
+    if chat_admins.is_user_admin and not chat_admins.is_user_admin.can_promote_members:
         await effective_message.reply_text("You don't have enough permission to promote chat members!")
         return
     
-    if not chat_admins["is_bot_admin"]:
+    if not chat_admins.is_bot_admin:
         await effective_message.reply_text("I'm not an admin in this chat!")
         return
     
-    if not chat_admins["is_bot_admin"].can_promote_members:
+    if not chat_admins.is_bot_admin.can_promote_members:
         await effective_message.reply_text("I don't have enough permission to promote chat members!")
         return
     

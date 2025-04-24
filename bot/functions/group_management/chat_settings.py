@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from bot.helper.button_maker import ButtonMaker
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
-from .auxiliary.fetch_chat_admins import fetch_chat_admins
+from .auxiliary.chat_admins import ChatAdmins
 
 class GroupChatSettingsData:
     TEXT = (
@@ -44,17 +44,18 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
         return
     
-    chat_admins = await fetch_chat_admins(chat, context.bot.id, user.id)
+    chat_admins = ChatAdmins()
+    await chat_admins.fetch_admins(chat, context.bot.id, user.id)
     
-    if not (chat_admins["is_user_admin"] or chat_admins["is_user_owner"]):
+    if not (chat_admins.is_user_admin or chat_admins.is_user_owner):
         await effective_message.reply_text("You aren't an admin in this chat!")
         return
     
-    if chat_admins["is_user_admin"] and not chat_admins["is_user_admin"].can_change_info:
+    if chat_admins.is_user_admin and not chat_admins.is_user_admin.can_change_info:
         await effective_message.reply_text("You don't have enough permission to manage this chat!")
         return
     
-    if not chat_admins["is_bot_admin"]:
+    if not chat_admins.is_bot_admin:
         await effective_message.reply_text("I'm not an admin in this chat!")
         return
     

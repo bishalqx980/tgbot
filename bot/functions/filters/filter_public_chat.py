@@ -5,7 +5,7 @@ from bot.modules.database.common import database_search
 from bot.modules.translator import translate
 from bot.modules.re_link import RE_LINK
 from bot.modules.base64 import BASE64
-from ..group_management.auxiliary.fetch_chat_admins import fetch_chat_admins
+from ..group_management.auxiliary.chat_admins import ChatAdmins
 from .edit_database import edit_database
 
 async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -33,9 +33,10 @@ async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
     is_text_contain_links = False
 
     if links_behave:
-        chat_admins = await fetch_chat_admins(chat, user_id=user.id)
+        chat_admins = ChatAdmins()
+        await chat_admins.fetch_admins(chat, user_id=user.id)
         
-        if not (chat_admins["is_user_admin"] or chat_admins["is_user_owner"]):
+        if not (chat_admins.is_user_admin or chat_admins.is_user_owner):
             links_list = RE_LINK.detect_link(effective_message.text or effective_message.caption)
             if links_list:
                 filtered_text = effective_message.text or effective_message.caption # keeping as variable to replace links later

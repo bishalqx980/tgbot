@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot import logger
 from .auxiliary.pm_error import pm_error
-from .auxiliary.fetch_chat_admins import fetch_chat_admins
+from .auxiliary.chat_admins import ChatAdmins
 
 async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -14,17 +14,18 @@ async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await pm_error(context, chat.id)
         return
     
-    chat_admins = await fetch_chat_admins(chat, context.bot.id, user.id)
+    chat_admins = ChatAdmins()
+    await chat_admins.fetch_admins(chat, context.bot.id, user.id)
     
-    if (chat_admins["is_user_admin"] or chat_admins["is_user_owner"]):
+    if (chat_admins.is_user_admin or chat_admins.is_user_owner):
         await effective_message.reply_text("I'm not going to kick you! You must be kidding!")
         return
     
-    if not chat_admins["is_bot_admin"]:
+    if not chat_admins.is_bot_admin:
         await effective_message.reply_text("I'm not an admin in this chat!")
         return
     
-    if not chat_admins["is_bot_admin"].can_restrict_members:
+    if not chat_admins.is_bot_admin.can_restrict_members:
         await effective_message.reply_text("I don't have enough permission to kick members in this chat!")
         return
     
