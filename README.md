@@ -89,6 +89,8 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
 
 10. Remove the `<db_password>` from that URI and add your password which one you gave on `2. 'Password Authentication'`
 
+> For more details: [Visit Here](https://www.mongodb.com/docs/languages/python/pymongo-driver/current/get-started/#create-a-connection-string)
+
 🥳 Done you have created your `MongoDB_URI` successfully...
 
 > **Note:** One last thing, on the left side list click on `Network Access` section click on `ADD IP ADDRESS` and set ip to `0.0.0.0/0` (Its important to access database without network restriction)
