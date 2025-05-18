@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
-from bot import __version__, BOT_UPTIME, BOT_HANDLERS_COUNT, logger
+from bot import __version__, BOT_UPTIME, logger
 from bot.helper.button_maker import ButtonMaker
 from bot.modules.database import MongoDB
 from ..core.help import HelpMenuData
@@ -38,8 +38,8 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /mute » Restrict a member (member will be unable to send messages etc.)\n"
             "• /unmute » Unrestrict a restricted member\n\n"
 
-            "<blockquote><b>Note:</b> Send command to get more details about the command functions!"
-            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</blockquote>"
+            "<blockquote><b>Note:</b> Send command to get more details about the command functions!\n"
+            "Some command has a silent & delete function! eg. <code>/s[command]</code> & <code>/d[command]</code> » /sban or /dban etc.</blockquote>"
         )
 
         btn_data = [
@@ -62,7 +62,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /settings » Settings of chat\n\n"
 
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!\n"
-            "Some command has a silent function! eg. <code>/s[command]</code> » /sban etc.</blockquote>"
+            "Some command has a silent & delete function! eg. <code>/s[command]</code> & <code>/d[command]</code> » /sban or /dban etc.</blockquote>"
         )
 
         btn_data = [
@@ -180,7 +180,6 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             f"<b>• System uptime:</b> <code>{int(sys_days)}d {int(sys_hours)}h {int(sys_minute)}m</code>\n"
             f"<b>• Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n"
-            f"<b>• Total commands:</b> <code>{BOT_HANDLERS_COUNT.get('bot_handlers_count') or 0}</code>\n"
             f"<b>• Version (stable):</b> <code>{__version__}</code>"
         )
 

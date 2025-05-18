@@ -10,7 +10,8 @@ def setup_logging():
         print(e)
         exit()
     
-    logging_format = "%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(filename)s - %(message)s"
+    # logging_format = "%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(filename)s - %(message)s"
+    logging_format = "%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s"
     logging_level = logging.INFO
 
     logging.basicConfig(

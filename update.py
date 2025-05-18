@@ -18,7 +18,7 @@ if os.path.exists(".git"):
 
 commands = [
     f"git init -b {UPSTREAM_BRANCH}",
-    "git config --global user.name bishalqx980",
+    "git config --global user.name Bishal Hasan Bhuiyan",
     "git config --global user.email bishalqx680@gmail.com",
     "git add .",
     "git commit -m update",
@@ -32,7 +32,7 @@ for command in commands:
     print_out = process.stdout or process.stderr or None
     print(print_out)
     
-    open("sys/update.txt", "a").write(print_out)
+    open("update.txt", "a").write(print_out)
 
 if process.returncode == 0:
     print(f"Successfully updated with latest commit from {UPSTREAM_REPO}")

@@ -9,10 +9,20 @@ async def func_lock(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     effective_message = update.effective_message
+
+    cmd_prefix = effective_message.text[1]
+    is_silent = False
     
     if chat.type == ChatType.PRIVATE:
         await pm_error(context, chat.id)
         return
+    
+    if cmd_prefix == "s":
+        is_silent = True
+        try:
+            await effective_message.delete()
+        except:
+            pass
     
     if user.is_bot:
         await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
@@ -44,4 +54,5 @@ async def func_lock(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text(str(e))
         return
     
-    await effective_message.reply_text("Chat has been locked!")
+    if not is_silent:
+        await effective_message.reply_text("Chat has been locked!")

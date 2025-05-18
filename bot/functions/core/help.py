@@ -16,8 +16,7 @@ class HelpMenuData:
         "I'm a Telegram bot that manages groups and handles various tasks effortlessly.\n\n"
         "• /start - Start the bot\n"
         "• /help - To see this message\n"
-        "• /support - Get Support or Report any bug related to bot\n\n"
-        "<blockquote><b>Note:</b> The bot is compatible with the <code>/</code>, <code>!</code>, <code>.</code> and <code>-</code> command prefixes.</blockquote>"
+        "• /support - Get Support or Report any bug related to bot"
     )
 
     BUTTONS = [

@@ -1,12 +1,10 @@
-import os
 import asyncio
 import aiohttp
-import importlib
+
 from telegram import Update, LinkPreviewOptions, BotCommand, BotCommandScope
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
-    PrefixHandler,
     MessageHandler,
     ChatJoinRequestHandler,
     ConversationHandler,
@@ -18,28 +16,92 @@ from telegram.ext import (
 )
 from telegram.error import BadRequest
 from telegram.constants import ChatID, ParseMode
-from . import DEFAULT_ERROR_CHANNEL_ID, HANDLERS_DIR, BOT_HANDLERS_COUNT, bot, logger, config
+
+from . import DEFAULT_ERROR_CHANNEL_ID, bot, logger, config
 from .alive import alive
 from .update_db import update_database
 from .modules import telegraph
 from .modules.database import MemoryDB
-from .functions.filters import (
+
+from .functions import (
+    SUPPORT_STATES,
+    init_support_conv,
+    support_state_one,
+    cancel_support_conv,
+
+    func_start,
+    func_help,
+
     filter_private_chat,
-    filter_public_chat
-)
-from .functions.query_handlers import (
+    filter_public_chat,
+
+    func_adminlist,
+    func_ban,
+    join_request_handler,
+    func_demote,
+    func_invite,
+    func_kick,
+    func_kickme,
+    func_lock,
+    func_mute,
+    func_pin,
+    func_promote,
+    func_purge,
+    func_purgefrom,
+    func_purgeto,
+    func_unban,
+    func_unlock,
+    func_unmute,
+    func_unpin,
+    func_unpinall,
+    func_whisper,
+
+    func_filter,
+    func_filters,
+    func_remove,
+
+    func_broadcast,
+    func_bsettings,
+    func_cadmins,
+    func_database,
+    func_invitelink,
+    func_log,
+    func_say,
+    func_send,
+    func_shell,
+    func_sys,
+
     query_bot_settings,
     query_chat_settings,
     query_help_menu,
     query_misc,
-    query_db_editing
+    query_db_editing,
+
+    func_decode,
+    func_encode,
+    func_calc,
+    func_gpt,
+    func_qr,
+    func_rap,
+    func_id,
+    func_imagine,
+    func_imgtolink,
+    func_info,
+    func_movie,
+    func_paste,
+    func_ping,
+    func_psndl,
+    func_settings,
+    func_shorturl,
+    func_tts,
+    func_tr,
+    func_weather,
+    func_ytdl,
+
+    fetch_sudos,
+    bot_chats_tracker,
+    chat_status_update
 )
-from .functions.sudo_users import fetch_sudos
-from .functions.bot_chats_tracker import bot_chats_tracker
-from .functions.chat_status_update import chat_status_update
-from .functions.core.help import func_help
-from .functions.conversation.support import SUPPORT_STATES, init_support_conv, support_state_one, cancel_support_conv
-from .functions.group_management.chat_join_req import join_request_handler
 
 
 async def post_init():
@@ -145,35 +207,10 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
             logger.error(e)
             return
     # if not DEFAULT_ERROR_CHANNEL_ID or BadRequest
-    await context.bot.send_message(config.owner_id, text)
-
-
-def load_handlers():
-    bot_commands = {}
-    
-    for root, dirs, files in os.walk(HANDLERS_DIR):
-        for file in files:
-            if file.endswith(".py") and not file.startswith("__"):
-                # Constructing module path
-                file_path = os.path.join(root, file)
-                normalized_path = os.path.normpath(file_path)
-                module_path = normalized_path.replace(os.sep, ".")
-
-                if module_path.endswith(".py"):
-                    module_path = module_path[:-3]
-                
-                # Importing the module
-                module = importlib.import_module(module_path)
-                
-                # Iterate over all attributes in the module
-                for attr_name in dir(module):
-                    attr = getattr(module, attr_name)
-
-                    if callable(attr) and attr_name.startswith("func_"):
-                        command_name = attr_name[len("func_"):]
-                        bot_commands[command_name] = attr
-    
-    return bot_commands
+    try:
+        await context.bot.send_message(config.owner_id, text)
+    except Exception as e:
+        logger.error(e)
 
 
 def main():
@@ -186,17 +223,6 @@ def main():
     # Bot instance
     application = ApplicationBuilder().token(config.bot_token).defaults(default_param).build()
 
-    # Command handlers
-    bot_commands = load_handlers()
-
-    global BOT_HANDLERS_COUNT
-    BOT_HANDLERS_COUNT.update({"bot_handlers_count": len(bot_commands)})
-
-    logger.info(f"Modules loaded: {len(bot_commands)}")
-
-    # registering deeplinking command handler (and this need to register before main handler)
-    application.add_handler(CommandHandler("start", func_help, filters.Regex("help")))
-
     # Conversation handlers
     application.add_handler(
         ConversationHandler(
@@ -207,11 +233,71 @@ def main():
             [CommandHandler("cancel", cancel_support_conv)]
         )
     )
-    
-    # registering main handlers
-    for command, handler in bot_commands.items():
-        application.add_handler(CommandHandler(command, handler)) # for /command
-        application.add_handler(PrefixHandler(["!", ".", "-"], command, handler)) # for other prefix command
+
+    main_handlers = [
+        CommandHandler("start", func_help, filters.Regex("help")), # this need to register before main start handler
+        # core func
+        CommandHandler("start", func_start),
+        CommandHandler("help", func_help),
+        # group management func
+        CommandHandler("adminlist", func_adminlist),
+        CommandHandler(["ban", "sban", "dban"], func_ban),
+        CommandHandler(["demote", "sdemote"], func_demote),
+        CommandHandler(["invite", "sinvite"], func_invite),
+        CommandHandler(["kick", "skick", "dkick"], func_kick),
+        CommandHandler("kickme", func_kickme),
+        CommandHandler(["lock", "slock"], func_lock),
+        CommandHandler(["mute", "smute", "dmute"], func_mute),
+        CommandHandler(["pin", "spin"], func_pin),
+        CommandHandler(["promote", "spromote"], func_promote),
+        CommandHandler(["purge", "spurge"], func_purge),
+        CommandHandler("purgefrom", func_purgefrom),
+        CommandHandler("purgeto", func_purgeto),
+        CommandHandler(["unban", "sunban"], func_unban),
+        CommandHandler(["unlock", "sunlock"], func_unlock),
+        CommandHandler(["unmute", "sunmute"], func_unmute),
+        CommandHandler(["unpin", "sunpin"], func_unpin),
+        CommandHandler(["unpinall", "sunpinall"], func_unpinall),
+        CommandHandler("whisper", func_whisper),
+        CommandHandler("filter", func_filter),
+        CommandHandler("filters", func_filters),
+        CommandHandler("remove", func_remove),
+        # owner func
+        CommandHandler("broadcast", func_broadcast),
+        CommandHandler("bsettings", func_bsettings),
+        CommandHandler("cadmins", func_cadmins),
+        CommandHandler("database", func_database),
+        CommandHandler("invitelink", func_invitelink),
+        CommandHandler("log", func_log),
+        CommandHandler("say", func_say),
+        CommandHandler("send", func_send),
+        CommandHandler("shell", func_shell),
+        CommandHandler("sys", func_sys),
+        # user func
+        CommandHandler("decode", func_decode),
+        CommandHandler("encode", func_encode),
+        CommandHandler("calc", func_calc),
+        CommandHandler("gpt", func_gpt),
+        CommandHandler("qr", func_qr),
+        CommandHandler("rap", func_rap),
+        CommandHandler("id", func_id),
+        CommandHandler("imagine", func_imagine),
+        CommandHandler("imgtolink", func_imgtolink),
+        CommandHandler("info", func_info),
+        CommandHandler("movie", func_movie),
+        CommandHandler("paste", func_paste),
+        CommandHandler("ping", func_ping),
+        CommandHandler("psndl", func_psndl),
+        CommandHandler("settings", func_settings), # part of group management also
+        CommandHandler("shorturl", func_shorturl),
+        CommandHandler("tts", func_tts),
+        CommandHandler("tr", func_tr),
+        CommandHandler("weather", func_weather),
+        CommandHandler("ytdl", func_ytdl)
+    ]
+
+    # main handlers register
+    application.add_handlers(main_handlers)
     
     # Chat Join Request Handler
     application.add_handler(ChatJoinRequestHandler(join_request_handler))
@@ -235,11 +321,13 @@ def main():
     application.add_handler(ChatMemberHandler(bot_chats_tracker, ChatMemberHandler.MY_CHAT_MEMBER))
 
     # Callback query handlers
-    application.add_handler(CallbackQueryHandler(query_help_menu.query_help_menu, "help_menu_[A-Za-z0-9]+"))
-    application.add_handler(CallbackQueryHandler(query_bot_settings.query_bot_settings, "bsettings_[A-Za-z0-9]+"))
-    application.add_handler(CallbackQueryHandler(query_chat_settings.query_chat_settings, "csettings_[A-Za-z0-9]+"))
-    application.add_handler(CallbackQueryHandler(query_misc.query_misc, "misc_[A-Za-z0-9]+"))
-    application.add_handler(CallbackQueryHandler(query_db_editing.query_db_editing, "database_[A-Za-z0-9]+"))
+    application.add_handlers([
+        CallbackQueryHandler(query_help_menu.query_help_menu, "help_menu_[A-Za-z0-9]+"),
+        CallbackQueryHandler(query_bot_settings.query_bot_settings, "bsettings_[A-Za-z0-9]+"),
+        CallbackQueryHandler(query_chat_settings.query_chat_settings, "csettings_[A-Za-z0-9]+"),
+        CallbackQueryHandler(query_misc.query_misc, "misc_[A-Za-z0-9]+"),
+        CallbackQueryHandler(query_db_editing.query_db_editing, "database_[A-Za-z0-9]+")
+    ])
 
     # Error handler
     application.add_error_handler(default_error_handler)

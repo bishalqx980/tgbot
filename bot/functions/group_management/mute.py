@@ -5,17 +5,29 @@ from bot import logger
 from .auxiliary.pm_error import pm_error
 from .auxiliary.chat_admins import ChatAdmins
 
-async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
+async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     effective_message = update.effective_message
     re_msg = effective_message.reply_to_message
     victim = re_msg.from_user if re_msg else None
     reason = " ".join(context.args)
+
+    cmd_prefix = effective_message.text[1]
+    is_silent = False
     
     if chat.type == ChatType.PRIVATE:
         await pm_error(context, chat.id)
         return
+    
+    try:
+        if cmd_prefix == "s":
+            is_silent = True
+            await effective_message.delete()
+        elif cmd_prefix == "d":
+            await re_msg.delete()
+    except:
+        pass
     
     if user.is_bot:
         await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
@@ -62,8 +74,3 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silen
     if not is_silent:
         text = f"{victim.mention_html()} has been muted in this chat." + (f"\nReason: {reason}" if reason else "")
         await effective_message.reply_text(text)
-
-
-async def func_smute(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.effective_message.delete()
-    await func_mute(update, context, is_silent=True)

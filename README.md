@@ -1,4 +1,4 @@
-# [tgbot](https://bishalqx980.github.io/tgbot) <img src="https://i.ibb.co/h7bL5bn/download.png" width="20px">
+# [tgbot](https://bishalqx980.github.io/tgbot)
 
 This Telegram bot is built using the `python-telegram-bot` library **_version 21.9_** and performs various tasks within **Telegram**.
 
@@ -11,10 +11,10 @@ This Telegram bot is built using the `python-telegram-bot` library **_version 21
 
 - **🔰 Note (14/12/2024):** _Certain features have been temporarily removed due to limitations. They may be reintroduced in future updates. Additionally, not all features are listed here. We encourage you to start the bot and explore its full functionality. Thank you for your understanding._
 
-- **Auto-Import Handlers**
+<!-- - **Auto-Import Handlers**
     - Location: Place handler files in the `bot/functions` folder.
     - Naming: Functions must start with `func_` to be auto-detected as handlers.
-    - File Names: File names don’t matter; only function names are checked.
+    - File Names: File names don’t matter; only function names are checked. -->
 
 - **Group Management 🛠️**
     - It has just everything...

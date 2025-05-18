@@ -6,15 +6,13 @@ from .config import CONFIG
 from .logger import setup_logging
 
 # constants
-__version__ = "1.1.6.496" # major.minor.patch.commits
+__version__ = "1.2.0.498" # major.minor.patch.commits
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
 ORIGINAL_BOT_ID = 6845693976
 DEFAULT_ERROR_CHANNEL_ID = -1002675104487
-HANDLERS_DIR = "bot/functions"
 BOT_UPTIME = time()
-BOT_HANDLERS_COUNT = {}
 
 # Creating Required Folder/Directories
 try:

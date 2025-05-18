@@ -9,10 +9,18 @@ async def func_invite(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     effective_message = update.effective_message
+    
+    cmd_prefix = effective_message.text[1]
 
     if chat.type == ChatType.PRIVATE:
         await pm_error(context, chat.id)
         return
+    
+    if cmd_prefix == "s":
+        try:
+            await effective_message.delete()
+        except:
+            pass
     
     if chat.link:
         await effective_message.reply_text(f"Invite link: {chat.link}")

@@ -5,15 +5,25 @@ from bot import logger
 from .auxiliary.pm_error import pm_error
 from .auxiliary.chat_admins import ChatAdmins
 
-async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_silent=None):
+async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     effective_message = update.effective_message
     re_msg = effective_message.reply_to_message
+
+    cmd_prefix = effective_message.text[1]
+    is_silent = False
     
     if chat.type == ChatType.PRIVATE:
         await pm_error(context, chat.id)
         return
+    
+    if cmd_prefix == "s":
+        is_silent = True
+        try:
+            await effective_message.delete()
+        except:
+            pass
     
     if user.is_bot:
         await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
@@ -57,11 +67,5 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE, is_sile
     
     if is_silent:
         await context.bot.delete_message(chat.id, sent_message.id)
-    
     else:
         await context.bot.edit_message_text("Purge completed!", chat.id, sent_message.id)
-
-
-async def func_spurge(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.effective_message.delete()
-    await func_purge(update, context, is_silent=True)
