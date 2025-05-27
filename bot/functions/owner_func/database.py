@@ -119,7 +119,11 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             victim_info = None
             btn = None
         
-        victim_name = victim_info.mention_html() if victim_info else database_data.get('mention')
+        try:
+            victim_name = victim_info.mention_html() if victim_info else database_data.get('mention')
+        except: # TypeError
+            victim_name = database_data.get('mention')
+        
         victim_username = victim_info.username if victim_info else database_data.get('username')
         text = "<blockquote><b>Database information</b></blockquote>\n\n"
 

@@ -19,11 +19,17 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     sent_message = await effective_message.reply_text(f"Searching...")
 
-    result = PSNDL.search(game_name)
-    if not result:
-        await context.bot.edit_message_text("Game wasn't found! Check game name again!", chat.id, sent_message.id)
-        return
+    result = await PSNDL.search(game_name)
+    response = {
+        404: "Error: fetching database!",
+        500: "Package wasn't found! Check package name again!",
+        None: "Something went wrong!"
+    }
 
+    if type(result) is not dict and result in response:
+        await context.bot.edit_message_text(response[result], chat.id, sent_message.id)
+        return
+    
     msg_list, counter = [], 0
     for game_type in result:
         collections = result.get(game_type)
@@ -61,4 +67,4 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for link in links:
         msg += f"• {link}\n"
 
-    await context.bot.edit_message_text(msg, chat.id, sent_message.id)
+    await context.bot.edit_message_text(f"{msg}\nPSNDL Website: https://bishalqx980.github.io/psndl/", chat.id, sent_message.id)

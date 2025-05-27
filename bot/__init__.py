@@ -6,13 +6,14 @@ from .config import CONFIG
 from .logger import setup_logging
 
 # constants
-__version__ = "1.2.0.498" # major.minor.patch.commits
+__version__ = "1.3.0.500" # major.minor.patch.commits
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
 ORIGINAL_BOT_ID = 6845693976
 DEFAULT_ERROR_CHANNEL_ID = -1002675104487
 BOT_UPTIME = time()
+PSNDL_DATABASE_URL = "https://psndl.pages.dev/database.json"
 
 # Creating Required Folder/Directories
 try:
