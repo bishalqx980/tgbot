@@ -27,13 +27,13 @@ class PSNDL:
             for packageType in database:
                 for packageRegion in database[packageType]:
                     for packageID in database[packageType][packageRegion]:
-                        sortedPackageData = database[packageType][packageRegion][packageID]
+                        packageData = database[packageType][packageRegion][packageID]
 
-                        if package_name.lower() in sortedPackageData.get("name").lower():
+                        if package_name.lower() in packageData.get("name").lower():
                             if sortedData.get(packageType):
-                                sortedData[packageType].update({packageID: sortedPackageData})
+                                sortedData[packageType].update({packageID: packageData})
                             else:
-                                sortedData.update({packageType: {packageID: sortedPackageData}})
+                                sortedData.update({packageType: {packageID: packageData}})
             
             return sortedData if sortedData else 500
         except Exception as e:
@@ -55,17 +55,15 @@ class PSNDL:
             for packageType in database:
                 for packageRegion in database[packageType]:
                     for packageID in database[packageType][packageRegion]:
-                        sortedPackageData = database[packageType][packageRegion][packageID]
+                        packageData = database[packageType][packageRegion][packageID]
 
-                        rapData = sortedPackageData.get("rap_data")
+                        rapData = packageData.get("rap_data")
 
                         if rap_data.lower() == rapData.lower():
-                            rapName = sortedPackageData.get("rap_name")
-                            
                             rapBytes = BytesIO(bytes.fromhex(rapData))
-                            rapBytes.name = rapName
+                            rapBytes.name = packageData.get("rap_name")
 
-                            sortedData = {"packageData": sortedPackageData, "rapBytes": rapBytes}
+                            sortedData = {"packageData": packageData, "rapBytes": rapBytes}
                             if sortedData: break
                     if sortedData: break
                 if sortedData: break

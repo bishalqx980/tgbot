@@ -65,13 +65,8 @@ async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
             to_translate = filtered_text if is_text_contain_links else (effective_message.text or effective_message.caption)
             translated_text = translate(to_translate, lang_code)
             if translated_text and translated_text.lower() != to_translate.lower():
-                text = (
-                    f"{translated_text}\n\n"
-                    f"• <a href='{effective_message.link}'>{effective_message.id}</a> | {user.mention_html()}"
-                )
-
                 try:
-                    await effective_message.reply_text(text)
+                    await effective_message.reply_text(f"<a href='{effective_message.link}'>{user.full_name}</a>: {translated_text}")
                 except:
                     pass
             

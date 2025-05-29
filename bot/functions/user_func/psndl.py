@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.modules.psndl.psndl_func import PSNDL
+from bot.modules.psndl_module import PSNDL
 from bot.modules import telegraph
 
 async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
