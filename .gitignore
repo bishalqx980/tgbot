@@ -14,4 +14,3 @@ config.env
 # Exception 
 !requirements.txt
 !.vscode/*
-!bot/modules/psndl/database.json
