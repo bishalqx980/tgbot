@@ -14,7 +14,7 @@ async def func_rap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response = {
         404: "Error: fetching database!",
         500: "Package RAP wasn't found! Check HEX data again!",
-        None: "Something went wrong!"
+        None: "Oops! Something went wrong!"
     }
 
     if type(result) is not dict and result in response:

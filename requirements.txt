@@ -1,7 +1,7 @@
 python-telegram-bot==21.9
 python-dotenv==1.0.1
 deep-translator==1.11.4
-pymongo==4.7.1
+pymongo==4.13.0
 pytz==2024.1
 Flask==3.0.3
 psutil==5.9.8

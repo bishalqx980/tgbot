@@ -33,7 +33,13 @@ async def support_state_one(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
 
     try:
-        await context.bot.send_message(config.owner_id, f"UserID: <code>{user.id}</code>\n\n<blockquote>{effective_message.text_html}</blockquote>")
+        message = (
+            f"Name: {user.mention_html()}\n"
+            f"UserID: <code>{user.id}</code>\n"
+            f"Message: <blockquote>{effective_message.text_html}</blockquote>"
+        )
+
+        await context.bot.send_message(config.owner_id, message)
         text = "Report has been submitted. Support team will contact you as soon as possible."
     except Exception as e:
         logger.error(e)

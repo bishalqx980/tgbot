@@ -5,7 +5,7 @@ GITHUB_OWNER_USERNAME = "bishalqx980"
 REPO_NAME = "tgbot"
 # telegram variables
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = int(os.getenv("CHAT_ID")) # chat_id to send update message; could be owner_id
+CHAT_ID = os.getenv("CHAT_ID") # chat_id to send update message; could be owner_id
 
 def main():
     # get commit
@@ -31,7 +31,7 @@ def main():
         )
 
         data = {
-            "chat_id": CHAT_ID,
+            "chat_id": int(CHAT_ID),
             "text": message,
             "disable_web_page_preview": True,
             "parse_mode": "HTML"
@@ -45,5 +45,7 @@ def main():
     except Exception as e:
         print(e)
 
-# calling the function
-main()
+
+if BOT_TOKEN and CHAT_ID:
+    # calling the function
+    main()

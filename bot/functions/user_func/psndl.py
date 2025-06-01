@@ -23,7 +23,7 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response = {
         404: "Error: fetching database!",
         500: "Package wasn't found! Check package name again!",
-        None: "Something went wrong!"
+        None: "Oops! Something went wrong!"
     }
 
     if type(result) is not dict and result in response:

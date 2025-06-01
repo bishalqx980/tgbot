@@ -1,12 +1,12 @@
 import os
 import shutil
 from time import time
-from telegram import Bot
+from telegram import Bot, __version__ as ptb_version
 from .config import CONFIG
 from .logger import setup_logging
 
 # constants
-__version__ = "1.3.1.502" # major.minor.patch.commits
+__version__ = "1.3.2.503" # major.minor.patch.commits
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
@@ -45,6 +45,6 @@ Developed by
   \/_____/   \/_/   \/_____/   \/_/\/_/   \/_/\/_/   \/_____/ 
    
     Version: {__version__}
-    Library: python-telegram-bot
+    Library: python-telegram-bot {ptb_version}
     GitHub: https://github.com/bishalqx980
 """)
