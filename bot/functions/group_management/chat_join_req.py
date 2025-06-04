@@ -7,12 +7,12 @@ async def join_request_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     join_request_update = update.chat_join_request
     chat = join_request_update.chat
     
-    database_data = database_search("groups", "chat_id", chat.id)
-    if not database_data:
+    chat_data = database_search("chats_data", "chat_id", chat.id)
+    if not chat_data:
         await chat.send_message("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
-    chat_join_req = database_data.get("chat_join_req")
+    chat_join_req = chat_data.get("chat_join_req")
     if not chat_join_req:
         return
     

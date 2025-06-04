@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import __version__, BOT_UPTIME, logger
-from bot.helper.button_maker import ButtonMaker
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.database import MongoDB
 from ..core.help import HelpMenuData
 
@@ -142,15 +142,15 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         for info in database_info:
             info = database_info[info]
-            if info.get("name") == "users":
+            if info.get("name") == "users_data":
                 total_users = info.get("quantity")
-            elif info.get("name") == "groups":
+            elif info.get("name") == "chats_data":
                 total_groups = info.get("quantity")
             
             if total_users and total_groups:
                 break
         
-        active_status = MongoDB.find("users", "active_status")
+        active_status = MongoDB.find("users_data", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
 

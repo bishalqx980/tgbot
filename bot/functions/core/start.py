@@ -4,7 +4,7 @@ from telegram.constants import ChatType
 from telegram.helpers import create_deep_linked_url
 from telegram.error import BadRequest
 from bot import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, logger
-from bot.helper.button_maker import ButtonMaker
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_add_user
 

@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.helper.button_maker import ButtonMaker
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 from ..group_management.chat_settings import chat_settings
@@ -35,24 +35,24 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     data = {
         "user_id": user.id, # authorization
-        "collection_name": "users",
+        "collection_name": "users_data",
         "search_key": "user_id",
         "match_value": user.id
     }
 
     MemoryDB.insert("data_center", user.id, data)
 
-    database_data = database_search("users", "user_id", user.id)
-    if not database_data:
+    user_data = database_search("users_data", "user_id", user.id)
+    if not user_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
     text = PvtChatSettingsData.TEXT.format(
         user.mention_html(),
         user.id,
-        database_data.get('lang'),
-        database_data.get('auto_tr') or False,
-        database_data.get('echo') or False
+        user_data.get('lang'),
+        user_data.get('auto_tr') or False,
+        user_data.get('echo') or False
     )
 
     btn = ButtonMaker.cbutton(PvtChatSettingsData.BUTTONS)

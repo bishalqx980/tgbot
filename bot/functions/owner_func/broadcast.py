@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import Forbidden
 from bot import logger
-from bot.helper.button_maker import ButtonMaker
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.database import MemoryDB, MongoDB
 from ..sudo_users import fetch_sudos
 
@@ -93,8 +93,8 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     is_forward = data_center["broadcast"]["is_forward"]
     is_pin = data_center["broadcast"]["is_pin"]
 
-    users_id = MongoDB.find("users", "user_id")
-    active_status = MongoDB.find("users", "active_status")
+    users_id = MongoDB.find("users_data", "user_id")
+    active_status = MongoDB.find("users_data", "active_status")
 
     if len(users_id) == len(active_status):
         combined_list = list(zip(users_id, active_status))
@@ -173,7 +173,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except Forbidden:
             except_count += 1
             exception_user_ids.append(f"Forbidden: {user_id}")
-            MongoDB.update("users", "user_id", int(user_id), "active_status", False)
+            MongoDB.update("users_data", "user_id", int(user_id), "active_status", False)
         
         except Exception as e:
             except_count += 1

@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot.modules.database import MongoDB
-from bot.helper.button_maker import ButtonMaker
+from bot.helper.keyboard_builder import ButtonMaker
 from ..sudo_users import fetch_sudos
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -37,7 +37,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"<b>• A. size:</b> <code>{info.get('acsize')}</code>\n\n"
             )
         
-        active_status = MongoDB.find("users", "active_status")
+        active_status = MongoDB.find("users_data", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
 
@@ -59,8 +59,8 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # if chat_id given
     if "-100" in str(victim_id):
-        database_data = MongoDB.find_one("groups", "chat_id", victim_id) # victim_id as int
-        if not database_data:
+        chat_data = MongoDB.find_one("chats_data", "chat_id", victim_id) # victim_id as int
+        if not chat_data:
             await effective_message.reply_text("Chat not found!")
             return
         
@@ -70,7 +70,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             victim_info = None
             btn = None
         
-        chat_title = victim_info.title if victim_info else database_data.get('title')
+        chat_title = victim_info.title if victim_info else chat_data.get('title')
         chat_invite_link = victim_info.invite_link if victim_info else None
 
         text = (
@@ -79,28 +79,28 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Title: {chat_title}\n"
             f"• ID: <code>{victim_id}</code>\n\n"
 
-            f"• Language: <code>{database_data.get('lang')}</code>\n"
-            f"• Auto translate: <code>{database_data.get('auto_tr') or False}</code>\n"
-            f"• Echo: <code>{database_data.get('echo') or False}</code>\n"
-            f"• Antibot: <code>{database_data.get('antibot') or False}</code>\n"
-            f"• Welcome Members: <code>{database_data.get('welcome_user') or False}</code>\n"
-            f"• Farewell Members: <code>{database_data.get('farewell_user') or False}</code>\n"
-            f"• Join Request: <code>{database_data.get('chat_join_req')}</code>\n"
-            f"• Service Messages: <code>{database_data.get('service_messages')}</code>\n"
-            f"• Links Behave: <code>{database_data.get('links_behave')}</code>\n"
-            f"• Allowed Links: <code>{', '.join(database_data.get('allowed_links') or [])}</code>"
+            f"• Language: <code>{chat_data.get('lang')}</code>\n"
+            f"• Auto translate: <code>{chat_data.get('auto_tr') or False}</code>\n"
+            f"• Echo: <code>{chat_data.get('echo') or False}</code>\n"
+            f"• Antibot: <code>{chat_data.get('antibot') or False}</code>\n"
+            f"• Welcome Members: <code>{chat_data.get('welcome_user') or False}</code>\n"
+            f"• Farewell Members: <code>{chat_data.get('farewell_user') or False}</code>\n"
+            f"• Join Request: <code>{chat_data.get('chat_join_req')}</code>\n"
+            f"• Service Messages: <code>{chat_data.get('service_messages')}</code>\n"
+            f"• Links Behave: <code>{chat_data.get('links_behave')}</code>\n"
+            f"• Allowed Links: <code>{', '.join(chat_data.get('allowed_links') or [])}</code>"
         )
 
         btn = ButtonMaker.ubutton([{"Invite Link": chat_invite_link}]) if chat_invite_link else None
         
-        custom_welcome_msg = database_data.get('custom_welcome_msg')
+        custom_welcome_msg = chat_data.get('custom_welcome_msg')
         if custom_welcome_msg:
             text += (
                 "\n\n<blockquote><b>Custom Welcome message</b></blockquote>\n\n"
                 f"<blockquote>{custom_welcome_msg}</blockquote>"
             )
         
-        chat_filters = database_data.get('filters')
+        chat_filters = chat_data.get('filters')
         if chat_filters:
             filters_file = BytesIO(json.dumps(chat_filters, indent=4).encode())
             filters_file.name = f"filters_{victim_id}.json"
@@ -108,8 +108,8 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await effective_message.reply_document(filters_file, f"ChatID: <code>{victim_id}</code>")
     
     else:
-        database_data = MongoDB.find_one("users", "user_id", victim_id) # victim_id as int
-        if not database_data:
+        user_data = MongoDB.find_one("users_data", "user_id", victim_id) # victim_id as int
+        if not user_data:
             await effective_message.reply_text("User not found!")
             return
         
@@ -120,11 +120,11 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn = None
         
         try:
-            victim_name = victim_info.mention_html() if victim_info else database_data.get('mention')
+            victim_name = victim_info.mention_html() if victim_info else user_data.get('mention')
         except: # TypeError
-            victim_name = database_data.get('mention')
+            victim_name = user_data.get('mention')
         
-        victim_username = victim_info.username if victim_info else database_data.get('username')
+        victim_username = victim_info.username if victim_info else user_data.get('username')
         text = "<blockquote><b>Database information</b></blockquote>\n\n"
 
         text += (
@@ -132,11 +132,11 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• ID: <code>{victim_id}</code>\n"
             f"• Username: @{victim_username or 'username'}\n\n"
 
-            f"• Language: <code>{database_data.get('lang')}</code>\n"
-            f"• Auto translate: <code>{database_data.get('auto_tr') or False}</code>\n"
-            f"• Echo: <code>{database_data.get('echo') or False}</code>\n\n"
+            f"• Language: <code>{user_data.get('lang')}</code>\n"
+            f"• Auto translate: <code>{user_data.get('auto_tr') or False}</code>\n"
+            f"• Echo: <code>{user_data.get('echo') or False}</code>\n\n"
 
-            f"• Active status: <code>{database_data.get('active_status')}</code>"
+            f"• Active status: <code>{user_data.get('active_status')}</code>"
         )
 
         if victim_info:

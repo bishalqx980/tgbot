@@ -1,7 +1,8 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.helper.button_maker import ButtonMaker
+from bot import TL_LANG_CODES_URL
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.database.common import database_search
 from bot.modules.translator import fetch_lang_codes, translate
 
@@ -14,7 +15,7 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context_args = " ".join(context.args)
 
     if not text and not context_args:
-        btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
+        btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
         await effective_message.reply_text("Use <code>/tr text</code> or <code>/tr lang code text</code> or reply the text with <code>/tr</code> or <code>/tr lang code</code>\n\nEnable auto translator mode for this chat from /settings", reply_markup=btn)
         return
     
@@ -37,11 +38,11 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not lang_code:
         if chat.type == ChatType.PRIVATE:
-            collection_name = "users"
+            collection_name = "users_data"
             to_find = "user_id"
             to_match = user.id
         else:
-            collection_name = "groups"
+            collection_name = "chats_data"
             to_find = "chat_id"
             to_match = chat.id
 
@@ -53,7 +54,7 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lang_code = database_data.get("lang")
     
     if not lang_code:
-        btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
+        btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
         await effective_message.reply_text("Chat language code wasn't found! Use /tr to get more details or /settings to set chat language.", reply_markup=btn)
         return
     
@@ -61,7 +62,7 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     translated_text = translate(to_translate, lang_code)
     if translated_text == False:
-        btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
+        btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
         await context.bot.edit_message_text("Invalid language code was given! Use /tr to get more details or /settings to set chat language.", chat.id, sent_message.id, reply_markup=btn)
 
     elif not translated_text:

@@ -1,6 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.button_maker import ButtonMaker
+from bot import TTS_LANG_CODES_URL
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.gtts import text_to_speech
 
 async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -10,7 +11,7 @@ async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
     lang_code = " ".join(context.args) or "en"
 
     if not re_msg:
-        btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Text-to-speech---language-codes-tts-01-23"}])
+        btn = ButtonMaker.ubutton([{"Language code's": TTS_LANG_CODES_URL}])
         await effective_message.reply_text("Reply any text to convert it into a voice message! E.g. Reply any message with <code>/tts en</code> to get english accent voice.", reply_markup=btn)
         return
     

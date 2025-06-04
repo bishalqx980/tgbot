@@ -1,12 +1,12 @@
 import os
 import shutil
 from time import time
-from telegram import Bot, __version__ as ptb_version
+from telegram import Bot, __version__ as __ptbversion__
 from .config import CONFIG
 from .logger import setup_logging
 
 # constants
-__version__ = "1.3.2.503" # major.minor.patch.commits
+__version__ = "1.3.3.504" # major.minor.patch.commits
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
@@ -14,6 +14,8 @@ ORIGINAL_BOT_ID = 6845693976
 DEFAULT_ERROR_CHANNEL_ID = -1002675104487
 BOT_UPTIME = time()
 PSNDL_DATABASE_URL = "https://psndl.pages.dev/database.json"
+TL_LANG_CODES_URL = "https://telegra.ph/Language-Code-12-24"
+TTS_LANG_CODES_URL = "https://telegra.ph/Text-to-speech---language-codes-tts-01-23"
 
 # Creating Required Folder/Directories
 try:
@@ -45,6 +47,6 @@ Developed by
   \/_____/   \/_/   \/_____/   \/_/\/_/   \/_/\/_/   \/_____/ 
    
     Version: {__version__}
-    Library: python-telegram-bot {ptb_version}
+    Library: python-telegram-bot {__ptbversion__}
     GitHub: https://github.com/bishalqx980
 """)

@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot.modules.database.common import database_search
 from bot.modules.database import MemoryDB, MongoDB
-from bot.helper.button_maker import ButtonMaker
+from bot.helper.keyboard_builder import ButtonMaker
 from ..auxiliary.pm_error import pm_error
 from ..auxiliary.chat_admins import ChatAdmins
 
@@ -64,12 +64,12 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text(text, reply_markup=btn)
         return
 
-    database_data = database_search("groups", "chat_id", chat.id)
-    if not database_data:
+    chat_data = database_search("chats_data", "chat_id", chat.id)
+    if not chat_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
-    filters = database_data.get("filters")
+    filters = chat_data.get("filters")
 
     modified_keyword = keyword.split(",")
     keywords = []
@@ -80,15 +80,15 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = {}
         for keyword in keywords:
             data.update({keyword: value})
-        MongoDB.update("groups", "chat_id", chat.id, "filters", data)
+        MongoDB.update("chats_data", "chat_id", chat.id, "filters", data)
     
     else:
         for keyword in keywords:
             filters[keyword] = value
-        MongoDB.update("groups", "chat_id", chat.id, "filters", filters)
+        MongoDB.update("chats_data", "chat_id", chat.id, "filters", filters)
     
-    group_data = MongoDB.find_one("groups", "chat_id", chat.id)
-    MemoryDB.insert("chat_data", chat.id, group_data)
+    chat_data = MongoDB.find_one("chats_data", "chat_id", chat.id)
+    MemoryDB.insert("chats_data", chat.id, chat_data)
     msg_keywords = ", ".join(keywords)
     
     await effective_message.reply_text(f"{msg_keywords} filters added!")

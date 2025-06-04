@@ -1,7 +1,7 @@
 import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.button_maker import ButtonMaker
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.database import MemoryDB, MongoDB
 
 async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -90,13 +90,6 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Updating Database
         response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
         if response:
-            mem_coll_names = {
-                "bot_data": "bot_data",
-                "users": "user_data",
-                "groups": "chat_data"
-            }
-            # bcz there are naming diff between mongodb and memory
-            collection_name = mem_coll_names[collection_name]
             identifier = None if collection_name == "bot_data" else chat.id
             data = {update_data_key: update_data_value}
 
@@ -120,13 +113,6 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         update_data_value = query_data.removeprefix("value_")
         response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
         if response:
-            mem_coll_names = {
-                "bot_data": "bot_data",
-                "users": "user_data",
-                "groups": "chat_data"
-            }
-            # bcz there are naming diff between mongodb and memory
-            collection_name = mem_coll_names[collection_name]
             identifier = None if collection_name == "bot_data" else chat.id
             data = {update_data_key: update_data_value}
 
@@ -142,13 +128,6 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         update_data_value = [] if is_list else update_data_value
         response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
         if response:
-            mem_coll_names = {
-                "bot_data": "bot_data",
-                "users": "user_data",
-                "groups": "chat_data"
-            }
-            # bcz there are naming diff between mongodb and memory
-            collection_name = mem_coll_names[collection_name]
             identifier = None if collection_name == "bot_data" else chat.id
             data = {update_data_key: update_data_value}
 
@@ -164,13 +143,6 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         update_data_value = query_data.strip("bool_") == "true"
         response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
         if response:
-            mem_coll_names = {
-                "bot_data": "bot_data",
-                "users": "user_data",
-                "groups": "chat_data"
-            }
-            # bcz there are naming diff between mongodb and memory
-            collection_name = mem_coll_names[collection_name]
             identifier = None if collection_name == "bot_data" else chat.id
             data = {update_data_key: update_data_value}
 

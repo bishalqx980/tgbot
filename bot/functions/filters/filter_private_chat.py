@@ -1,6 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.button_maker import ButtonMaker
+from bot import TL_LANG_CODES_URL
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.database.common import database_search
 from bot.modules.translator import translate
 from .edit_database import edit_database
@@ -14,19 +15,19 @@ async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE
     if is_editing:
         return
     
-    database_data = database_search("users", "user_id", user.id)
-    if not database_data:
+    user_data = database_search("users_data", "user_id", user.id)
+    if not user_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
-    echo_status = database_data.get("echo")
-    auto_tr_status = database_data.get("auto_tr")
+    echo_status = user_data.get("echo")
+    auto_tr_status = user_data.get("auto_tr")
 
     if echo_status:
         await effective_message.reply_text(effective_message.text_html or effective_message.caption_html)
 
     if auto_tr_status:
-        lang_code = database_data.get("lang")
+        lang_code = user_data.get("lang")
         if lang_code:
             original_text = effective_message.text or effective_message.caption
             translated_text = translate(original_text, lang_code)
@@ -35,8 +36,8 @@ async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE
                 await effective_message.reply_text(translated_text)
             
             elif translated_text == False:
-                btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
+                btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
                 await effective_message.reply_text("Invalid language code was given! Use /settings to set chat language.", reply_markup=btn)
         else:
-            btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
+            btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
             await effective_message.reply_text("Chat language code wasn't found! Use /settings to set chat language.", reply_markup=btn)

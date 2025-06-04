@@ -17,34 +17,33 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type == ChatType.PRIVATE:
         # checking database entry
-        user_data = MongoDB.find_one("users", "user_id", user.id)
+        user_data = MongoDB.find_one("users_data", "user_id", user.id)
         if not user_data:
             data = {
                 "user_id": user.id,
                 "name": user.full_name,
                 "username": user.username,
-                "mention": user.mention_html(),
                 "lang": user.language_code
             }
 
-            MongoDB.insert("users", data)
-            MemoryDB.insert("user_data", user.id, data)
+            MongoDB.insert("users_data", data)
+            MemoryDB.insert("users_data", user.id, data)
         
         # checking member status & updating database
         active_status = new_status == ChatMember.MEMBER
-        MongoDB.update("users", "user_id", user.id, "active_status", active_status)
+        MongoDB.update("users_data", "user_id", user.id, "active_status", active_status)
     
     elif chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
         # checking database entry
-        chat_data = MongoDB.find_one("groups", "chat_id", chat.id)
+        chat_data = MongoDB.find_one("chats_data", "chat_id", chat.id)
         if not chat_data:
             data = {
                 "chat_id": chat.id,
                 "title": chat.title
             }
 
-            MongoDB.insert("groups", data)
-            MemoryDB.insert("chat_data", chat.id, data)
+            MongoDB.insert("chats_data", data)
+            MemoryDB.insert("chats_data", chat.id, data)
         
         if old_status in [ChatMember.LEFT, ChatMember.BANNED] and new_status == ChatMember.MEMBER:
             text = (

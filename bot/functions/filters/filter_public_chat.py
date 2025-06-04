@@ -1,6 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.button_maker import ButtonMaker
+from bot import TL_LANG_CODES_URL
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.database.common import database_search
 from bot.modules.translator import translate
 from bot.modules.re_link import RE_LINK
@@ -17,19 +18,19 @@ async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
     if is_editing:
         return
 
-    database_data = database_search("groups", "chat_id", chat.id)
-    if not database_data:
+    chat_data = database_search("chats_data", "chat_id", chat.id)
+    if not chat_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
-    links_behave = database_data.get("links_behave") # 3 values: delete; convert; None;
-    allowed_links = database_data.get("allowed_links") or []
+    links_behave = chat_data.get("links_behave") # 3 values: delete; convert; None;
+    allowed_links = chat_data.get("allowed_links") or []
     allowed_links = [link.strip() for link in allowed_links]
 
-    echo_status = database_data.get("echo")
-    auto_tr_status = database_data.get("auto_tr")
-    lang_code = database_data.get("lang")
-    filters = database_data.get("filters")
+    echo_status = chat_data.get("echo")
+    auto_tr_status = chat_data.get("auto_tr")
+    lang_code = chat_data.get("lang")
+    filters = chat_data.get("filters")
     is_text_contain_links = False
 
     if links_behave:
@@ -71,10 +72,10 @@ async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
                     pass
             
             elif translated_text == False:
-                btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
+                btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
                 await effective_message.reply_text("Invalid language code was given! Use /settings to set chat language.", reply_markup=btn)
         else:
-            btn = ButtonMaker.ubutton([{"Language code's": "https://telegra.ph/Language-Code-12-24"}])
+            btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
             await effective_message.reply_text("Chat language code wasn't found! Use /settings to set chat language.", reply_markup=btn)
 
     if filters:

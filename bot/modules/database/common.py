@@ -13,22 +13,15 @@ def database_search(collection_name, search_key, match_value):
         data = MemoryDB.bot_data
     
     else:
-        mem_coll_names = {
-            "bot_data": "bot_data",
-            "users": "user_data",
-            "groups": "chat_data",
-            "data_center": "data_center"
-        }
-        
         # getting all data of `collection_name` that stored in Memory
-        memory_data = getattr(MemoryDB, mem_coll_names[collection_name])
+        memory_data = getattr(MemoryDB, collection_name)
         # matched data
         data = memory_data.get(match_value)
 
         if not data:
             data = MongoDB.find_one(collection_name, search_key, match_value)
             if data:
-                MemoryDB.insert(mem_coll_names[collection_name], match_value, data)
+                MemoryDB.insert(collection_name, match_value, data)
     
     return data
 
@@ -42,17 +35,16 @@ def database_add_user(user):
     if user_data:
         return
     
-    user_data = MongoDB.find_one("users", "user_id", user.id)
+    user_data = MongoDB.find_one("users_data", "user_id", user.id)
     if not user_data:
         user_data = {
             "user_id": user.id,
             "name": user.full_name,
             "username": user.username,
-            "mention": user.mention_html(),
             "lang": user.language_code,
             "active_status": True
         }
 
-        MongoDB.insert("users", user_data)
+        MongoDB.insert("users_data", user_data)
     # inserts data to memorydb
-    MemoryDB.insert("user_data", user.id, user_data)
+    MemoryDB.insert("users_data", user.id, user_data)

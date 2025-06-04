@@ -40,18 +40,18 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text(text)
         return
 
-    database_data = database_search("groups", "chat_id", chat.id)
-    if not database_data:
+    chat_data = database_search("chats_data", "chat_id", chat.id)
+    if not chat_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
-    filters = database_data.get("filters")
+    filters = chat_data.get("filters")
 
     if filters and keyword:
         if keyword == "clear_all":
-            MongoDB.update("groups", "chat_id", chat.id, "filters", None)
-            group_data = MongoDB.find_one("groups", "chat_id", chat.id)
-            MemoryDB.insert("chat_data", chat.id, group_data)
+            MongoDB.update("chats_data", "chat_id", chat.id, "filters", None)
+            chat_data = MongoDB.find_one("chats_data", "chat_id", chat.id)
+            MemoryDB.insert("chats_data", chat.id, chat_data)
 
             await effective_message.reply_text("All filters of this chat has been removed!")
             return
@@ -59,15 +59,15 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             if keyword.lower() in filters:
                 del filters[keyword]
-                MongoDB.update("groups", "chat_id", chat.id, "filters", filters)
+                MongoDB.update("chats_data", "chat_id", chat.id, "filters", filters)
                 await effective_message.reply_text(f"Filter <code>{keyword}</code> has been removed!")
             
             else:
                 await effective_message.reply_text("Filter doesn't exist! Chat filters /filters")
                 return
             
-            group_data = MongoDB.find_one("groups", "chat_id", chat.id)
-            MemoryDB.insert("chat_data", chat.id, group_data)
+            chat_data = MongoDB.find_one("chats_data", "chat_id", chat.id)
+            MemoryDB.insert("chats_data", chat.id, chat_data)
         except Exception as e:
             logger.error(e)
             await effective_message.reply_text(str(e))

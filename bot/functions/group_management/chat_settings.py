@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.button_maker import ButtonMaker
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 from .auxiliary.chat_admins import ChatAdmins
@@ -59,14 +59,14 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("I'm not an admin in this chat!")
         return
     
-    database_data = database_search("groups", "chat_id", chat.id)
-    if not database_data:
+    chat_data = database_search("chats_data", "chat_id", chat.id)
+    if not chat_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
     data = {
         "user_id": user.id, # authorization
-        "collection_name": "groups",
+        "collection_name": "chats_data",
         "search_key": "chat_id",
         "match_value": chat.id
     }
@@ -76,16 +76,16 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = GroupChatSettingsData.TEXT.format(
         chat.title,
         chat.id,
-        database_data.get('lang'),
-        database_data.get('auto_tr') or False,
-        database_data.get('echo') or False,
-        database_data.get('antibot') or False,
-        database_data.get('welcome_user') or False,
-        database_data.get('farewell_user') or False,
-        database_data.get('chat_join_req'),
-        database_data.get('service_messages'),
-        database_data.get('links_behave'),
-        ', '.join(database_data.get('allowed_links') or [])
+        chat_data.get('lang'),
+        chat_data.get('auto_tr') or False,
+        chat_data.get('echo') or False,
+        chat_data.get('antibot') or False,
+        chat_data.get('welcome_user') or False,
+        chat_data.get('farewell_user') or False,
+        chat_data.get('chat_join_req'),
+        chat_data.get('service_messages'),
+        chat_data.get('links_behave'),
+        ', '.join(chat_data.get('allowed_links') or [])
     )
 
     btn = ButtonMaker.cbutton(GroupChatSettingsData.BUTTONS)

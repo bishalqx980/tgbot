@@ -12,15 +12,15 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
     cause_user = update.effective_user
     effective_message = update.effective_message
 
-    database_data = database_search("groups", "chat_id", chat.id)
-    if not database_data:
+    chat_data = database_search("chats_data", "chat_id", chat.id)
+    if not chat_data:
         return
 
-    welcome_user = database_data.get("welcome_user")
-    custom_welcome_msg = database_data.get("custom_welcome_msg") # related to new_chat_members
-    farewell_user = database_data.get("farewell_user")
-    antibot = database_data.get("antibot") # related to new_chat_members
-    service_messages = database_data.get("service_messages") # boolean (delete service messages)
+    welcome_user = chat_data.get("welcome_user")
+    custom_welcome_msg = chat_data.get("custom_welcome_msg") # related to new_chat_members
+    farewell_user = chat_data.get("farewell_user")
+    antibot = chat_data.get("antibot") # related to new_chat_members
+    service_messages = chat_data.get("service_messages") # boolean (delete service messages)
 
     if service_messages:
         try:

@@ -2,8 +2,8 @@ from telegram import Update
 from telegram.constants import ChatType
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
-from bot import logger
-from bot.helper.button_maker import ButtonMaker
+from bot import logger, TL_LANG_CODES_URL
+from bot.helper.keyboard_builder import ButtonMaker
 from bot.modules.database import MemoryDB
 from ..user_func.settings import PvtChatSettingsData
 from ..group_management.chat_settings import GroupChatSettingsData
@@ -87,7 +87,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Language: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> <a href='{}'>Available language codes</a>\nExample: <code>en</code> for English language.</blockquote>"
-        ).format(memory_data.get("lang"), "https://telegra.ph/Language-Code-12-24")
+        ).format(memory_data.get("lang"), TL_LANG_CODES_URL)
     
     elif query_data == "auto_tr":
         MemoryDB.insert("data_center", chat.id, {
