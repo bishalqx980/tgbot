@@ -3,8 +3,8 @@ from bot import logger
 class MemoryDatabase:
     def __init__(self):
         self.bot_data = {}
-        self.user_data = {}
-        self.chat_data = {}
+        self.users_data = {}
+        self.chats_data = {}
         self.data_center = {}
     
 
@@ -36,6 +36,6 @@ class MemoryDatabase:
 
     def clear_all(self):
         self.bot_data.clear()
-        self.user_data.clear()
-        self.chat_data.clear()
+        self.users_data.clear()
+        self.chats_data.clear()
         self.data_center.clear()

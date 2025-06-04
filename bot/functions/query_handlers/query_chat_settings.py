@@ -3,7 +3,7 @@ from telegram.constants import ChatType
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import logger, TL_LANG_CODES_URL
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database import MemoryDB
 from ..user_func.settings import PvtChatSettingsData
 from ..group_management.chat_settings import GroupChatSettingsData
@@ -37,7 +37,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         return
     
     # common variable for chat_data and user_data
-    memory_data = MemoryDB.chat_data.get(chat.id) or MemoryDB.user_data.get(chat.id)
+    memory_data = MemoryDB.chats_data.get(chat.id) or MemoryDB.users_data.get(chat.id)
 
     # variable required for global reply
     is_editing_btn = None
@@ -54,7 +54,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
                 memory_data.get('echo') or False
             )
 
-            btn = ButtonMaker.cbutton(PvtChatSettingsData.BUTTONS)
+            btn = BuildKeyboard.cbutton(PvtChatSettingsData.BUTTONS)
         
         else:
             text = GroupChatSettingsData.TEXT.format(
@@ -72,7 +72,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
                 ', '.join(memory_data.get('allowed_links') or [])
             )
 
-            btn = ButtonMaker.cbutton(GroupChatSettingsData.BUTTONS)
+            btn = BuildKeyboard.cbutton(GroupChatSettingsData.BUTTONS)
     
     elif query_data == "lang":
         MemoryDB.insert("data_center", chat.id, {
@@ -153,7 +153,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "custom_welcome_msg":
         MemoryDB.insert("data_center", chat.id, {
@@ -180,7 +180,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             {"Back": "csettings_welcome_user", "Close": "csettings_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "formattings":
         text = (
@@ -194,7 +194,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "• <code>{chatname}</code> - chat title"
         )
 
-        btn = ButtonMaker.cbutton([{"Back": "csettings_custom_welcome_msg", "Close": "csettings_close"}])
+        btn = BuildKeyboard.cbutton([{"Back": "csettings_custom_welcome_msg", "Close": "csettings_close"}])
     
     elif query_data == "farewell_user":
         MemoryDB.insert("data_center", chat.id, {
@@ -229,7 +229,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "service_messages":
         MemoryDB.insert("data_center", chat.id, {
@@ -265,7 +265,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "allowed_links":
         MemoryDB.insert("data_center", chat.id, {
@@ -302,7 +302,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data) # cant use btn as common bcz maybe there are other btn
+        btn = BuildKeyboard.cbutton(btn_data) # cant use btn as common bcz maybe there are other btn
     
     if is_boolean_btn:
         btn_data = [
@@ -310,7 +310,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data) # cant use btn as common bcz maybe there are other btn
+        btn = BuildKeyboard.cbutton(btn_data) # cant use btn as common bcz maybe there are other btn
     
     # global reply
     try:

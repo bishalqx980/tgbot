@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot.modules.database import MongoDB
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from ..sudo_users import fetch_sudos
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -91,7 +91,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Allowed Links: <code>{', '.join(chat_data.get('allowed_links') or [])}</code>"
         )
 
-        btn = ButtonMaker.ubutton([{"Invite Link": chat_invite_link}]) if chat_invite_link else None
+        btn = BuildKeyboard.ubutton([{"Invite Link": chat_invite_link}]) if chat_invite_link else None
         
         custom_welcome_msg = chat_data.get('custom_welcome_msg')
         if custom_welcome_msg:
@@ -140,7 +140,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         if victim_info:
-            btn = ButtonMaker.ubutton([{"User Profile": f"tg://user?id={victim_info.id}"}]) if victim_info.username else None
+            btn = BuildKeyboard.ubutton([{"User Profile": f"tg://user?id={victim_info.id}"}]) if victim_info.username else None
     
     # common message sender for both group chat & private chat database info
     await effective_message.reply_text(text, reply_markup=btn)

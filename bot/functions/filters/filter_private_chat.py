@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import TL_LANG_CODES_URL
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database.common import database_search
 from bot.modules.translator import translate
 from .edit_database import edit_database
@@ -36,8 +36,8 @@ async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE
                 await effective_message.reply_text(translated_text)
             
             elif translated_text == False:
-                btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
+                btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
                 await effective_message.reply_text("Invalid language code was given! Use /settings to set chat language.", reply_markup=btn)
         else:
-            btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
+            btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
             await effective_message.reply_text("Chat language code wasn't found! Use /settings to set chat language.", reply_markup=btn)

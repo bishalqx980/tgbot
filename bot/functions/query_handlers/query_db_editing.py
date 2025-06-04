@@ -1,7 +1,7 @@
 import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database import MemoryDB, MongoDB
 
 async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -51,7 +51,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query_data == "edit_value":
         MemoryDB.insert("data_center", chat.id, {"is_editing": True})
         
-        btn = ButtonMaker.cbutton([{"Cancel": "database_cancel_editing"}])
+        btn = BuildKeyboard.cbutton([{"Cancel": "database_cancel_editing"}])
         sent_message = await context.bot.send_message(chat.id, "Waiting for a new value:", reply_markup=btn)
 
         for i in range(10):

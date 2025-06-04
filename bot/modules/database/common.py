@@ -31,7 +31,7 @@ def database_add_user(user):
     ***Checks Memory for `user_data` if not found then checks on MongoDB & updates `user_data` to Memory & MongoDB***\n
     :param user: `update.effective_user`
     """
-    user_data = MemoryDB.user_data.get(user.id)
+    user_data = MemoryDB.users_data.get(user.id)
     if user_data:
         return
     

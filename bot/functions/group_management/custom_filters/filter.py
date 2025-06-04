@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot.modules.database.common import database_search
 from bot.modules.database import MemoryDB, MongoDB
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from ..auxiliary.pm_error import pm_error
 from ..auxiliary.chat_admins import ChatAdmins
 
@@ -60,7 +60,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<code>{chatname}</code> chat title\n"
         )
 
-        btn = ButtonMaker.cbutton([{"Close": "query_close"}])
+        btn = BuildKeyboard.cbutton([{"Close": "query_close"}])
         await effective_message.reply_text(text, reply_markup=btn)
         return
 

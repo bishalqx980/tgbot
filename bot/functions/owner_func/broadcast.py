@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import Forbidden
 from bot import logger
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database import MemoryDB, MongoDB
 from ..sudo_users import fetch_sudos
 
@@ -44,7 +44,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         {"Done": "misc_broadcast_done", "Cancel": "misc_broadcast_cancel"}
     ]
 
-    btn = ButtonMaker.cbutton(btn_data)
+    btn = BuildKeyboard.cbutton(btn_data)
 
     # storing required data in datacenter
     data = {
@@ -110,7 +110,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_count, except_count, pin_except_count = 0, 0, 0
     exception_user_ids = []
 
-    notify_btn = ButtonMaker.cbutton([{"Cancel": "misc_broadcast_cancel"}])
+    notify_btn = BuildKeyboard.cbutton([{"Cancel": "misc_broadcast_cancel"}])
     notify_message = await effective_message.reply_text(f"Total users: {len(users_id)}\nActive users: {len(active_users)}", reply_markup=notify_btn)
 
     start_time = time()

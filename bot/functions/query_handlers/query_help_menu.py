@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import __version__, BOT_UPTIME, logger
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database import MongoDB
 from ..core.help import HelpMenuData
 
@@ -18,7 +18,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query_data == "menu":
         text = HelpMenuData.TEXT
-        btn = ButtonMaker.cbutton(HelpMenuData.BUTTONS)
+        btn = BuildKeyboard.cbutton(HelpMenuData.BUTTONS)
     
     elif query_data == "gm1":
         text = (
@@ -47,7 +47,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {"Back": "help_menu_menu", "Close": "help_menu_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "gm2":
         text = (
@@ -70,7 +70,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {"Back": "help_menu_menu", "Close": "help_menu_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "ai_knowledge":
         text = (
@@ -82,7 +82,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
 
-        btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
+        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
     
     elif query_data == "misc":
         text = (
@@ -111,7 +111,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
         
-        btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
+        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
     
     elif query_data == "owner":
         text = (
@@ -131,7 +131,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
         
-        btn = ButtonMaker.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
+        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
     
     elif query_data == "botinfo":
         await query.answer("Getting information...")
@@ -189,7 +189,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {"Back": "help_menu_menu", "Close": "help_menu_close"}
         ]
         
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "close":
         try:

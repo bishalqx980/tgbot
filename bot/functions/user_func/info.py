@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import MessageOriginType
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 
 async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -41,7 +41,7 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>• Is premium:</b> <code>{victim.is_premium}</code>"
     )
 
-    btn = ButtonMaker.ubutton([{"User Profile": f"tg://user?id={victim.id}"}]) if victim.username else None
+    btn = BuildKeyboard.ubutton([{"User Profile": f"tg://user?id={victim.id}"}]) if victim.username else None
 
     if victim_pfp:
         await effective_message.reply_photo(victim_pfp, text, reply_markup=btn)

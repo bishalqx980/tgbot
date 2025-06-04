@@ -3,7 +3,7 @@ from telegram.constants import ChatType
 from telegram.ext import ContextTypes
 from bot.modules.database import MemoryDB
 from bot.modules.base64 import BASE64
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from .auxiliary.pm_error import pm_error
 
 async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -81,5 +81,5 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if re_msg and whisper_username is None:
         whisper_username = re_msg.from_user.mention_html()
     
-    btn = ButtonMaker.cbutton([{"See the message 💭": f"misc_whisper_{whsiper_key}"}])
+    btn = BuildKeyboard.cbutton([{"See the message 💭": f"misc_whisper_{whsiper_key}"}])
     await context.bot.edit_message_text(f"Hey, {whisper_username}. You got a whisper message from {user.name}.", chat.id, sent_message.id, reply_markup=btn)

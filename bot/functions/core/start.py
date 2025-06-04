@@ -4,7 +4,7 @@ from telegram.constants import ChatType
 from telegram.helpers import create_deep_linked_url
 from telegram.error import BadRequest
 from bot import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, logger
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_add_user
 
@@ -14,7 +14,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
 
     if chat.type != ChatType.PRIVATE:
-        btn = ButtonMaker.ubutton([{"Start me in PM": create_deep_linked_url(context.bot.username, "start")}])
+        btn = BuildKeyboard.ubutton([{"Start me in PM": create_deep_linked_url(context.bot.username, "start")}])
         await effective_message.reply_text(f"Hey, {user.first_name}\nStart me in PM!", reply_markup=btn)
         return
     
@@ -49,7 +49,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if support_chat:
         btn_data.append({"Support Chat": support_chat})
     
-    btn = ButtonMaker.ubutton(btn_data)
+    btn = BuildKeyboard.ubutton(btn_data)
 
     if photo_file_id:
         try:

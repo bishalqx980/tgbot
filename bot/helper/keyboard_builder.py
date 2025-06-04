@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from bot import logger
 
-class ButtonMaker:
+class BuildKeyboard:
     @staticmethod
     def ubutton(data):
         """

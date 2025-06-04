@@ -5,7 +5,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import BadRequest
 from bot import logger
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database import MemoryDB
 from ..sudo_users import fetch_sudos
 
@@ -71,7 +71,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         bot_data.get('weather_api')
     )
 
-    btn = ButtonMaker.cbutton(BotSettingsData.BUTTONS)
+    btn = BuildKeyboard.cbutton(BotSettingsData.BUTTONS)
     
     show_bot_pic = MemoryDB.bot_data.get("show_bot_pic")
     images = MemoryDB.bot_data.get("images")

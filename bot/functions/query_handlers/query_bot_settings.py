@@ -5,7 +5,7 @@ from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import logger
 from bot.update_db import update_database
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database import MemoryDB, MongoDB
 from ..owner_func.bsettings import BotSettingsData
 
@@ -34,7 +34,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             bot_data.get('weather_api')
         )
 
-        btn = ButtonMaker.cbutton(BotSettingsData.BUTTONS)
+        btn = BuildKeyboard.cbutton(BotSettingsData.BUTTONS)
     
     elif query_data == "show_bot_pic":
         MemoryDB.insert("data_center", user.id, {
@@ -54,7 +54,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             {"Back": "bsettings_menu", "Close": "bsettings_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "images":
         MemoryDB.insert("data_center", user.id, {
@@ -187,7 +187,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             {"Back": "bsettings_menu", "Close": "bsettings_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "restoredb":
         text = (
@@ -200,7 +200,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             {"Back": "bsettings_database"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "restoredb_confirm":
         await query.answer("Restoring Bot Data...")
@@ -257,7 +257,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             {"Back": "bsettings_menu", "Close": "bsettings_close"}
         ]
 
-        btn = ButtonMaker.cbutton(btn_data)
+        btn = BuildKeyboard.cbutton(btn_data)
     
     # global reply
     try:

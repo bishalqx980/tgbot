@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 from ..group_management.chat_settings import chat_settings
@@ -55,6 +55,6 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_data.get('echo') or False
     )
 
-    btn = ButtonMaker.cbutton(PvtChatSettingsData.BUTTONS)
+    btn = BuildKeyboard.cbutton(PvtChatSettingsData.BUTTONS)
     
     await effective_message.reply_text(text, reply_markup=btn)

@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot import TL_LANG_CODES_URL
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database.common import database_search
 from bot.modules.translator import fetch_lang_codes, translate
 
@@ -15,7 +15,7 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context_args = " ".join(context.args)
 
     if not text and not context_args:
-        btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
+        btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
         await effective_message.reply_text("Use <code>/tr text</code> or <code>/tr lang code text</code> or reply the text with <code>/tr</code> or <code>/tr lang code</code>\n\nEnable auto translator mode for this chat from /settings", reply_markup=btn)
         return
     
@@ -54,7 +54,7 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
         lang_code = database_data.get("lang")
     
     if not lang_code:
-        btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
+        btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
         await effective_message.reply_text("Chat language code wasn't found! Use /tr to get more details or /settings to set chat language.", reply_markup=btn)
         return
     
@@ -62,7 +62,7 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     translated_text = translate(to_translate, lang_code)
     if translated_text == False:
-        btn = ButtonMaker.ubutton([{"Language code's": TL_LANG_CODES_URL}])
+        btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
         await context.bot.edit_message_text("Invalid language code was given! Use /tr to get more details or /settings to set chat language.", chat.id, sent_message.id, reply_markup=btn)
 
     elif not translated_text:

@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.freeimagehost import upload_image
 
 async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -45,5 +45,5 @@ async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>- Mime:</b> <code>{img_mime}</code>"
     )
 
-    btn = ButtonMaker.ubutton([{"View 👀": img_url}])
+    btn = BuildKeyboard.ubutton([{"View 👀": img_url}])
     await context.bot.edit_message_text(text, chat.id, sent_message.id, reply_markup=btn)

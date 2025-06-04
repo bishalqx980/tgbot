@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 from .auxiliary.chat_admins import ChatAdmins
@@ -88,6 +88,6 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ', '.join(chat_data.get('allowed_links') or [])
     )
 
-    btn = ButtonMaker.cbutton(GroupChatSettingsData.BUTTONS)
+    btn = BuildKeyboard.cbutton(GroupChatSettingsData.BUTTONS)
 
     await effective_message.reply_text(text, reply_markup=btn)

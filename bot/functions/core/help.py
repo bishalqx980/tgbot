@@ -5,7 +5,7 @@ from telegram.constants import ChatType
 from telegram.error import BadRequest
 from telegram.helpers import create_deep_linked_url
 from bot import logger
-from bot.helper.keyboard_builder import ButtonMaker
+from bot.helper.keyboard_builder import BuildKeyboard
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_add_user
 
@@ -32,7 +32,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
 
     if chat.type != ChatType.PRIVATE:
-        btn = ButtonMaker.ubutton([{"Click here for help": create_deep_linked_url(context.bot.username, "help")}])
+        btn = BuildKeyboard.ubutton([{"Click here for help": create_deep_linked_url(context.bot.username, "help")}])
         await effective_message.reply_text(f"Hey, {user.first_name}\nContact me in PM for help!", reply_markup=btn)
         return
     
@@ -53,7 +53,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except:
             pass
     
-    btn = ButtonMaker.cbutton(HelpMenuData.BUTTONS)
+    btn = BuildKeyboard.cbutton(HelpMenuData.BUTTONS)
     
     if photo or photo_file_id:
         try:
