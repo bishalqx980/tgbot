@@ -22,7 +22,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != ChatType.PRIVATE:
         sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
-        await context.bot.delete_messages(chat.id, [effective_message.id, sent_message.id])
+        await chat.delete_messages([effective_message.id, sent_message.id])
         return
     
     if not command:
@@ -42,16 +42,16 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     time_executed = time()
     
     if not result.stdout and not result.stderr:
-        await context.bot.edit_message_text("<b>⌊ None ⌉</b>", chat.id, sent_message.id)
+        await sent_message.edit_text("<b>⌊ None ⌉</b>")
         return
 
     result = result.stdout if result.stdout else result.stderr
 
     try:
-        await context.bot.edit_message_text(f"<pre>{result}</pre>", chat.id, sent_message.id)
+        await sent_message.edit_text(f"<pre>{result}</pre>")
     except:
         shell = BytesIO(result.encode())
         shell.name = "shell.txt"
 
-        await context.bot.delete_message(chat.id, sent_message.id)
+        await sent_message.delete()
         await effective_message.reply_document(shell, f"<b>Command</b>: {command}\n<b>Execute time</b>: {(time_executed - time_executing):.2f}s")

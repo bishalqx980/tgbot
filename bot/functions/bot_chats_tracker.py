@@ -67,7 +67,7 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         
         if text:
-            await context.bot.send_message(chat.id, text)
+            await chat.send_message(text)
     
     elif chat.type == ChatType.CHANNEL and new_status == ChatMember.ADMINISTRATOR:
-        await context.bot.send_message(user.id, f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")
+        await user.send_message(f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")

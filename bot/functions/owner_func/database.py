@@ -22,12 +22,12 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != ChatType.PRIVATE:
         sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
-        await context.bot.delete_messages(chat.id, [effective_message.id, sent_message.id])
+        await chat.delete_messages([effective_message.id, sent_message.id])
         return
     
     if not victim_id:
         database_info = MongoDB.info()
-        msg_storage = "<b><u>Database</u></b>\n\n"
+        msg_storage = "<blockquote><b>Database information</b></blockquote>\n\n"
         for info in database_info:
             info = database_info[info]
             msg_storage += (

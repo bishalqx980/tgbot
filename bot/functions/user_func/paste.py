@@ -17,7 +17,7 @@ async def func_paste(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     paste = await telegraph.paste(text, user.full_name)
     if not paste:
-        await context.bot.edit_message_text("Oops! Something went wrong!", chat.id, sent_message.id)
+        await sent_message.edit_text("Oops! Something went wrong!")
         return
     
-    await context.bot.edit_message_text(paste, chat.id, sent_message.id)
+    await sent_message.edit_text(paste)

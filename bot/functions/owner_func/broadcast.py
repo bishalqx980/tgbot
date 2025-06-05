@@ -24,7 +24,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != ChatType.PRIVATE:
         sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
-        await context.bot.delete_messages(chat.id, [effective_message.id, sent_message.id])
+        await chat.delete_messages([effective_message.id, sent_message.id])
         return
     
     if not re_msg:
@@ -81,14 +81,14 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             break
 
         elif is_cancelled:
-            await context.bot.edit_message_text("<blockquote><b>Broadcast cancelled!</b></blockquote>", chat.id, sent_message.id)
+            await sent_message.edit_text("<blockquote><b>Broadcast cancelled!</b></blockquote>")
             return
     
     if not is_done:
-        await context.bot.edit_message_text("Oops, Timeout!", chat.id, sent_message.id)
+        await sent_message.edit_text("Oops, Timeout!")
         return
     
-    await context.bot.delete_message(chat.id, sent_message.id)
+    await sent_message.delete()
     
     is_forward = data_center["broadcast"]["is_forward"]
     is_pin = data_center["broadcast"]["is_pin"]
@@ -125,7 +125,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"{notify_message.text_html}"
             )
 
-            await context.bot.edit_message_text(text, chat.id, notify_message.id)
+            await notify_message.edit_text(text)
             return
         
         try:
@@ -181,7 +181,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         if is_pin and sent_message:
             try:
-                await context.bot.pin_chat_message(user_id, sent_message.id)
+                await sent_message.pin()
             except Exception as e:
                 pin_except_count += 1
                 logger.error(e)
@@ -199,7 +199,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # cancel btn will be removed if broadcast done
         btn = None if (sent_count + except_count) == len(active_users) else notify_btn
         # update notify message
-        notify_message = await context.bot.edit_message_text(updated_text, chat.id, notify_message.id, reply_markup=btn)
+        notify_message = await notify_message.edit_text(updated_text, reply_markup=btn)
         await asyncio.sleep(0.5) # sleep for 0.5 sec
     
     end_time = time()
@@ -214,10 +214,10 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{notify_message.text_html}"
     )
 
-    await context.bot.edit_message_text(text, chat.id, notify_message.id)
+    await notify_message.edit_text(text)
 
     if exception_user_ids:
         exception_file = BytesIO(", ".join(exception_user_ids).encode())
         exception_file.name = "Exception.txt"
 
-        await context.bot.send_document(chat.id, exception_file, f"Total Exception: {len(exception_user_ids)}")
+        await chat.send_document(exception_file, f"Total Exception: {len(exception_user_ids)}")

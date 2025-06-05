@@ -27,7 +27,7 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
 
     if type(result) is not dict and result in response:
-        await context.bot.edit_message_text(response[result], chat.id, sent_message.id)
+        await sent_message.edit_text(response[result])
         return
     
     msg_list, counter = [], 0
@@ -67,4 +67,4 @@ async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for link in links:
         msg += f"• {link}\n"
 
-    await context.bot.edit_message_text(f"{msg}\nPSNDL Website: https://bishalqx980.github.io/psndl/", chat.id, sent_message.id)
+    await sent_message.edit_text(f"{msg}\nPSNDL Website: https://bishalqx980.github.io/psndl/")

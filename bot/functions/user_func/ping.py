@@ -56,5 +56,5 @@ async def func_ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = "Error: Connection error."
     except Exception:
         text = "Oops! Something went wrong!"
-
-    await context.bot.edit_message_text(f"<b>{text}</b>", chat.id, sent_message.id)
+    
+    await sent_message.edit_text(f"<b>{text}</b>")

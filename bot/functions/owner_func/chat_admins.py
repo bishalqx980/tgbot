@@ -18,7 +18,7 @@ async def func_cadmins(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if chat.type != ChatType.PRIVATE:
         sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
-        await context.bot.delete_messages(chat.id, [effective_message.id, sent_message.id])
+        await chat.delete_messages([effective_message.id, sent_message.id])
         return
     
     if not chat_id:
@@ -32,7 +32,7 @@ async def func_cadmins(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         admins = await context.bot.get_chat_administrators(chat_id)
     except Exception as e:
-        await context.bot.edit_message_text(str(e), chat.id, sent_message.id)
+        await sent_message.edit_text(str(e))
         return
     
     for admin in admins:
@@ -52,4 +52,4 @@ async def func_cadmins(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"{owner_storage}{admins_storage}"
     )
 
-    await context.bot.edit_message_text(text, chat.id, sent_message.id)
+    await sent_message.edit_text(text)

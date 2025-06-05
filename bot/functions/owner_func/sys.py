@@ -1,10 +1,28 @@
 import psutil
+import aiohttp
 from time import time
 from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import BOT_UPTIME
+from bot.modules.database import MemoryDB
 from ..sudo_users import fetch_sudos
+
+def createProgressBar(percentValue, barSize=10):
+    """
+    :param percentValue: `int`
+    :param barSize: `int` default 10
+    """
+
+    emptySymbol = "▱"
+    fullSymbol = "▰"
+
+    barFilled = int(barSize * (int(percentValue) / 100))
+    barEmpty = int(barSize - barFilled)
+
+    barStr = f"[ {fullSymbol * barFilled}{emptySymbol * barEmpty} ]"
+    return barStr
+
 
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -15,6 +33,9 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Access denied!")
         return
     
+    sent_message = await effective_message.reply_text("⌛")
+    
+    # Uptime Calculating
     sys_uptime = timedelta(seconds=datetime.now().timestamp() - psutil.boot_time())
 
     sys_days = sys_uptime.days
@@ -26,39 +47,71 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_days = bot_uptime.days
     bot_hours, remainder = divmod(bot_uptime.seconds, 3600)
     bot_minute = remainder / 60
+
+    # System info variables
+    ramPercent = psutil.virtual_memory()[2]
+    swapRamPercent = psutil.swap_memory()[3]
+    diskUsagePercent = psutil.disk_usage('/')[3]
+
+    # percent vizualize
+    ramBar = createProgressBar(ramPercent)
+    swapRamBar = createProgressBar(swapRamPercent)
+    diskUsageBar = createProgressBar(diskUsagePercent)
+
+    # pinging server
+    server_url = MemoryDB.bot_data.get("server_url")
+    server_ping = "~ infinite ~"
+    if server_url:
+        try:
+            start_time = time()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(server_url) as response:
+                    response_time = int((time() - start_time) * 1000) # converting to ms
+                    if response_time > 1000:
+                        server_ping = f"{(response_time / 1000):.2f}s"
+                    else:
+                        server_ping = f"{response_time}ms"
+        except:
+            pass
     
     sys_info = (
-        f"<b>↺ System info</b>\n\n"
+        "<blockquote><b>🖥️ System information</b></blockquote>\n\n"
 
-        f"<b>• <u>CPU</u></b>\n"
-        f"<b>CPU:</b> <code>{psutil.cpu_count()}</code>\n"
-        f"<b>CPU (Logical):</b> <code>{psutil.cpu_count(False)}</code>\n"
-        f"<b>CPU freq Current:</b> <code>{psutil.cpu_freq()[0]/1024:.2f} Ghz</code>\n"
-        f"<b>CPU freq Max:</b> <code>{psutil.cpu_freq()[2]/1024:.2f} Ghz</code>\n\n"
+        "<b>🔹 CPU</b>\n"
+        f"<b>├ CPU:</b> <code>{psutil.cpu_count()}</code>\n"
+        f"<b>├ CPU (Logical):</b> <code>{psutil.cpu_count(False)}</code>\n"
+        f"<b>├ CPU freq Current:</b> <code>{psutil.cpu_freq()[0]/1024:.2f} Ghz</code>\n"
+        f"<b>└ CPU freq Max:</b> <code>{psutil.cpu_freq()[2]/1024:.2f} Ghz</code>\n\n"
 
-        f"<b>• <u>RAM</u></b>\n"
-        f"<b>RAM Total:</b> <code>{psutil.virtual_memory()[0]/(1024**3):.2f} GB</code>\n"
-        f"<b>RAM Avail:</b> <code>{psutil.virtual_memory()[1]/(1024**3):.2f} GB</code>\n"
-        f"<b>RAM Used:</b> <code>{psutil.virtual_memory()[3]/(1024**3):.2f} GB</code>\n"
-        f"<b>RAM Free:</b> <code>{psutil.virtual_memory()[4]/(1024**3):.2f} GB</code>\n"
-        f"<b>RAM Percent:</b> <code>{psutil.virtual_memory()[2]} %</code>\n\n"
+        "<b>🔸 RAM</b>\n"
+        f"<b>├ RAM Total:</b> <code>{psutil.virtual_memory()[0]/(1024**3):.2f} GB</code>\n"
+        f"<b>├ RAM Avail:</b> <code>{psutil.virtual_memory()[1]/(1024**3):.2f} GB</code>\n"
+        f"<b>├ RAM Used:</b> <code>{psutil.virtual_memory()[3]/(1024**3):.2f} GB</code>\n"
+        f"<b>├ RAM Free:</b> <code>{psutil.virtual_memory()[4]/(1024**3):.2f} GB</code>\n"
+        f"<b>└ RAM Percent:</b> <code>{ramPercent} %</code>\n"
+        f"<b>{ramBar}</b>\n\n"
 
-        f"<b>• <u>RAM (Swap)</u></b>\n"
-        f"<b>RAM Total (Swap):</b> <code>{psutil.swap_memory()[0]/(1024**3):.2f} GB</code>\n"
-        f"<b>RAM Used (Swap):</b> <code>{psutil.swap_memory()[1]/(1024**3):.2f} GB</code>\n"
-        f"<b>RAM Free (Swap):</b> <code>{psutil.swap_memory()[2]/(1024**3):.2f} GB</code>\n"
-        f"<b>RAM Percent (Swap):</b> <code>{psutil.swap_memory()[3]} %</code>\n\n"
+        "<b>🔸 RAM (Swap)</b>\n"
+        f"<b>├ RAM Total (Swap):</b> <code>{psutil.swap_memory()[0]/(1024**3):.2f} GB</code>\n"
+        f"<b>├ RAM Used (Swap):</b> <code>{psutil.swap_memory()[1]/(1024**3):.2f} GB</code>\n"
+        f"<b>├ RAM Free (Swap):</b> <code>{psutil.swap_memory()[2]/(1024**3):.2f} GB</code>\n"
+        f"<b>└ RAM Percent (Swap):</b> <code>{swapRamPercent} %</code>\n"
+        f"<b>{swapRamBar}</b>\n\n"
 
-        f"<b>• <u>Drive/Storage</u></b>\n"
-        f"<b>Total Partitions:</b> <code>{len(psutil.disk_partitions())}</code>\n"
-        f"<b>Disk Usage Total:</b> <code>{psutil.disk_usage('/')[0]/(1024**3):.2f} GB</code>\n"
-        f"<b>Disk Usage Used:</b> <code>{psutil.disk_usage('/')[1]/(1024**3):.2f} GB</code>\n"
-        f"<b>Disk Usage Free:</b> <code>{psutil.disk_usage('/')[2]/(1024**3):.2f} GB</code>\n"
-        f"<b>Disk Usage Percent:</b> <code>{psutil.disk_usage('/')[3]} %</code>\n\n"
+        "<b>📦 Storage</b>\n"
+        f"<b>├ Total Partitions:</b> <code>{len(psutil.disk_partitions())}</code>\n"
+        f"<b>├ Disk Usage Total:</b> <code>{psutil.disk_usage('/')[0]/(1024**3):.2f} GB</code>\n"
+        f"<b>├ Disk Usage Used:</b> <code>{psutil.disk_usage('/')[1]/(1024**3):.2f} GB</code>\n"
+        f"<b>├ Disk Usage Free:</b> <code>{psutil.disk_usage('/')[2]/(1024**3):.2f} GB</code>\n"
+        f"<b>└ Disk Usage Percent:</b> <code>{diskUsagePercent} %</code>\n"
+        f"<b>{diskUsageBar}</b>\n\n"
 
-        f"<b>• <u>Uptime</u></b>\n"
-        f"<b>System uptime:</b> <code>{int(sys_days)}d {int(sys_hours)}h {int(sys_minute)}m</code>\n"
-        f"<b>Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>"
+        "<b>⚜️ Uptime</b>\n"
+        f"<b>├ System uptime:</b> <code>{int(sys_days)}d {int(sys_hours)}h {int(sys_minute)}m</code>\n"
+        f"<b>└ Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n\n"
+
+        "<b>🌐 Server</b>\n"
+        f"<b>└ Ping:</b> <code>{server_ping}</code>"
     )
 
-    await effective_message.reply_text(sys_info)
+    await sent_message.edit_text(sys_info)

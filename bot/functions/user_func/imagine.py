@@ -20,7 +20,7 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response_time = f"{(time() - start_time):.2f}s"
 
     if not response:
-        await context.bot.edit_message_text("Oops! Something went wrong!", chat.id, sent_message.id)
+        await sent_message.edit_text("Oops! Something went wrong!")
         return
     
     caption = (
@@ -29,5 +29,5 @@ async def func_imagine(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>UserID:</b> <code>{user.id}</code>"
     )
 
-    await context.bot.delete_message(chat.id, sent_message.id)
+    await sent_message.delete()
     await effective_message.reply_photo(response, caption)

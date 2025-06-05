@@ -24,7 +24,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer("Session Expired.", True)
         try:
             message_id = query.message.message_id
-            await context.bot.delete_messages(chat.id, [message_id, message_id - 1])
+            await chat.delete_messages([message_id, message_id - 1])
         except:
             try:
                 await query.delete_message()
@@ -52,7 +52,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         MemoryDB.insert("data_center", chat.id, {"is_editing": True})
         
         btn = BuildKeyboard.cbutton([{"Cancel": "database_cancel_editing"}])
-        sent_message = await context.bot.send_message(chat.id, "Waiting for a new value:", reply_markup=btn)
+        sent_message = await chat.send_message("Waiting for a new value: ", reply_markup=btn)
 
         for i in range(10):
             data_center = MemoryDB.data_center[chat.id]
@@ -72,7 +72,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if data_center.get("message_id"):
                 message_ids.append(data_center.get("message_id"))
             
-            await context.bot.delete_messages(chat.id, message_ids)
+            await chat.delete_messages(message_ids)
         except:
             pass
 

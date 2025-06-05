@@ -82,4 +82,4 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         whisper_username = re_msg.from_user.mention_html()
     
     btn = BuildKeyboard.cbutton([{"See the message 💭": f"misc_whisper_{whsiper_key}"}])
-    await context.bot.edit_message_text(f"Hey, {whisper_username}. You got a whisper message from {user.name}.", chat.id, sent_message.id, reply_markup=btn)
+    await sent_message.edit_text(f"Hey, {whisper_username}. You got a whisper message from {user.name}.", reply_markup=btn)

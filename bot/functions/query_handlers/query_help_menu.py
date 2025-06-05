@@ -194,7 +194,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query_data == "close":
         try:
             message_id = query.message.message_id
-            await context.bot.delete_messages(user.id, [message_id, message_id - 1])
+            await user.delete_messages([message_id, message_id - 1])
         except:
             try:
                 await query.delete_message()

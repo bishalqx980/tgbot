@@ -25,7 +25,7 @@ async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response = await upload_image(photo.file_path)
     if not response:
-        await context.bot.edit_message_text("Timeout! Please try again or report the issue." if response is False else "Oops! Something went wrong!", chat.id, sent_message.id)
+        await sent_message.edit_text("Timeout! Please try again or report the issue." if response is False else "Oops! Something went wrong!")
         return
     
     image_data = response["image"]
@@ -46,4 +46,4 @@ async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     btn = BuildKeyboard.ubutton([{"View 👀": img_url}])
-    await context.bot.edit_message_text(text, chat.id, sent_message.id, reply_markup=btn)
+    await sent_message.edit_text(text, reply_markup=btn)

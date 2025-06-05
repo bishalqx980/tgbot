@@ -29,4 +29,4 @@ async def func_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         text = "Oops! Something went wrong!"
     
-    await context.bot.edit_message_text(text, chat.id, sent_message.id)
+    await sent_message.edit_text(text)

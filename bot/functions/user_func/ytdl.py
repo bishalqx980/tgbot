@@ -17,12 +17,12 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response = youtube_download(url)
     if not response:
-        await context.bot.edit_message_text("Oops! Something went wrong!", chat.id, sent_message.id)
+        await sent_message.edit_text("Oops! Something went wrong!")
         return
     
     file_name = f"{response['file_name']}.mp3"
     
-    await context.bot.delete_message(chat.id, sent_message.id)
+    await sent_message.delete()
     await effective_message.reply_audio(response["file_path"], title=file_name, filename=file_name)
 
     try:

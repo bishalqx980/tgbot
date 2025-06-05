@@ -78,7 +78,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             images_binary = BytesIO(",\n".join(images).encode())
             images_binary.name = "images.txt"
 
-            await context.bot.send_document(user.id, images_binary, f"Total images: {len(images)}")
+            await user.send_document(images_binary, f"Total images: {len(images)}")
     
     elif query_data == "support_chat":
         MemoryDB.insert("data_center", user.id, {
@@ -211,11 +211,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         db_backup = BytesIO(json.dumps(bot_data, indent=4).encode())
         db_backup.name = "backup_database.json"
 
-        await context.bot.send_document(
-            user.id,
-            db_backup,
-            "Database Backup File"
-        )
+        await user.send_document(db_backup, "Database Backup File")
 
         # process of deleting...
         response = MongoDB.delete_collection("bot_data")
@@ -229,7 +225,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         else:
             text = "Something went wrong! Check /log"
         
-        await context.bot.send_message(user.id, text)
+        await user.send_message(text)
         return # don't want to edit message by global reply
     
     elif query_data == "wipe_memory":
@@ -238,13 +234,13 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         MemoryDB.clear_all()
         update_database()
 
-        await context.bot.send_message(user.id, "Memory Cache has been cleaned!")
+        await user.send_message("Memory Cache has been cleaned!")
         return # don't want to edit message by global reply
     
     elif query_data == "close":
         try:
             message_id = query.message.message_id
-            await context.bot.delete_messages(user.id, [message_id, message_id - 1])
+            await user.delete_messages([message_id, message_id - 1])
         except:
             pass
         return # don't want to edit message by global reply

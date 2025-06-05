@@ -19,10 +19,10 @@ async def func_tts(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response = text_to_speech(re_msg.text or re_msg.caption, lang_code)
     if not response:
-        await context.bot.edit_message_text("Oops! Something went wrong!", chat.id, sent_message.id)
+        await sent_message.edit_text("Oops! Something went wrong!")
         return
     
     file_name = f"Voice {re_msg.id} [ {lang_code} ].mp3"
 
-    await context.bot.delete_message(chat.id, sent_message.id)
+    await sent_message.delete()
     await effective_message.reply_audio(response, title=file_name, filename=file_name)

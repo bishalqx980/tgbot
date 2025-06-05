@@ -31,7 +31,7 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
     # handling new chat member
     if effective_message.new_chat_members:
         if len(effective_message.new_chat_members) > 1:
-            await context.bot.send_message(chat.id, "I can't handle this! Too many members are joining at once!")
+            await chat.send_message("I can't handle this! Too many members are joining at once!")
             return
         
         victim = effective_message.new_chat_members[0]
@@ -48,21 +48,21 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 return
             
             if not chat_admins.is_bot_admin:
-                await context.bot.send_message(chat.id, "Antibot Error: I'm not an admin in this chat!")
+                await chat.send_message("Antibot Error: I'm not an admin in this chat!")
                 return
             
             if not chat_admins.is_bot_admin.can_restrict_members:
-                await context.bot.send_message(chat.id, "Antibot Error: I don't have enough permission to restrict chat members!")
+                await chat.send_message("Antibot Error: I don't have enough permission to restrict chat members!")
                 return
             
             try:
                 await chat.unban_member(victim.id)
             except Exception as e:
                 logger.error(e)
-                await context.bot.send_message(chat.id, str(e))
+                await chat.send_message(str(e))
                 return
             
-            await context.bot.send_message(chat.id, f"Antibot: {victim.mention_html()} has been kicked from this chat!")
+            await chat.send_message(f"Antibot: {victim.mention_html()} has been kicked from this chat!")
         
         # greeting new chat member
         elif welcome_user:
@@ -85,8 +85,8 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
             else:
                 greeting_message = f"Hi, {victim.mention_html()}! Welcome to {chat.title}!"
 
-            await context.bot.send_message(chat.id, greeting_message)
+            await chat.send_message(greeting_message)
     
     # farewell for left chat member
     elif effective_message.left_chat_member and farewell_user:
-        await context.bot.send_message(chat.id, f"Nice to see you! {effective_message.left_chat_member.mention_html()} has left us!")
+        await chat.send_message(f"Nice to see you! {effective_message.left_chat_member.mention_html()} has left us!")

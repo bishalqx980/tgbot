@@ -62,10 +62,10 @@ async def func_purge(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await chat.delete_messages(message_ids)
     except Exception as e:
         logger.error(e)
-        await context.bot.edit_message_text(str(e), chat.id, sent_message.id)
+        await sent_message.edit_text(str(e))
         return
     
     if is_silent:
-        await context.bot.delete_message(chat.id, sent_message.id)
+        await sent_message.delete()
     else:
-        await context.bot.edit_message_text("Purge completed!", chat.id, sent_message.id)
+        await sent_message.edit_text("Purge completed!")

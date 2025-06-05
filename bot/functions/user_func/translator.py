@@ -61,12 +61,16 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_message = await effective_message.reply_text("💭 Translating...")
 
     translated_text = translate(to_translate, lang_code)
+    btn = None
+
     if translated_text == False:
+        text = "Invalid language code was given! Use /tr to get more details or /settings to set chat language."
         btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
-        await context.bot.edit_message_text("Invalid language code was given! Use /tr to get more details or /settings to set chat language.", chat.id, sent_message.id, reply_markup=btn)
 
     elif not translated_text:
-        await context.bot.edit_message_text("Oops! Something went wrong!", chat.id, sent_message.id)
+        text = "Oops! Something went wrong!"
 
     else:
-        await context.bot.edit_message_text(translated_text, chat.id, sent_message.id)
+        text = translated_text
+    
+    await sent_message.edit_text(text, reply_markup=btn)
