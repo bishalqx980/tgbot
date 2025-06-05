@@ -11,7 +11,7 @@ class MemoryDatabase:
     def insert(self, collection_name, identifier=None, data=None):
         """
         Available `collection_name`'s:\n
-        (`bot_data`, `user_data`, `chat_data`, `data_center`)
+        (`bot_data`, `users_data`, `chats_data`, `data_center`)
         - `identifier`: key to find/store the data | example: chat.id `optional` "if not given, data will be inserted directly"
         - `data` type: dict
         """

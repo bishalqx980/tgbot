@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper.keyboard_builder import BuildKeyboard
+from bot.helper import BuildKeyboard
 from bot.modules.database import MemoryDB
 from bot.modules.database.common import database_search
 from .auxiliary.chat_admins import ChatAdmins

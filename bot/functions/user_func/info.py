@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import MessageOriginType
-from bot.helper.keyboard_builder import BuildKeyboard
+from bot.helper import BuildKeyboard
 
 async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

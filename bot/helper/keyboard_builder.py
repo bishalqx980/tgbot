@@ -1,26 +1,29 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from bot import logger
 
-class BuildKeyboard:
-    @staticmethod
-    def ubutton(data):
+class KeyboardBuilder:
+    def __init__(self):
+        self.keyboard = []
+    
+
+    def ubutton(self, data):
         """
         **url button maker**\n
         :param data: `list` of `dict`\n
         *Note: same data in one `dict` will be in same row*
         """
         try:
-            keyboard = []
+            self.keyboard.clear()
             for keyboard_data in data:
                 button = [InlineKeyboardButton(btn_name, btn_url) for btn_name, btn_url in keyboard_data.items()]
-                keyboard.append(button)
+                self.keyboard.append(button)
 
-            return InlineKeyboardMarkup(keyboard)
+            return InlineKeyboardMarkup(self.keyboard)
         except Exception as e:
             logger.error(e)
 
-    @staticmethod
-    def cbutton(data):
+
+    def cbutton(self, data):
         """
         **callback button maker (also works for url btn)**\n
         > **This function work for both url and callback button maker if `data` starts with `http` otherwise you can use `ubutton` function to make url btn**\n
@@ -28,7 +31,7 @@ class BuildKeyboard:
         *Note: same data in one `dict` will be in same row*
         """
         try:
-            keyboard = []
+            self.keyboard.clear()
             for keyboard_data in data:
                 row = []
                 for btn_name, btn_data in keyboard_data.items():
@@ -37,8 +40,8 @@ class BuildKeyboard:
                     
                     row.append(InlineKeyboardButton(btn_name, btn_url, callback_data))
                 
-                keyboard.append(row)
+                self.keyboard.append(row)
 
-            return InlineKeyboardMarkup(keyboard)
+            return InlineKeyboardMarkup(self.keyboard)
         except Exception as e:
             logger.error(e)

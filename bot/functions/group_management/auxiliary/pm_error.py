@@ -1,6 +1,6 @@
 from telegram.ext import ContextTypes
 from telegram.helpers import create_deep_linked_url
-from bot.helper.keyboard_builder import BuildKeyboard
+from bot.helper import BuildKeyboard
 
 async def pm_error(context: ContextTypes.DEFAULT_TYPE, chat_id):
     """`chat_id` where you want to send this message"""

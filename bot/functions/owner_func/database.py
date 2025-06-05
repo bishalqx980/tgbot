@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot.modules.database import MongoDB
-from bot.helper.keyboard_builder import BuildKeyboard
+from bot.helper import BuildKeyboard
 from ..sudo_users import fetch_sudos
 
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):

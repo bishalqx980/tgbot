@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import __version__, BOT_UPTIME, logger
-from bot.helper.keyboard_builder import BuildKeyboard
+from bot.helper import BuildKeyboard
 from bot.modules.database import MongoDB
 from ..core.help import HelpMenuData
 

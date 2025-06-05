@@ -2,7 +2,7 @@ from . import MemoryDB, MongoDB
 
 def database_search(collection_name, search_key, match_value):
     """
-    :param collection_name: Name of collection. e.g. `users`
+    :param collection_name: Name of collection. e.g. `users_data`
     :param search_key: Key to search. e.g. `user_id`
     :param match_value: Value to match. e.g. `2134776547`
     :return: Speficied search data | `Error: None; Which means chat isn't registered.`
@@ -28,7 +28,7 @@ def database_search(collection_name, search_key, match_value):
 
 def database_add_user(user):
     """
-    ***Checks Memory for `user_data` if not found then checks on MongoDB & updates `user_data` to Memory & MongoDB***\n
+    ***Checks Memory for `users_data` if not found then checks on MongoDB & updates `users_data` to Memory & MongoDB***\n
     :param user: `update.effective_user`
     """
     user_data = MemoryDB.users_data.get(user.id)

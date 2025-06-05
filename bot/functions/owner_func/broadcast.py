@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import Forbidden
 from bot import logger
-from bot.helper.keyboard_builder import BuildKeyboard
+from bot.helper import BuildKeyboard
 from bot.modules.database import MemoryDB, MongoDB
 from ..sudo_users import fetch_sudos
 
