@@ -207,7 +207,7 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<b>• Total users:</b> <code>{}</code>\n"
             "<b>• Active users:</b> <code>{}</code>\n\n"
 
-            "<b>📊 Progress</b>"
+            "<b>📊 Progress</b>\n"
             "<b>• Sent:</b> <code>{}</code>\n"
             "<b>• Exception:</b> <code>{}</code>\n"
             "<b>• Progress:</b> <code>{}%</code>\n"
@@ -216,7 +216,7 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         text = broadcastUpdateText.format(
             len(users_id),
-            len(active_status),
+            len(active_users),
             sent_count,
             exception_count,
             f"{progress:.2f}",
@@ -264,7 +264,7 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             text = broadcastUpdateText.format(
                 len(users_id),
-                len(active_status),
+                len(active_users),
                 sent_count,
                 exception_count,
                 f"{progress:.2f}",
