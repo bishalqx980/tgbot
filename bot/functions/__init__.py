@@ -49,6 +49,7 @@ from .query_handlers import (
     query_chat_settings,
     query_help_menu,
     query_misc,
+    query_broadcast,
     query_db_editing
 )
 

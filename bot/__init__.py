@@ -6,7 +6,7 @@ from .config import CONFIG
 from .logger import setup_logging
 
 # constants
-__version__ = "1.3.6.507" # major.minor.patch.commits
+__version__ = "1.3.7.508" # major.minor.patch.commits
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"

@@ -14,7 +14,7 @@ async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user = update.effective_user
     effective_message = update.effective_message
 
-    is_editing = edit_database(chat.id, user.id, effective_message.text, effective_message.id)
+    is_editing = edit_database(chat.id, user.id, effective_message)
     if is_editing:
         return
 

@@ -6,23 +6,8 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot import BOT_UPTIME
 from bot.modules.database import MemoryDB
+from bot.modules.utils import Utils
 from ..sudo_users import fetch_sudos
-
-def createProgressBar(percentValue, barSize=10):
-    """
-    :param percentValue: `int`
-    :param barSize: `int` default 10
-    """
-
-    emptySymbol = "▱"
-    fullSymbol = "▰"
-
-    barFilled = int(barSize * (int(percentValue) / 100))
-    barEmpty = int(barSize - barFilled)
-
-    barStr = f"[ {fullSymbol * barFilled}{emptySymbol * barEmpty} ]"
-    return barStr
-
 
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -54,14 +39,17 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
     diskUsagePercent = psutil.disk_usage('/')[3]
 
     # percent vizualize
-    ramBar = createProgressBar(ramPercent)
-    swapRamBar = createProgressBar(swapRamPercent)
-    diskUsageBar = createProgressBar(diskUsagePercent)
+    ramBar = Utils.createProgressBar(ramPercent)
+    swapRamBar = Utils.createProgressBar(swapRamPercent)
+    diskUsageBar = Utils.createProgressBar(diskUsagePercent)
 
     # pinging server
     server_url = MemoryDB.bot_data.get("server_url")
     server_ping = "~ infinite ~"
     if server_url:
+        if not server_url.startswith("http"):
+            server_url = f"http://{server_url}"
+        
         try:
             start_time = time()
             async with aiohttp.ClientSession() as session:

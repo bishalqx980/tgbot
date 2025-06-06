@@ -75,6 +75,7 @@ from .functions import (
     query_chat_settings,
     query_help_menu,
     query_misc,
+    query_broadcast,
     query_db_editing,
 
     func_decode,
@@ -305,13 +306,13 @@ def main():
     # filter private chat
     application.add_handler(MessageHandler(
         # SERVICE_CHAT is Linked channel with Group
-        ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.PRIVATE & (filters.TEXT | filters.CAPTION),
+        ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.PRIVATE & (filters.TEXT | filters.CAPTION | filters.PHOTO),
         filter_private_chat.filter_private_chat
     ))
     # filter public chat
     application.add_handler(MessageHandler(
         # SERVICE_CHAT is Linked channel with Group
-        ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.GROUPS & (filters.TEXT | filters.CAPTION),
+        ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.GROUPS & (filters.TEXT | filters.CAPTION | filters.PHOTO),
         filter_public_chat.filter_public_chat
     ))
     # filter Chat Status Updates
@@ -326,6 +327,7 @@ def main():
         CallbackQueryHandler(query_bot_settings.query_bot_settings, "bsettings_[A-Za-z0-9]+"),
         CallbackQueryHandler(query_chat_settings.query_chat_settings, "csettings_[A-Za-z0-9]+"),
         CallbackQueryHandler(query_misc.query_misc, "misc_[A-Za-z0-9]+"),
+        CallbackQueryHandler(query_broadcast.query_broadcast, "broadcast_[A-Za-z0-9]+"),
         CallbackQueryHandler(query_db_editing.query_db_editing, "database_[A-Za-z0-9]+")
     ])
 
