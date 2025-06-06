@@ -74,5 +74,5 @@ def main():
     apiReq("setMessageReaction", setMessageReactionData)
 
 # calling the function
-if [BOT_TOKEN, CHAT_ID, GITHUB_OWNER_USERNAME, REPO_NAME]:
+if all([BOT_TOKEN, CHAT_ID, GITHUB_OWNER_USERNAME, REPO_NAME]):
     main()
