@@ -49,10 +49,9 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query_data == "close":
         try:
             message_id = query.message.message_id
-            await user.delete_messages([message_id, message_id - 1])
+            await chat.delete_messages([message_id, message_id - 1])
         except:
             try:
                 await query.delete_message()
             except:
                 pass
-        return

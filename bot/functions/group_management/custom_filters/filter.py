@@ -60,7 +60,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<code>{chatname}</code> chat title\n"
         )
 
-        btn = BuildKeyboard.cbutton([{"Close": "query_close"}])
+        btn = BuildKeyboard.cbutton([{"Close": "misc_close"}])
         await effective_message.reply_text(text, reply_markup=btn)
         return
 

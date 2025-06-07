@@ -6,28 +6,11 @@ from bot.helper import BuildKeyboard
 from bot.modules.database import MemoryDB
 from ..sudo_users import fetch_sudos
 
-class BroadcastMenu:
-    TEXT = (
-        "<blockquote><b>Broadcast</b></blockquote>\n\n"
-
-        "Media: <code>{}</code>\n"
-        "Message: <code>{}</code>\n"
-        "Pin: <code>{}</code>"
-    )
-
-    BUTTONS = [
-        {"Media 📸": "broadcast_add_media", "See 👀": "broadcast_see_media"},
-        {"Text 📝": "broadcast_add_text", "See 👀": "broadcast_see_text"},
-        {"Pin 📌": "broadcast_value_pin"},
-        {"Full preview 👀": "broadcast_preview"},
-        {"Done": "broadcast_sendToAll", "Cancel": "broadcast_close"}
-    ]
-
-
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     effective_message = update.effective_message
+    re_msg = effective_message.reply_to_message
 
     sudo_users = fetch_sudos()
     if user.id not in sudo_users:
@@ -40,26 +23,66 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await chat.delete_messages([effective_message.id, sent_message.id])
         return
     
-    # storing required data in datacenter
-    data = {
-        "user_id": user.id, # authorization
-        "broadcast": {
-            "media": None,
-            "text": None,
-            "pin": False,
-            "is_cancelled": False
-        }
+    if not re_msg:
+        await effective_message.reply_text("Reply a message to broadcast!")
+        return
+    
+    # variables
+    broadcastText = re_msg.text_html # only if the message doesn't contain any video/doc or other things
+    broadcastCaption = re_msg.caption_html # message with video/audio/doc etc.
+
+    broadcastPhoto = re_msg.photo[-1].file_id if re_msg.photo else None
+
+    broadcastDocument = re_msg.document.file_id if re_msg.document else None
+    broadcastDocument_filename = re_msg.document.file_name if re_msg.document else None
+
+    broadcastVideo = re_msg.video.file_id if re_msg.video else None
+    broadcastVideo_note = re_msg.video_note.file_id if re_msg.video_note else None
+
+    broadcastAudio = re_msg.audio.file_id if re_msg.audio else None
+    broadcastAudio_filename = re_msg.audio.file_name if re_msg.audio else None
+
+    broadcastVoice = re_msg.voice.file_id if re_msg.voice else None
+
+    broadcastButton = BuildKeyboard.cbutton([
+        {"📩 Forward": "broadcast_value_forward", "📌 Pin": "broadcast_value_pin"},
+        {"✅ Send": "broadcast_send", "✖️ Close": "misc_close"}
+    ])
+
+    broadcastData = {
+        "broadcastText": broadcastText,
+        "broadcastCaption": broadcastCaption,
+        "broadcastPhoto": broadcastPhoto,
+        "broadcastDocument": broadcastDocument,
+        "broadcastDocument_filename": broadcastDocument_filename,
+        "broadcastVideo": broadcastVideo,
+        "broadcastVideo_note": broadcastVideo_note,
+        "broadcastAudio": broadcastAudio,
+        "broadcastAudio_filename": broadcastAudio_filename,
+        "broadcastVoice": broadcastVoice,
+        # other
+        "forward": False,
+        "pin": False,
+        "is_cancelled": False,
+        "replied_message_id": re_msg.id
     }
 
-    MemoryDB.insert("data_center", chat.id, data)
-    # accessing memory data
-    broadcast_data = MemoryDB.data_center[chat.id]["broadcast"]
+    MemoryDB.insert("data_center", "broadcast", broadcastData)
 
-    text = BroadcastMenu.TEXT.format(
-        "Available" if broadcast_data["media"] else "Not available",
-        "Available" if broadcast_data["text"] else "Not available",
-        broadcast_data["pin"]
-    )
-    
-    btn = BuildKeyboard.cbutton(BroadcastMenu.BUTTONS)
-    await effective_message.reply_text(text, reply_markup=btn)
+    # sening demo preview for owner/sudo
+    if broadcastText:
+        await effective_message.reply_text(text=broadcastText, reply_markup=broadcastButton)
+    elif broadcastPhoto:
+        await effective_message.reply_photo(photo=broadcastPhoto, caption=broadcastCaption, reply_markup=broadcastButton)
+    elif broadcastDocument:
+        await effective_message.reply_document(document=broadcastDocument, caption=broadcastCaption, filename=broadcastCaption, reply_markup=broadcastButton)
+    elif broadcastVideo:
+        await effective_message.reply_video(video=broadcastVideo, caption=broadcastCaption, reply_markup=broadcastButton)
+    elif broadcastVideo_note:
+        await effective_message.reply_video_note(video_note=broadcastVideo_note, reply_markup=broadcastButton)
+    elif broadcastAudio:
+        await effective_message.reply_audio(audio=broadcastAudio, title=broadcastAudio_filename, caption=broadcastCaption, filename=broadcastAudio_filename, reply_markup=broadcastButton)
+    elif broadcastVoice:
+        await effective_message.reply_voice(voice=broadcastVoice, caption=broadcastCaption, reply_markup=broadcastButton)
+    else:
+        await effective_message.text("Error: unknown filetype! The file isn't supported for broadcast!")

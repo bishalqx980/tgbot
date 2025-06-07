@@ -7,7 +7,6 @@ from telegram.error import BadRequest, Forbidden
 from bot.modules.database import MemoryDB, MongoDB
 from bot.modules.utils import Utils
 from bot.helper import BuildKeyboard
-from ..owner_func.broadcast import BroadcastMenu
 
 async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -15,10 +14,10 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # refined query data
     query_data = query.data.removeprefix("broadcast_")
+
     # accessing Database
-    chat_data = MemoryDB.data_center.get(chat.id)
-    broadcast_data = chat_data.get("broadcast") if chat_data else None
-    if not broadcast_data:
+    broadcastData = MemoryDB.data_center.get("broadcast")
+    if not broadcastData:
         await query.answer("Session Expired!", True)
         return
     
@@ -27,161 +26,40 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer()
         return
     
-    elif query_data == "menu":
-        text = BroadcastMenu.TEXT.format(
-            "Available" if broadcast_data["media"] else "Not available",
-            "Available" if broadcast_data["text"] else "Not available",
-            broadcast_data["pin"]
-        )
-        
-        btn = BuildKeyboard.cbutton(BroadcastMenu.BUTTONS)
-
-        try:
-            await query.edit_message_text(text, reply_markup=btn)
-        except BadRequest:
-            await query.delete_message()
-            await chat.send_message(text, reply_markup=btn)
-        except:
-            pass
-    
-    elif query_data.startswith("add_"):
-        # Starting Editing Mode
-        MemoryDB.insert("data_center", chat.id, {"photo_file_id": None, "broadcast_text": None, "is_editing": True})
-
-        btn = BuildKeyboard.cbutton([{"Cancel": "broadcast_cancel_editing"}])
-        sent_message = await chat.send_message("Now send...", reply_markup=btn)
-
-        for i in range(10):
-            data_center = MemoryDB.data_center[chat.id]
-            # to check > is operation cancelled
-            is_editing = data_center.get("is_editing")
-            if not is_editing:
-                await query.answer()
-                return
-            
-            await asyncio.sleep(1)
-            photo_file_id = data_center.get("photo_file_id")
-            broadcast_text = data_center.get("broadcast_text")
-            if photo_file_id or broadcast_text:
-                break
-        
-        try:
-            message_ids = [sent_message.id]
-            if data_center.get("message_id"):
-                message_ids.append(data_center.get("message_id"))
-            
-            await chat.delete_messages(message_ids)
-        except:
-            pass
-
-        # terminating editing mode
-        MemoryDB.insert("data_center", chat.id, {"is_editing": False})
-
-        if not photo_file_id and not broadcast_text:
-            await query.answer("Timeout.", True)
-            return
-        # Updateing broadcast data
-        if photo_file_id:
-            broadcast_data.update({"media": photo_file_id})
-        elif broadcast_text:
-            broadcast_data.update({"text": broadcast_text})
-        
-        await query.answer("Updated...")
-
-        text = BroadcastMenu.TEXT.format(
-            "Available" if broadcast_data["media"] else "Not available",
-            "Available" if broadcast_data["text"] else "Not available",
-            broadcast_data["pin"]
-        )
-        
-        btn = BuildKeyboard.cbutton(BroadcastMenu.BUTTONS)
-
-        try:
-            await query.edit_message_text(text, reply_markup=btn)
-        except:
-            pass
-    
-    elif query_data == "cancel_editing":
-        MemoryDB.insert("data_center", chat.id, {"photo_file_id": None, "broadcast_text": None, "update_data_value": None, "is_editing": False})
-        await query.answer("Operation cancelled.", True)
-        await query.delete_message()
-    
-    # only for pin (toggle)
+    # only for boolean (toggle)
     elif query_data.startswith("value_"):
         data = query_data.removeprefix("value_")
 
-        existing_data = broadcast_data.get(data) # Boolean
+        existing_data = broadcastData.get(data) # Boolean
         if existing_data:
-            broadcast_data.update({data: False})
+            broadcastData.update({data: False})
         else:
-            broadcast_data.update({data: True})
+            broadcastData.update({data: True})
         
-        await query.answer("Updated...")
-
-        text = BroadcastMenu.TEXT.format(
-            "Available" if broadcast_data["media"] else "Not available",
-            "Available" if broadcast_data["text"] else "Not available",
-            broadcast_data["pin"]
-        )
-        
-        btn = BuildKeyboard.cbutton(BroadcastMenu.BUTTONS)
-
-        try:
-            await query.edit_message_text(text, reply_markup=btn)
-        except:
-            pass
+        await query.answer(f"Updated: {data}: {broadcastData.get(data)}", True)
     
-    # This is to see all kind of things media/text/btn
-    elif query_data.startswith("see_"):
-        data = query_data.removeprefix("see_")
+    elif query_data == "send":
+        # variables
+        broadcastText = broadcastData["broadcastText"] # only if the message doesn't contain any video/doc or other things
+        broadcastCaption = broadcastData["broadcastCaption"] # message with video/audio/doc etc.
 
-        memData = broadcast_data.get(data)
-        if not memData:
-            await query.answer("No data to show!", True)
-            return
-        
-        btn = BuildKeyboard.cbutton([{"Back": "broadcast_menu"}])
+        broadcastPhoto = broadcastData["broadcastPhoto"]
 
-        if data == "media":
-            await query.delete_message()
-            await chat.send_photo(memData, reply_markup=btn)
-        
-        else:
-            text = (
-                "<blockquote><b>Broadcast</b></blockquote>\n\n"
-                f"⌈\n{memData}\n⌊"
-            )
+        broadcastDocument = broadcastData["broadcastDocument"]
+        broadcastDocument_filename = broadcastData["broadcastDocument_filename"]
 
-            await query.edit_message_text(text, reply_markup=btn)
-    
-    elif query_data == "preview":
-        media = broadcast_data["media"]
-        text = broadcast_data["text"]
-        pin_message = broadcast_data["pin"]
+        broadcastVideo = broadcastData["broadcastVideo"]
+        broadcastVideo_note = broadcastData["broadcastVideo_note"]
 
-        if not media and not text:
-            await query.answer("No data to show!", True)
-            return
-        else:
-            await query.answer()
+        broadcastAudio = broadcastData["broadcastAudio"]
+        broadcastAudio_filename = broadcastData["broadcastAudio_filename"]
 
-        if media:
-            sent_message = await chat.send_photo(media, text)
-        else:
-            sent_message = await chat.send_message(text)
-        
-        if pin_message:
-            await sent_message.pin()
-    
-    elif query_data == "sendToAll":
-        broadcastMedia = broadcast_data["media"]
-        broadcastText = broadcast_data["text"]
-        pin_message = broadcast_data["pin"]
+        broadcastVoice = broadcastData["broadcastVoice"]
 
-        if not broadcastMedia and not broadcastText:
-            await query.answer("Media or Text isn't given!", True)
-            return
-        
+        is_forward = broadcastData["forward"]
+        is_pin = broadcastData["pin"]
+
+        # getting userID from DB
         users_id = MongoDB.find("users_data", "user_id")
         active_status = MongoDB.find("users_data", "active_status")
         active_users = []
@@ -223,23 +101,43 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "[]"
         )
 
-        broadcastBtn = BuildKeyboard.cbutton([{"Cancel": "broadcast_cancel"}])
-        await query.edit_message_text(text, reply_markup=broadcastBtn)
+        broadcastButton = BuildKeyboard.cbutton([{"Cancel": "broadcast_cancel"}])
+        
+        try:
+            await query.edit_message_text(text, reply_markup=broadcastButton)
+        except BadRequest:
+            await query.edit_message_caption(text, reply_markup=broadcastData)
+        except Exception as e:
+            await chat.send_message(str(e))
+            return
 
         broadcastStartTime = time()
 
         for user_id in active_users:
             sent_message = None
 
-            is_cancelled = broadcast_data["is_cancelled"]
+            is_cancelled = broadcastData["is_cancelled"]
             if is_cancelled:
                 return
             
             try:
-                if broadcastMedia:
-                    sent_message = await context.bot.send_photo(user_id, broadcastMedia, broadcastText)
+                if is_forward:
+                    sent_message = await context.bot.forward_message(user_id, chat.id, broadcastData["replied_message_id"])
                 else:
-                    sent_message = await context.bot.send_message(user_id, broadcastText)
+                    if broadcastText:
+                        sent_message = await context.bot.send_message(chat_id=user_id, text=broadcastText)
+                    elif broadcastPhoto:
+                        sent_message = await context.bot.send_photo(chat_id=user_id, photo=broadcastPhoto, caption=broadcastCaption)
+                    elif broadcastDocument:
+                        sent_message = await context.bot.send_document(chat_id=user_id, document=broadcastDocument, caption=broadcastCaption, filename=broadcastDocument_filename)
+                    elif broadcastVideo:
+                        sent_message = await context.bot.send_video(chat_id=user_id, video=broadcastVideo, caption=broadcastCaption)
+                    elif broadcastVideo_note:
+                        sent_message = await context.bot.send_video_note(chat_id=user_id, video_note=broadcastVideo_note)
+                    elif broadcastAudio:
+                        sent_message = await context.bot.send_audio(chat_id=user_id, audio=broadcastAudio, title=broadcastAudio_filename, caption=broadcastCaption, filename=broadcastAudio_filename)
+                    elif broadcastVoice:
+                        sent_message = await context.bot.send_voice(chat_id=user_id, voice=broadcastVoice, caption=broadcastCaption)
                 
                 if sent_message: sent_count += 1
 
@@ -253,7 +151,7 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 exception_count += 1
                 exception_users_id.append(f"{str(e)}: {user_id}")
             
-            if pin_message and sent_message:
+            if is_pin and sent_message:
                 try:
                     await sent_message.pin()
                 except:
@@ -262,7 +160,7 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             progress = (sent_count + exception_count) * 100 / len(active_users)
             progressBar = Utils.createProgressBar(progress)
 
-            text = broadcastUpdateText.format(
+            updateText = broadcastUpdateText.format(
                 len(users_id),
                 len(active_users),
                 sent_count,
@@ -271,12 +169,14 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 progressBar
             )
 
-            btn = None if (sent_count + exception_count) == len(active_status) else broadcastBtn
+            btn = None if (sent_count + exception_count) == len(active_status) else broadcastButton
 
             try:
-                await query.edit_message_text(text, reply_markup=btn)
-            except:
-                pass
+                await query.edit_message_text(updateText, reply_markup=btn)
+            except BadRequest:
+                await query.edit_message_caption(updateText, reply_markup=btn)
+            except Exception as e:
+                await chat.send_message(f"An error occured (broadcast still running): {e}")
 
             await asyncio.sleep(0.5) # sleep for 0.5 sec
         
@@ -287,8 +187,14 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             time_took = f"{(broadcastEndTime - broadcastStartTime):.2f} sec"
         
-        text += f"\n\n<b>Broadcast Done ✅: {time_took}</b>"
-        await query.edit_message_text(text)
+        updateText += f"\n\n<b>Broadcast Done ✅: {time_took}</b>"
+        
+        try:
+            await query.edit_message_text(updateText)
+        except BadRequest:
+            await query.edit_message_caption(updateText)
+        except Exception as e:
+            await chat.send_message(f"An error occured (After broadcast done): {e}")
 
         if exception_users_id:
             exception_file = BytesIO(", ".join(exception_users_id).encode())
@@ -297,15 +203,5 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await chat.send_document(exception_file, f"Total Exception: {len(exception_users_id)}")
     
     elif query_data == "cancel":
-        broadcast_data.update({"is_cancelled": True})
+        broadcastData.update({"is_cancelled": True})
         await query.answer("Broadcast Cancelled!", True)
-    
-    elif query_data == "close":
-        try:
-            message_id = query.message.message_id
-            await chat.delete_messages([message_id, message_id - 1])
-        except:
-            try:
-                await query.delete_message()
-            except:
-                pass

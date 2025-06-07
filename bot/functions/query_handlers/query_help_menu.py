@@ -44,7 +44,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn_data = [
             {"Next page ⇒": "help_menu_gm2"},
-            {"Back": "help_menu_menu", "Close": "help_menu_close"}
+            {"Back": "help_menu_menu", "Close": "misc_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data)
@@ -67,7 +67,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn_data = [
             {"⇐ Previous page": "help_menu_gm1"},
-            {"Back": "help_menu_menu", "Close": "help_menu_close"}
+            {"Back": "help_menu_menu", "Close": "misc_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data)
@@ -82,7 +82,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
 
-        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
+        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "misc_close"}])
     
     elif query_data == "misc":
         text = (
@@ -111,7 +111,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
         
-        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
+        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "misc_close"}])
     
     elif query_data == "owner":
         text = (
@@ -131,7 +131,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
         
-        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "help_menu_close"}])
+        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "misc_close"}])
     
     elif query_data == "botinfo":
         await query.answer("Getting information...")
@@ -186,21 +186,10 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn_data = [
             {"Source code": "https://github.com/bishalqx980/tgbot", "Report bug": "https://github.com/bishalqx980/tgbot/issues"},
             {"Developer": "https://t.me/bishalqx680/22"},
-            {"Back": "help_menu_menu", "Close": "help_menu_close"}
+            {"Back": "help_menu_menu", "Close": "misc_close"}
         ]
         
         btn = BuildKeyboard.cbutton(btn_data)
-    
-    elif query_data == "close":
-        try:
-            message_id = query.message.message_id
-            await user.delete_messages([message_id, message_id - 1])
-        except:
-            try:
-                await query.delete_message()
-            except:
-                pass
-        return
     
     # global reply
     try:

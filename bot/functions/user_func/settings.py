@@ -20,7 +20,7 @@ class PvtChatSettingsData:
 
     BUTTONS = [
         {"Language": "csettings_lang", "Auto translate": "csettings_auto_tr"},
-        {"Echo": "csettings_echo", "Close": "csettings_close"}
+        {"Echo": "csettings_echo", "Close": "misc_close"}
     ]
 
 

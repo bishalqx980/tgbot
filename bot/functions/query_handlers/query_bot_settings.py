@@ -51,7 +51,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         btn_data = [
             {"YES": "database_bool_true", "NO": "database_bool_false"},
-            {"Back": "bsettings_menu", "Close": "bsettings_close"}
+            {"Back": "bsettings_menu", "Close": "misc_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data)
@@ -184,7 +184,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         btn_data = [
             {"Restore Database": "bsettings_restoredb", "Wipe Memory Cache": "bsettings_wipe_memory"},
-            {"Back": "bsettings_menu", "Close": "bsettings_close"}
+            {"Back": "bsettings_menu", "Close": "misc_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data)
@@ -237,20 +237,12 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await user.send_message("Memory Cache has been cleaned!")
         return # don't want to edit message by global reply
     
-    elif query_data == "close":
-        try:
-            message_id = query.message.message_id
-            await user.delete_messages([message_id, message_id - 1])
-        except:
-            pass
-        return # don't want to edit message by global reply
-    
     # common editing keyboard buttons
     if is_editing_btn:
         btn_data = [
             {"Edit Value": "database_edit_value"},
             {"Remove Value": "database_rm_value"},
-            {"Back": "bsettings_menu", "Close": "bsettings_close"}
+            {"Back": "bsettings_menu", "Close": "misc_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data)

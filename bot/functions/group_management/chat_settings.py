@@ -30,7 +30,7 @@ class GroupChatSettingsData:
         {"Welcome Members": "csettings_welcome_user", "Farewell Members": "csettings_farewell_user"},
         {"Links Behave": "csettings_links_behave", "Allowed Links": "csettings_allowed_links"},
         {"Join Request": "csettings_chat_join_req", "Service Messages": "csettings_service_messages"},
-        {"Close": "csettings_close"}
+        {"Close": "misc_close"}
     ]
 
 
