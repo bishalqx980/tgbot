@@ -137,19 +137,13 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.answer("Getting information...")
 
         database_info = MongoDB.info()
-        total_users = None
-        total_groups = None
 
-        for info in database_info:
-            info = database_info[info]
-            if info.get("name") == "users_data":
-                total_users = info.get("quantity")
-            elif info.get("name") == "chats_data":
-                total_groups = info.get("quantity")
-            
-            if total_users and total_groups:
-                break
-        
+        i_users_data = database_info.get("users_data")
+        i_chats_data = database_info.get("chats_data")
+
+        t_users_count = i_users_data.get("quantity") if i_users_data else "Unknown"
+        t_chats_count = i_chats_data.get("quantity") if i_chats_data else "Unknown"
+
         active_status = MongoDB.find("users_data", "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
@@ -173,10 +167,10 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<b>• ID:</b> <code>{context.bot.id}</code>\n"
             f"<b>• Username:</b> {context.bot.name}\n\n"
 
-            f"<b>• Registered users:</b> <code>{total_users}</code>\n"
+            f"<b>• Registered users:</b> <code>{t_users_count}</code>\n"
             f"<b>• Active users:</b> <code>{active_users}</code>\n"
             f"<b>• Inactive users:</b> <code>{inactive_users}</code>\n"
-            f"<b>• Total chats:</b> <code>{total_groups}</code>\n\n"
+            f"<b>• Total chats:</b> <code>{t_chats_count}</code>\n\n"
 
             f"<b>• System uptime:</b> <code>{int(sys_days)}d {int(sys_hours)}h {int(sys_minute)}m</code>\n"
             f"<b>• Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n"

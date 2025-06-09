@@ -45,11 +45,11 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.bot.id != ORIGINAL_BOT_ID:
         text += f"\n\n<blockquote>Cloned bot of @{ORIGINAL_BOT_USERNAME}</blockquote>"
 
-    btn_data = [{"Add me to your chat": create_deep_linked_url(context.bot.username, "help", True)}]
+    btn_data = {"Add me to your chat": create_deep_linked_url(context.bot.username, "help", True)}
     if support_chat:
-        btn_data.append({"Support Chat": support_chat})
+        btn_data.update({"Support Chat": support_chat})
     
-    btn = BuildKeyboard.ubutton(btn_data)
+    btn = BuildKeyboard.ubutton([btn_data])
 
     if photo_file_id:
         try:
