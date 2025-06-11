@@ -1,4 +1,4 @@
-import requests
+from aiohttp import ClientSession, ClientTimeout
 from telegraph.aio import Telegraph
 from bot import ORIGINAL_BOT_USERNAME, logger
 
@@ -12,18 +12,19 @@ class TELEGRAPH:
         domain_names = ["telegra.ph", "graph.org"]
         for domain in domain_names:
             try:
-                response = requests.get(f"https://{domain}", timeout=3)
-                if response.ok:
-                    self.domain = domain
-                    logger.info(f"Telegraph initialized! Domain: https://{self.domain}")
-                    break
+                async with ClientSession() as session:
+                    async with session.get(f"http://{domain}", timeout=ClientTimeout(10)) as response:
+                        if response.status == 200:
+                            self.domain = domain
+                            break
             except Exception as e:
                 logger.error(e)
-        
+            
         if self.domain:
             try:
                 self.telegraph = Telegraph(domain=self.domain)
                 await self.telegraph.create_account(f"@{ORIGINAL_BOT_USERNAME}")
+                logger.info(f"Telegraph initialized! Domain: http://{self.domain}")
             except Exception as e:
                 logger.error(e)
 

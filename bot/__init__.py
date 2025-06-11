@@ -2,11 +2,11 @@ import os
 import shutil
 from time import time
 from telegram import Bot, __version__ as __ptbversion__
-from .config import CONFIG
-from .logger import setup_logging
+from .utils.config import CONFIG
+from .utils.logger import setup_logging
 
 # constants
-__version__ = "1.3.11.513" # major.minor.patch.commits
+__version__ = "1.4.0.514" # major.minor.patch.commits
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"

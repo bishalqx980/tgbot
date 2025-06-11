@@ -18,8 +18,8 @@ from telegram.error import BadRequest
 from telegram.constants import ChatID, ParseMode
 
 from . import DEFAULT_ERROR_CHANNEL_ID, bot, logger, config
-from .alive import alive
-from .update_db import update_database
+from .utils.alive import alive
+from .utils.update_db import update_database
 from .modules import telegraph
 from .modules.database import MemoryDB
 
@@ -136,18 +136,15 @@ async def post_init():
         await asyncio.gather(*(bot.send_message(user_id, "<b>Bot Started!</b>", parse_mode=ParseMode.HTML) for user_id in sudo_users))
     except Exception as e:
         logger.error(e)
+    
+    logger.info("Bot Started...")
 
 
 async def server_alive():
     # executing after updating database so getting data from memory...
     server_url = MemoryDB.bot_data.get("server_url")
     if not server_url:
-        logger.warning("Server URL wasn't found.")
-        await bot.send_message(
-            config.owner_id,
-            "<b>Error:</b> <code>Server URL</code> wasn't found. Bot may fall asleep if deployed on Render (free instance). /bsettings to set Server URL.",
-            parse_mode=ParseMode.HTML
-        )
+        logger.warning("'Server URL' wasn't found. Bot may fall asleep if deployed on Render (free instance)")
         return
     
     while True:
@@ -335,7 +332,7 @@ def main():
     application.add_error_handler(default_error_handler)
 
     # Check Updates
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
 
 
 async def app_init():
