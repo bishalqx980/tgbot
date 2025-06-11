@@ -1,4 +1,4 @@
-from aiohttp import ClientSession, ClientTimeout
+from aiohttp import ClientSession
 from telegraph.aio import Telegraph
 from bot import ORIGINAL_BOT_USERNAME, logger
 
@@ -13,7 +13,7 @@ class TELEGRAPH:
         for domain in domain_names:
             try:
                 async with ClientSession() as session:
-                    async with session.get(f"http://{domain}", timeout=ClientTimeout(10)) as response:
+                    async with session.get(f"http://{domain}") as response:
                         if response.status == 200:
                             self.domain = domain
                             break

@@ -23,7 +23,7 @@ from .utils.update_db import update_database
 from .modules import telegraph
 from .utils.database import MemoryDB
 
-from .functions import (
+from .handlers import (
     SUPPORT_STATES,
     init_support_conv,
     support_state_one,
