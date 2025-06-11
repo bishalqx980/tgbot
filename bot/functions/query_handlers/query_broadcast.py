@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 from telegram.error import BadRequest, Forbidden
 from bot.utils.database import MemoryDB, MongoDB
 from bot.modules.utils import Utils
-from bot.helper import BuildKeyboard
+from bot.helpers import BuildKeyboard
 
 async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

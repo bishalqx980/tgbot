@@ -3,7 +3,7 @@ from telegram.constants import ChatType
 from telegram.ext import ContextTypes
 from bot.utils.database import MemoryDB
 from bot.modules.base64 import BASE64
-from bot.helper import BuildKeyboard
+from bot.helpers import BuildKeyboard
 from .auxiliary.pm_error import pm_error
 
 async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):

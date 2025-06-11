@@ -2,7 +2,7 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.helper import BuildKeyboard
+from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB
 from ..sudo_users import fetch_sudos
 

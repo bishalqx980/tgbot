@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.helper import BuildKeyboard
+from bot.helpers import BuildKeyboard
 from bot.modules.freeimagehost import upload_image
 
 async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):

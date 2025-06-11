@@ -3,7 +3,7 @@ from telegram.constants import ChatType
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import logger, TL_LANG_CODES_URL
-from bot.helper import BuildKeyboard
+from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB
 from ..user_func.settings import PvtChatSettingsData
 from ..group_management.chat_settings import GroupChatSettingsData

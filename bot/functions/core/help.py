@@ -5,7 +5,7 @@ from telegram.constants import ChatType
 from telegram.error import BadRequest
 from telegram.helpers import create_deep_linked_url
 from bot import logger
-from bot.helper import BuildKeyboard
+from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB
 from bot.utils.database.common import database_add_user
 
