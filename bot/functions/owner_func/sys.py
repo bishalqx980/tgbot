@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot import BOT_UPTIME
-from bot.modules.database import MemoryDB
+from bot.utils.database import MemoryDB
 from bot.modules.utils import Utils
 from ..sudo_users import fetch_sudos
 

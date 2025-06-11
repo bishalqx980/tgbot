@@ -4,7 +4,7 @@ from io import BytesIO
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest, Forbidden
-from bot.modules.database import MemoryDB, MongoDB
+from bot.utils.database import MemoryDB, MongoDB
 from bot.modules.utils import Utils
 from bot.helper import BuildKeyboard
 

@@ -4,7 +4,7 @@ from telegram.constants import ChatType
 from bot import logger
 from .auxiliary.pm_error import pm_error
 from .auxiliary.chat_admins import ChatAdmins
-from bot.modules.database import MemoryDB
+from bot.utils.database import MemoryDB
 
 async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

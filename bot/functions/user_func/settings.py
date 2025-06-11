@@ -2,8 +2,8 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot.helper import BuildKeyboard
-from bot.modules.database import MemoryDB
-from bot.modules.database.common import database_search
+from bot.utils.database import MemoryDB
+from bot.utils.database.common import database_search
 from ..group_management.chat_settings import chat_settings
 
 class PvtChatSettingsData:

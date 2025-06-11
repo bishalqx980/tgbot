@@ -1,4 +1,4 @@
-from bot.modules.database import MemoryDB
+from bot.utils.database import MemoryDB
 
 def edit_database(chat_id, user_id, message):
     """
@@ -22,8 +22,6 @@ def edit_database(chat_id, user_id, message):
             pass
         
         data = {
-            "photo_file_id": message.photo[-1].file_id if message.photo else None, # used for broadcast (MemoryDB)
-            "broadcast_text": message.text_html, # used forBroadcast (MemoryDB)
             "update_data_value": data_value, # used for MongoDB Editing
             "message_id": message.id # mostly to delete the message
         }

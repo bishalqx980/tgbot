@@ -2,7 +2,7 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helper import BuildKeyboard
-from bot.modules.database import MemoryDB, MongoDB
+from bot.utils.database import MemoryDB, MongoDB
 
 async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """

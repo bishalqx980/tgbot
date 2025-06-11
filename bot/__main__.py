@@ -21,7 +21,7 @@ from . import DEFAULT_ERROR_CHANNEL_ID, bot, logger, config
 from .utils.alive import alive
 from .utils.update_db import update_database
 from .modules import telegraph
-from .modules.database import MemoryDB
+from .utils.database import MemoryDB
 
 from .functions import (
     SUPPORT_STATES,
@@ -303,13 +303,13 @@ def main():
     # filter private chat
     application.add_handler(MessageHandler(
         # SERVICE_CHAT is Linked channel with Group
-        ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.PRIVATE & (filters.TEXT | filters.CAPTION | filters.PHOTO),
+        ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.PRIVATE & (filters.TEXT | filters.CAPTION),
         filter_private_chat.filter_private_chat
     ))
     # filter public chat
     application.add_handler(MessageHandler(
         # SERVICE_CHAT is Linked channel with Group
-        ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.GROUPS & (filters.TEXT | filters.CAPTION | filters.PHOTO),
+        ~ filters.User(ChatID.SERVICE_CHAT) & filters.ChatType.GROUPS & (filters.TEXT | filters.CAPTION),
         filter_public_chat.filter_public_chat
     ))
     # filter Chat Status Updates

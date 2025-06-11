@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import __version__, BOT_UPTIME, logger
 from bot.helper import BuildKeyboard
-from bot.modules.database import MongoDB
+from bot.utils.database import MongoDB
 from ..core.help import HelpMenuData
 
 async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):

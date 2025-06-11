@@ -6,7 +6,7 @@ from telegram.error import BadRequest
 from bot import logger
 from bot.utils.update_db import update_database
 from bot.helper import BuildKeyboard
-from bot.modules.database import MemoryDB, MongoDB
+from bot.utils.database import MemoryDB, MongoDB
 from ..owner_func.bsettings import BotSettingsData
 
 async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):

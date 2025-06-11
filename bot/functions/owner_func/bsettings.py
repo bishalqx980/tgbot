@@ -6,7 +6,7 @@ from telegram.constants import ChatType
 from telegram.error import BadRequest
 from bot import logger
 from bot.helper import BuildKeyboard
-from bot.modules.database import MemoryDB
+from bot.utils.database import MemoryDB
 from ..sudo_users import fetch_sudos
 
 class BotSettingsData:

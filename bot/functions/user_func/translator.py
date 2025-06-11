@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot import TL_LANG_CODES_URL
 from bot.helper import BuildKeyboard
-from bot.modules.database.common import database_search
+from bot.utils.database.common import database_search
 from bot.modules.translator import fetch_lang_codes, translate
 
 async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):

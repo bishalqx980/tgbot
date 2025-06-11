@@ -1,8 +1,8 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.modules.database.common import database_search
-from bot.modules.database import MemoryDB, MongoDB
+from bot.utils.database.common import database_search
+from bot.utils.database import MemoryDB, MongoDB
 from bot.helper import BuildKeyboard
 from ..auxiliary.pm_error import pm_error
 from ..auxiliary.chat_admins import ChatAdmins

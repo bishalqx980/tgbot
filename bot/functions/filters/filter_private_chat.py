@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot import TL_LANG_CODES_URL
 from bot.helper import BuildKeyboard
-from bot.modules.database.common import database_search
+from bot.utils.database.common import database_search
 from bot.modules.translator import translate
 from .edit_database import edit_database
 

@@ -1,5 +1,5 @@
 from bot import config
-from bot.modules.database import MemoryDB
+from bot.utils.database import MemoryDB
 
 def fetch_sudos():
     """

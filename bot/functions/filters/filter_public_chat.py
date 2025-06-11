@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from bot import TL_LANG_CODES_URL
 from bot.helper import BuildKeyboard
-from bot.modules.database.common import database_search
+from bot.utils.database.common import database_search
 from bot.modules.translator import translate
 from bot.modules.re_link import RE_LINK
 from bot.modules.base64 import BASE64
@@ -67,7 +67,7 @@ async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
             translated_text = translate(to_translate, lang_code)
             if translated_text and translated_text.lower() != to_translate.lower():
                 try:
-                    await effective_message.reply_text(f"<a href='{effective_message.link}'>{user.full_name}</a>: {translated_text}")
+                    await effective_message.reply_text(f"{user.mention_html()}: {translated_text}")
                 except:
                     pass
             
