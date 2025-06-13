@@ -10,7 +10,7 @@ async def func_say(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     sudo_users = fetch_sudos()
     if user.id not in sudo_users:
-        await effective_message.reply_text("Access denied!")
+        await effective_message.reply_text("Sorry, I just listen to my boss! Try bribing me some cookies 🍪... Just Kidding 🤣!")
         return
     
     try:

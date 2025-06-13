@@ -150,7 +150,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         btn_data = [
             {"Enable": "database_bool_true", "Disable": "database_bool_false"},
             {"Custom Welcome Message": "csettings_custom_welcome_msg"},
-            {"Back": "csettings_menu", "Close": "misc_close"}
+            {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data)
@@ -177,7 +177,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         btn_data = [
             {"Set Custom Message": "database_edit_value", "Remove Custom Message": "database_rm_value"},
             {"Formattings": "csettings_formattings"},
-            {"Back": "csettings_welcome_user", "Close": "misc_close"}
+            {"Back": "csettings_welcome_user", "Close": "csettings_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data)
@@ -194,7 +194,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "• <code>{chatname}</code> - chat title"
         )
 
-        btn = BuildKeyboard.cbutton([{"Back": "csettings_custom_welcome_msg", "Close": "misc_close"}])
+        btn = BuildKeyboard.cbutton([{"Back": "csettings_custom_welcome_msg", "Close": "csettings_close"}])
     
     elif query_data == "farewell_user":
         MemoryDB.insert("data_center", chat.id, {
@@ -226,7 +226,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         btn_data = [
             {"Approve": "database_value_approve", "Decline": "database_value_decline", "Do Nothing": "database_rm_value"},
-            {"Back": "csettings_menu", "Close": "misc_close"}
+            {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data)
@@ -262,7 +262,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         btn_data = [
             {"Delete": "database_value_delete", "Convert to base64": "database_value_convert", "Do Nothing": "database_rm_value"},
-            {"Back": "csettings_menu", "Close": "misc_close"}
+            {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data)
@@ -283,12 +283,23 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "Allowed links won't be affected by <code>Links Behave</code></blockquote>"
         ).format(", ".join(memory_data.get("allowed_links") or []))
     
+    elif query_data == "close":
+        try:
+            message_id = query.message.message_id
+            await chat.delete_messages([message_id, message_id - 1])
+        except:
+            try:
+                await query.delete_message()
+            except:
+                pass
+        return
+
     # common editing keyboard buttons
     if is_editing_btn:
         btn_data = [
             {"Edit Value": "database_edit_value"},
             {"Remove Value": "database_rm_value"},
-            {"Back": "csettings_menu", "Close": "misc_close"}
+            {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data) # cant use btn as common bcz maybe there are other btn
@@ -296,7 +307,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
     if is_boolean_btn:
         btn_data = [
             {"Enable": "database_bool_true", "Disable": "database_bool_false"},
-            {"Back": "csettings_menu", "Close": "misc_close"}
+            {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data) # cant use btn as common bcz maybe there are other btn

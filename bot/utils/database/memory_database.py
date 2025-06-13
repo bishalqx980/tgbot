@@ -35,6 +35,7 @@ class MemoryDatabase:
     
 
     def clear_all(self):
+        """Clear all cached data (MemoryDB)"""
         self.bot_data.clear()
         self.users_data.clear()
         self.chats_data.clear()
