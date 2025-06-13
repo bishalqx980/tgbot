@@ -149,8 +149,32 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         btn_data = [
             {"Enable": "database_bool_true", "Disable": "database_bool_false"},
+            {"Welcome Photo": "csettings_welcome_photo"},
             {"Custom Welcome Message": "csettings_custom_welcome_msg"},
             {"Back": "csettings_menu", "Close": "csettings_close"}
+        ]
+
+        btn = BuildKeyboard.cbutton(btn_data)
+    
+    elif query_data == "welcome_photo":
+        MemoryDB.insert("data_center", chat.id, {
+            "update_data_key": "welcome_photo",
+            "is_list": False,
+            "is_int": False
+        })
+
+        welcome_photo = memory_data.get("welcome_photo") or ""
+        
+        text = (
+            "<blockquote><b>Chat Settings</b></blockquote>\n\n"
+            "Welcome Photo:\n<code>{}</code>\n"
+            "<blockquote><b>Note:</b>Welcome photo to greet new chat members. (Currently only supports URL photo link)</blockquote>"
+        ).format(welcome_photo)
+
+        btn_data = [
+            {"Edit Value": "database_edit_value"},
+            {"Remove Value": "database_rm_value"},
+            {"Back": "csettings_welcome_user", "Close": "csettings_close"}
         ]
 
         btn = BuildKeyboard.cbutton(btn_data)

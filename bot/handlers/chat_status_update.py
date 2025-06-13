@@ -1,6 +1,5 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import logger
 from bot.utils.database.common import database_search
 from .group_management.auxiliary.chat_admins import ChatAdmins
 
@@ -17,6 +16,7 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
         return
 
     welcome_user = chat_data.get("welcome_user")
+    welcome_photo = chat_data.get("welcome_photo") # related to new_chat_members
     custom_welcome_msg = chat_data.get("custom_welcome_msg") # related to new_chat_members
     farewell_user = chat_data.get("farewell_user")
     antibot = chat_data.get("antibot") # related to new_chat_members
@@ -25,8 +25,8 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
     if service_messages:
         try:
             await effective_message.delete()
-        except Exception as e:
-            logger.error(e)
+        except:
+            pass
     
     # handling new chat member
     if effective_message.new_chat_members:
@@ -58,7 +58,6 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
             try:
                 await chat.unban_member(victim.id)
             except Exception as e:
-                logger.error(e)
                 await chat.send_message(str(e))
                 return
             
@@ -84,7 +83,14 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
             
             else:
                 greeting_message = f"Hi, {victim.mention_html()}! Welcome to {chat.title}!"
-
+            
+            if welcome_photo:
+                try:
+                    await chat.send_photo(welcome_photo, greeting_message)
+                    return # dont send message again
+                except Exception as e:
+                    await chat.send_message(str(e))
+            
             await chat.send_message(greeting_message)
     
     # farewell for left chat member

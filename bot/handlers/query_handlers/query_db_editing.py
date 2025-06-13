@@ -6,7 +6,7 @@ from bot.utils.database import MemoryDB, MongoDB
 
 async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    This function accepts (`edit_value`, `cancel_editing`, `value_`, `rm_value`, "bool_") callback query data's\n
+    This function accepts (`edit_value`, `cancel_editing`, `value_[custom value]`, `rm_value`, `bool_[true/false]`) callback query data's\n
     `value_`: The data given after value_ takes as `update_data_value`\n
     `bool_`: Expects `bool_true` or `bool_false`\n
     `rm_value`: Sets `update_data_value` as None
@@ -95,7 +95,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             MemoryDB.insert(collection_name, identifier, data)
 
-            await query.answer("Database Updated Successfully.")
+            await query.answer("Database Updated Successfully.", True)
 
         else:
             await query.answer("Something went wrong.", True)
@@ -118,7 +118,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             MemoryDB.insert(collection_name, identifier, data)
 
-            await query.answer("Database Updated Successfully.")
+            await query.answer("Database Updated Successfully.", True)
 
         else:
             await query.answer("Something went wrong.", True)
@@ -133,7 +133,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             MemoryDB.insert(collection_name, identifier, data)
 
-            await query.answer("Database Updated Successfully.")
+            await query.answer("Database Updated Successfully.", True)
 
         else:
             await query.answer("Something went wrong.", True)
@@ -148,7 +148,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             MemoryDB.insert(collection_name, identifier, data)
 
-            await query.answer("Database Updated Successfully.")
+            await query.answer("Database Updated Successfully.", True)
 
         else:
             await query.answer("Something went wrong.", True)
