@@ -20,6 +20,6 @@ async def func_warns(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not warn_count:
         text = "🎉 Congratulations, you don't have any warning in this chat!"
     else:
-        text = f"You have {warn_count}/3 !! Be careful...!"
+        text = f"You have {warn_count}/3 warnings!! Be careful...!"
     
     await effective_message.reply_text(text)

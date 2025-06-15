@@ -86,7 +86,7 @@ async def func_warn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
         f"Watchout, {victim.mention_html()} !!\n"
         f"<b>You got warning's:</b> <code>{warn_count}/3</code>\n"
-        f"<b>Reason (current warn):</b> <code>{reason if reason else "Not Given"}</code>"
+        f"<b>Reason (current warn):</b> <code>{reason if reason else 'Not Given'}</code>"
     )
 
     btn = BuildKeyboard.cbutton([{"Remove Warn's (Admin only)": f"admin_remove_warn_{victim.id}"}])
