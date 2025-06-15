@@ -47,4 +47,4 @@ async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TY
             await query.edit_message_text(str(e))
             return
         
-        await query.edit_message_text(f"Great! Admin {user.mention_html()} has cleared all warnings of {victim_mention or f"<code>{victim_id}</code>"}.")
+        await query.edit_message_text(f"Great! Admin {user.mention_html()} has cleared all warnings of {victim_mention or f'<code>{victim_id}</code>'}.")
