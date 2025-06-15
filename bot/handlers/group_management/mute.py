@@ -25,7 +25,7 @@ async def func_mute(update: Update, context: ContextTypes.DEFAULT_TYPE):
             is_silent = True
             await effective_message.delete()
         elif cmd_prefix == "d":
-            await re_msg.delete()
+            await chat.delete_messages([effective_message.id, re_msg.id])
     except:
         pass
     

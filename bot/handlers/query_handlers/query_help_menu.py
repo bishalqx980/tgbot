@@ -53,6 +53,8 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = (
             "<blockquote><b>Group Management</b></blockquote>\n\n"
 
+            "• /warn » Give warning to member (automatic action will be taken by bot if member gets 3 warns)\n"
+            "• /warns » See your warnings in current chat\n"
             "• /purge » Delete all messages between replied to current message!\n"
             "• /purgefrom | /purgeto » Delete all messages between <code>purgefrom</code> and <code>purgeto</code>.\n"
             "• /lock » Lock the chat (member will be unable to send messages etc.)\n"

@@ -27,6 +27,8 @@ from .group_management.unlock import func_unlock
 from .group_management.unmute import func_unmute
 from .group_management.unpin import func_unpin
 from .group_management.unpinall import func_unpinall
+from .group_management.warn import func_warn
+from .group_management.warns import func_warns
 from .group_management.whisper import func_whisper
 
 from .group_management.custom_filters.filter import func_filter
@@ -45,6 +47,7 @@ from .owner_func.shell import func_shell
 from .owner_func.sys import func_sys
 
 from .query_handlers import (
+    query_admin_task,
     query_bot_settings,
     query_chat_settings,
     query_help_menu,
