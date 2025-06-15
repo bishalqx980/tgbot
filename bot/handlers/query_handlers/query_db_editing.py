@@ -51,10 +51,12 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query_data == "edit_value":
         MemoryDB.insert("data_center", chat.id, {"update_data_value": None, "is_editing": True})
         
-        btn = BuildKeyboard.cbutton([{"Cancel": "database_cancel_editing"}])
-        sent_message = await chat.send_message("Waiting for a new value: ", reply_markup=btn)
+        timeout = 15
 
-        for i in range(10):
+        btn = BuildKeyboard.cbutton([{"Cancel": "database_cancel_editing"}])
+        sent_message = await chat.send_message(f"Waiting for a new value (Timeout: {timeout}s): ", reply_markup=btn)
+
+        for i in range(timeout):
             data_center = MemoryDB.data_center[chat.id]
             # to check > is operation cancelled
             is_editing = data_center.get("is_editing")
