@@ -37,7 +37,7 @@ async def func_warn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if victim.id == context.bot.id:
-        await effective_message.reply_text("I'm not going to warn myself!")
+        await effective_message.reply_text("Ohh, haha!! I can remove my own warn's 😝!!")
         return
     
     chat_admins = ChatAdmins()
@@ -48,7 +48,7 @@ async def func_warn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     if chat_admins.is_victim_admin or chat_admins.is_victim_owner:
-        await effective_message.reply_text("I'm not going to warn an admin! You must be kidding!")
+        await effective_message.reply_text("Rule no. 1 - Admins are always right!\nRule no. 2 - If admins are wrong then read rule no. 1 !!")
         return
     
     if not chat_admins.is_bot_admin:
@@ -81,7 +81,7 @@ async def func_warn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     response = MongoDB.update("chats_data", "chat_id", chat.id, "warns", warns)
     if response:
-        MemoryDB.insert("chats_data", chat.id, warns)
+        MemoryDB.insert("chats_data", chat.id, {"warns": warns})
     
     text = (
         f"Watchout, {victim.mention_html()} !!\n"

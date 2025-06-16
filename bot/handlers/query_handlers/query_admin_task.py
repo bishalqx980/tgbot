@@ -39,7 +39,7 @@ async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TY
         
         response = MongoDB.update("chats_data", "chat_id", chat.id, "warns", warns)
         if response:
-            MemoryDB.insert("chats_data", chat.id, warns)
+            MemoryDB.insert("chats_data", chat.id, {"warns": warns})
         
         try:
             await chat.restrict_member(int(victim_id), ChatPermissions.all_permissions())

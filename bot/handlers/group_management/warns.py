@@ -1,5 +1,8 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+from telegram.constants import ChatType
+from .auxiliary.chat_admins import ChatAdmins
+from .auxiliary.pm_error import pm_error
 from bot.utils.database.common import database_search
 
 async def func_warns(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -7,11 +10,22 @@ async def func_warns(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     effective_message = update.effective_message
 
+    if chat.type == ChatType.PRIVATE:
+        await pm_error(context, chat.id)
+        return
+    
+    chat_admins = ChatAdmins()
+    await chat_admins.fetch_admins(chat, user_id=user.id)
+
+    if chat_admins.is_user_admin or chat_admins.is_user_owner:
+        await effective_message.reply_text("How could someone give you a warning?")
+        return
+    
     chat_data = database_search("chats_data", "chat_id", chat.id)
     if not chat_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
-
+    
     warns = chat_data.get("warns") or {}
     victim_warns = warns.get(str(user.id)) or {} # mongodb doesn't allow int doc key
 
