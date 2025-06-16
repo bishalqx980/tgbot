@@ -1,8 +1,10 @@
+import random
+import string
 from bot import logger
 
 class Utils:
     @staticmethod
-    def createProgressBar(percentValue, barSize=10):
+    def createProgressBar(percentValue, barSize=10) -> str:
         """
         :param percentValue: `int`
         :param barSize: `int` default 10
@@ -17,9 +19,19 @@ class Utils:
         barStr = f"[ {fullSymbol * barFilled}{emptySymbol * barEmpty} ]"
         return barStr
     
-    
+
     @staticmethod
-    def calculator(math):
+    def randomString(length: int = 16) -> str:
+        """
+        Generates a random string with a mix of:
+        - hexdigits
+        - octdigits
+        """
+        return "".join(random.choice(string.hexdigits + string.octdigits) for _ in range(length))
+
+
+    @staticmethod
+    def calculator(math) -> tuple[bool, float | int | str]:
         """
         solves normal maths: supported syntax: (+, -, *, /)
         """

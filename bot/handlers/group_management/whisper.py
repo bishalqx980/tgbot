@@ -1,10 +1,11 @@
 from telegram import Update
 from telegram.constants import ChatType
 from telegram.ext import ContextTypes
-from bot.utils.database import MemoryDB
-from bot.modules.base64 import BASE64
+from bot.utils.database.common import database_search
+from bot.utils.database import MemoryDB, MongoDB
 from bot.helpers import BuildKeyboard
 from .auxiliary.pm_error import pm_error
+from bot.modules.utils import Utils
 
 async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -57,20 +58,18 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sent_message = await effective_message.reply_text("Processing...")
 
-    data_center = MemoryDB.data_center.get(chat.id)
-    whisper_data = data_center.get("whisper_data") if data_center else None
-
-    if not data_center or not whisper_data:
-        MemoryDB.insert("data_center", chat.id, {"whisper_data": {}})
-        # getting data again bcz data_center can be None
-        data_center = MemoryDB.data_center.get(chat.id)
-        whisper_data = data_center.get("whisper_data")
+    chat_data = database_search("chats_data", "chat_id", chat.id)
+    if not chat_data:
+        await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
+        return
     
-    # if replied then it will be user_id else it will be username
-    whsiper_key = BASE64.encode(f"{whisper_username or whisper_user_id}_{user.id}_{effective_message.id}")
+    whispers = chat_data.get("whispers") or {}
 
-    whisper_data.update({
-        whsiper_key: {
+    # if replied then it will be user_id else it will be username
+    whisper_key = Utils.randomString()
+
+    whispers.update({
+        whisper_key: {
             "sender_user_id": user.id,
             "user_id": whisper_user_id,
             "username": whisper_username, # contains @ prefix
@@ -78,8 +77,15 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
     })
 
+    response = MongoDB.update("chats_data", "chat_id", chat.id, "whispers", whispers)
+    if not response:
+        await sent_message.edit_text("Hmm, Something went wrong! Try again or report the issue!")
+        return
+    
+    MemoryDB.insert("chats_data", chat.id, {"whispers": whispers})
+    
     if re_msg and whisper_username is None:
         whisper_username = re_msg.from_user.mention_html()
     
-    btn = BuildKeyboard.cbutton([{"See the message 💭": f"misc_whisper_{whsiper_key}"}])
+    btn = BuildKeyboard.cbutton([{"See the message 💭": f"misc_whisper_{whisper_key}"}])
     await sent_message.edit_text(f"Hey, {whisper_username}. You got a whisper message from {user.name}.", reply_markup=btn)
