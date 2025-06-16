@@ -4,6 +4,7 @@ from telegram.constants import ChatType
 from bot import logger
 from .auxiliary.pm_error import pm_error
 from .auxiliary.chat_admins import ChatAdmins
+from .auxiliary.anonymous_admin import anonymousAdmin
 
 async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -30,8 +31,9 @@ async def func_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         pass
     
     if user.is_bot:
-        await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
-        return
+        user = await anonymousAdmin(chat, effective_message)
+        if not user:
+            return
     
     if not re_msg:
         await effective_message.reply_text("I don't know who you are talking about! Reply the member whom you want to ban!\nE.g<code>/ban reason</code>")

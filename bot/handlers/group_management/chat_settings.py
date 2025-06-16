@@ -4,6 +4,7 @@ from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB
 from bot.utils.database.common import database_search
 from .auxiliary.chat_admins import ChatAdmins
+from .auxiliary.anonymous_admin import anonymousAdmin
 
 class GroupChatSettingsData:
     TEXT = (
@@ -41,8 +42,9 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
 
     if user.is_bot:
-        await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
-        return
+        user = await anonymousAdmin(chat, effective_message)
+        if not user:
+            return
     
     chat_admins = ChatAdmins()
     await chat_admins.fetch_admins(chat, context.bot.id, user.id)

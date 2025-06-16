@@ -16,6 +16,11 @@ async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TY
         await query.answer()
         return
     
+    elif query_data == "anonymous_verify":
+        await query.answer("Verified!")
+        MemoryDB.insert("data_center", chat.id, {"anonymous_admin": user})
+        return
+    
     elif query_data.startswith("remove_warn"):
         # expecting remove_warn_[victim_id]
         victim_id = query_data.removeprefix("remove_warn_")

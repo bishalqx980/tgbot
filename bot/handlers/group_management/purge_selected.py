@@ -4,6 +4,7 @@ from telegram.constants import ChatType
 from bot import logger
 from .auxiliary.pm_error import pm_error
 from .auxiliary.chat_admins import ChatAdmins
+from .auxiliary.anonymous_admin import anonymousAdmin
 from bot.utils.database import MemoryDB
 
 async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -17,8 +18,9 @@ async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if user.is_bot:
-        await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
-        return
+        user = await anonymousAdmin(chat, effective_message)
+        if not user:
+            return
     
     if not re_msg:
         await effective_message.reply_text(

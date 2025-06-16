@@ -6,6 +6,7 @@ from bot.utils.database import MemoryDB, MongoDB
 from bot.helpers import BuildKeyboard
 from ..auxiliary.pm_error import pm_error
 from ..auxiliary.chat_admins import ChatAdmins
+from ..auxiliary.anonymous_admin import anonymousAdmin
 
 async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -20,8 +21,9 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     if user.is_bot:
-        await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
-        return
+        user = await anonymousAdmin(chat, effective_message)
+        if not user:
+            return
     
     chat_admins = ChatAdmins()
     await chat_admins.fetch_admins(chat, user_id=user.id)

@@ -4,6 +4,7 @@ from telegram.constants import ChatType
 from bot import logger
 from .auxiliary.pm_error import pm_error
 from .auxiliary.chat_admins import ChatAdmins
+from .auxiliary.anonymous_admin import anonymousAdmin
 
 async def func_lock(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -25,8 +26,9 @@ async def func_lock(update: Update, context: ContextTypes.DEFAULT_TYPE):
             pass
     
     if user.is_bot:
-        await effective_message.reply_text("Who are you? I don't take commands from anonymous admins...!")
-        return
+        user = await anonymousAdmin(chat, effective_message)
+        if not user:
+            return
     
     chat_admins = ChatAdmins()
     await chat_admins.fetch_admins(chat, context.bot.id, user.id)
