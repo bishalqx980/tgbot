@@ -1,7 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot import logger
 from .auxiliary.pm_error import pm_error
 from .auxiliary.chat_admins import ChatAdmins
 from .auxiliary.anonymous_admin import anonymousAdmin
@@ -68,7 +67,6 @@ async def func_unban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await chat.unban_member(victim.id, True)
     except Exception as e:
-        logger.error(e)
         await effective_message.reply_text(str(e))
         return
     

@@ -1,7 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot import logger
 from bot.utils.database import MemoryDB, MongoDB
 from bot.utils.database.common import database_search
 from ..auxiliary.pm_error import pm_error
@@ -71,5 +70,4 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_data = MongoDB.find_one("chats_data", "chat_id", chat.id)
             MemoryDB.insert("chats_data", chat.id, chat_data)
         except Exception as e:
-            logger.error(e)
             await effective_message.reply_text(str(e))

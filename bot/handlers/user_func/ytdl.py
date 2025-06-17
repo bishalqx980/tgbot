@@ -5,7 +5,6 @@ from bot import logger
 from bot.modules.ytdlp import youtube_download
 
 async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
     effective_message = update.effective_message
     url = " ".join(context.args)
 

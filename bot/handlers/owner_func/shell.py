@@ -5,7 +5,6 @@ from time import time
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot import logger
 from ..sudo_users import fetch_sudos
 
 async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -36,7 +35,7 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         result = subprocess.run(command, shell=True, capture_output=True, text=True)
     except Exception as e:
-        logger.error(e)
+        await sent_message.edit_text(str(e))
         return
     
     time_executed = time()

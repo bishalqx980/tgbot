@@ -1,6 +1,5 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot import logger
 from bot.utils.database.common import database_search
 
 async def join_request_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -23,5 +22,4 @@ async def join_request_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         elif chat_join_req == "decline":
             await join_request_update.decline()
     except Exception as e:
-        logger.error(e)
         await chat.send_message(str(e))
