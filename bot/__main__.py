@@ -8,6 +8,7 @@ from telegram.ext import (
     MessageHandler,
     ChatJoinRequestHandler,
     ConversationHandler,
+    InlineQueryHandler,
     filters,
     CallbackQueryHandler,
     ChatMemberHandler,
@@ -73,6 +74,7 @@ from .handlers import (
     func_shell,
     func_sys,
 
+    inline_query,
     query_admin_task,
     query_bot_settings,
     query_chat_settings,
@@ -322,6 +324,9 @@ def main():
 
     # Bot chat tracker (PRIVATE: only if bot is blocked or unblocked; PIUBLIC: any)
     application.add_handler(ChatMemberHandler(bot_chats_tracker, ChatMemberHandler.MY_CHAT_MEMBER))
+
+    # Inline Query Handler
+    application.add_handler(InlineQueryHandler(inline_query.inline_query_handler))
 
     # Callback query handlers
     application.add_handlers([

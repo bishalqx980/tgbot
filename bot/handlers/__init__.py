@@ -47,6 +47,7 @@ from .owner_func.shell import func_shell
 from .owner_func.sys import func_sys
 
 from .query_handlers import (
+    inline_query,
     query_admin_task,
     query_bot_settings,
     query_chat_settings,

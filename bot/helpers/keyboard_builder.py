@@ -25,20 +25,27 @@ class KeyboardBuilder:
 
     def cbutton(self, data):
         """
-        **callback button maker (also works for url btn)**\n
+        **callback button maker (also works for url btn) also including `inlineQuery`**\n
         > **This function work for both url and callback button maker if `data` starts with `http` otherwise you can use `ubutton` function to make url btn**\n
         :param data: `list` of `dict`\n
-        *Note: same data in one `dict` will be in same row*
+        *Note: same data in one `dict` will be in same row*\n
+        *Demo for inlineQuery button: {"Try inline": "switch_to_inline"}*
         """
         try:
             self.keyboard.clear()
             for keyboard_data in data:
                 row = []
                 for btn_name, btn_data in keyboard_data.items():
-                    btn_url = btn_data if btn_data.startswith("http") else None
-                    callback_data = btn_data if not btn_url else None
+                    if btn_data == "switch_to_inline":
+                        switch_to_inline = ""
+                        btn_url = None
+                        callback_data = None
+                    else:
+                        switch_to_inline = None
+                        btn_url = btn_data if btn_data.startswith("http") else None
+                        callback_data = btn_data if not btn_url else None
                     
-                    row.append(InlineKeyboardButton(btn_name, btn_url, callback_data))
+                    row.append(InlineKeyboardButton(btn_name, btn_url, callback_data, switch_inline_query_current_chat=switch_to_inline))
                 
                 self.keyboard.append(row)
 

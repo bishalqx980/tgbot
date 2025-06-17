@@ -20,6 +20,7 @@ class HelpMenuData:
     )
 
     BUTTONS = [
+        {"Try inline": "switch_to_inline"},
         {"Group Management": "help_menu_gm1", "AI/Info": "help_menu_ai_knowledge"},
         {"Misc": "help_menu_misc", "Owner/Sudo": "help_menu_owner"},
         {"» bot.info()": "help_menu_botinfo", "Close": "misc_close"}
