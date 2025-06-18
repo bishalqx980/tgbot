@@ -20,8 +20,7 @@ def inlineQueryMaker(title, message, reply_markup=None, description=None):
             title=title,
             input_message_content=InputTextMessageContent(message),
             reply_markup=reply_markup,
-            description=message if description == "same" else description,
-            thumbnail_url="https://iili.io/Fngo7s9.jpg"
+            description=message if description == "same" else description
         )
 
         return content
@@ -37,16 +36,38 @@ async def inline_query_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     results = []
 
     if not message:
-        results.append(inlineQueryMaker(f"What's up, {user.full_name} 🤗", "Huh, not funny 😒 !!"))
-        results.append(inlineQueryMaker("Source Code", "Source Code: https://github.com/bishalqx980/tgbot", description="https://github.com/bishalqx980/tgbot"))
-        results.append(inlineQueryMaker("Report Bug", "Report Bug: https://github.com/bishalqx980/tgbot/issues", description="https://github.com/bishalqx980/tgbot/issues"))
-        results.append(inlineQueryMaker("Developer", "Developer: <a href='https://t.me/bishalqx680/22'>@bishalqx980</a>", description="@bishalqx980"))
+        bot_source_info = (
+            "<blockquote><b>Source info</b></blockquote>\n\n"
+
+            "<b>• Source code:</b> <a href='https://github.com/bishalqx980/tgbot'>GitHub</a>\n"
+            "<b>• Report bug:</b> <a href='https://github.com/bishalqx980/tgbot/issues'>Report</a>\n"
+            "<b>• Developer:</b> <a href='https://t.me/bishalqx680/22'>bishalqx980</a>"
+        )
+
+        results.append(inlineQueryMaker(f"What's up, {user.full_name} 🤗!!", "Huh, not funny 😒!!", description="Don't click!"))
+        results.append(inlineQueryMaker("bot.source.info()", bot_source_info, description="Loading... (click/tap to see)"))
         await query.answer(results)
         return
     
     # need to be here after message update otherwise it shows cached userID
     results.append(inlineQueryMaker("Your UserID", f"<code>{user.id}</code>", description=user.id))
-    
+    # need to be here bcz of cached
+    user_info = (
+        "<blockquote><code>» user.info()</code></blockquote>\n\n"
+        
+        f"<b>• Full name:</b> <code>{user.full_name}</code>\n"
+        f"<b>  » First name:</b> <code>{user.first_name}</code>\n"
+        f"<b>  » Last name:</b> <code>{user.last_name}</code>\n"
+        f"<b>• Mention:</b> {user.mention_html()}\n"
+        f"<b>• Username:</b> {user.name if user.username else 'Huh, not funny 😒!!'}\n"
+        f"<b>• ID:</b> <code>{user.id}</code>\n"
+        f"<b>• Lang:</b> <code>{user.language_code}</code>\n"
+        f"<b>• Is bot:</b> <code>{'Yes' if user.is_bot else 'Huh, not funny 😒!!'}</code>\n"
+        f"<b>• Is premium:</b> <code>{'Yes' if user.is_premium else 'Huh, not funny 😒!!'}</code>"
+    )
+
+    results.append(inlineQueryMaker(f"user.info(): {user.full_name}", user_info, description="See your info"))
+
     # base64 encode / decode
     b64_encode = BASE64.encode(message)
     b64_decode = BASE64.decode(message)
