@@ -103,8 +103,7 @@ from .handlers import (
     func_tr,
     func_weather,
     func_ytdl,
-
-    fetch_sudos,
+    
     bot_chats_tracker,
     chat_status_update
 )
@@ -134,11 +133,9 @@ async def post_init():
     except Exception as e:
         logger.error(e)
 
-    # Send alive message to all sudo and bot owner
-    sudo_users = fetch_sudos()
-    
+    # Send alive message to bot owner
     try:
-        await asyncio.gather(*(bot.send_message(user_id, "<b>Bot Started!</b>", parse_mode=ParseMode.HTML) for user_id in sudo_users))
+        await bot.send_message(config.owner_id, "<blockquote><b>Bot Started!</b></blockquote>", parse_mode=ParseMode.HTML)
     except Exception as e:
         logger.error(e)
     

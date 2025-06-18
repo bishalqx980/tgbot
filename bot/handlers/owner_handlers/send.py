@@ -3,36 +3,31 @@ from telegram import Update, ReactionTypeEmoji
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import Forbidden
-from ..sudo_users import fetch_sudos
+from bot.utils.decorators.sudo_users import require_sudo
 
+@require_sudo
 async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
     chat = update.effective_chat
-    effective_message = update.effective_message
-    re_msg = effective_message.reply_to_message
+    message = update.effective_message
+    re_msg = message.reply_to_message
     context_args = " ".join(context.args) # contains something if forward is true and contains victim_id >> /send f chat_id
-
-    sudo_users = fetch_sudos()
-    if user.id not in sudo_users:
-        await effective_message.reply_text("Access denied!")
-        return
     
     if chat.type != ChatType.PRIVATE:
-        sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
+        sent_message = await message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
-        await chat.delete_messages([effective_message.id, sent_message.id])
+        await chat.delete_messages([message.id, sent_message.id])
         return
     
     if not context_args or not re_msg:
         text = (
             "Use <code>/send ChatID</code> by replying a message!\n"
             "<code>/send f ChatID</code> to forward the replied message to ChatID!\n"
-            "Returns reaction on message\n"
-            "Sent - '👍'\n"
-            "Forbidden - '👎'\n"
-            "Something went wrong - '🤷‍♂'"
+            "<blockquote expandable>Returns reaction on message\n"
+            "- Sent: 👍\n"
+            "- Forbidden: 👎\n"
+            "- Something went wrong: 🤷‍♂ </blockquote>"
         )
-        await effective_message.reply_text(text)
+        await message.reply_text(text)
         return
     
     forward_confirm = None
@@ -80,7 +75,7 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await context.bot.send_video_note(victim_id, video_note.file_id, reply_markup=btn)
             
             else:
-                await effective_message.reply_text("Replied content isn't added yet. Stay tuned for future update.")
+                await message.reply_text("Replied content isn't added yet. Stay tuned for future update.")
                 return
             
     except Forbidden:
@@ -88,4 +83,4 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except:
         reaction = "🤷‍♂"
 
-    await effective_message.set_reaction([ReactionTypeEmoji(reaction)])
+    await message.set_reaction([ReactionTypeEmoji(reaction)])

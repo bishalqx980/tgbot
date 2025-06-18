@@ -5,8 +5,8 @@ from telegram.error import BadRequest
 from bot import logger, TL_LANG_CODES_URL
 from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB
-from ..user_func.settings import PvtChatSettingsData
-from ..group_management.chat_settings import GroupChatSettingsData
+from ..user_handlers.settings import PvtChatSettingsData
+from ..group.chat_settings import GroupChatSettingsData
 
 async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat

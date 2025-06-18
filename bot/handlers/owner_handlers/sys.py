@@ -2,23 +2,18 @@ import psutil
 import aiohttp
 from time import time
 from datetime import datetime, timedelta
+
 from telegram import Update
 from telegram.ext import ContextTypes
+
 from bot import BOT_UPTIME
 from bot.utils.database import MemoryDB
 from bot.modules.utils import Utils
-from ..sudo_users import fetch_sudos
+from bot.utils.decorators.sudo_users import require_sudo
 
+@require_sudo
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
-    effective_message = update.effective_message
-
-    sudo_users = fetch_sudos()
-    if user.id not in sudo_users:
-        await effective_message.reply_text("Access denied!")
-        return
-    
-    sent_message = await effective_message.reply_text("⌛")
+    sent_message = await update.message.reply_text("⌛")
     
     # Uptime Calculating
     sys_uptime = timedelta(seconds=datetime.now().timestamp() - psutil.boot_time())

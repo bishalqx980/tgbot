@@ -6,7 +6,7 @@ from bot.utils.database.common import database_search
 from bot.modules.translator import translate
 from bot.modules.re_link import RE_LINK
 from bot.modules.base64 import BASE64
-from ..group_management.auxiliary.chat_admins import ChatAdmins
+from ..group.auxiliary.chat_admins import ChatAdmins
 from .edit_database import edit_database
 
 async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):

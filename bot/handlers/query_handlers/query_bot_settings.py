@@ -7,7 +7,7 @@ from bot import logger
 from bot.utils.update_db import update_database
 from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB, MongoDB
-from ..owner_func.bsettings import BotSettingsData
+from ..owner_handlers.bsettings import BotSettingsData
 
 async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

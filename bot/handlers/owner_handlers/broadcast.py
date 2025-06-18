@@ -1,30 +1,27 @@
 import asyncio
+
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
+
 from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB
-from ..sudo_users import fetch_sudos
+from bot.utils.decorators.sudo_users import require_sudo
 
+@require_sudo
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
     chat = update.effective_chat
-    effective_message = update.effective_message
-    re_msg = effective_message.reply_to_message
-
-    sudo_users = fetch_sudos()
-    if user.id not in sudo_users:
-        await effective_message.reply_text("Access denied!")
-        return
+    message = update.effective_message
+    re_msg = message.reply_to_message
     
     if chat.type != ChatType.PRIVATE:
-        sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
+        sent_message = await message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
-        await chat.delete_messages([effective_message.id, sent_message.id])
+        await chat.delete_messages([message.id, sent_message.id])
         return
     
     if not re_msg:
-        await effective_message.reply_text("Reply a message to broadcast!")
+        await message.reply_text("Reply a message to broadcast!")
         return
     
     # variables
@@ -71,18 +68,18 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # sening demo preview for owner/sudo
     if broadcastText:
-        await effective_message.reply_text(text=broadcastText, reply_markup=broadcastButton)
+        await message.reply_text(text=broadcastText, reply_markup=broadcastButton)
     elif broadcastPhoto:
-        await effective_message.reply_photo(photo=broadcastPhoto, caption=broadcastCaption, reply_markup=broadcastButton)
+        await message.reply_photo(photo=broadcastPhoto, caption=broadcastCaption, reply_markup=broadcastButton)
     elif broadcastDocument:
-        await effective_message.reply_document(document=broadcastDocument, caption=broadcastCaption, filename=broadcastCaption, reply_markup=broadcastButton)
+        await message.reply_document(document=broadcastDocument, caption=broadcastCaption, filename=broadcastCaption, reply_markup=broadcastButton)
     elif broadcastVideo:
-        await effective_message.reply_video(video=broadcastVideo, caption=broadcastCaption, reply_markup=broadcastButton)
+        await message.reply_video(video=broadcastVideo, caption=broadcastCaption, reply_markup=broadcastButton)
     elif broadcastVideo_note:
-        await effective_message.reply_video_note(video_note=broadcastVideo_note, reply_markup=broadcastButton)
+        await message.reply_video_note(video_note=broadcastVideo_note, reply_markup=broadcastButton)
     elif broadcastAudio:
-        await effective_message.reply_audio(audio=broadcastAudio, title=broadcastAudio_filename, caption=broadcastCaption, filename=broadcastAudio_filename, reply_markup=broadcastButton)
+        await message.reply_audio(audio=broadcastAudio, title=broadcastAudio_filename, caption=broadcastCaption, filename=broadcastAudio_filename, reply_markup=broadcastButton)
     elif broadcastVoice:
-        await effective_message.reply_voice(voice=broadcastVoice, caption=broadcastCaption, reply_markup=broadcastButton)
+        await message.reply_voice(voice=broadcastVoice, caption=broadcastCaption, reply_markup=broadcastButton)
     else:
-        await effective_message.text("Error: unknown filetype! The file isn't supported for broadcast!")
+        await message.text("Error: unknown filetype! The file isn't supported for broadcast!")

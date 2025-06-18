@@ -1,28 +1,25 @@
 import json
 import asyncio
 from io import BytesIO
+
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
+
 from bot.utils.database import MongoDB
 from bot.helpers import BuildKeyboard
-from ..sudo_users import fetch_sudos
+from bot.utils.decorators.sudo_users import require_sudo
 
+@require_sudo
 async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.effective_user
     chat = update.effective_chat
-    effective_message = update.effective_message
+    message = update.effective_message
     victim_id = " ".join(context.args)
-
-    sudo_users = fetch_sudos()
-    if user.id not in sudo_users:
-        await effective_message.reply_text("Access denied!")
-        return
     
     if chat.type != ChatType.PRIVATE:
-        sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
+        sent_message = await message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
-        await chat.delete_messages([effective_message.id, sent_message.id])
+        await chat.delete_messages([message.id, sent_message.id])
         return
     
     if not victim_id:
@@ -48,20 +45,20 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"<blockquote><b>Note:</b> <code>/database ChatID</code> to get specific chat database information.</blockquote>"
         )
 
-        await effective_message.reply_text(text)
+        await message.reply_text(text)
         return
     
     try:
         victim_id = int(victim_id)
     except ValueError:
-        await effective_message.reply_text("Invalid ChatID!")
+        await message.reply_text("Invalid ChatID!")
         return
 
     # if chat_id given
     if "-100" in str(victim_id):
         chat_data = MongoDB.find_one("chats_data", "chat_id", victim_id) # victim_id as int
         if not chat_data:
-            await effective_message.reply_text("Chat not found!")
+            await message.reply_text("Chat not found!")
             return
         
         try:
@@ -105,12 +102,12 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             filters_file = BytesIO(json.dumps(chat_filters, indent=4).encode())
             filters_file.name = f"filters_{victim_id}.json"
 
-            await effective_message.reply_document(filters_file, f"ChatID: <code>{victim_id}</code>")
+            await message.reply_document(filters_file, f"ChatID: <code>{victim_id}</code>")
     
     else:
         user_data = MongoDB.find_one("users_data", "user_id", victim_id) # victim_id as int
         if not user_data:
-            await effective_message.reply_text("User not found!")
+            await message.reply_text("User not found!")
             return
         
         try:
@@ -143,4 +140,4 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             btn = BuildKeyboard.ubutton([{"User Profile": f"tg://user?id={victim_info.id}"}]) if victim_info.username else None
     
     # common message sender for both group chat & private chat database info
-    await effective_message.reply_text(text, reply_markup=btn)
+    await message.reply_text(text, reply_markup=btn)

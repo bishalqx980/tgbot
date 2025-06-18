@@ -4,7 +4,7 @@ from telegram.constants import ChatType
 from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB
 from bot.utils.database.common import database_search
-from ..group_management.chat_settings import chat_settings
+from ..group.chat_settings import chat_settings
 
 class PvtChatSettingsData:
     TEXT = (

@@ -1,13 +1,15 @@
 import random
 import asyncio
+
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import BadRequest
+
 from bot import logger
 from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB
-from ..sudo_users import fetch_sudos
+from bot.utils.decorators.sudo_users import require_sudo
 
 class BotSettingsData:
     TEXT = (
@@ -30,21 +32,16 @@ class BotSettingsData:
         {"> ⁅ Database ⁆": "bsettings_database", "Close": "misc_close"}
     ]
 
-
+@require_sudo
 async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
-    effective_message = update.effective_message
+    message = update.effective_message
 
-    sudo_users = fetch_sudos()
-    if user.id not in sudo_users:
-        await effective_message.reply_text("Access denied!")
-        return
-    
     if chat.type != ChatType.PRIVATE:
-        sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
+        sent_message = await message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
-        await chat.delete_messages([effective_message.id, sent_message.id])
+        await chat.delete_messages([message.id, sent_message.id])
         return
     
     # requied data needed for editing
@@ -89,7 +86,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if photo or photo_file_id:
         try:
-            await effective_message.reply_photo(photo or photo_file_id, text, reply_markup=btn)
+            await message.reply_photo(photo or photo_file_id, text, reply_markup=btn)
             return
         except BadRequest:
             pass
@@ -97,4 +94,4 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.error(e)
     
     # if BadRequest or No Photo or Other error
-    await effective_message.reply_text(text, reply_markup=btn)
+    await message.reply_text(text, reply_markup=btn)

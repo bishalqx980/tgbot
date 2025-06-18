@@ -2,33 +2,30 @@ import asyncio
 import subprocess
 from io import BytesIO
 from time import time
+
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from ..sudo_users import fetch_sudos
 
+from bot.utils.decorators.sudo_users import require_sudo
+
+@require_sudo
 async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
-    user = update.effective_user
-    effective_message = update.effective_message
+    message = update.effective_message
     command = " ".join(context.args).replace("'", "")
-
-    sudo_users = fetch_sudos()
-    if user.id not in sudo_users:
-        await effective_message.reply_text("Access denied!")
-        return
     
     if chat.type != ChatType.PRIVATE:
-        sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
+        sent_message = await message.reply_text(f"This command is made to be used in pm, not in public chat!")
         await asyncio.sleep(3)
-        await chat.delete_messages([effective_message.id, sent_message.id])
+        await chat.delete_messages([message.id, sent_message.id])
         return
     
     if not command:
-        await effective_message.reply_text("Use <code>/shell dir/ls</code> [linux/Windows Depend on your hosting server]")
+        await message.reply_text("Use <code>/shell dir/ls</code> [linux/Windows Depend on your hosting server]")
         return
     
-    sent_message = await effective_message.reply_text("<b>⌊ please wait... ⌉</b>")
+    sent_message = await message.reply_text("<b>⌊ please wait... ⌉</b>")
     
     time_executing = time()
 
@@ -53,4 +50,4 @@ async def func_shell(update: Update, context: ContextTypes.DEFAULT_TYPE):
         shell.name = "shell.txt"
 
         await sent_message.delete()
-        await effective_message.reply_document(shell, f"<b>Command</b>: {command}\n<b>Execute time</b>: {(time_executed - time_executing):.2f}s")
+        await message.reply_document(shell, f"<b>Command</b>: {command}\n<b>Execute time</b>: {(time_executed - time_executing):.2f}s")
