@@ -1,17 +1,14 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from telegram.constants import ChatType
-from .auxiliary.pm_error import pm_error
+
+from bot.utils.decorators.pm_error import pm_error
 from .auxiliary.chat_admins import ChatAdmins
 
+@pm_error
 async def func_kickme(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
     effective_message = update.effective_message
-    
-    if chat.type == ChatType.PRIVATE:
-        await pm_error(context, chat.id)
-        return
     
     chat_admins = ChatAdmins()
     await chat_admins.fetch_admins(chat, context.bot.id, user.id)

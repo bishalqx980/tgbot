@@ -5,8 +5,7 @@ from telegram.helpers import create_deep_linked_url
 from telegram.error import BadRequest
 from bot import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, logger
 from bot.helpers import BuildKeyboard
-from bot.utils.database import MemoryDB
-from bot.utils.database.common import database_add_user
+from bot.utils.database import MemoryDB, database_add_user
 
 async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user

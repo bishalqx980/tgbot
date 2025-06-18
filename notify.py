@@ -64,14 +64,14 @@ def main():
     if not res:
         return
     
-    setMessageReactionData = {
-        "chat_id": int(CHAT_ID),
-        "message_id": res["result"]["message_id"],
-        "reaction": json.dumps([{"type": "emoji", "emoji": "🔥"}]),
-        "is_big": True
-    }
+    # setMessageReactionData = {
+    #     "chat_id": int(CHAT_ID),
+    #     "message_id": res["result"]["message_id"],
+    #     "reaction": json.dumps([{"type": "emoji", "emoji": "🔥"}]),
+    #     "is_big": True
+    # }
 
-    apiReq("setMessageReaction", setMessageReactionData)
+    # apiReq("setMessageReaction", setMessageReactionData)
 
 # calling the function
 if all([BOT_TOKEN, CHAT_ID, GITHUB_OWNER_USERNAME, REPO_NAME]):

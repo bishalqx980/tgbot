@@ -1,8 +1,9 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+
 from bot import TL_LANG_CODES_URL
 from bot.helpers import BuildKeyboard
-from bot.utils.database.common import database_search
+from bot.utils.database import database_search
 from bot.modules.translator import translate
 from bot.modules.re_link import RE_LINK
 from bot.modules.base64 import BASE64

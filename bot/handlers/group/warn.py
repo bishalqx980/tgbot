@@ -1,13 +1,13 @@
 from telegram import Update, ChatPermissions
 from telegram.ext import ContextTypes
-from telegram.constants import ChatType
-from .auxiliary.pm_error import pm_error
+
+from bot.utils.decorators.pm_error import pm_error
+from bot.utils.database import MemoryDB, MongoDB, database_search
+from bot.helpers import BuildKeyboard
 from .auxiliary.chat_admins import ChatAdmins
 from .auxiliary.anonymous_admin import anonymousAdmin
-from bot.utils.database import MemoryDB, MongoDB
-from bot.utils.database.common import database_search
-from bot.helpers import BuildKeyboard
 
+@pm_error
 async def func_warn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -17,10 +17,6 @@ async def func_warn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reason = " ".join(context.args)
 
     cmd_prefix = effective_message.text[1]
-    
-    if chat.type == ChatType.PRIVATE:
-        await pm_error(context, chat.id)
-        return
     
     if cmd_prefix == "d":
         try:

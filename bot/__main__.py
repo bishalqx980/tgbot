@@ -18,7 +18,7 @@ from telegram.ext import (
 from telegram.error import BadRequest
 from telegram.constants import ChatID, ParseMode
 
-from . import DEFAULT_ERROR_CHANNEL_ID, bot, logger, config
+from . import DEFAULT_ERROR_CHANNEL_ID, RUN_SERVER, bot, logger, config
 from .utils.alive import alive
 from .utils.update_db import update_database
 from .modules import telegraph
@@ -144,6 +144,9 @@ async def post_init():
 
 async def server_alive():
     # executing after updating database so getting data from memory...
+    if not RUN_SERVER:
+        return
+    
     server_url = MemoryDB.bot_data.get("server_url")
     if not server_url:
         logger.warning("'Server URL' wasn't found. Bot may fall asleep if deployed on Render (free instance)")
@@ -344,7 +347,9 @@ def main():
 
 
 async def app_init():
-    alive() # Server breathing
+    if RUN_SERVER:
+        alive() # Server breathing
+    # maintain the sequence
     update_database()
     await post_init()
     await server_alive()

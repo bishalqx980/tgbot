@@ -1,22 +1,18 @@
 from telegram import Update
-from telegram.constants import ChatType
 from telegram.ext import ContextTypes
-from bot.utils.database.common import database_search
-from bot.utils.database import MemoryDB, MongoDB
-from bot.helpers import BuildKeyboard
-from .auxiliary.pm_error import pm_error
-from bot.modules.utils import Utils
 
+from bot.utils.decorators.pm_error import pm_error
+from bot.utils.database import MemoryDB, MongoDB, database_search
+from bot.modules.utils import Utils
+from bot.helpers import BuildKeyboard
+
+@pm_error
 async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat = update.effective_chat
     effective_message = update.effective_message
     re_msg = effective_message.reply_to_message
     secret_message = " ".join(context.args)
-
-    if chat.type == ChatType.PRIVATE:
-        await pm_error(context, chat.id)
-        return
     
     if not secret_message:
         await effective_message.reply_text("Use <code>/whisper @username message</code>\nor reply user by <code>/whisper message</code>\nE.g. <code>/whisper @bishalqx980 This is a secret message 😜</code>")

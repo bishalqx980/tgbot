@@ -1,13 +1,13 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from telegram.constants import ChatType
-from bot.utils.database.common import database_search
-from bot.utils.database import MemoryDB, MongoDB
+
+from bot.utils.decorators.pm_error import pm_error
+from bot.utils.database import MemoryDB, MongoDB, database_search
 from bot.helpers import BuildKeyboard
-from ..auxiliary.pm_error import pm_error
 from ..auxiliary.chat_admins import ChatAdmins
 from ..auxiliary.anonymous_admin import anonymousAdmin
 
+@pm_error
 async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -15,10 +15,6 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
     re_msg = effective_message.reply_to_message
     value = re_msg.text_html or re_msg.caption if re_msg else None
     keyword = " ".join(context.args).lower()
-    
-    if chat.type == ChatType.PRIVATE:
-        await pm_error(context, chat.id)
-        return
     
     if user.is_bot:
         user = await anonymousAdmin(chat, effective_message)

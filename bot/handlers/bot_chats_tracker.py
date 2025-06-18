@@ -15,7 +15,7 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
     new_status = chat_update.new_chat_member.status
     text = None
 
-    if chat.type == ChatType.PRIVATE:
+    if chat.type in [ChatType.PRIVATE]:
         # checking database entry
         user_data = MongoDB.find_one("users_data", "user_id", user.id)
         if not user_data:
@@ -69,5 +69,5 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if text:
             await chat.send_message(text)
     
-    elif chat.type == ChatType.CHANNEL and new_status == ChatMember.ADMINISTRATOR:
+    elif chat.type in [ChatType.CHANNEL] and new_status == ChatMember.ADMINISTRATOR:
         await user.send_message(f"You have added me in {chat.title}\nChatID: <code>{chat.id}</code>")

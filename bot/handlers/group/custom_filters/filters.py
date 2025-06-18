@@ -1,16 +1,13 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from telegram.constants import ChatType
-from bot.utils.database.common import database_search
-from ..auxiliary.pm_error import pm_error
 
+from bot.utils.database import database_search
+from bot.utils.decorators.pm_error import pm_error
+
+@pm_error
 async def func_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     effective_message = update.effective_message
-
-    if chat.type == ChatType.PRIVATE:
-        await pm_error(context, chat.id)
-        return
     
     chat_data = database_search("chats_data", "chat_id", chat.id)
     if not chat_data:

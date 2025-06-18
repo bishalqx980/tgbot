@@ -45,7 +45,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     if query_data == "menu":
         # Handling PRIVATE chat setting
-        if chat.type == ChatType.PRIVATE:
+        if chat.type in [ChatType.PRIVATE]:
             text = PvtChatSettingsData.TEXT.format(
                 user.mention_html(),
                 user.id,

@@ -1,15 +1,11 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
-from telegram.constants import ChatType
-from .auxiliary.pm_error import pm_error
+from bot.utils.decorators.pm_error import pm_error
 
+@pm_error
 async def func_adminlist(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     effective_message = update.effective_message
-    
-    if chat.type == ChatType.PRIVATE:
-        await pm_error(context, chat.id)
-        return
 
     owner = "<b>Owner:</b>\n"
     admins = ""

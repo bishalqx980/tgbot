@@ -1,10 +1,11 @@
 from telegram import Update, ChatPermissions
 from telegram.ext import ContextTypes
-from telegram.constants import ChatType
-from .auxiliary.pm_error import pm_error
+
+from bot.utils.decorators.pm_error import pm_error
 from .auxiliary.chat_admins import ChatAdmins
 from .auxiliary.anonymous_admin import anonymousAdmin
 
+@pm_error
 async def func_lock(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
@@ -12,10 +13,6 @@ async def func_lock(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     cmd_prefix = effective_message.text[1]
     is_silent = False
-    
-    if chat.type == ChatType.PRIVATE:
-        await pm_error(context, chat.id)
-        return
     
     if cmd_prefix == "s":
         is_silent = True

@@ -6,7 +6,7 @@ from .utils.config import CONFIG
 from .utils.logger import setup_logging
 
 # constants
-__version__ = "1.6.0.534" # major.minor.patch.commits
+__version__ = "1.6.1.535" # major.minor.patch.commits
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
@@ -16,6 +16,7 @@ BOT_UPTIME = time()
 PSNDL_DATABASE_URL = "https://psndl.pages.dev/database.json"
 TL_LANG_CODES_URL = "https://telegra.ph/Language-Code-12-24"
 TTS_LANG_CODES_URL = "https://telegra.ph/Text-to-speech---language-codes-tts-01-23"
+RUN_SERVER = True # switch to run flask server
 
 # Creating Required Folder/Directories
 try:

@@ -1,7 +1,6 @@
 from telegram import Update, ChatPermissions
 from telegram.ext import ContextTypes
-from bot.utils.database import MemoryDB, MongoDB
-from bot.utils.database.common import database_search
+from bot.utils.database import MemoryDB, MongoDB, database_search
 from bot.handlers.group.auxiliary.chat_admins import ChatAdmins
 
 async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TYPE):

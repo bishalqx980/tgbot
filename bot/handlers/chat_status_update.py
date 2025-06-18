@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.utils.database.common import database_search
+from bot.utils.database import database_search
 from .group.auxiliary.chat_admins import ChatAdmins
 
 async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
