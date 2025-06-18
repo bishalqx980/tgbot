@@ -1,6 +1,8 @@
 from uuid import uuid4
+
 from telegram import Update, InlineQueryResultArticle, InputTextMessageContent
 from telegram.ext import ContextTypes
+
 from bot import logger
 from bot.helpers import BuildKeyboard
 from bot.modules.base64 import BASE64
@@ -18,7 +20,8 @@ def inlineQueryMaker(title, message, reply_markup=None, description=None):
             title=title,
             input_message_content=InputTextMessageContent(message),
             reply_markup=reply_markup,
-            description=message if description == "same" else description
+            description=message if description == "same" else description,
+            thumbnail_url="https://iili.io/Fngo7s9.jpg"
         )
 
         return content
@@ -34,12 +37,14 @@ async def inline_query_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     results = []
 
     if not message:
-        results.append(inlineQueryMaker("Type your message/text", "Type your message/text"))
+        results.append(inlineQueryMaker(f"What's up, {user.full_name} 🤗", "Huh, not funny 😒 !!"))
+        results.append(inlineQueryMaker("Your UserID", f"<code>{user.id}</code>", description=user.id))
+        results.append(inlineQueryMaker("Source Code", "Source Code: https://github.com/bishalqx980/tgbot", description="https://github.com/bishalqx980/tgbot"))
+        results.append(inlineQueryMaker("Report Bug", "Report Bug: https://github.com/bishalqx980/tgbot/issues", description="https://github.com/bishalqx980/tgbot/issues"))
+        results.append(inlineQueryMaker("Developer", "Developer: <a href='https://t.me/bishalqx680/22'>@bishalqx980</a>", description="@bishalqx980"))
         await query.answer(results)
         return
     
-    # userID
-    results.append(inlineQueryMaker("Your UserID", f"<code>{user.id}</code>", description=user.id))
     # base64 encode / decode
     b64_encode = BASE64.encode(message)
     b64_decode = BASE64.decode(message)
