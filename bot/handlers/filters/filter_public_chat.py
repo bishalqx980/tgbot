@@ -25,8 +25,12 @@ async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
         return
     
     links_behave = chat_data.get("links_behave") # 3 values: delete; convert; None;
+    
     allowed_links = chat_data.get("allowed_links") or []
-    allowed_links = [link.strip() for link in allowed_links]
+    filtered_allowed_links = []
+    for link in allowed_links:
+        filtered_allowed_links.append(RE_LINK.get_domain(link.strip()))
+    allowed_links = filtered_allowed_links
 
     echo_status = chat_data.get("echo")
     auto_tr_status = chat_data.get("auto_tr")

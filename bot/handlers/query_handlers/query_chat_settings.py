@@ -303,7 +303,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         text = (
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Allowed links: <code>{}</code>\n\n"
-            "<blockquote><b>Note:</b> Send domain name of allowed links. Example: <code>google.com</code> ! Multiple domain should be separated by comma."
+            "<blockquote><b>Note:</b> Send link/domain of allowed links. Example: <code>google.com or https://google.com</code> ! Multiple domain should be separated by comma."
             "Allowed links won't be affected by <code>Links Behave</code></blockquote>"
         ).format(", ".join(memory_data.get("allowed_links") or []))
     

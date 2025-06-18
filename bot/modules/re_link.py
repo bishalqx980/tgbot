@@ -7,8 +7,8 @@ class RE_LINK:
         :param text: text that contain link/s
         :returns list: list of link/s contains in given text
         """
-        link_pattern = r"(https?://)?(www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=%]*)?"
-        links = re.findall(link_pattern, text)
+        pattern = r"(https?://)?(www\.)?([a-zA-Z0-9-]+\.[a-zA-Z]{2,})(/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=%]*)?"
+        links = re.findall(pattern, text)
         return ["".join(link) for link in links]
     
     @staticmethod
