@@ -1,23 +1,16 @@
-import asyncio
 from datetime import datetime, timedelta
 
 from telegram import Update
 from telegram.ext import ContextTypes
-from telegram.constants import ChatType
 
 from bot.utils.decorators.sudo_users import require_sudo
+from bot.utils.decorators.pm_only import pm_only
 
+@pm_only
 @require_sudo
 async def func_invitelink(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
     message = update.effective_message
     chat_id = " ".join(context.args)
-    
-    if chat.type != ChatType.PRIVATE:
-        sent_message = await message.reply_text(f"This command is made to be used in pm, not in public chat!")
-        await asyncio.sleep(3)
-        await chat.delete_messages([message.id, sent_message.id])
-        return
     
     if not chat_id:
         await message.reply_text("<code>/invitelink ChatID</code> to get specified chat invite link.\n<i>Note: only works if this bot is in that chat and have enough permissions to get invite link!</i>")

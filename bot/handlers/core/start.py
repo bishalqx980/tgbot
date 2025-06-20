@@ -12,7 +12,7 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     effective_message = update.effective_message
 
-    if chat.type != ChatType.PRIVATE:
+    if chat.type not in [ChatType.PRIVATE]:
         btn = BuildKeyboard.ubutton([{"Start me in PM": create_deep_linked_url(context.bot.username, "start")}])
         await effective_message.reply_text(f"Hey, {user.first_name}\nStart me in PM!", reply_markup=btn)
         return

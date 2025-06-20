@@ -1,15 +1,14 @@
 import random
-import asyncio
 
 from telegram import Update
 from telegram.ext import ContextTypes
-from telegram.constants import ChatType
 from telegram.error import BadRequest
 
 from bot import logger
 from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB
 from bot.utils.decorators.sudo_users import require_sudo
+from bot.utils.decorators.pm_only import pm_only
 
 class BotSettingsData:
     TEXT = (
@@ -32,17 +31,11 @@ class BotSettingsData:
         {"> ⁅ Database ⁆": "bsettings_database", "Close": "misc_close"}
     ]
 
+@pm_only
 @require_sudo
 async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    chat = update.effective_chat
     message = update.effective_message
-
-    if chat.type != ChatType.PRIVATE:
-        sent_message = await message.reply_text(f"This command is made to be used in pm, not in public chat!")
-        await asyncio.sleep(3)
-        await chat.delete_messages([message.id, sent_message.id])
-        return
     
     # requied data needed for editing
     data = {

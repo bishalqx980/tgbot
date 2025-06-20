@@ -28,7 +28,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     effective_message = update.effective_message
 
-    if chat.type != ChatType.PRIVATE:
+    if chat.type not in [ChatType.PRIVATE]:
         await chat_settings(update, context)
         return
     

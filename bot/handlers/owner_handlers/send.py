@@ -1,22 +1,16 @@
-import asyncio
 from telegram import Update, ReactionTypeEmoji
 from telegram.ext import ContextTypes
-from telegram.constants import ChatType
 from telegram.error import Forbidden
 from bot.utils.decorators.sudo_users import require_sudo
+from bot.utils.decorators.pm_only import pm_only
 
+@pm_only
 @require_sudo
 async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     message = update.effective_message
     re_msg = message.reply_to_message
     context_args = " ".join(context.args) # contains something if forward is true and contains victim_id >> /send f chat_id
-    
-    if chat.type != ChatType.PRIVATE:
-        sent_message = await message.reply_text(f"This command is made to be used in pm, not in public chat!")
-        await asyncio.sleep(3)
-        await chat.delete_messages([message.id, sent_message.id])
-        return
     
     if not context_args or not re_msg:
         text = (

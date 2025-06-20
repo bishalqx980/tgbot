@@ -1,24 +1,16 @@
-import asyncio
-
 from telegram import Update
 from telegram.ext import ContextTypes
-from telegram.constants import ChatType
 
 from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB
 from bot.utils.decorators.sudo_users import require_sudo
+from bot.utils.decorators.pm_only import pm_only
 
+@pm_only
 @require_sudo
 async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
     message = update.effective_message
     re_msg = message.reply_to_message
-    
-    if chat.type != ChatType.PRIVATE:
-        sent_message = await message.reply_text(f"This command is made to be used in pm, not in public chat!")
-        await asyncio.sleep(3)
-        await chat.delete_messages([message.id, sent_message.id])
-        return
     
     if not re_msg:
         await message.reply_text("Reply a message to broadcast!")

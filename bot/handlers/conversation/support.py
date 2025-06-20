@@ -1,22 +1,14 @@
-import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
-from telegram.constants import ChatType
 from bot import logger, config
+from bot.utils.decorators.pm_only import pm_only
 
 class SUPPORT_STATES:
     STATE_ONE = range(1)
 
-
+@pm_only
 async def init_support_conv(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
     effective_message = update.effective_message
-
-    if chat.type != ChatType.PRIVATE:
-        sent_message = await effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
-        await asyncio.sleep(3)
-        await chat.delete_messages([effective_message.id, sent_message.id])
-        return
     
     text = (
         "Hey, please send your request/report in one message.\n"

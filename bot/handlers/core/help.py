@@ -31,7 +31,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     effective_message = update.effective_message
 
-    if chat.type != ChatType.PRIVATE:
+    if chat.type not in [ChatType.PRIVATE]:
         btn = BuildKeyboard.ubutton([{"Click here for help": create_deep_linked_url(context.bot.username, "help")}])
         await effective_message.reply_text(f"Hey, {user.first_name}\nContact me in PM for help!", reply_markup=btn)
         return
