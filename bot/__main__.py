@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import traceback
 
 from telegram import Update, LinkPreviewOptions, BotCommand, BotCommandScope
 from telegram.ext import (
@@ -172,33 +173,20 @@ async def server_alive():
 async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.error(context.error)
 
-    if update:
-        user = update.effective_user
-        chat = update.effective_chat
-        effective_message = update.effective_message
-        query = update.callback_query
+    error_text = "".join(traceback.format_exception(type(context.error), context.error, context.error.__traceback__))
+    # Remove excessive path details for readability
+    error_text = "\n".join(line for line in error_text.split("\n") if "site-packages" not in line)
+    # telegram message limit ?
+    error_text = error_text[-2000:]
 
-        query_data = query.data if query else None
-        chat_title = chat.full_name or chat.title if chat else None
+    text = (
+        "<blockquote>An error occured</blockquote>\n\n"
 
-        user_mention = user.mention_html() if user else None
-        user_id = user.id if user else None
-        chat_id = chat.id if chat else None
-        effective_message_text = effective_message.text if effective_message else None
-
-        text = (
-            f"<b>⚠️ An error occured:</b>\n\n"
-            f"<b>User:</b> {user_mention} | <code>{user_id}</code>\n"
-            f"<b>Chat:</b> {chat_title} | <code>{chat_id}</code>\n"
-            f"<b>Effective message:</b> <code>{effective_message_text}</code>\n"
-            f"<b>Query message:</b> <code>{query_data}</code>\n\n"
-            f"<pre>{context.error}</pre>"
-        )
-    else:
-        text = (
-            "<b>⚠️ An error occured:</b>\n\n"
-            f"<pre>{context.error}</pre>"
-        )
+        f"<b>• Type:</b> <code>{type(context.error).__name__}</code>\n"
+        f"<b>• Message:</b> <code>{str(context.error)}</code>\n"
+        "<b>• Traceback:</b>\n\n"
+        f"<pre>{error_text}</pre>"
+    )
     
     if DEFAULT_ERROR_CHANNEL_ID:
         try:
