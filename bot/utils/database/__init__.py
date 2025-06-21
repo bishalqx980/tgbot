@@ -14,6 +14,13 @@ MemoryDB = MemoryDatabase()
 MongoDB = MongoDatabase()
 
 # Helper functions
+def updateUsernameDB(user):
+    """:param user: `update.effective_user`"""
+    usernameDB = MongoDB.find_username(user.name)
+    if not usernameDB:
+        MongoDB.insert_username({user.name: user.id})
+
+
 def database_search(collection_name, search_key, match_value):
     """
     :param collection_name: Name of collection. e.g. `users_data`

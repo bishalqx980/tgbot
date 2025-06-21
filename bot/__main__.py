@@ -16,7 +16,7 @@ from telegram.ext import (
     ContextTypes,
     Defaults
 )
-from telegram.error import BadRequest
+from telegram.error import BadRequest, Conflict, NetworkError, TimedOut
 from telegram.constants import ChatID, ParseMode
 
 from . import DEFAULT_ERROR_CHANNEL_ID, RUN_SERVER, bot, logger, config
@@ -173,20 +173,24 @@ async def server_alive():
 async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.error(context.error)
 
-    error_text = "".join(traceback.format_exception(type(context.error), context.error, context.error.__traceback__))
-    # Remove excessive path details for readability
-    error_text = "\n".join(line for line in error_text.split("\n") if "site-packages" not in line)
-    # telegram message limit ?
-    error_text = error_text[-2000:]
+    if isinstance(context.error, (Conflict, NetworkError, TimedOut)):
+        text = f"<blockquote>An error occured</blockquote>\n\n<code>{context.error}</code>"
+    
+    else:
+        error_text = "".join(traceback.format_exception(type(context.error), context.error, context.error.__traceback__))
+        # Remove excessive path details for readability
+        error_text = "\n".join(line for line in error_text.split("\n") if "site-packages" not in line)
+        # telegram message limit ?
+        error_text = error_text[-2000:]
 
-    text = (
-        "<blockquote>An error occured</blockquote>\n\n"
+        text = (
+            "<blockquote>An error occured</blockquote>\n\n"
 
-        f"<b>• Type:</b> <code>{type(context.error).__name__}</code>\n"
-        f"<b>• Message:</b> <code>{str(context.error)}</code>\n"
-        "<b>• Traceback:</b>\n\n"
-        f"<pre>{error_text}</pre>"
-    )
+            f"<b>• Type:</b> <code>{type(context.error).__name__}</code>\n"
+            f"<b>• Message:</b> <code>{str(context.error)}</code>\n"
+            "<b>• Traceback:</b>\n\n"
+            f"<pre>{error_text}</pre>"
+        )
     
     if DEFAULT_ERROR_CHANNEL_ID:
         try:
