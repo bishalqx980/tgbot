@@ -39,7 +39,7 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "match_value": user.id
     }
 
-    MemoryDB.insert("data_center", user.id, data)
+    MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, data)
 
     user_data = database_search("users_data", "user_id", user.id)
     if not user_data:

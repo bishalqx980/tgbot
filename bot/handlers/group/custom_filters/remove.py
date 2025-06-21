@@ -48,7 +48,7 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if keyword == "clear_all":
             MongoDB.update("chats_data", "chat_id", chat.id, "filters", None)
             chat_data = MongoDB.find_one("chats_data", "chat_id", chat.id)
-            MemoryDB.insert("chats_data", chat.id, chat_data)
+            MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, chat_data)
 
             await effective_message.reply_text("All filters of this chat has been removed!")
             return
@@ -64,6 +64,6 @@ async def func_remove(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
             
             chat_data = MongoDB.find_one("chats_data", "chat_id", chat.id)
-            MemoryDB.insert("chats_data", chat.id, chat_data)
+            MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, chat_data)
         except Exception as e:
             await effective_message.reply_text(str(e))

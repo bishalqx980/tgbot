@@ -78,7 +78,7 @@ async def func_warn(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     response = MongoDB.update("chats_data", "chat_id", chat.id, "warns", warns)
     if response:
-        MemoryDB.insert("chats_data", chat.id, {"warns": warns})
+        MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, {"warns": warns})
     
     text = (
         f"Watchout, {victim.mention_html()} !!\n"

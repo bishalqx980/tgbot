@@ -17,7 +17,7 @@ async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TY
     
     elif query_data == "anonymous_verify":
         await query.answer("Verified!")
-        MemoryDB.insert("data_center", chat.id, {"anonymous_admin": user})
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {"anonymous_admin": user})
         return
     
     elif query_data.startswith("remove_warn"):
@@ -43,7 +43,7 @@ async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TY
         
         response = MongoDB.update("chats_data", "chat_id", chat.id, "warns", warns)
         if response:
-            MemoryDB.insert("chats_data", chat.id, {"warns": warns})
+            MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, {"warns": warns})
         
         try:
             await chat.restrict_member(int(victim_id), ChatPermissions.all_permissions())

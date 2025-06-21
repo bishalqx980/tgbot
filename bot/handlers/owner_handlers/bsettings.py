@@ -45,7 +45,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "match_value": MemoryDB.bot_data.get("_id")
     }
 
-    MemoryDB.insert("data_center", user.id, data)
+    MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, data)
 
     # accessing bot data
     bot_data = MemoryDB.bot_data

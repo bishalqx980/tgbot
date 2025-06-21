@@ -53,7 +53,7 @@ async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "sent_message_id": sent_message.id
     }
 
-    MemoryDB.insert("data_center", chat.id, data)
+    MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, data)
 
 
 @pm_error
@@ -106,7 +106,7 @@ async def func_purgeto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "sent_message_id": None
     }
 
-    MemoryDB.insert("data_center", chat.id, data)
+    MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, data)
     
     await effective_message.reply_text("Purge completed!")
     await effective_message.delete()

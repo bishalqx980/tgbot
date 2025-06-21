@@ -37,7 +37,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         btn = BuildKeyboard.cbutton(BotSettingsData.BUTTONS)
     
     elif query_data == "show_bot_pic":
-        MemoryDB.insert("data_center", user.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, {
             "update_data_key": "show_bot_pic",
             "is_list": False,
             "is_int": False
@@ -57,7 +57,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "images":
-        MemoryDB.insert("data_center", user.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, {
             "update_data_key": "images",
             "is_list": True,
             "is_int": False
@@ -81,7 +81,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             await user.send_document(images_binary, f"Total images: {len(images)}")
     
     elif query_data == "support_chat":
-        MemoryDB.insert("data_center", user.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, {
             "update_data_key": "support_chat",
             "is_list": False,
             "is_int": False
@@ -96,7 +96,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         ).format(bot_data.get("support_chat"))
     
     elif query_data == "server_url":
-        MemoryDB.insert("data_center", user.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, {
             "update_data_key": "server_url",
             "is_list": False,
             "is_int": False
@@ -111,7 +111,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         ).format(bot_data.get("server_url"))
 
     elif query_data == "sudo":
-        MemoryDB.insert("data_center", user.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, {
             "update_data_key": "sudo_users",
             "is_list": True,
             "is_int": True
@@ -126,7 +126,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         ).format(", ".join(str(user_id) for user_id in (bot_data.get("sudo_users") or [])))
 
     elif query_data == "shrinkme_api":
-        MemoryDB.insert("data_center", user.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, {
             "update_data_key": "shrinkme_api",
             "is_list": False,
             "is_int": False
@@ -141,7 +141,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         ).format(bot_data.get("shrinkme_api"))
     
     elif query_data == "omdb_api":
-        MemoryDB.insert("data_center", user.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, {
             "update_data_key": "omdb_api",
             "is_list": False,
             "is_int": False
@@ -156,7 +156,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         ).format(bot_data.get("omdb_api"))
     
     elif query_data == "weather_api":
-        MemoryDB.insert("data_center", user.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, {
             "update_data_key": "weather_api",
             "is_list": False,
             "is_int": False

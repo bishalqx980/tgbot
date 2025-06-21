@@ -26,5 +26,5 @@ def edit_database(chat_id, user_id, message):
             "message_id": message.id # mostly to delete the message
         }
 
-        MemoryDB.insert("data_center", chat_id, data)
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat_id, data)
         return True

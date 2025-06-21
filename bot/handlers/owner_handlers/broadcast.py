@@ -56,7 +56,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "replied_message_id": re_msg.id
     }
 
-    MemoryDB.insert("data_center", "broadcast", broadcastData)
+    MemoryDB.insert(MemoryDB.DATA_CENTER, "broadcast", broadcastData)
 
     # sening demo preview for owner/sudo
     if broadcastText:

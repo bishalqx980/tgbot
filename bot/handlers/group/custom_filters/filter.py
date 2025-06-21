@@ -39,7 +39,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "effective_message_id": effective_message.id
         }
 
-        MemoryDB.insert("data_center", chat.id, data)
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, data)
 
         text = (
             "To set filters for this chat follow the instruction below...\n"
@@ -86,7 +86,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         MongoDB.update("chats_data", "chat_id", chat.id, "filters", filters)
     
     chat_data = MongoDB.find_one("chats_data", "chat_id", chat.id)
-    MemoryDB.insert("chats_data", chat.id, chat_data)
+    MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, chat_data)
     msg_keywords = ", ".join(keywords)
     
     await effective_message.reply_text(f"{msg_keywords} filters added!")

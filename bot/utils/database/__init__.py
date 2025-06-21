@@ -53,4 +53,4 @@ def database_add_user(user):
 
         MongoDB.insert("users_data", user_data)
     # inserts data to memorydb
-    MemoryDB.insert("users_data", user.id, user_data)
+    MemoryDB.insert(MemoryDB.USERS_DATA, user.id, user_data)

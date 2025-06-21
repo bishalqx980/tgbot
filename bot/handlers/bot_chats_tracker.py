@@ -27,7 +27,7 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }
 
             MongoDB.insert("users_data", data)
-            MemoryDB.insert("users_data", user.id, data)
+            MemoryDB.insert(MemoryDB.USERS_DATA, user.id, data)
         
         # checking member status & updating database
         active_status = new_status == ChatMember.MEMBER
@@ -43,7 +43,7 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }
 
             MongoDB.insert("chats_data", data)
-            MemoryDB.insert("chats_data", chat.id, data)
+            MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, data)
         
         if old_status in [ChatMember.LEFT, ChatMember.BANNED] and new_status == ChatMember.MEMBER:
             text = (

@@ -78,7 +78,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await sent_message.edit_text("Hmm, Something went wrong! Try again or report the issue!")
         return
     
-    MemoryDB.insert("chats_data", chat.id, {"whispers": whispers})
+    MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, {"whispers": whispers})
     
     if re_msg and whisper_username is None:
         whisper_username = re_msg.from_user.mention_html()

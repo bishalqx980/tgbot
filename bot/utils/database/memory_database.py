@@ -1,6 +1,12 @@
 from bot import logger
 
 class MemoryDatabase:
+    # Constants
+    BOT_DATA = "bot_data"
+    USERS_DATA = "users_data"
+    CHATS_DATA = "chats_data"
+    DATA_CENTER = "data_center"
+
     def __init__(self):
         self.bot_data = {}
         self.users_data = {}
@@ -11,7 +17,11 @@ class MemoryDatabase:
     def insert(self, collection_name, identifier=None, data=None):
         """
         Available `collection_name`'s:\n
-        (`bot_data`, `users_data`, `chats_data`, `data_center`)
+        Use class constants:
+        - MemoryDatabase.BOT_DATA
+        - MemoryDatabase.USERS_DATA
+        - MemoryDatabase.CHATS_DATA
+        - MemoryDatabase.DATA_CENTER
         - `identifier`: key to find/store the data | example: chat.id `optional` "if not given, data will be inserted directly"
         - `data` type: dict
         """

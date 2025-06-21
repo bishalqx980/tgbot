@@ -10,7 +10,7 @@ async def anonymousAdmin(chat, effective_message, timeout=10):
     :returns User: `telegram.User`
     """
     anonymous_admin = None
-    MemoryDB.insert("data_center", chat.id, {"anonymous_admin": None})
+    MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {"anonymous_admin": None})
 
     btn = BuildKeyboard.cbutton([{"Verify": "admin_anonymous_verify"}])
     sent_message = await effective_message.reply_text(f"UwU, annoymous admin! Click on <code>Verify</code> to proceed next! Timeout: <code>{timeout}</code>", reply_markup=btn)

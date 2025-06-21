@@ -49,7 +49,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # getting update_data_value
     if query_data == "edit_value":
-        MemoryDB.insert("data_center", chat.id, {"update_data_value": None, "is_editing": True})
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {"update_data_value": None, "is_editing": True})
         
         timeout = 15
 
@@ -79,7 +79,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             pass
 
         # terminating editing mode
-        MemoryDB.insert("data_center", chat.id, {"is_editing": False})
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {"is_editing": False})
 
         if not update_data_value:
             await query.answer("Timeout.", True)
@@ -103,7 +103,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.answer("Something went wrong.", True)
     
     elif query_data == "cancel_editing":
-        MemoryDB.insert("data_center", chat.id, {"update_data_value": None, "is_editing": False})
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {"update_data_value": None, "is_editing": False})
         await query.answer("Operation cancelled.", True)
         try:
             await query.delete_message()

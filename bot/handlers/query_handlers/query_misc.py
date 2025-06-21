@@ -52,7 +52,7 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if whisper_seen:
             whispers.pop(whisper_key)
             MongoDB.update("chats_data", "chat_id", chat.id, "whispers", whispers)
-            MemoryDB.insert("chats_data", chat.id, {"whispers": whispers})
+            MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, {"whispers": whispers})
 
             await query.edit_message_text(f"<i>The whisper message is seen by {user.full_name}!</i>")
     

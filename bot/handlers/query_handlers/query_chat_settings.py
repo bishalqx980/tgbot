@@ -75,7 +75,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             btn = BuildKeyboard.cbutton(GroupChatSettingsData.BUTTONS)
     
     elif query_data == "lang":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "lang",
             "is_list": False,
             "is_int": False
@@ -90,7 +90,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(memory_data.get("lang"), TL_LANG_CODES_URL)
     
     elif query_data == "auto_tr":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "auto_tr",
             "is_list": False,
             "is_int": False
@@ -105,7 +105,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(memory_data.get("auto_tr") or False)
     
     elif query_data == "echo":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "echo",
             "is_list": False,
             "is_int": False
@@ -120,7 +120,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(memory_data.get("echo") or False)
     
     elif query_data == "antibot":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "antibot",
             "is_list": False,
             "is_int": False
@@ -135,7 +135,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(memory_data.get("antibot"))
     
     elif query_data == "welcome_user":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "welcome_user",
             "is_list": False,
             "is_int": False
@@ -157,7 +157,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "welcome_photo":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "welcome_photo",
             "is_list": False,
             "is_int": False
@@ -180,7 +180,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "custom_welcome_msg":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "custom_welcome_msg",
             "is_list": False,
             "is_int": False
@@ -221,7 +221,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         btn = BuildKeyboard.cbutton([{"Back": "csettings_custom_welcome_msg", "Close": "csettings_close"}])
     
     elif query_data == "farewell_user":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "farewell_user",
             "is_list": False,
             "is_int": False
@@ -236,7 +236,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(memory_data.get("farewell_user"))
     
     elif query_data == "chat_join_req":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "chat_join_req",
             "is_list": False,
             "is_int": False
@@ -256,7 +256,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "service_messages":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "service_messages",
             "is_list": False,
             "is_int": False
@@ -271,7 +271,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(memory_data.get("service_messages"))
     
     elif query_data == "links_behave":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "links_behave",
             "is_list": False,
             "is_int": False
@@ -292,7 +292,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "allowed_links":
-        MemoryDB.insert("data_center", chat.id, {
+        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {
             "update_data_key": "allowed_links",
             "is_list": True,
             "is_int": False

@@ -72,7 +72,7 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "match_value": chat.id
     }
     
-    MemoryDB.insert("data_center", chat.id, data)
+    MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, data)
 
     text = GroupChatSettingsData.TEXT.format(
         chat.title,
