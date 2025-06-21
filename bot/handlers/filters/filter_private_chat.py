@@ -4,41 +4,34 @@ from telegram.ext import ContextTypes
 from bot import TL_LANG_CODES_URL
 from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, database_search
-from bot.modules.translator import translate
 from .edit_database import edit_database
+from .auto_translate import autoTranslate
 
 async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    effective_message = update.effective_message
+    message = update.message
 
-    is_editing = edit_database(chat.id, user.id, effective_message)
+    is_editing = edit_database(chat.id, user.id, message)
     if is_editing:
         return
     
     user_data = database_search(DBConstants.USERS_DATA, "user_id", user.id)
     if not user_data:
-        await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
+        await message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
-    echo_status = user_data.get("echo")
-    auto_tr_status = user_data.get("auto_tr")
+    # Echo message
+    if user_data.get("echo"):
+        await message.reply_text(message.text_html or message.caption_html)
+    
+    # Auto Translator
+    auto_tr = user_data.get("auto_tr")
+    chat_lang = user_data.get("lang")
 
-    if echo_status:
-        await effective_message.reply_text(effective_message.text_html or effective_message.caption_html)
-
-    if auto_tr_status:
-        lang_code = user_data.get("lang")
-        if lang_code:
-            original_text = effective_message.text or effective_message.caption
-            translated_text = translate(original_text, lang_code)
-
-            if translated_text and translated_text.lower() != original_text.lower():
-                await effective_message.reply_text(translated_text)
-            
-            elif translated_text == False:
-                btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
-                await effective_message.reply_text("Invalid language code was given! Use /settings to set chat language.", reply_markup=btn)
-        else:
-            btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
-            await effective_message.reply_text("Chat language code wasn't found! Use /settings to set chat language.", reply_markup=btn)
+    if auto_tr and not chat_lang:
+        btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
+        await message.reply_text("Chat language code wasn't found! Use /settings to set chat language.", reply_markup=btn)
+    
+    elif auto_tr:
+        await autoTranslate(message, user, chat_lang)

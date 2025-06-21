@@ -2,7 +2,7 @@ import re
 
 class RE_LINK:
     @staticmethod
-    def detect_link(text):
+    def detectLinks(text):
         """
         :param text: text that contain link/s
         :returns list: list of link/s contains in given text
@@ -12,7 +12,7 @@ class RE_LINK:
         return ["".join(link) for link in links]
     
     @staticmethod
-    def get_domain(link):
+    def extractDomainName(link):
         """
         :param link: link/URL
         :returns str: domain name of the given link

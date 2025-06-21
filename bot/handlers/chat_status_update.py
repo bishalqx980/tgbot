@@ -68,16 +68,16 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
             if custom_welcome_msg:
                 formattings = {
                     "{first}": victim.first_name,
-                    "{last}": victim.last_name,
+                    "{last}": victim.last_name or "",
                     "{fullname}": victim.full_name,
-                    "{username}": victim.username,
+                    "{username}": victim.name,
                     "{mention}": victim.mention_html(),
                     "{id}": victim.id,
                     "{chatname}": chat.title
                 }
 
                 for key, value in formattings.items():
-                    custom_welcome_msg = custom_welcome_msg.replace(key, str(value) if value else "")
+                    custom_welcome_msg = custom_welcome_msg.replace(key, str(value))
                 # needs to keep everything simple
                 greeting_message = custom_welcome_msg
             
