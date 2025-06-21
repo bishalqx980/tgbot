@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 from bot import __version__, BOT_UPTIME, logger
 from bot.helpers import BuildKeyboard
-from bot.utils.database import MongoDB
+from bot.utils.database import DBConstants, MongoDB
 from ..core.help import HelpMenuData
 
 async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -140,13 +140,13 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         database_info = MongoDB.info()
 
-        i_users_data = database_info.get("users_data")
-        i_chats_data = database_info.get("chats_data")
+        i_users_data = database_info.get(DBConstants.USERS_DATA)
+        i_chats_data = database_info.get(DBConstants.CHATS_DATA)
 
         t_users_count = i_users_data.get("quantity") if i_users_data else "Unknown"
         t_chats_count = i_chats_data.get("quantity") if i_chats_data else "Unknown"
 
-        active_status = MongoDB.find("users_data", "active_status")
+        active_status = MongoDB.find(DBConstants.USERS_DATA, "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
 

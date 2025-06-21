@@ -1,4 +1,4 @@
-from bot.utils.database import MemoryDB
+from bot.utils.database import DBConstants, MemoryDB
 
 def edit_database(chat_id, user_id, message):
     """
@@ -26,5 +26,5 @@ def edit_database(chat_id, user_id, message):
             "message_id": message.id # mostly to delete the message
         }
 
-        MemoryDB.insert(MemoryDB.DATA_CENTER, chat_id, data)
+        MemoryDB.insert(DBConstants.DATA_CENTER, chat_id, data)
         return True

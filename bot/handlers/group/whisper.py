@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from bot.utils.decorators.pm_error import pm_error
-from bot.utils.database import MemoryDB, MongoDB, database_search
+from bot.utils.database import DBConstants, MemoryDB, MongoDB, database_search
 from bot.modules.utils import Utils
 from bot.helpers import BuildKeyboard
 
@@ -54,7 +54,7 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     sent_message = await effective_message.reply_text("Processing...")
 
-    chat_data = database_search("chats_data", "chat_id", chat.id)
+    chat_data = database_search(DBConstants.CHATS_DATA, "chat_id", chat.id)
     if not chat_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
@@ -73,12 +73,12 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
     })
 
-    response = MongoDB.update("chats_data", "chat_id", chat.id, "whispers", whispers)
+    response = MongoDB.update(DBConstants.CHATS_DATA, "chat_id", chat.id, {"whispers": whispers})
     if not response:
         await sent_message.edit_text("Hmm, Something went wrong! Try again or report the issue!")
         return
     
-    MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, {"whispers": whispers})
+    MemoryDB.insert(DBConstants.CHATS_DATA, chat.id, {"whispers": whispers})
     
     if re_msg and whisper_username is None:
         whisper_username = re_msg.from_user.mention_html()

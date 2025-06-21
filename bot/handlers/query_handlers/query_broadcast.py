@@ -4,7 +4,7 @@ from io import BytesIO
 from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest, Forbidden
-from bot.utils.database import MemoryDB, MongoDB
+from bot.utils.database import DBConstants, MemoryDB, MongoDB
 from bot.modules.utils import Utils
 from bot.helpers import BuildKeyboard
 
@@ -60,8 +60,8 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         is_pin = broadcastData["pin"]
 
         # getting userID from DB
-        users_id = MongoDB.find("users_data", "user_id")
-        active_status = MongoDB.find("users_data", "active_status")
+        users_id = MongoDB.find(DBConstants.USERS_DATA, "user_id")
+        active_status = MongoDB.find(DBConstants.USERS_DATA, "active_status")
         active_users = []
 
         if len(users_id) != len(active_status):
@@ -145,7 +145,7 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 exception_count += 1
                 exception_users_id.append(f"Forbidden: {user_id}")
                 # updating MongoDB
-                MongoDB.update("users_data", "user_id", int(user_id), "active_status", False)
+                MongoDB.update(DBConstants.USERS_DATA, "user_id", int(user_id), {"active_status": False})
             
             except Exception as e:
                 exception_count += 1

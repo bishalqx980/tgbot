@@ -6,7 +6,7 @@ from telegram.error import BadRequest
 
 from bot import logger
 from bot.helpers import BuildKeyboard
-from bot.utils.database import MemoryDB
+from bot.utils.database import DBConstants, MemoryDB
 from bot.utils.decorators.sudo_users import require_sudo
 from bot.utils.decorators.pm_only import pm_only
 
@@ -40,12 +40,12 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # requied data needed for editing
     data = {
         "user_id": user.id, # authorization
-        "collection_name": "bot_data",
+        "collection_name": DBConstants.BOT_DATA,
         "search_key": "_id",
         "match_value": MemoryDB.bot_data.get("_id")
     }
 
-    MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, data)
+    MemoryDB.insert(DBConstants.DATA_CENTER, user.id, data)
 
     # accessing bot data
     bot_data = MemoryDB.bot_data

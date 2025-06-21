@@ -1,6 +1,14 @@
 from .memory_database import MemoryDatabase
 from .mongodb import MongoDatabase
 
+# Database Constants
+class DBConstants:
+    BOT_DATA = "bot_data"
+    USERS_DATA = "users_data"
+    CHATS_DATA = "chats_data"
+    # only for MemoryDB
+    DATA_CENTER = "data_center"
+
 # initializing
 MemoryDB = MemoryDatabase()
 MongoDB = MongoDatabase()
@@ -15,7 +23,7 @@ def database_search(collection_name, search_key, match_value):
     """
     data = None
 
-    if collection_name == "bot_data":
+    if collection_name == DBConstants.BOT_DATA:
         data = MemoryDB.bot_data
     
     else:
@@ -41,7 +49,7 @@ def database_add_user(user):
     if user_data:
         return
     
-    user_data = MongoDB.find_one("users_data", "user_id", user.id)
+    user_data = MongoDB.find_one(DBConstants.USERS_DATA, "user_id", user.id)
     if not user_data:
         user_data = {
             "user_id": user.id,
@@ -51,6 +59,6 @@ def database_add_user(user):
             "active_status": True
         }
 
-        MongoDB.insert("users_data", user_data)
+        MongoDB.insert(DBConstants.USERS_DATA, user_data)
     # inserts data to memorydb
-    MemoryDB.insert(MemoryDB.USERS_DATA, user.id, user_data)
+    MemoryDB.insert(DBConstants.USERS_DATA, user.id, user_data)

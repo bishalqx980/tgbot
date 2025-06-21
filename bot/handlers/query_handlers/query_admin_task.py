@@ -1,6 +1,6 @@
 from telegram import Update, ChatPermissions
 from telegram.ext import ContextTypes
-from bot.utils.database import MemoryDB, MongoDB, database_search
+from bot.utils.database import DBConstants, MemoryDB, MongoDB, database_search
 from bot.handlers.group.auxiliary.chat_admins import ChatAdmins
 
 async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -17,7 +17,7 @@ async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TY
     
     elif query_data == "anonymous_verify":
         await query.answer("Verified!")
-        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {"anonymous_admin": user})
+        MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {"anonymous_admin": user})
         return
     
     elif query_data.startswith("remove_warn"):
@@ -31,7 +31,7 @@ async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TY
             await query.answer("You aren't an admin in this chat!", True)
             return
         
-        chat_data = database_search("chats_data", "chat_id", chat.id)
+        chat_data = database_search(DBConstants.CHATS_DATA, "chat_id", chat.id)
         if not chat_data:
             await query.answer("Chat isn't registered! Remove/Block me from this chat then add me again!", True)
             return
@@ -41,9 +41,9 @@ async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TY
         victim_mention = victim_warns.get("victim_mention")
         victim_warns.clear()
         
-        response = MongoDB.update("chats_data", "chat_id", chat.id, "warns", warns)
+        response = MongoDB.update(DBConstants.CHATS_DATA, "chat_id", chat.id, {"warns": warns})
         if response:
-            MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, {"warns": warns})
+            MemoryDB.insert(DBConstants.CHATS_DATA, chat.id, {"warns": warns})
         
         try:
             await chat.restrict_member(int(victim_id), ChatPermissions.all_permissions())

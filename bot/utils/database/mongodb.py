@@ -9,7 +9,7 @@ class MongoDatabase:
 
     def insert(self, collection_name, data: dict):
         """
-        :param collection_name: Name of collection. e.g. `users_data`
+        :param collection_name: Example:`MongoDatabase.BOT_DATA`
         :param data: `dict` if data
         :return bool: `True` | `False` | `None`
         """
@@ -24,7 +24,7 @@ class MongoDatabase:
 
     def find_one(self, collection_name, search_key, match_value):
         """
-        :param collection_name: Name of collection. e.g. `users_data`
+        :param collection_name: Example:`MongoDatabase.USERS_DATA`
         :param search_key: Key to search. e.g. `user_id`
         :param match_value: Value to match. e.g. `2134776547`
         :return dict: Speficied search data | `None`
@@ -40,7 +40,7 @@ class MongoDatabase:
 
     def find(self, collection_name, search_key):
         """
-        :param collection_name: Name of collection. e.g. `users_data`
+        :param collection_name: Example:`MongoDatabase.USERS_DATA`
         :param search_key: Key to search. e.g. `user_id`
         :return list: Value `list` of speficied search key | `None`
         """
@@ -61,7 +61,7 @@ class MongoDatabase:
     def get(self, collection_name, key):
         """
         ***Note: Get data from single doc, which doesn't contain any `sub_collection`***\n
-        :param collection_name: Name of collection. e.g. `bot_data`
+        :param collection_name: Example:`MongoDatabase.BOT_DATA`
         :param key: Key name to get value. e.g. `owner_id`
         :return str: Value of specified key | `None`
         """
@@ -74,20 +74,19 @@ class MongoDatabase:
             logger.error(e)
 
 
-    def update(self, collection_name, search_key, match_value, update_data_key, update_data_value):
+    def update(self, collection_name, search_key, match_value, data):
         """
-        :param collection_name: Name of collection. e.g. `users_data`
+        :param collection_name: Example:`MongoDatabase.USERS_DATA`
         :param search_key: Key to search. e.g. `user_id`
         :param match_value: Value to match. e.g. `2134776547`
-        :param update_data_key: Key of data to update. e.g. `name`
-        :param update_data_value: New `value` of specified key. e.g. `Bishal`
+        :param data: dict Example: `{"name": "Bishal"}`
         :return bool: `True` | `False` | `None`
         """
         try:
             coll_data = self.database[collection_name]
             response = coll_data.update_one(
                 {search_key: match_value},
-                {"$set": {update_data_key: update_data_value}}
+                {"$set": data}
             )
 
             return response.acknowledged
@@ -97,7 +96,7 @@ class MongoDatabase:
 
     def info(self, collection_name=None):
         """
-        :param collection_name: Name of collection. e.g. `users_data`
+        :param collection_name: Example:`MongoDatabase.USERS_DATA`
         :return dict: Information about whole database or specified `collection` | `None`
         """
         try:

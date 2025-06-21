@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helpers import BuildKeyboard
-from bot.utils.database import MemoryDB, database_search
+from bot.utils.database import DBConstants, MemoryDB, database_search
 from .auxiliary.chat_admins import ChatAdmins
 from .auxiliary.anonymous_admin import anonymousAdmin
 
@@ -60,19 +60,19 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("I'm not an admin in this chat!")
         return
     
-    chat_data = database_search("chats_data", "chat_id", chat.id)
+    chat_data = database_search(DBConstants.CHATS_DATA, "chat_id", chat.id)
     if not chat_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
     
     data = {
         "user_id": user.id, # authorization
-        "collection_name": "chats_data",
+        "collection_name": DBConstants.CHATS_DATA,
         "search_key": "chat_id",
         "match_value": chat.id
     }
     
-    MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, data)
+    MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, data)
 
     text = GroupChatSettingsData.TEXT.format(
         chat.title,

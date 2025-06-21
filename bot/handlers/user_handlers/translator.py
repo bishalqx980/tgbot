@@ -4,7 +4,7 @@ from telegram.constants import ChatType
 
 from bot import TL_LANG_CODES_URL
 from bot.helpers import BuildKeyboard
-from bot.utils.database import database_search
+from bot.utils.database import DBConstants, database_search
 from bot.modules.translator import fetch_lang_codes, translate
 
 async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -39,11 +39,11 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not lang_code:
         if chat.type in [ChatType.PRIVATE]:
-            collection_name = "users_data"
+            collection_name = DBConstants.USERS_DATA
             to_find = "user_id"
             to_match = user.id
         else:
-            collection_name = "chats_data"
+            collection_name = DBConstants.CHATS_DATA
             to_find = "chat_id"
             to_match = chat.id
 

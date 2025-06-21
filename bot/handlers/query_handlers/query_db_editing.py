@@ -2,7 +2,7 @@ import asyncio
 from telegram import Update
 from telegram.ext import ContextTypes
 from bot.helpers import BuildKeyboard
-from bot.utils.database import MemoryDB, MongoDB
+from bot.utils.database import DBConstants, MemoryDB, MongoDB
 
 async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -49,7 +49,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # getting update_data_value
     if query_data == "edit_value":
-        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {"update_data_value": None, "is_editing": True})
+        MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {"update_data_value": None, "is_editing": True})
         
         timeout = 15
 
@@ -79,7 +79,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             pass
 
         # terminating editing mode
-        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {"is_editing": False})
+        MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {"is_editing": False})
 
         if not update_data_value:
             await query.answer("Timeout.", True)
@@ -90,9 +90,9 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             update_data_value = [int(v) if is_int else v.strip() for v in values]
         
         # Updating Database
-        response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
+        response = MongoDB.update(collection_name, search_key, match_value, {update_data_key: update_data_value})
         if response:
-            identifier = None if collection_name == "bot_data" else chat.id
+            identifier = None if collection_name == DBConstants.BOT_DATA else chat.id
             data = {update_data_key: update_data_value}
 
             MemoryDB.insert(collection_name, identifier, data)
@@ -103,7 +103,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.answer("Something went wrong.", True)
     
     elif query_data == "cancel_editing":
-        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, {"update_data_value": None, "is_editing": False})
+        MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {"update_data_value": None, "is_editing": False})
         await query.answer("Operation cancelled.", True)
         try:
             await query.delete_message()
@@ -113,9 +113,9 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query_data.startswith("value_"): # expecting value_ > a fixed value which is update_data_value
         # Updating Database
         update_data_value = query_data.removeprefix("value_")
-        response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
+        response = MongoDB.update(collection_name, search_key, match_value, {update_data_key: update_data_value})
         if response:
-            identifier = None if collection_name == "bot_data" else chat.id
+            identifier = None if collection_name == DBConstants.BOT_DATA else chat.id
             data = {update_data_key: update_data_value}
 
             MemoryDB.insert(collection_name, identifier, data)
@@ -128,9 +128,9 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query_data == "rm_value":
         # Updating Database (removing values)
         update_data_value = [] if is_list else update_data_value
-        response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
+        response = MongoDB.update(collection_name, search_key, match_value, {update_data_key: update_data_value})
         if response:
-            identifier = None if collection_name == "bot_data" else chat.id
+            identifier = None if collection_name == DBConstants.BOT_DATA else chat.id
             data = {update_data_key: update_data_value}
 
             MemoryDB.insert(collection_name, identifier, data)
@@ -143,9 +143,9 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query_data.startswith("bool_"): # expecting bool_true or bool_false
         # Updating Database (boolean)
         update_data_value = query_data.strip("bool_") == "true"
-        response = MongoDB.update(collection_name, search_key, match_value, update_data_key, update_data_value)
+        response = MongoDB.update(collection_name, search_key, match_value, {update_data_key: update_data_value})
         if response:
-            identifier = None if collection_name == "bot_data" else chat.id
+            identifier = None if collection_name == DBConstants.BOT_DATA else chat.id
             data = {update_data_key: update_data_value}
 
             MemoryDB.insert(collection_name, identifier, data)

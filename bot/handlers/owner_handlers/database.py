@@ -4,7 +4,7 @@ from io import BytesIO
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from bot.utils.database import MongoDB
+from bot.utils.database import DBConstants, MongoDB
 from bot.helpers import BuildKeyboard
 from bot.utils.decorators.sudo_users import require_sudo
 from bot.utils.decorators.pm_only import pm_only
@@ -27,7 +27,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"<b>• A. size:</b> <code>{info.get('acsize')}</code>\n\n"
             )
         
-        active_status = MongoDB.find("users_data", "active_status")
+        active_status = MongoDB.find(DBConstants.USERS_DATA, "active_status")
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
 
@@ -49,7 +49,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # if chat_id given
     if "-100" in str(victim_id):
-        chat_data = MongoDB.find_one("chats_data", "chat_id", victim_id) # victim_id as int
+        chat_data = MongoDB.find_one(DBConstants.CHATS_DATA, "chat_id", victim_id) # victim_id as int
         if not chat_data:
             await message.reply_text("Chat not found!")
             return
@@ -98,7 +98,7 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await message.reply_document(filters_file, f"ChatID: <code>{victim_id}</code>")
     
     else:
-        user_data = MongoDB.find_one("users_data", "user_id", victim_id) # victim_id as int
+        user_data = MongoDB.find_one(DBConstants.USERS_DATA, "user_id", victim_id) # victim_id as int
         if not user_data:
             await message.reply_text("User not found!")
             return

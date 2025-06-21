@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from bot.helpers import BuildKeyboard
-from bot.utils.database import MemoryDB, database_search
+from bot.utils.database import DBConstants, MemoryDB, database_search
 from ..group.chat_settings import chat_settings
 
 class PvtChatSettingsData:
@@ -34,14 +34,14 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     data = {
         "user_id": user.id, # authorization
-        "collection_name": "users_data",
+        "collection_name": DBConstants.USERS_DATA,
         "search_key": "user_id",
         "match_value": user.id
     }
 
-    MemoryDB.insert(MemoryDB.DATA_CENTER, user.id, data)
+    MemoryDB.insert(DBConstants.DATA_CENTER, user.id, data)
 
-    user_data = database_search("users_data", "user_id", user.id)
+    user_data = database_search(DBConstants.USERS_DATA, "user_id", user.id)
     if not user_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return

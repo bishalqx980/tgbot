@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from bot.utils.decorators.pm_error import pm_error
-from bot.utils.database import MemoryDB, MongoDB, database_search
+from bot.utils.database import DBConstants, MemoryDB, MongoDB, database_search
 from bot.helpers import BuildKeyboard
 from ..auxiliary.chat_admins import ChatAdmins
 from ..auxiliary.anonymous_admin import anonymousAdmin
@@ -39,7 +39,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "effective_message_id": effective_message.id
         }
 
-        MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, data)
+        MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, data)
 
         text = (
             "To set filters for this chat follow the instruction below...\n"
@@ -62,7 +62,7 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text(text, reply_markup=btn)
         return
 
-    chat_data = database_search("chats_data", "chat_id", chat.id)
+    chat_data = database_search(DBConstants.CHATS_DATA, "chat_id", chat.id)
     if not chat_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return
@@ -78,15 +78,15 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
         data = {}
         for keyword in keywords:
             data.update({keyword: value})
-        MongoDB.update("chats_data", "chat_id", chat.id, "filters", data)
+        MongoDB.update(DBConstants.CHATS_DATA, "chat_id", chat.id, {"filters": data})
     
     else:
         for keyword in keywords:
             filters[keyword] = value
-        MongoDB.update("chats_data", "chat_id", chat.id, "filters", filters)
+        MongoDB.update(DBConstants.CHATS_DATA, "chat_id", chat.id, {"filters": filters})
     
-    chat_data = MongoDB.find_one("chats_data", "chat_id", chat.id)
-    MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, chat_data)
+    chat_data = MongoDB.find_one(DBConstants.CHATS_DATA, "chat_id", chat.id)
+    MemoryDB.insert(DBConstants.CHATS_DATA, chat.id, chat_data)
     msg_keywords = ", ".join(keywords)
     
     await effective_message.reply_text(f"{msg_keywords} filters added!")

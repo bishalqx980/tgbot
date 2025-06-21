@@ -1,12 +1,12 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.utils.database import database_search
+from bot.utils.database import DBConstants, database_search
 
 async def join_request_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     join_request_update = update.chat_join_request
     chat = join_request_update.chat
     
-    chat_data = database_search("chats_data", "chat_id", chat.id)
+    chat_data = database_search(DBConstants.CHATS_DATA, "chat_id", chat.id)
     if not chat_data:
         await chat.send_message("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return

@@ -1,12 +1,6 @@
 from bot import logger
 
 class MemoryDatabase:
-    # Constants
-    BOT_DATA = "bot_data"
-    USERS_DATA = "users_data"
-    CHATS_DATA = "chats_data"
-    DATA_CENTER = "data_center"
-
     def __init__(self):
         self.bot_data = {}
         self.users_data = {}

@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from bot.helpers import BuildKeyboard
-from bot.utils.database import MemoryDB
+from bot.utils.database import DBConstants, MemoryDB
 from bot.utils.decorators.sudo_users import require_sudo
 from bot.utils.decorators.pm_only import pm_only
 
@@ -56,7 +56,7 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "replied_message_id": re_msg.id
     }
 
-    MemoryDB.insert(MemoryDB.DATA_CENTER, "broadcast", broadcastData)
+    MemoryDB.insert(DBConstants.DATA_CENTER, "broadcast", broadcastData)
 
     # sening demo preview for owner/sudo
     if broadcastText:

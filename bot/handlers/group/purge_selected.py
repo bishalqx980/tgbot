@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from bot.utils.decorators.pm_error import pm_error
-from bot.utils.database import MemoryDB
+from bot.utils.database import DBConstants, MemoryDB
 from .auxiliary.chat_admins import ChatAdmins
 from .auxiliary.anonymous_admin import anonymousAdmin
 
@@ -53,7 +53,7 @@ async def func_purgefrom(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "sent_message_id": sent_message.id
     }
 
-    MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, data)
+    MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, data)
 
 
 @pm_error
@@ -106,7 +106,7 @@ async def func_purgeto(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "sent_message_id": None
     }
 
-    MemoryDB.insert(MemoryDB.DATA_CENTER, chat.id, data)
+    MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, data)
     
     await effective_message.reply_text("Purge completed!")
     await effective_message.delete()

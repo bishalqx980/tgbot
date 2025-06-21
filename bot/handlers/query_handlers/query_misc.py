@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.utils.database import MemoryDB, MongoDB, database_search
+from bot.utils.database import DBConstants, MemoryDB, MongoDB, database_search
 
 async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
@@ -15,7 +15,7 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     elif query_data.startswith("whisper_"):
-        chat_data = database_search("chats_data", "chat_id", chat.id)
+        chat_data = database_search(DBConstants.CHATS_DATA, "chat_id", chat.id)
         if not chat_data:
             await query.answer("Chat isn't registered! Remove/Block me from this chat then add me again!", True)
             return
@@ -51,8 +51,8 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # delete whisper is seen
         if whisper_seen:
             whispers.pop(whisper_key)
-            MongoDB.update("chats_data", "chat_id", chat.id, "whispers", whispers)
-            MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, {"whispers": whispers})
+            MongoDB.update(DBConstants.CHATS_DATA, "chat_id", chat.id, {"whispers": whispers})
+            MemoryDB.insert(DBConstants.CHATS_DATA, chat.id, {"whispers": whispers})
 
             await query.edit_message_text(f"<i>The whisper message is seen by {user.full_name}!</i>")
     

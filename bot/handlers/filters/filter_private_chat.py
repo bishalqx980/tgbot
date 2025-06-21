@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 
 from bot import TL_LANG_CODES_URL
 from bot.helpers import BuildKeyboard
-from bot.utils.database import database_search
+from bot.utils.database import DBConstants, database_search
 from bot.modules.translator import translate
 from .edit_database import edit_database
 
@@ -16,7 +16,7 @@ async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE
     if is_editing:
         return
     
-    user_data = database_search("users_data", "user_id", user.id)
+    user_data = database_search(DBConstants.USERS_DATA, "user_id", user.id)
     if not user_data:
         await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
         return

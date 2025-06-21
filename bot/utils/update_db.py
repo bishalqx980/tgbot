@@ -1,11 +1,11 @@
 from bot import CONFIG_FILE, logger, config
-from .database import MemoryDB, MongoDB
+from .database import DBConstants, MemoryDB, MongoDB
 
 def update_database():
-    bot_data = MongoDB.find("bot_data", "_id")
+    bot_data = MongoDB.find(DBConstants.BOT_DATA, "_id")
     if bot_data:
-        data = MongoDB.find_one("bot_data", "_id", bot_data[0])
-        MemoryDB.insert(MemoryDB.BOT_DATA, None, data)
+        data = MongoDB.find_one(DBConstants.BOT_DATA, "_id", bot_data[0])
+        MemoryDB.insert(DBConstants.BOT_DATA, None, data)
         logger.info("MongoDB database exist! Skiping update process!")
         return
     
@@ -24,8 +24,8 @@ def update_database():
     }
     
     try:
-        MongoDB.insert("bot_data", config_data)
-        MemoryDB.insert(MemoryDB.BOT_DATA, None, config_data)
+        MongoDB.insert(DBConstants.BOT_DATA, config_data)
+        MemoryDB.insert(DBConstants.BOT_DATA, None, config_data)
         logger.info(f"Database has been updated from `{CONFIG_FILE}` file.")
     except Exception as e:
         logger.warning(e)

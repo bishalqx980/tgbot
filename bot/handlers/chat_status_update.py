@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.utils.database import database_search
+from bot.utils.database import DBConstants, database_search
 from .group.auxiliary.chat_admins import ChatAdmins
 
 async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -11,7 +11,7 @@ async def chat_status_update(update: Update, context: ContextTypes.DEFAULT_TYPE)
     cause_user = update.effective_user
     effective_message = update.effective_message
 
-    chat_data = database_search("chats_data", "chat_id", chat.id)
+    chat_data = database_search(DBConstants.CHATS_DATA, "chat_id", chat.id)
     if not chat_data:
         return
 

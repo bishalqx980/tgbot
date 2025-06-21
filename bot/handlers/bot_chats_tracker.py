@@ -1,7 +1,7 @@
 from telegram import Update, ChatMember
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from bot.utils.database import MemoryDB, MongoDB
+from bot.utils.database import DBConstants, MemoryDB, MongoDB
 
 async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -17,7 +17,7 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if chat.type in [ChatType.PRIVATE]:
         # checking database entry
-        user_data = MongoDB.find_one("users_data", "user_id", user.id)
+        user_data = MongoDB.find_one(DBConstants.USERS_DATA, "user_id", user.id)
         if not user_data:
             data = {
                 "user_id": user.id,
@@ -26,24 +26,24 @@ async def bot_chats_tracker(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "lang": user.language_code
             }
 
-            MongoDB.insert("users_data", data)
-            MemoryDB.insert(MemoryDB.USERS_DATA, user.id, data)
+            MongoDB.insert(DBConstants.USERS_DATA, data)
+            MemoryDB.insert(DBConstants.USERS_DATA, user.id, data)
         
         # checking member status & updating database
         active_status = new_status == ChatMember.MEMBER
-        MongoDB.update("users_data", "user_id", user.id, "active_status", active_status)
+        MongoDB.update(DBConstants.USERS_DATA, "user_id", user.id, {"active_status": active_status})
     
     elif chat.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
         # checking database entry
-        chat_data = MongoDB.find_one("chats_data", "chat_id", chat.id)
+        chat_data = MongoDB.find_one(DBConstants.CHATS_DATA, "chat_id", chat.id)
         if not chat_data:
             data = {
                 "chat_id": chat.id,
                 "title": chat.title
             }
 
-            MongoDB.insert("chats_data", data)
-            MemoryDB.insert(MemoryDB.CHATS_DATA, chat.id, data)
+            MongoDB.insert(DBConstants.CHATS_DATA, data)
+            MemoryDB.insert(DBConstants.CHATS_DATA, chat.id, data)
         
         if old_status in [ChatMember.LEFT, ChatMember.BANNED] and new_status == ChatMember.MEMBER:
             text = (
