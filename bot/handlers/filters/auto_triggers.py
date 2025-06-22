@@ -2,7 +2,7 @@ from telegram import Message, User, Chat
 
 async def autoTriggers(message: Message, user: User, chat: Chat, filters: dict):
     """
-    :param message: `update.message`
+    :param message: `update.effective_message`
     :param user: `update.effective_user`
     :param chat: `update.effective_chat`
     :param filters: chat filters (from chat database)

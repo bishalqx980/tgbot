@@ -11,7 +11,7 @@ from .auto_translate import autoTranslate
 async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    message = update.message
+    message = update.effective_message
 
     is_editing = edit_database(chat.id, user.id, message)
     if is_editing:

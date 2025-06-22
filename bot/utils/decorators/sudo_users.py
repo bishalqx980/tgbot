@@ -18,7 +18,7 @@ def require_sudo(func):
             sudo_users.append(owner_id)
         
         if user.id not in sudo_users:
-            await update.message.reply_text("Access denied!")
+            await update.effective_message.reply_text("Access denied!")
             return
         
         return await func(update, context)

@@ -11,9 +11,9 @@ def pm_only(func):
         chat = update.effective_chat
 
         if chat.type not in [ChatType.PRIVATE]:
-            sent_message = await update.message.reply_text(f"This command is made to be used in pm, not in public chat!")
+            sent_message = await update.effective_message.reply_text(f"This command is made to be used in pm, not in public chat!")
             await asyncio.sleep(3)
-            await chat.delete_messages([update.message.id, sent_message.id])
+            await chat.delete_messages([update.effective_message.id, sent_message.id])
             return
         
         return await func(update, context)

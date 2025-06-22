@@ -13,7 +13,7 @@ from bot.utils.decorators.sudo_users import require_sudo
 
 @require_sudo
 async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    sent_message = await update.message.reply_text("⌛")
+    sent_message = await update.effective_message.reply_text("⌛")
     
     # Uptime Calculating
     sys_uptime = timedelta(seconds=datetime.now().timestamp() - psutil.boot_time())

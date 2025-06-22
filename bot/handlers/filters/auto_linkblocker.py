@@ -4,7 +4,7 @@ from bot.modules.base64 import BASE64
 
 async def autoLinkBlocker(message: Message, user: User, link_rules: dict):
     """
-    :param message: `update.message`
+    :param message: `update.effective_message`
     :param user: `update.effective_user`
     :param link_rules: `dict` of link rules (database variables)
     """

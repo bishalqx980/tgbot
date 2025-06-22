@@ -172,9 +172,11 @@ async def server_alive():
 
 async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.error(context.error)
+    auto_del_message = False
 
     if isinstance(context.error, (Conflict, NetworkError, TimedOut)):
         text = f"<blockquote>An error occured</blockquote>\n\n<code>{context.error}</code>"
+        auto_del_message = True
     
     else:
         error_text = "".join(traceback.format_exception(type(context.error), context.error, context.error.__traceback__))
@@ -194,7 +196,10 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
     
     if DEFAULT_ERROR_CHANNEL_ID:
         try:
-            await context.bot.send_message(DEFAULT_ERROR_CHANNEL_ID, text)
+            sent_message = await context.bot.send_message(DEFAULT_ERROR_CHANNEL_ID, text)
+            if auto_del_message:
+                await asyncio.sleep(60)
+                await sent_message.delete()
             return
         except BadRequest:
             pass

@@ -13,7 +13,7 @@ from .auto_triggers import autoTriggers
 async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
     user = update.effective_user
-    message = update.message
+    message = update.effective_message
 
     is_editing = edit_database(chat.id, user.id, message)
     if is_editing:
