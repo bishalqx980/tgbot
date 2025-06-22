@@ -3,7 +3,7 @@ from telegram.ext import ContextTypes
 
 from bot import TL_LANG_CODES_URL
 from bot.helpers import BuildKeyboard
-from bot.utils.database import DBConstants, updateUsernameDB, database_search
+from bot.utils.database import DBConstants, database_search
 
 from .edit_database import edit_database
 from .auto_linkblocker import autoLinkBlocker
@@ -14,9 +14,6 @@ async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
     chat = update.effective_chat
     user = update.effective_user
     message = update.message
-
-    # Adding/Updating Username on Database
-    updateUsernameDB(user)
 
     is_editing = edit_database(chat.id, user.id, message)
     if is_editing:

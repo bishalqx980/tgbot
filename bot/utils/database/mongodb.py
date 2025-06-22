@@ -5,44 +5,6 @@ class MongoDatabase:
     def __init__(self):
         self.client = MongoClient(config.mongodb_uri) # full cluster access
         self.database = self.client[config.db_name] # for only accessing bot database
-        # special collection of usernames
-        self.usernames = self.client["usernames"]
-        self.username_collection = "usernames"
-    
-
-    def insert_username(self, data: dict):
-        """
-        # Special collection for usernames only
-
-        :param data: `dict` Example: `{user.name: user.id}`
-        """
-        try:
-            coll_data = self.usernames[self.username_collection]
-            response = coll_data.insert_one(data)
-
-            return response.acknowledged
-        except Exception as e:
-            logger.error(e)
-    
-
-    def find_username(self, username):
-        """
-        :param username: `user.name` to search
-        :return list: Value `list` of speficied username's `user.id` | `None`
-        """
-        try:
-            coll_data = self.usernames[self.username_collection]
-            documents = coll_data.find({})
-            storage = []
-
-            for doc in documents:
-                doc_value = doc.get(username)
-                if doc_value and doc_value not in storage:
-                    storage.append(doc_value)
-            
-            return storage
-        except Exception as e:
-            logger.error(e)
     
 
     def insert(self, collection_name, data: dict):

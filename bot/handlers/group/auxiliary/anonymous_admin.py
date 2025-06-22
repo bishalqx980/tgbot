@@ -13,7 +13,7 @@ async def anonymousAdmin(chat, effective_message, timeout=10):
     MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {"anonymous_admin": None})
 
     btn = BuildKeyboard.cbutton([{"Verify": "admin_anonymous_verify"}])
-    sent_message = await effective_message.reply_text(f"UwU, annoymous admin! Click on <code>Verify</code> to proceed next! Timeout: <code>{timeout}</code>", reply_markup=btn)
+    sent_message = await effective_message.reply_text(f"UwU, annoymous admin! Click on <code>Verify</code> to proceed next!", reply_markup=btn)
 
     for i in range(timeout):
         data_center = MemoryDB.data_center[chat.id]

@@ -10,14 +10,9 @@ class MemoryDatabase:
 
     def insert(self, collection_name, identifier=None, data=None):
         """
-        Available `collection_name`'s:\n
-        Use class constants:
-        - MemoryDatabase.BOT_DATA
-        - MemoryDatabase.USERS_DATA
-        - MemoryDatabase.CHATS_DATA
-        - MemoryDatabase.DATA_CENTER
-        - `identifier`: key to find/store the data | example: chat.id `optional` "if not given, data will be inserted directly"
-        - `data` type: dict
+        :param collection_name: `database.DBConstants`
+        :param identifier: key to find/store the data | example: chat.id `optional` "if not given, data will be inserted directly"
+        :param data: `dict`
         """
         if not data:
             logger.error("MemoryDatabase: `data` parameter can't be None.")
