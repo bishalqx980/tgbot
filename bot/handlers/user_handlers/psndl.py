@@ -5,12 +5,15 @@ from bot.modules import telegraph
 
 async def func_psndl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-    chat = update.effective_chat
     effective_message = update.effective_message
     game_name = " ".join(context.args)
 
     if not game_name:
-        await effective_message.reply_text("Use <code>/psndl game name</code>\nE.g. <code>/psndl red dead redemption</code>")
+        await effective_message.reply_text(
+            "Use <code>/psndl game name</code>\n"
+            "E.g. <code>/psndl red dead redemption</code>\n\n"
+            "PSNDL Website: https://bishalqx980.github.io/psndl/"
+        )
         return
 
     if len(effective_message.text) < 4:
