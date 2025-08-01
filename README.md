@@ -1,4 +1,4 @@
-# [tgbot](https://bishalqx980.github.io/tgbot) 👻 | [MiniApp](https://bishalqx980.github.io/tgbot/bot/utils/templates/) 🍊
+# [tgbot](https://bishalqx980.github.io/tgbot) 👻
 
 This Telegram bot is built using the `python-telegram-bot` library *`version 21.9`* and performs various tasks within **Telegram**.
 
