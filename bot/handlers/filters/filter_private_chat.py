@@ -1,7 +1,8 @@
-from telegram import Update
+from telegram import Update, ReactionTypeEmoji
 from telegram.ext import ContextTypes
+from telegram.error import Forbidden
 
-from bot import TL_LANG_CODES_URL
+from bot import TL_LANG_CODES_URL, config
 from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, database_search
 
@@ -13,6 +14,22 @@ async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE
     user = update.effective_user
     message = update.effective_message
 
+    # Support Seekers Reply
+    if user.id in [config.owner_id] and message.reply_to_message:
+        replied_message = message.reply_to_message
+        if "#support" in replied_message.text:
+            support_seeker_id = replied_message.text.split("#id")[1].strip()
+            # sending message to support seeker
+            try:
+                await context.bot.send_message(support_seeker_id, message.text_html)
+                reaction = "👍"
+            except Forbidden:
+                reaction = "👎"
+            except:
+                reaction = "🤷‍♂"
+            # Confirm support team that message is sent or not
+            await message.set_reaction([ReactionTypeEmoji(reaction)])
+    
     is_editing = edit_database(chat.id, user.id, message)
     if is_editing:
         return
