@@ -28,9 +28,9 @@ async def support_state_one(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = (
             f"Name: {user.mention_html()}\n"
             f"UserID: <code>{user.id}</code>\n"
-            f"Message: <blockquote>{effective_message.text_html}</blockquote>\n\n"
-            "<i>Reply this message to send your replied message to that user! or use /send</i>\n"
-            f"#support #id{user.id}" # Contains two hashtags
+            f"Message: {effective_message.text_html}\n\n"
+            "<i>Reply to this message to continue conversation! or use /send</i>\n"
+            f"<tg-spoiler>#uid{hex(user.id)}</tg-spoiler>"
         )
 
         await context.bot.send_message(config.owner_id, message)

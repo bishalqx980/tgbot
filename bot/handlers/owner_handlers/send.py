@@ -8,6 +8,7 @@ from bot.utils.decorators.pm_only import pm_only
 @require_sudo
 async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat = update.effective_chat
+    user = update.effective_user
     message = update.effective_message
     re_msg = message.reply_to_message
     context_args = " ".join(context.args) # contains something if forward is true and contains victim_id >> /send f chat_id
@@ -37,8 +38,21 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.forward_message(victim_id, chat.id, re_msg.id)
         
         else:
-            text = re_msg.text_html
-            caption = re_msg.caption_html
+            if str(victim_id).startswith("-100"):
+                text = re_msg.text_html
+                caption = re_msg.caption_html
+            else:
+                text = (
+                    f"{re_msg.text_html}\n\n"
+                    "<i>Reply to this message to continue conversation!</i>\n"
+                    f"<tg-spoiler>#uid{hex(user.id)}</tg-spoiler>"
+                )
+                caption = (
+                    f"{re_msg.caption_html}\n\n"
+                    "<i>Reply to this message to continue conversation!</i>\n"
+                    f"<tg-spoiler>#uid{hex(user.id)}</tg-spoiler>"
+                )
+            
             photo = re_msg.photo
             audio = re_msg.audio
             video = re_msg.video

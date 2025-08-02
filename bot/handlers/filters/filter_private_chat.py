@@ -14,20 +14,24 @@ async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE
     user = update.effective_user
     message = update.effective_message
 
-    # Support Seekers Reply
-    if user.id in [config.owner_id] and message.reply_to_message:
+    # Support Conversation
+    if message.reply_to_message:
         replied_message = message.reply_to_message
-        if "#support" in replied_message.text:
-            support_seeker_id = replied_message.text.split("#id")[1].strip()
-            # sending message to support seeker
+        if "#uid" in replied_message.text:
+            support_conv_uid = int(replied_message.text.split("#uid")[1].strip(), 16) # base 16: hex
+            text = (
+                f"Message: {message.text_html}\n\n"
+                "<i>Reply to this message to continue conversation!</i>\n"
+                f"<tg-spoiler>#uid{hex(user.id)}</tg-spoiler>"
+            )
             try:
-                await context.bot.send_message(support_seeker_id, message.text_html)
+                await context.bot.send_message(support_conv_uid, text)
                 reaction = "👍"
             except Forbidden:
                 reaction = "👎"
             except:
                 reaction = "🤷‍♂"
-            # Confirm support team that message is sent or not
+            # Confirm that message is sent or not
             await message.set_reaction([ReactionTypeEmoji(reaction)])
     
     is_editing = edit_database(chat.id, user.id, message)
