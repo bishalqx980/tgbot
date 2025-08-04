@@ -28,17 +28,16 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if victim_photos.photos:
         victim_pfp = victim_photos.photos[0][-1].file_id # returns victims latest and best quality pfp file id
     
-    victim_username = victim.name if victim.username else None
     text = (
         f"<b>• Full name:</b> <code>{victim.full_name}</code>\n"
         f"<b>  » First name:</b> <code>{victim.first_name}</code>\n"
         f"<b>  » Last name:</b> <code>{victim.last_name}</code>\n"
         f"<b>• Mention:</b> {victim.mention_html()}\n"
-        f"<b>• Username:</b> {victim_username}\n"
+        f"<b>• Username:</b> {victim.name if victim.username else ''}\n"
         f"<b>• ID:</b> <code>{victim.id}</code>\n"
         f"<b>• Lang:</b> <code>{victim.language_code}</code>\n"
-        f"<b>• Is bot:</b> <code>{victim.is_bot}</code>\n"
-        f"<b>• Is premium:</b> <code>{victim.is_premium}</code>"
+        f"<b>• Is bot:</b> <code>{'Yes' if victim.is_bot else 'No'}</code>\n"
+        f"<b>• Is premium:</b> <code>{'Yes' if victim.is_premium else 'No'}</code>"
     )
 
     btn = BuildKeyboard.ubutton([{"User Profile": f"tg://user?id={victim.id}"}]) if victim.username else None

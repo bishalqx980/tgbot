@@ -60,8 +60,6 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     
     whispers = chat_data.get("whispers") or {}
-
-    # if replied then it will be user_id else it will be username
     whisper_key = Utils.randomString()
 
     whispers.update({

@@ -17,7 +17,7 @@ async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE
     # Support Conversation
     if message.reply_to_message:
         replied_message = message.reply_to_message
-        if "#uid" in replied_message.text:
+        if "#uid" in [replied_message.text or replied_message.caption]:
             try:
                 support_conv_uid = int(replied_message.text.split("#uid")[1].strip(), 16) # base 16: hex
                 text = ""
