@@ -43,12 +43,12 @@ async def func_send(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 caption = re_msg.caption_html
             else:
                 text = (
-                    f"{re_msg.text_html}\n\n"
+                    f"Message: {re_msg.text_html}\n\n"
                     "<i>Reply to this message to continue conversation!</i>\n"
                     f"<tg-spoiler>#uid{hex(user.id)}</tg-spoiler>"
                 )
                 caption = (
-                    f"{re_msg.caption_html}\n\n"
+                    f"Message: {re_msg.caption_html}\n\n"
                     "<i>Reply to this message to continue conversation!</i>\n"
                     f"<tg-spoiler>#uid{hex(user.id)}</tg-spoiler>"
                 )

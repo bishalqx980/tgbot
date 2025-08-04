@@ -18,14 +18,27 @@ async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE
     if message.reply_to_message:
         replied_message = message.reply_to_message
         if "#uid" in replied_message.text:
-            support_conv_uid = int(replied_message.text.split("#uid")[1].strip(), 16) # base 16: hex
-            text = (
-                f"Message: {message.text_html}\n\n"
-                "<i>Reply to this message to continue conversation!</i>\n"
-                f"<tg-spoiler>#uid{hex(user.id)}</tg-spoiler>"
-            )
             try:
-                await context.bot.send_message(support_conv_uid, text)
+                support_conv_uid = int(replied_message.text.split("#uid")[1].strip(), 16) # base 16: hex
+                text = ""
+                btn = None
+                # if user sending message to owner/support-team then add userinfo
+                if user.id != config.owner_id:
+                    text += (
+                        f"Name: {user.mention_html()}\n"
+                        f"UserID: <code>{user.id}</code>\n"
+                    )
+
+                    btn = BuildKeyboard.ubutton([{"User Profile": f"tg://user?id={user.id}"}]) if user.username else None
+                
+                # Common text for owner & user
+                text += (
+                    f"Message: {message.text_html}\n\n"
+                    "<i>Reply to this message to continue conversation!</i>\n"
+                    f"<tg-spoiler>#uid{hex(user.id)}</tg-spoiler>"
+                )
+
+                await context.bot.send_message(support_conv_uid, text, reply_markup=btn)
                 reaction = "👍"
             except Forbidden:
                 reaction = "👎"
