@@ -1,5 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
+
+from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, MemoryDB, MongoDB, database_search
 
 async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -34,7 +36,8 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if whisper_sender_user_id == user.id:
             # access granted for message sender
-            whisper_seen = False
+            # If sender & receiver are same user then mark the message as seen
+            whisper_seen = True if whisper_username == user.name else False
             pass
 
         # verifying user (only by username)
@@ -48,7 +51,9 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
             whispers.pop(whisper_key)
             # Diffrent from normal /whisper cmd
             MemoryDB.insert(DBConstants.DATA_CENTER, "whisper_data", {"whispers": whispers})
-            await query.edit_message_text(f"<i>The whisper message is seen by {user.full_name}!</i>")
+
+            btn = BuildKeyboard.cbutton([{"Try Yourself!": "switch_to_inline"}])
+            await query.edit_message_text(f"<i>The whisper message is seen by {user.full_name}!</i>", reply_markup=btn)
     
     elif query_data.startswith("whisper_"):
         chat_data = database_search(DBConstants.CHATS_DATA, "chat_id", chat.id)
@@ -75,7 +80,8 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         if whisper_sender_user_id == user.id:
             # access granted for message sender
-            whisper_seen = False
+            # If sender & receiver are same user then mark the message as seen
+            whisper_seen = True if (whisper_user_id and whisper_user_id == user.id) or (whisper_username and whisper_username == user.name) else False
             pass
 
         # verifying user

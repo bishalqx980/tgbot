@@ -64,7 +64,7 @@ async def inline_query_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         return
     
     # whisper option: if chat isn't private | This whisper system is temporary store message, use /whisper cmd for permanent message store
-    if query.chat_type not in [ChatType.PRIVATE]:
+    if query.chat_type not in [ChatType.PRIVATE, ChatType.SENDER]:
         splitted_message = message.split()
         whisper_username = splitted_message[0]
         secret_message = " ".join(splitted_message[1:])
