@@ -15,15 +15,20 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sent_message = await effective_message.reply_text("Downloading...")
 
     response = youtube_download(url)
-    if not response:
-        await sent_message.edit_text("Oops! Something went wrong!")
+    if not isinstance(response, dict):
+        await sent_message.edit_text(f"Error: {response}")
         return
     
-    file_name = f"{response['file_name']}.mp3"
-    
-    await sent_message.delete()
-    await effective_message.reply_audio(response["file_path"], title=file_name, filename=file_name)
+    file_name = f"{response['title']}.mp3"
+    file_path = response["file_path"]
 
+    try:
+        await effective_message.reply_audio(file_path, title=file_name, filename=file_name)
+        await sent_message.delete()
+    except Exception as e:
+        await sent_message.edit_text(str(e))
+        return
+    
     try:
         os.remove(response["file_path"])
     except Exception as e:
