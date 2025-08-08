@@ -27,7 +27,6 @@ async def func_ytdl(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await sent_message.delete()
     except Exception as e:
         await sent_message.edit_text(str(e))
-        return
     
     try:
         os.remove(response["file_path"])
