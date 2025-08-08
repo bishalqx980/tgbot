@@ -49,9 +49,9 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = PvtChatSettingsData.TEXT.format(
         user.mention_html(),
         user.id,
-        user_data.get('lang'),
-        user_data.get('auto_tr') or False,
-        user_data.get('echo') or False
+        user_data.get('lang') or '-',
+        'Enabled' if user_data.get('auto_tr') else 'Disabled',
+        'Enabled' if user_data.get('echo') else 'Disabled'
     )
 
     btn = BuildKeyboard.cbutton(PvtChatSettingsData.BUTTONS)

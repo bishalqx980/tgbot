@@ -1,5 +1,7 @@
 import random
 import string
+import aiohttp
+from time import time
 from bot import logger
 
 class Utils:
@@ -41,3 +43,19 @@ class Utils:
         except Exception as e:
             logger.error(e)
             return False, e
+    
+    @staticmethod
+    async def pingServer(url) -> str:
+        """:return str: Server `response time` or `infinite`"""
+        try:
+            start_time = time()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    response_time = int((time() - start_time) * 1000) # converting to ms
+                    if response_time > 1000:
+                        server_ping = f"{(response_time / 1000):.2f}s"
+                    else:
+                        server_ping = f"{response_time}ms"
+                    return server_ping
+        except:
+            return "~ infinite ~"

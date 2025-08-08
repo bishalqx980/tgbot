@@ -49,9 +49,9 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             text = PvtChatSettingsData.TEXT.format(
                 user.mention_html(),
                 user.id,
-                memory_data.get('lang'),
-                memory_data.get('auto_tr') or False,
-                memory_data.get('echo') or False
+                memory_data.get('lang') or '-',
+                'Enabled' if memory_data.get('auto_tr') else 'Disabled',
+                'Enabled' if memory_data.get('echo') else 'Disabled'
             )
 
             btn = BuildKeyboard.cbutton(PvtChatSettingsData.BUTTONS)
@@ -60,14 +60,14 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             text = GroupChatSettingsData.TEXT.format(
                 chat.title,
                 chat.id,
-                memory_data.get('lang'),
-                memory_data.get('auto_tr') or False,
-                memory_data.get('echo') or False,
-                memory_data.get('antibot') or False,
-                memory_data.get('welcome_user') or False,
-                memory_data.get('farewell_user') or False,
-                memory_data.get('chat_join_req'),
-                memory_data.get('service_messages'),
+                memory_data.get('lang') or '-',
+                'Enabled' if memory_data.get('auto_tr') else 'Disabled',
+                'Enabled' if memory_data.get('echo') else 'Disabled',
+                'Enabled' if memory_data.get('antibot') else 'Disabled',
+                'Enabled' if memory_data.get('welcome_user') else 'Disabled',
+                'Enabled' if memory_data.get('farewell_user') else 'Disabled',
+                'Enabled' if memory_data.get('chat_join_req') else 'Disabled',
+                'Enabled' if memory_data.get('service_messages') else 'Disabled',
                 memory_data.get('links_behave'),
                 ', '.join(memory_data.get('allowed_links') or [])
             )
@@ -87,7 +87,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Language: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> <a href='{}'>Available language codes</a>\nExample: <code>en</code> for English language.</blockquote>"
-        ).format(memory_data.get("lang"), TL_LANG_CODES_URL)
+        ).format(memory_data.get("lang") or "-", TL_LANG_CODES_URL)
     
     elif query_data == "auto_tr":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -102,7 +102,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Auto translate: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This will automatically translate chat messages to seleted language.</blockquote>"
-        ).format(memory_data.get("auto_tr") or False)
+        ).format("Enabled" if memory_data.get("auto_tr") else "Disabled")
     
     elif query_data == "echo":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -117,7 +117,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Echo: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This will echo user messages.</blockquote>"
-        ).format(memory_data.get("echo") or False)
+        ).format("Enabled" if memory_data.get("echo") else 'Disabled')
     
     elif query_data == "antibot":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -132,7 +132,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Antibot: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> If someone try to add bots in chat, this will kick the bot, if enabled.</blockquote>"
-        ).format(memory_data.get("antibot"))
+        ).format("Enabled" if memory_data.get("antibot") else 'Disabled')
     
     elif query_data == "welcome_user":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -145,7 +145,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Welcome Members: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This will welcome new chat member, if enabled.</blockquote>"
-        ).format(memory_data.get("welcome_user") or False)
+        ).format("Enabled" if memory_data.get("welcome_user") else 'Disabled')
 
         btn_data = [
             {"Enable": "database_bool_true", "Disable": "database_bool_false"},
@@ -163,13 +163,11 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "is_int": False
         })
 
-        welcome_photo = memory_data.get("welcome_photo") or ""
-        
         text = (
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Welcome Photo:\n<code>{}</code>\n"
             "<blockquote><b>Note:</b>Welcome photo to greet new chat members. (Currently only supports URL photo link)</blockquote>"
-        ).format(welcome_photo)
+        ).format(memory_data.get("welcome_photo") or "-")
 
         btn_data = [
             {"Edit Value": "database_edit_value"},
@@ -186,7 +184,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "is_int": False
         })
 
-        custom_message = memory_data.get("custom_welcome_msg") or ""
+        custom_message = memory_data.get("custom_welcome_msg") or "-"
 
         if len(custom_message) > 500:
             await chat.send_message(f"Custom Greeting Message:\n\n{custom_message}")
@@ -233,7 +231,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Farewell Members: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This will send a farewell message to chat when a member left, if enabled.</blockquote>"
-        ).format(memory_data.get("farewell_user"))
+        ).format("Enabled" if memory_data.get("farewell_user") else 'Disabled')
     
     elif query_data == "chat_join_req":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -246,7 +244,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Join Request: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This will auto Approve or Decline or Do Nothing while a member request to join this Group. (Bot should have add/invite member permission.)</blockquote>"
-        ).format(memory_data.get("chat_join_req"))
+        ).format("Enabled" if memory_data.get("chat_join_req") else 'Disabled')
 
         btn_data = [
             {"Approve": "database_value_approve", "Decline": "database_value_decline", "Do Nothing": "database_rm_value"},
@@ -268,7 +266,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Service Messages: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This will auto delete chat service messages (new member join, chat photo update etc.)</blockquote>"
-        ).format(memory_data.get("service_messages"))
+        ).format("Enabled" if memory_data.get("service_messages") else 'Disabled')
     
     elif query_data == "links_behave":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {

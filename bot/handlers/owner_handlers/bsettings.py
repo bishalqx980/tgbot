@@ -51,14 +51,14 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_data = MemoryDB.bot_data
 
     text = BotSettingsData.TEXT.format(
-        bot_data.get('show_bot_pic') or False,
+        'Yes' if bot_data.get('show_bot_pic') else 'No',
         len(bot_data.get('images') or []),
-        bot_data.get('support_chat'),
-        bot_data.get('server_url'),
+        bot_data.get('support_chat') or '-',
+        bot_data.get('server_url') or '-',
         len(bot_data.get('sudo_users') or []),
-        bot_data.get('shrinkme_api'),
-        bot_data.get('omdb_api'),
-        bot_data.get('weather_api')
+        bot_data.get('shrinkme_api') or '-',
+        bot_data.get('omdb_api') or '-',
+        bot_data.get('weather_api') or '-'
     )
 
     btn = BuildKeyboard.cbutton(BotSettingsData.BUTTONS)
@@ -79,7 +79,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if photo or photo_file_id:
         try:
-            await message.reply_photo(photo or photo_file_id, text, reply_markup=btn)
+            await message.reply_photo(photo or photo_file_id, text, reply_markup=btn, protect_content=True)
             return
         except BadRequest:
             pass
@@ -87,4 +87,4 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.error(e)
     
     # if BadRequest or No Photo or Other error
-    await message.reply_text(text, reply_markup=btn)
+    await message.reply_text(text, reply_markup=btn, protect_content=True)

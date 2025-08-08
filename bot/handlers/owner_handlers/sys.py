@@ -40,22 +40,14 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # pinging server
     server_url = MemoryDB.bot_data.get("server_url")
-    server_ping = "~ infinite ~"
+    server_ping = "~ infinite ~" # pre-determined
     if server_url:
         if not server_url.startswith("http"):
             server_url = f"http://{server_url}"
         
-        try:
-            start_time = time()
-            async with aiohttp.ClientSession() as session:
-                async with session.get(server_url) as response:
-                    response_time = int((time() - start_time) * 1000) # converting to ms
-                    if response_time > 1000:
-                        server_ping = f"{(response_time / 1000):.2f}s"
-                    else:
-                        server_ping = f"{response_time}ms"
-        except:
-            pass
+        server_ping = await Utils.pingServer(server_url)
+    # Telegram Server Ping Check
+    tg_server_ping = await Utils.pingServer("http://api.telegram.org/")
     
     sys_info = (
         "<blockquote><b>🖥️ System information</b></blockquote>\n\n"
@@ -94,7 +86,8 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>└ Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n\n"
 
         "<b>🌐 Server</b>\n"
-        f"<b>└ Ping:</b> <code>{server_ping}</code>"
+        f"<b>└ Ping:</b> <code>{server_ping}</code>\n"
+        f"<b>└ Telegram:</b> <code>{tg_server_ping}</code>"
     )
 
     await sent_message.edit_text(sys_info)

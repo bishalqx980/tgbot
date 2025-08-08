@@ -77,15 +77,15 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = GroupChatSettingsData.TEXT.format(
         chat.title,
         chat.id,
-        chat_data.get('lang'),
-        chat_data.get('auto_tr') or False,
-        chat_data.get('echo') or False,
-        chat_data.get('antibot') or False,
-        chat_data.get('welcome_user') or False,
-        chat_data.get('farewell_user') or False,
-        chat_data.get('chat_join_req'),
-        chat_data.get('service_messages'),
-        chat_data.get('links_behave'),
+        chat_data.get('lang') or '-',
+        'Enabled' if chat_data.get('auto_tr') else 'Disabled',
+        'Enabled' if chat_data.get('echo') else 'Disabled',
+        'Enabled' if chat_data.get('antibot') else 'Disabled',
+        'Enabled' if chat_data.get('welcome_user') else 'Disabled',
+        'Enabled' if chat_data.get('farewell_user') else 'Disabled',
+        'Enabled' if chat_data.get('chat_join_req') else 'Disabled',
+        'Enabled' if chat_data.get('service_messages') else 'Disabled',
+        chat_data.get('links_behave'), # this contains a value
         ', '.join(chat_data.get('allowed_links') or [])
     )
 

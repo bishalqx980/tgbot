@@ -24,14 +24,14 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     if query_data == "menu":
         text = BotSettingsData.TEXT.format(
-            bot_data.get('show_bot_pic') or False,
+            'Yes' if bot_data.get('show_bot_pic') else 'No',
             len(bot_data.get('images') or []),
-            bot_data.get('support_chat'),
-            bot_data.get('server_url'),
+            bot_data.get('support_chat') or '-',
+            bot_data.get('server_url') or '-',
             len(bot_data.get('sudo_users') or []),
-            bot_data.get('shrinkme_api'),
-            bot_data.get('omdb_api'),
-            bot_data.get('weather_api')
+            bot_data.get('shrinkme_api') or '-',
+            bot_data.get('omdb_api') or '-',
+            bot_data.get('weather_api') or '-'
         )
 
         btn = BuildKeyboard.cbutton(BotSettingsData.BUTTONS)
@@ -47,7 +47,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Show Bot Photo: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> Send's /start message or other supported message with Bot photo.</blockquote>"
-        ).format(bot_data.get("show_bot_pic"))
+        ).format("Yes" if bot_data.get("show_bot_pic") else "No")
 
         btn_data = [
             {"YES": "database_bool_true", "NO": "database_bool_false"},
@@ -93,7 +93,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Support Chat (link): <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> Group chat link for bot support (optional)</blockquote>"
-        ).format(bot_data.get("support_chat"))
+        ).format(bot_data.get("support_chat") or '-')
     
     elif query_data == "server_url":
         MemoryDB.insert(DBConstants.DATA_CENTER, user.id, {
@@ -108,7 +108,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Server URL: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> If <code>Server URL</code> isn't provided and bot is deployed on render (free) then bot will fall asleep. (Server Reboot Required)</blockquote>"
-        ).format(bot_data.get("server_url"))
+        ).format(bot_data.get("server_url") or '-')
 
     elif query_data == "sudo":
         MemoryDB.insert(DBConstants.DATA_CENTER, user.id, {
@@ -138,7 +138,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Shrinkme API: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This API is for /shorturl command.</blockquote>"
-        ).format(bot_data.get("shrinkme_api"))
+        ).format(bot_data.get("shrinkme_api") or '-')
     
     elif query_data == "omdb_api":
         MemoryDB.insert(DBConstants.DATA_CENTER, user.id, {
@@ -153,7 +153,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "OMDB API: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This API is for /movie command.</blockquote>"
-        ).format(bot_data.get("omdb_api"))
+        ).format(bot_data.get("omdb_api") or '-')
     
     elif query_data == "weather_api":
         MemoryDB.insert(DBConstants.DATA_CENTER, user.id, {
@@ -168,7 +168,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "<blockquote><b>Bot Settings</b></blockquote>\n\n"
             "Weather API: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This API is for /weather command.</blockquote>"
-        ).format(bot_data.get("weather_api"))
+        ).format(bot_data.get("weather_api") or '-')
     
     elif query_data == "database":
         text = (
