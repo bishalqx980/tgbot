@@ -1,4 +1,5 @@
 import os
+import json
 import shutil
 from time import time
 from telegram import Bot, __version__ as __ptbversion__
@@ -6,7 +7,7 @@ from .utils.config import CONFIG
 from .utils.logger import setup_logging
 
 # constants
-__version__ = "1.8.10.557" # major.minor.patch.commits
+__version__ = json.load(open("version.json", "rb"))["__version__"] # major.minor.patch.commits
 CONFIG_FILE = "config.env"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
