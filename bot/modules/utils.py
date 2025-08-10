@@ -1,6 +1,7 @@
 import random
 import string
 import aiohttp
+import pyzipper
 from time import time
 from bot import logger
 
@@ -44,6 +45,7 @@ class Utils:
             logger.error(e)
             return False, e
     
+
     @staticmethod
     async def pingServer(url) -> str:
         """:return str: Server `response time` or `infinite`"""
@@ -59,3 +61,30 @@ class Utils:
                     return server_ping
         except:
             return "~ infinite ~"
+    
+
+    @staticmethod
+    def unzipFile(path, password=None):
+        """
+        :param path: file path or bytes\n
+        :returns list: file path list
+        """
+        EXTRACTION_PATH = "downloads"
+        FILEPATH_LIST = []
+
+        try:
+            try:
+                with pyzipper.AESZipFile(path) as archiveFile:
+                    if password: archiveFile.setpassword(password.encode())
+                    archiveFile.extractall(EXTRACTION_PATH)
+            except:
+                with pyzipper.ZipFile(path) as archiveFile:
+                    if password: archiveFile.setpassword(password.encode())
+                    archiveFile.extractall(EXTRACTION_PATH)
+            
+            name_list = archiveFile.namelist()
+            for i in name_list:
+                FILEPATH_LIST.append(f"{EXTRACTION_PATH}/{i}")
+            return FILEPATH_LIST
+        except Exception as e:
+            return e

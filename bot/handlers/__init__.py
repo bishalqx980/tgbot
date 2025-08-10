@@ -75,6 +75,7 @@ from .user_handlers.settings import func_settings
 from .user_handlers.shortener import func_shorturl
 from .user_handlers.text_to_speech import func_tts
 from .user_handlers.translator import func_tr
+from .user_handlers.unzip import func_unzip
 from .user_handlers.weather import func_weather
 from .user_handlers.ytdl import func_ytdl
 

@@ -98,6 +98,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /ping » Get response of website\n"
             "• /calc » Normal calculator (supported syntex: +, -, *, /)\n"
             "• /tts » Convert text into speech (voice)\n"
+            "• /unzip » Unzip any <code>.zip</code> file\n"
             "• /weather » Get current weather info\n"
             "• /qr » Generate QR code (image)\n"
             "• /imgtolink » Get Image to public link\n"

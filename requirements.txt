@@ -9,4 +9,5 @@ telegraph[aio]==2.2.0
 gtts==2.5.4
 yt-dlp==2025.6.9
 qrcode[pil]==8.2
+pyzipper==0.3.6
 aiohttp[speedups]

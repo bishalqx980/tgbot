@@ -102,6 +102,7 @@ from .handlers import (
     func_shorturl,
     func_tts,
     func_tr,
+    func_unzip,
     func_weather,
     func_ytdl,
     
@@ -294,6 +295,7 @@ def main():
         CommandHandler("shorturl", func_shorturl),
         CommandHandler("tts", func_tts),
         CommandHandler("tr", func_tr),
+        CommandHandler("unzip", func_unzip),
         CommandHandler("weather", func_weather),
         CommandHandler("ytdl", func_ytdl)
     ]
