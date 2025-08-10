@@ -24,7 +24,7 @@ async def func_unzip(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     file_size = re_msg.document.file_size
     if file_size >= FileSizeLimit.FILESIZE_DOWNLOAD:
-        await effective_message.reply_text(f"FileSize Error: Replied FileSize {int(file_size / 1024)} - MaxFileSize Allowed {int(FileSizeLimit.FILESIZE_DOWNLOAD / 1024)}")
+        await effective_message.reply_text(f"FileSize Error: Replied FileSize {int(file_size / (1024 * 1024))}MB - MaxFileSize Allowed {int(FileSizeLimit.FILESIZE_DOWNLOAD / (1024 * 1024))}MB")
         return
     
     sent_message = await effective_message.reply_text("Please wait...")
@@ -39,22 +39,26 @@ async def func_unzip(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await sent_message.edit_text("Unziping...")
     response = Utils.unzipFile(zipFile, password)
     if not isinstance(response, list):
-        await sent_message.edit_text(str(response))
+        await sent_message.edit_text(f"Error: {response}")
         return
     
     # File path list
     counter = 0
+    uploaded = 0
+    uploadfailed = ""
     for i in response:
         counter += 1
         try:
+            percentBar = Utils.createProgressBar(counter * 100/len(response))
             await sent_message.edit_text((
                 "Uploading...\n"
-                f"{i}\n"
-                f"{counter}/{len(response)}"
+                f"File: <code>{i}</code>\n"
+                f"Percent: <code>{percentBar}</code>"
             ))
             await effective_message.reply_document(i)
+            uploaded += 1
         except Exception as e:
-            await sent_message.edit_text(f"Upload Failed ({e}): {i}")
+            uploadfailed += f"- {e}: <code>{i}</code>\n"
         
         await sleep(0.5)
 
@@ -62,3 +66,5 @@ async def func_unzip(update: Update, context: ContextTypes.DEFAULT_TYPE):
             os.remove(i)
         except Exception as e:
             logger.error(e)
+    
+    await sent_message.edit_text(f"Upload Completed! ({uploaded}/{len(response)})\n{uploadfailed}")
