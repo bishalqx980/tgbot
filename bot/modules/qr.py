@@ -1,5 +1,7 @@
 import qrcode
 from io import BytesIO
+from pyzbar.pyzbar import decode
+from PIL import Image
 from bot import logger
 
 class QR:
@@ -28,5 +30,18 @@ class QR:
             img_buffer.seek(0)
 
             return img_buffer.read()
+        except Exception as e:
+            logger.error(e)
+    
+
+    @staticmethod
+    def decode_qr(image_data):
+        """
+        :param image_data: byte or image path
+        :returns ?:
+        """
+        try:
+            decoded_objects = decode(Image.open(image_data))
+            return decoded_objects[0]
         except Exception as e:
             logger.error(e)

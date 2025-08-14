@@ -51,7 +51,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query_data == "edit_value":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {"update_data_value": None, "is_editing": True})
         
-        timeout = 15
+        timeout = 10
 
         btn = BuildKeyboard.cbutton([{"Cancel": "database_cancel_editing"}])
         sent_message = await chat.send_message(f"Waiting for a new value (Timeout: {timeout}s): ", reply_markup=btn)
@@ -97,7 +97,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             MemoryDB.insert(collection_name, identifier, data)
 
-            await query.answer("Database Updated Successfully.", True)
+            await query.answer("Database Updated Successfully.\nRefresh to see the updated value!", True)
 
         else:
             await query.answer("Something went wrong.", True)
@@ -135,7 +135,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             MemoryDB.insert(collection_name, identifier, data)
 
-            await query.answer("Database Updated Successfully.", True)
+            await query.answer("Database Updated Successfully.\nRefresh to see the updated value!", True)
 
         else:
             await query.answer("Something went wrong.", True)
@@ -150,7 +150,7 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             MemoryDB.insert(collection_name, identifier, data)
 
-            await query.answer("Database Updated Successfully.", True)
+            await query.answer("Database Updated Successfully.\nRefresh to see the updated value!", True)
 
         else:
             await query.answer("Something went wrong.", True)

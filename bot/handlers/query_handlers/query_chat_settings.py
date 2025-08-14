@@ -42,6 +42,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
     # variable required for global reply
     is_editing_btn = None
     is_boolean_btn = None
+    is_refresh_btn = True
 
     if query_data == "menu":
         # Handling PRIVATE chat setting
@@ -54,7 +55,8 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
                 'Enabled' if memory_data.get('echo') else 'Disabled'
             )
 
-            btn = BuildKeyboard.cbutton(PvtChatSettingsData.BUTTONS)
+            btn_data = PvtChatSettingsData.BUTTONS
+            is_refresh_btn = False
         
         else:
             text = GroupChatSettingsData.TEXT.format(
@@ -66,13 +68,14 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
                 'Enabled' if memory_data.get('antibot') else 'Disabled',
                 'Enabled' if memory_data.get('welcome_user') else 'Disabled',
                 'Enabled' if memory_data.get('farewell_user') else 'Disabled',
-                'Enabled' if memory_data.get('chat_join_req') else 'Disabled',
+                memory_data.get('chat_join_req'),
                 'Enabled' if memory_data.get('service_messages') else 'Disabled',
                 memory_data.get('links_behave'),
                 ', '.join(memory_data.get('allowed_links') or [])
             )
 
-            btn = BuildKeyboard.cbutton(GroupChatSettingsData.BUTTONS)
+            btn_data = GroupChatSettingsData.BUTTONS
+            is_refresh_btn = False
     
     elif query_data == "lang":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -153,8 +156,6 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             {"Custom Welcome Message": "csettings_custom_welcome_msg"},
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "welcome_photo":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -165,17 +166,14 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         text = (
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
-            "Welcome Photo:\n<code>{}</code>\n"
+            "Welcome Photo: <code>{}</code>\n"
             "<blockquote><b>Note:</b>Welcome photo to greet new chat members. (Currently only supports URL photo link)</blockquote>"
         ).format(memory_data.get("welcome_photo") or "-")
 
         btn_data = [
-            {"Edit Value": "database_edit_value"},
-            {"Remove Value": "database_rm_value"},
+            {"Edit Value": "database_edit_value", "Remove Value": "database_rm_value"},
             {"Back": "csettings_welcome_user", "Close": "csettings_close"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "custom_welcome_msg":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -186,7 +184,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
 
         custom_message = memory_data.get("custom_welcome_msg") or "-"
 
-        if len(custom_message) > 500:
+        if len(str(custom_message)) > 500:
             await chat.send_message(f"Custom Greeting Message:\n\n{custom_message}")
             custom_message = "Message is too long."
         
@@ -201,8 +199,6 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             {"Formattings": "csettings_formattings"},
             {"Back": "csettings_welcome_user", "Close": "csettings_close"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "formattings":
         text = (
@@ -216,7 +212,8 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "• <code>{chatname}</code> - chat title"
         )
 
-        btn = BuildKeyboard.cbutton([{"Back": "csettings_custom_welcome_msg", "Close": "csettings_close"}])
+        btn_data = [{"Back": "csettings_custom_welcome_msg", "Close": "csettings_close"}]
+        is_refresh_btn = False
     
     elif query_data == "farewell_user":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -244,14 +241,12 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "<blockquote><b>Chat Settings</b></blockquote>\n\n"
             "Join Request: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This will auto Approve or Decline or Do Nothing while a member request to join this Group. (Bot should have add/invite member permission.)</blockquote>"
-        ).format("Enabled" if memory_data.get("chat_join_req") else 'Disabled')
+        ).format(memory_data.get("chat_join_req"))
 
         btn_data = [
             {"Approve": "database_value_approve", "Decline": "database_value_decline", "Do Nothing": "database_rm_value"},
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "service_messages":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -286,8 +281,6 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             {"Delete": "database_value_delete", "Convert to base64": "database_value_convert", "Do Nothing": "database_rm_value"},
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "allowed_links":
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {
@@ -319,25 +312,28 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
     # common editing keyboard buttons
     if is_editing_btn:
         btn_data = [
-            {"Edit Value": "database_edit_value"},
-            {"Remove Value": "database_rm_value"},
+            {"Edit Value": "database_edit_value", "Remove Value": "database_rm_value"},
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data) # cant use btn as common bcz maybe there are other btn
     
     if is_boolean_btn:
         btn_data = [
             {"Enable": "database_bool_true", "Disable": "database_bool_false"},
             {"Back": "csettings_menu", "Close": "csettings_close"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data) # cant use btn as common bcz maybe there are other btn
     
-    # global reply
+    # `btn_data` pre-determined & added Refresh btn
+    if is_refresh_btn: btn_data.insert(0, {"Refresh": query.data})
+    btn = BuildKeyboard.cbutton(btn_data)
+    # Global Reply
     try:
         await query.edit_message_caption(text, reply_markup=btn)
     except BadRequest:
-        await query.edit_message_text(text, reply_markup=btn)
+        try:
+            await query.edit_message_text(text, reply_markup=btn)
+        except BadRequest:
+            await query.answer()
+        except Exception as e:
+            logger.error(e)
     except Exception as e:
         logger.error(e)

@@ -83,7 +83,7 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         'Enabled' if chat_data.get('antibot') else 'Disabled',
         'Enabled' if chat_data.get('welcome_user') else 'Disabled',
         'Enabled' if chat_data.get('farewell_user') else 'Disabled',
-        'Enabled' if chat_data.get('chat_join_req') else 'Disabled',
+        chat_data.get('chat_join_req'),
         'Enabled' if chat_data.get('service_messages') else 'Disabled',
         chat_data.get('links_behave'), # this contains a value
         ', '.join(chat_data.get('allowed_links') or [])

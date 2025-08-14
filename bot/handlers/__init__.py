@@ -61,7 +61,8 @@ from .user_handlers.b64decode import func_decode
 from .user_handlers.b64encode import func_encode
 from .user_handlers.calc import func_calc
 from .user_handlers.chatgpt import func_gpt
-from .user_handlers.gen_qr import func_qr
+from .user_handlers.decode_qr import func_decqr
+from .user_handlers.gen_qr import func_genqr
 from .user_handlers.gen_rap import func_rap
 from .user_handlers.id import func_id
 from .user_handlers.imagine import func_imagine

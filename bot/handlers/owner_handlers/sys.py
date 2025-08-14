@@ -86,7 +86,7 @@ async def func_sys(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>└ Bot uptime:</b> <code>{int(bot_days)}d {int(bot_hours)}h {int(bot_minute)}m</code>\n\n"
 
         "<b>🌐 Server</b>\n"
-        f"<b>└ Ping:</b> <code>{server_ping}</code>\n"
+        f"<b>├ Ping:</b> <code>{server_ping}</code>\n"
         f"<b>└ Telegram:</b> <code>{tg_server_ping}</code>"
     )
 

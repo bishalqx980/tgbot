@@ -21,6 +21,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     # variable required for global reply
     is_editing_btn = None
+    is_refresh_btn = True
 
     if query_data == "menu":
         text = BotSettingsData.TEXT.format(
@@ -34,7 +35,8 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             bot_data.get('weather_api') or '-'
         )
 
-        btn = BuildKeyboard.cbutton(BotSettingsData.BUTTONS)
+        btn_data = BotSettingsData.BUTTONS
+        is_refresh_btn = False
     
     elif query_data == "show_bot_pic":
         MemoryDB.insert(DBConstants.DATA_CENTER, user.id, {
@@ -53,8 +55,6 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             {"YES": "database_bool_true", "NO": "database_bool_false"},
             {"Back": "bsettings_menu", "Close": "misc_close"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
     
     elif query_data == "images":
         MemoryDB.insert(DBConstants.DATA_CENTER, user.id, {
@@ -186,8 +186,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             {"Restore Database": "bsettings_restoredb", "Wipe Memory Cache": "bsettings_wipe_memory"},
             {"Back": "bsettings_menu", "Close": "misc_close"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
+        is_refresh_btn = False
     
     elif query_data == "restoredb":
         text = (
@@ -199,8 +198,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             {"YES": "bsettings_restoredb_confirm", "NO": "bsettings_database"},
             {"Back": "bsettings_database"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
+        is_refresh_btn = False
     
     elif query_data == "restoredb_confirm":
         await query.answer("Restoring Bot Data...")
@@ -240,17 +238,22 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
     # common editing keyboard buttons
     if is_editing_btn:
         btn_data = [
-            {"Edit Value": "database_edit_value"},
-            {"Remove Value": "database_rm_value"},
+            {"Edit Value": "database_edit_value", "Remove Value": "database_rm_value"},
             {"Back": "bsettings_menu", "Close": "misc_close"}
         ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
     
-    # global reply
+    # `btn_data` pre-determined & added Refresh btn
+    if is_refresh_btn: btn_data.insert(0, {"Refresh": query.data})
+    btn = BuildKeyboard.cbutton(btn_data)
+    # Global Reply
     try:
         await query.edit_message_caption(text, reply_markup=btn)
     except BadRequest:
-        await query.edit_message_text(text, reply_markup=btn)
+        try:
+            await query.edit_message_text(text, reply_markup=btn)
+        except BadRequest:
+            await query.answer()
+        except Exception as e:
+            logger.error(e)
     except Exception as e:
         logger.error(e)
