@@ -34,6 +34,21 @@ This Telegram bot is built using the `python-telegram-bot` library *`version 21.
     - ~~Search YouTube video~~ `Removed due to limitations`
     - Much more...🤩 [Start Now](https://t.me/MissCiri_bot) to explore 🌴
 
+
+## How to add new command?
+
+- Only for `CommandHandler`
+- Create your handler file/func inside `bot/handlers`
+- Add your handler details in `bot/handler/commands.json`
+
+```
+{
+    "command": str or [str, str],   # str or list of str example: "start" or ["start", "demo"]
+    "function": "",                 # func name example: func_start
+    "module": ""                    # str example: .handlers.core.start
+}
+```
+
 ## Deploy your own bot 👩‍🚀
 
 **Steps**

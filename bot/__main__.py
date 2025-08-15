@@ -1,6 +1,8 @@
+import json
 import asyncio
 import aiohttp
 import traceback
+import importlib
 
 from telegram import Update, LinkPreviewOptions, BotCommand, BotCommandScope
 from telegram.ext import (
@@ -16,65 +18,32 @@ from telegram.ext import (
     ContextTypes,
     Defaults
 )
+
 from telegram.error import BadRequest, Conflict, NetworkError, TimedOut
 from telegram.constants import ChatID, ParseMode
 
-from . import DEFAULT_ERROR_CHANNEL_ID, RUN_SERVER, bot, logger, config
+from . import COMMANDS_FILE_PATH, DEFAULT_ERROR_CHANNEL_ID, RUN_SERVER, bot, logger, config
 from .utils.alive import alive
 from .utils.update_db import update_database
 from .modules import telegraph
 from .utils.database import MemoryDB
 
-from .handlers import (
+from .handlers.conversation.support import (
     SUPPORT_STATES,
     init_support_conv,
     support_state_one,
-    cancel_support_conv,
+    cancel_support_conv
+)
 
-    func_start,
-    func_help,
-
+from .handlers.filters import (
     filter_private_chat,
-    filter_public_chat,
+    filter_public_chat
+)
 
-    func_adminlist,
-    func_ban,
-    join_request_handler,
-    func_demote,
-    func_invite,
-    func_kick,
-    func_kickme,
-    func_lock,
-    func_mute,
-    func_pin,
-    func_promote,
-    func_purge,
-    func_purgefrom,
-    func_purgeto,
-    func_unban,
-    func_unlock,
-    func_unmute,
-    func_unpin,
-    func_unpinall,
-    func_warn,
-    func_warns,
-    func_whisper,
+from .handlers.core.help import func_help
+from .handlers.group.chat_join_req import join_request_handler
 
-    func_filter,
-    func_filters,
-    func_remove,
-
-    func_broadcast,
-    func_bsettings,
-    func_cadmins,
-    func_database,
-    func_invitelink,
-    func_log,
-    func_say,
-    func_send,
-    func_shell,
-    func_sys,
-
+from .handlers.query_handlers import (
     inline_query,
     query_admin_task,
     query_bot_settings,
@@ -82,34 +51,11 @@ from .handlers import (
     query_help_menu,
     query_misc,
     query_broadcast,
-    query_db_editing,
-
-    func_decode,
-    func_encode,
-    func_calc,
-    func_gpt,
-    func_decqr,
-    func_genqr,
-    func_rap,
-    func_id,
-    func_imagine,
-    func_imgtolink,
-    func_info,
-    func_movie,
-    func_paste,
-    func_ping,
-    func_psndl,
-    func_settings,
-    func_shorturl,
-    func_tts,
-    func_tr,
-    func_unzip,
-    func_weather,
-    func_ytdl,
-    
-    bot_chats_tracker,
-    chat_status_update
+    query_db_editing
 )
+
+from .handlers.bot_chats_tracker import bot_chats_tracker
+from .handlers.chat_status_update import chat_status_update
 
 
 async def post_init():
@@ -216,6 +162,24 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
         logger.error(e)
 
 
+def load_handlers():
+    handlers = []
+
+    with open(COMMANDS_FILE_PATH, "r") as f:
+        config = json.load(f)
+    
+    for handler_config in config["handlers"]:
+        # Import the module
+        module = importlib.import_module(handler_config["module"], __package__)
+        # Get the function
+        func = getattr(module, handler_config["function"])
+
+        # Create handler for main command
+        handlers.append(CommandHandler(handler_config["command"], func))
+    
+    return handlers
+
+
 def main():
     default_param = Defaults(
         parse_mode=ParseMode.HTML,
@@ -237,73 +201,11 @@ def main():
         )
     )
 
-    main_handlers = [
-        CommandHandler("start", func_help, filters.Regex("help")), # this need to register before main start handler
-        # core func
-        CommandHandler("start", func_start),
-        CommandHandler("help", func_help),
-        # group management func
-        CommandHandler("adminlist", func_adminlist),
-        CommandHandler(["ban", "sban", "dban"], func_ban),
-        CommandHandler(["demote", "sdemote"], func_demote),
-        CommandHandler(["invite", "sinvite"], func_invite),
-        CommandHandler(["kick", "skick", "dkick"], func_kick),
-        CommandHandler("kickme", func_kickme),
-        CommandHandler(["lock", "slock"], func_lock),
-        CommandHandler(["mute", "smute", "dmute"], func_mute),
-        CommandHandler(["pin", "spin"], func_pin),
-        CommandHandler(["promote", "spromote"], func_promote),
-        CommandHandler(["purge", "spurge"], func_purge),
-        CommandHandler("purgefrom", func_purgefrom),
-        CommandHandler("purgeto", func_purgeto),
-        CommandHandler(["unban", "sunban"], func_unban),
-        CommandHandler(["unlock", "sunlock"], func_unlock),
-        CommandHandler(["unmute", "sunmute"], func_unmute),
-        CommandHandler(["unpin", "sunpin"], func_unpin),
-        CommandHandler(["unpinall", "sunpinall"], func_unpinall),
-        CommandHandler(["warn", "dwarn"], func_warn),
-        CommandHandler("warns", func_warns),
-        CommandHandler("whisper", func_whisper),
-        CommandHandler("filter", func_filter),
-        CommandHandler("filters", func_filters),
-        CommandHandler("remove", func_remove),
-        # owner func
-        CommandHandler("broadcast", func_broadcast),
-        CommandHandler("bsettings", func_bsettings),
-        CommandHandler("cadmins", func_cadmins),
-        CommandHandler("database", func_database),
-        CommandHandler("invitelink", func_invitelink),
-        CommandHandler("log", func_log),
-        CommandHandler("say", func_say),
-        CommandHandler("send", func_send),
-        CommandHandler("shell", func_shell),
-        CommandHandler("sys", func_sys),
-        # user func
-        CommandHandler("decode", func_decode),
-        CommandHandler("encode", func_encode),
-        CommandHandler("calc", func_calc),
-        CommandHandler("gpt", func_gpt),
-        CommandHandler("decqr", func_decqr),
-        CommandHandler("genqr", func_genqr),
-        CommandHandler("rap", func_rap),
-        CommandHandler("id", func_id),
-        CommandHandler("imagine", func_imagine),
-        CommandHandler("imgtolink", func_imgtolink),
-        CommandHandler("info", func_info),
-        CommandHandler("movie", func_movie),
-        CommandHandler("paste", func_paste),
-        CommandHandler("ping", func_ping),
-        CommandHandler("psndl", func_psndl),
-        CommandHandler("settings", func_settings), # part of group management also
-        CommandHandler("shorturl", func_shorturl),
-        CommandHandler("tts", func_tts),
-        CommandHandler("tr", func_tr),
-        CommandHandler("unzip", func_unzip),
-        CommandHandler("weather", func_weather),
-        CommandHandler("ytdl", func_ytdl)
-    ]
-
     # main handlers register
+    main_handlers = load_handlers()
+    # this need to register before main start handler
+    main_handlers.insert(0, CommandHandler("start", func_help, filters.Regex("help")))
+    
     application.add_handlers(main_handlers)
     
     # Chat Join Request Handler

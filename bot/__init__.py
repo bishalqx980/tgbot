@@ -9,6 +9,7 @@ from .utils.logger import setup_logging
 # constants
 __version__ = json.load(open("version.json", "rb"))["__version__"] # major.minor.patch.commits
 CONFIG_FILE = "config.env"
+COMMANDS_FILE_PATH = "bot/handlers/commands.json"
 REQUIRED_DIRS = ["downloads", "sys"]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot"
 ORIGINAL_BOT_ID = 6845693976
