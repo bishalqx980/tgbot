@@ -27,5 +27,5 @@ async def func_leave(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Huh, you aren't the owner of this chat!")
         return
     
-    btn = BuildKeyboard.cbutton([{"Leave": "misc_leavechat", "Stay": "misc_close"}])
+    btn = BuildKeyboard.cbutton([{"Leave": f"misc_leavechat_{user.id}", "Stay": "misc_close"}])
     await effective_message.reply_text("Should I leave?", reply_markup=btn)
