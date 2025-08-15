@@ -61,6 +61,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• /unlock » Unlock the chat (back to normal)\n"
             "• /adminlist » Get chat admins list.\n"
             "• /filters | /filter | /remove » to see/set/remove custom message/command.\n"
+            "• /leave » bot will leave the chat.\n"
             "• /settings » Settings of chat\n\n"
 
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!\n"

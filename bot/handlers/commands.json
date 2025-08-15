@@ -42,6 +42,11 @@
             "module": ".handlers.group.kickme"
         },
         {
+            "command": "leave",
+            "function": "func_leave",
+            "module": ".handlers.group.leave"
+        },
+        {
             "command": ["lock", "slock"],
             "function": "func_lock",
             "module": ".handlers.group.lock"
