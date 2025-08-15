@@ -120,6 +120,7 @@ async def post_init():
     bot_pvt_commands = [
         BotCommand("start", "Introducing..."),
         BotCommand("help", "Bots help section..."),
+        BotCommand("settings", "Chat settings..."),
         BotCommand("support", "Get Support or Report any bug related to bot...")
     ]
 

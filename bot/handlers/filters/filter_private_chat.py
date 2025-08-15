@@ -13,13 +13,15 @@ async def filter_private_chat(update: Update, context: ContextTypes.DEFAULT_TYPE
     chat = update.effective_chat
     user = update.effective_user
     message = update.effective_message
+    re_msg = message.reply_to_message
 
     # Support Conversation
-    if message.reply_to_message:
-        replied_message = message.reply_to_message
-        if "#uid" in [replied_message.text or replied_message.caption]:
+    if re_msg:
+        message_text = re_msg.text or re_msg.caption
+
+        if message_text and "#uid" in message_text:
             try:
-                support_conv_uid = int(replied_message.text.split("#uid")[1].strip(), 16) # base 16: hex
+                support_conv_uid = int(message_text.split("#uid")[1].strip(), 16) # base 16: hex
                 text = ""
                 btn = None
                 # if user sending message to owner/support-team then add userinfo
