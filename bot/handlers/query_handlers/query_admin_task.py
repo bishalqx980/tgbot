@@ -20,7 +20,7 @@ async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TY
         MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, {"anonymous_admin": user})
         return
     
-    elif query_data.startswith("remove_warn"):
+    elif query_data.startswith("remove_warn_"):
         # expecting remove_warn_[victim_id]
         victim_id = query_data.removeprefix("remove_warn_")
 
@@ -52,3 +52,13 @@ async def query_groupManagement(update: Update, context: ContextTypes.DEFAULT_TY
             return
         
         await query.edit_message_text(f"Great! Admin {user.mention_html()} has cleared all warnings of {victim_mention or f'<code>{victim_id}</code>'}.")
+    
+    elif query_data.startswith("leavechat_"):
+        # expecting leavechat_[adminUserID]
+        user_id = query_data.removeprefix("leavechat_")
+        if user_id != str(user.id):
+            await query.answer("Access Denied!")
+            return
+        
+        await query.edit_message_text("Sorry, I couldn't help you! Bye..! 😕")
+        await chat.leave()

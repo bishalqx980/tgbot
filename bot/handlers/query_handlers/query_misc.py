@@ -98,15 +98,6 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             await query.edit_message_text(f"<i>The whisper message is seen by {user.full_name}!</i>")
     
-    elif query_data.startswith("leavechat_"):
-        user_id = query_data.removeprefix("leavechat_")
-        if user_id != str(user.id):
-            await query.answer("Access Denied!")
-            return
-        
-        await query.edit_message_text("Sorry, I couldn't help you! Bye..! 😕")
-        await chat.leave()
-    
     elif query_data == "close":
         try:
             message_id = query.message.message_id
