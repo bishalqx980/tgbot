@@ -63,6 +63,11 @@ async def func_purgeto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
     re_msg = effective_message.reply_to_message
     
+    if user.is_bot:
+        user = await anonymousAdmin(chat, effective_message)
+        if not user:
+            return
+    
     if not re_msg:
         await effective_message.reply_text(
             "Reply the last message to delete.\n"
