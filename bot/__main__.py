@@ -57,6 +57,8 @@ from .handlers.query_handlers import (
 from .handlers.bot_chats_tracker import bot_chats_tracker
 from .handlers.chat_status_update import chat_status_update
 
+from .helpers.discord_helper import send_discord_message
+
 
 async def post_init():
     # initializing telegraph
@@ -86,6 +88,7 @@ async def post_init():
     # Send alive message to bot owner
     try:
         await bot.send_message(config.owner_id, "<blockquote><b>Bot Started!</b></blockquote>", parse_mode=ParseMode.HTML)
+        send_discord_message("**> Bot Started!**")
     except Exception as e:
         logger.error(e)
     
@@ -146,6 +149,8 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
     if DEFAULT_ERROR_CHANNEL_ID:
         try:
             sent_message = await context.bot.send_message(DEFAULT_ERROR_CHANNEL_ID, text)
+            # Send message to discord
+            send_discord_message(f"```{text}```")
             if auto_del_message:
                 await asyncio.sleep(60)
                 await sent_message.delete()
@@ -158,6 +163,8 @@ async def default_error_handler(update: Update, context: ContextTypes.DEFAULT_TY
     # if not DEFAULT_ERROR_CHANNEL_ID or BadRequest
     try:
         await context.bot.send_message(config.owner_id, text)
+        # Send message to discord
+        send_discord_message(f"```{text}```")
     except Exception as e:
         logger.error(e)
 

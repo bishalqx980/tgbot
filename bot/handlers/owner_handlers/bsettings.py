@@ -21,7 +21,8 @@ class BotSettingsData:
         "• Sudo: <code>{}</code>\n"
         "• Shrinkme API: <code>{}</code>\n"
         "• OMDB API: <code>{}</code>\n"
-        "• Weather API: <code>{}</code>"
+        "• Weather API: <code>{}</code>\n"
+        "• Discord Webhook: <code>{}</code>"
     )
 
     BUTTONS = [
@@ -29,6 +30,7 @@ class BotSettingsData:
         {"Support Chat": "bsettings_support_chat", "Server URL": "bsettings_server_url"},
         {"Sudo": "bsettings_sudo", "Shrinkme API": "bsettings_shrinkme_api"},
         {"OMDB API": "bsettings_omdb_api", "Weather API": "bsettings_weather_api"},
+        {"Discord Webhook": "bsettings_discord_webhook"},
         {"> ⁅ Database ⁆": "bsettings_database", "Close": "misc_close"}
     ]
 
@@ -60,7 +62,8 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         len(bot_data.get('sudo_users') or []),
         bot_data.get('shrinkme_api') or '-',
         bot_data.get('omdb_api') or '-',
-        bot_data.get('weather_api') or '-'
+        bot_data.get('weather_api') or '-',
+        bot_data.get('discord_webhook') or '-'
     )
 
     btn = BuildKeyboard.cbutton(BotSettingsData.BUTTONS)
