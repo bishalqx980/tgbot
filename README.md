@@ -111,6 +111,8 @@ This Telegram bot is built using the `python-telegram-bot` library *`version 21.
 
 ---
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://telegra.ph/Buy-me-a-Coffee-03-01)
+
 ```
 𝓐 𝓹𝓻𝓸𝓳𝓮𝓬𝓽 𝓸𝓯
 

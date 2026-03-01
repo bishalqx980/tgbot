@@ -184,7 +184,11 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         btn_data = [
-            {"Source code": "https://github.com/bishalqx980/tgbot", "Report bug": "https://github.com/bishalqx980/tgbot/issues"},
+            {
+                "Source code": "https://github.com/bishalqx980/tgbot",
+                "Report bug": "https://github.com/bishalqx980/tgbot/issues",
+                "Buy me a Coffee": "https://telegra.ph/Buy-me-a-Coffee-03-01"
+            },
             {"Developer": "https://t.me/bishalqx680/22"},
             {"Back": "help_menu_menu", "Close": "misc_close"}
         ]

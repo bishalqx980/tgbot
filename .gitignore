@@ -16,3 +16,4 @@ sys
 !.vscode/*
 !version.json
 !commands.json
+!coffee.json
