@@ -54,7 +54,7 @@ async def func_unzip(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await sent_message.edit_text((
                 "Uploading...\n"
                 f"File: <code>{i}</code>\n"
-                f"Percent: <code>{percentBar}</code>"
+                f"Progress: <code>{percentBar}</code>"
             ))
             await effective_message.reply_document(i)
             uploaded += 1
