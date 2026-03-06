@@ -1,5 +1,4 @@
 python-telegram-bot==22.6
-discord-webhook==1.4.1
 python-dotenv==1.1.0
 deep-translator==1.11.4
 pymongo==4.13.0

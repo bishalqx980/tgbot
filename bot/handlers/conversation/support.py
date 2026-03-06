@@ -4,7 +4,6 @@ from telegram.ext import ContextTypes, ConversationHandler
 from bot import logger, config
 from bot.utils.decorators.pm_only import pm_only
 from bot.helpers import BuildKeyboard
-from bot.helpers.discord_helper import send_discord_message
 
 
 class SUPPORT_STATES:
@@ -40,8 +39,6 @@ async def support_state_one(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         btn = BuildKeyboard.ubutton([{"User Profile": f"tg://user?id={user.id}"}]) if user.username else None
         await context.bot.send_message(config.owner_id, message, reply_markup=btn)
-        # Send message to discord
-        send_discord_message(f"```{message}```")
         # confirm message
         text = "Report has been submitted. Support team will contact you as soon as possible."
     except Exception as e:

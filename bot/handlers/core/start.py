@@ -18,9 +18,6 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text(f"Hey, {user.first_name}\nStart me in PM!", reply_markup=btn)
         return
     
-    # database entry checking if user is registered.
-    database_add_user(user)
-
     show_bot_pic = MemoryDB.bot_data.get("show_bot_pic") # Boolean
     support_chat = MemoryDB.bot_data.get("support_chat")
     photo_file_id = None
@@ -51,14 +48,21 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     btn = BuildKeyboard.ubutton([btn_data])
 
-    if photo_file_id:
-        try:
-            await effective_message.reply_photo(photo_file_id, text, reply_markup=btn)
-            return
-        except BadRequest:
-            pass
-        except Exception as e:
-            logger.error(e)
+    try:
+        if photo_file_id:
+            try:
+                await effective_message.reply_photo(photo_file_id, text, reply_markup=btn)
+                return
+            except BadRequest:
+                pass
+            except Exception as e:
+                logger.error(e)
+        
+        # if BadRequest or No Photo or Other error
+        await effective_message.reply_text(text, reply_markup=btn)
+    except Exception as e:
+        logger.error(e)
     
-    # if BadRequest or No Photo or Other error
-    await effective_message.reply_text(text, reply_markup=btn)
+    finally:
+        # database entry checking if user is registered.
+        database_add_user(user)

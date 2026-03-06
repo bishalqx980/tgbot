@@ -35,9 +35,6 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         btn = BuildKeyboard.ubutton([{"Click here for help": create_deep_linked_url(context.bot.username, "help")}])
         await effective_message.reply_text(f"Hey, {user.first_name}\nContact me in PM for help!", reply_markup=btn)
         return
-    
-    # database entry checking if user is registered.
-    database_add_user(user)
 
     show_bot_pic = MemoryDB.bot_data.get("show_bot_pic")
     images = MemoryDB.bot_data.get("images")
@@ -55,14 +52,21 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     btn = BuildKeyboard.cbutton(HelpMenuData.BUTTONS)
     
-    if photo or photo_file_id:
-        try:
-            await effective_message.reply_photo(photo or photo_file_id, HelpMenuData.TEXT, reply_markup=btn)
-            return
-        except BadRequest:
-            pass
-        except Exception as e:
-            logger.error(e)
+    try:
+        if photo or photo_file_id:
+            try:
+                await effective_message.reply_photo(photo or photo_file_id, HelpMenuData.TEXT, reply_markup=btn)
+                return
+            except BadRequest:
+                pass
+            except Exception as e:
+                logger.error(e)
+        
+        # if BadRequest or No Photo or Other error
+        await effective_message.reply_text(HelpMenuData.TEXT, reply_markup=btn)
+    except Exception as e:
+        logger.error(e)
     
-    # if BadRequest or No Photo or Other error
-    await effective_message.reply_text(HelpMenuData.TEXT, reply_markup=btn)
+    finally:
+        # database entry checking if user is registered.
+        database_add_user(user)

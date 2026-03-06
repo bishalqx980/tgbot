@@ -18,8 +18,6 @@ class CONFIG:
         self.omdb_api: Optional[str] = None
         self.weather_api: Optional[str] = None
 
-        self.discord_webhook: Optional[str] = None
-
 
     def load_config(self, config_file) -> None:
         """
@@ -40,9 +38,6 @@ class CONFIG:
         self.shrinkme_api = os.getenv("SHRINKME_API")
         self.omdb_api = os.getenv("OMDB_API")
         self.weather_api = os.getenv("WEATHER_API")
-
-        # ----- Discord Webhook ------
-        self.discord_webhook = os.getenv("DISCORD_WEBHOOK")
     
 
     def validate(self) -> bool:

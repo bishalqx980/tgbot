@@ -35,8 +35,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             len(bot_data.get('sudo_users') or []),
             bot_data.get('shrinkme_api') or '-',
             bot_data.get('omdb_api') or '-',
-            bot_data.get('weather_api') or '-',
-            bot_data.get('discord_webhook') or '-'
+            bot_data.get('weather_api') or '-'
         )
 
         btn_data = BotSettingsData.BUTTONS
@@ -173,21 +172,6 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             "Weather API: <code>{}</code>\n\n"
             "<blockquote><b>Note:</b> This API is for /weather command.</blockquote>"
         ).format(bot_data.get("weather_api") or '-')
-
-    elif query_data == "discord_webhook":
-        MemoryDB.insert(DBConstants.DATA_CENTER, user.id, {
-            "update_data_key": "discord_webhook",
-            "is_list": False,
-            "is_int": False
-        })
-        
-        is_editing_btn = True
-
-        text = (
-            "<blockquote><b>Bot Settings</b></blockquote>\n\n"
-            "Discord Webhook: <code>{}</code>\n\n"
-            "<blockquote><b>Note:</b> This is required if you want to send log to your discord server.</blockquote>"
-        ).format(bot_data.get("discord_webhook") or '-')
     
     elif query_data == "database":
         text = (

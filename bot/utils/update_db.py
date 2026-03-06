@@ -21,9 +21,7 @@ def update_database():
 
         "shrinkme_api": config.shrinkme_api,
         "omdb_api": config.omdb_api,
-        "weather_api": config.weather_api,
-        
-        "discord_webhook": config.discord_webhook
+        "weather_api": config.weather_api
     }
     
     try:
