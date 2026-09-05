@@ -1,13 +1,12 @@
 import json
 from io import BytesIO
 
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 
 from bot import logger
 from bot.utils.update_db import update_database
-from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, MemoryDB, MongoDB
 from ..owner_handlers.bsettings import BotSettingsData
 
@@ -241,13 +240,21 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
     # common editing keyboard buttons
     if is_editing_btn:
         btn_data = [
-            {"Edit Value": "database_edit_value", "Remove Value": "database_rm_value"},
-            {"Back": "bsettings_menu", "Close": "misc_close"}
+            [
+                InlineKeyboardButton("Edit Value", callback_data="database_edit_value"),
+                InlineKeyboardButton("Remove Value", callback_data="database_rm_value")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="bsettings_menu"),
+                InlineKeyboardButton("Close", callback_data="misc_close")
+            ]
         ]
     
     # `btn_data` pre-determined & added Refresh btn
-    if is_refresh_btn: btn_data.insert(0, {"Refresh": query.data})
-    btn = BuildKeyboard.cbutton(btn_data)
+    if is_refresh_btn:
+        btn_data.insert(0, InlineKeyboardButton("Refresh", callback_data=query.data))
+    
+    btn = InlineKeyboardMarkup(btn_data)
     # Global Reply
     try:
         await query.edit_message_caption(text, reply_markup=btn)

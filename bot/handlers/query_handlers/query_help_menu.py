@@ -2,13 +2,12 @@ import psutil
 from time import time
 from datetime import timedelta
 
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 
-from bot import __version__, __versionStatus__, BOT_UPTIME, logger
-from bot.helpers import BuildKeyboard
-from bot.utils.database import DBConstants, MongoDB
+from bot import __version__, __versionStatus__, BOT_UPTIME, logger, config
+from bot.utils.database import DBConstants, MongoDB, MemoryDB
 from ..core.help import HelpMenuData
 
 
@@ -21,7 +20,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query_data == "menu":
         text = HelpMenuData.TEXT
-        btn = BuildKeyboard.cbutton(HelpMenuData.BUTTONS)
+        btn = HelpMenuData.BUTTONS
     
     elif query_data == "gm1":
         text = (
@@ -45,12 +44,15 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Some command has a silent & delete function! eg. <code>/s[command]</code> & <code>/d[command]</code> » /sban or /dban etc.</blockquote>"
         )
 
-        btn_data = [
-            {"Next page ⇒": "help_menu_gm2"},
-            {"Back": "help_menu_menu", "Close": "misc_close"}
-        ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
+        btn = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton("Next page ⇒", callback_data="help_menu_gm2")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="help_menu_menu"),
+                InlineKeyboardButton("Close", callback_data="misc_close")
+            ]
+        ])
     
     elif query_data == "gm2":
         text = (
@@ -71,12 +73,15 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Some command has a silent & delete function! eg. <code>/s[command]</code> & <code>/d[command]</code> » /sban or /dban etc.</blockquote>"
         )
 
-        btn_data = [
-            {"⇐ Previous page": "help_menu_gm1"},
-            {"Back": "help_menu_menu", "Close": "misc_close"}
-        ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
+        btn = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton("⇐ Previous page", callback_data="help_menu_gm1")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="help_menu_menu"),
+                InlineKeyboardButton("Close", callback_data="misc_close")
+            ]
+        ])
     
     elif query_data == "ai_knowledge":
         text = (
@@ -88,7 +93,10 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
 
-        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "misc_close"}])
+        btn = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Back", callback_data="help_menu_menu"),
+            InlineKeyboardButton("Close", callback_data="misc_close")
+        ]])
     
     elif query_data == "misc":
         text = (
@@ -118,10 +126,24 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
-        
-        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "misc_close"}])
+
+        btn = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Back", callback_data="help_menu_menu"),
+            InlineKeyboardButton("Close", callback_data="misc_close")
+        ]])
     
     elif query_data == "owner":
+        # authorization check
+        owner_id = config.owner_id
+        sudo_users = MemoryDB.bot_data.get("sudo_users") or []
+        
+        if owner_id not in sudo_users:
+            sudo_users.append(owner_id)
+
+        if user.id not in sudo_users:
+            await query.answer("Unauthorized!", True)
+            return
+        
         text = (
             "<blockquote><b>Owner/Sudo Functions</b></blockquote>\n\n"
 
@@ -138,8 +160,11 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             "<blockquote><b>Note:</b> Send command to get more details about the command functions!</blockquote>"
         )
-        
-        btn = BuildKeyboard.cbutton([{"Back": "help_menu_menu", "Close": "misc_close"}])
+
+        btn = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Back", callback_data="help_menu_menu"),
+            InlineKeyboardButton("Close", callback_data="misc_close")
+        ]])
     
     elif query_data == "botinfo":
         await query.answer("Getting information...")
@@ -183,13 +208,20 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
             t_chats_count = "loading..."
         )
 
-        btn_data = [
-            {"Source code": "https://github.com/bishalqx980/tgbot", "Report bug": "https://github.com/bishalqx980/tgbot/issues"},
-            {"Developer": "https://t.me/bishalqx680/22", "Buy me a Coffee": "https://telegra.ph/Buy-me-a-Coffee-03-01"},
-            {"Back": "help_menu_menu", "Close": "misc_close"}
-        ]
-
-        btn = BuildKeyboard.cbutton(btn_data)
+        btn = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton("Source code", "https://github.com/bishalqx980/tgbot"),
+                InlineKeyboardButton("Report bug", "https://github.com/bishalqx980/tgbot/issues")
+            ],
+            [
+                InlineKeyboardButton("Developer", "https://t.me/bishalqx680/22"),
+                InlineKeyboardButton("Buy me a Coffee", "https://telegra.ph/Buy-me-a-Coffee-03-01")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="help_menu_menu"),
+                InlineKeyboardButton("Close", callback_data="misc_close")
+            ]
+        ])
 
         # sending response without db info (more efficient?)
         try:

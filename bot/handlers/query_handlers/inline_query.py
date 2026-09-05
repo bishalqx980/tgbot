@@ -1,12 +1,11 @@
 from uuid import uuid4
 from base64 import b64decode, b64encode
 
-from telegram import Update, InlineQueryResultArticle, InputTextMessageContent
+from telegram import Update, InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 
 from bot import logger
-from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, MemoryDB
 from bot.modules.utils import UTILITY
 
@@ -16,7 +15,9 @@ def inlineQueryMaker(title, message, reply_markup=None, description=None):
     :param description: Type `same` if you want to keep the description same as message!
     """
     if not reply_markup:
-        reply_markup = BuildKeyboard.cbutton([{"Try inline": "switch_to_inline"}])
+        reply_markup = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Try inline", switch_inline_query_current_chat="")
+        ]])
     
     try:
         content = InlineQueryResultArticle(
@@ -119,9 +120,13 @@ async def inline_query_handler(update: Update, context: ContextTypes.DEFAULT_TYP
             # Diffrent from normal /whisper cmd
             MemoryDB.insert(DBConstants.DATA_CENTER, "whisper_data", {"whispers": whispers})
 
-            btn = BuildKeyboard.cbutton([
-                {"See the message 💭": f"misc_tmp_whisper_{whisper_key}"},
-                {"Try Yourself!": "switch_to_inline"}
+            btn = InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton("See the message 💭", callback_data=f"misc_tmp_whisper_{whisper_key}")
+                ],
+                [
+                    InlineKeyboardButton("Try Yourself!", switch_inline_query_current_chat="Type your secret message!")
+                ]
             ])
 
             results.append(inlineQueryMaker(

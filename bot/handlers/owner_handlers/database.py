@@ -1,11 +1,10 @@
 import json
 from io import BytesIO
 
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
 from bot.utils.database import DBConstants, MongoDB
-from bot.helpers import BuildKeyboard
 from bot.utils.decorators.sudo_users import require_sudo
 from bot.utils.decorators.pm_only import pm_only
 
@@ -82,7 +81,9 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Allowed Links: <code>{', '.join(chat_data.get('allowed_links') or [])}</code>"
         )
 
-        btn = BuildKeyboard.ubutton([{"Invite Link": chat_invite_link}]) if chat_invite_link else None
+        btn = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Invite Link", chat_invite_link)
+        ]]) if chat_invite_link else None
         
         custom_welcome_msg = chat_data.get('custom_welcome_msg')
         if custom_welcome_msg:
@@ -131,7 +132,9 @@ async def func_database(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
         if victim_info:
-            btn = BuildKeyboard.ubutton([{"User Profile": f"tg://user?id={victim_info.id}"}]) if victim_info.username else None
+            btn = InlineKeyboardMarkup([[
+                InlineKeyboardButton("User Profile", f"tg://user?id={victim_info.id}")
+            ]]) if victim_info.username else None
     
     # common message sender for both group chat & private chat database info
     await message.reply_text(text, reply_markup=btn)

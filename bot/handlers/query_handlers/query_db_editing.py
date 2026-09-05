@@ -1,8 +1,7 @@
 import asyncio
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
-from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, MemoryDB, MongoDB
 
 
@@ -55,8 +54,12 @@ async def query_db_editing(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         timeout = 10
 
-        btn = BuildKeyboard.cbutton([{"Cancel": "database_cancel_editing"}])
-        sent_message = await chat.send_message(f"Waiting for a new value (Timeout: {timeout}s): ", reply_markup=btn)
+        sent_message = await chat.send_message(
+            f"Waiting for a new value (Timeout: {timeout}s): ",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("Cancel", callback_data="database_cancel_editing")
+            ]])
+        )
 
         for i in range(timeout):
             data_center = MemoryDB.data_center[chat.id]

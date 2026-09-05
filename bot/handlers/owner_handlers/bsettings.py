@@ -1,11 +1,10 @@
 import random
 
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest
 
 from bot import logger
-from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, MemoryDB
 from bot.utils.decorators.sudo_users import require_sudo
 from bot.utils.decorators.pm_only import pm_only
@@ -24,13 +23,28 @@ class BotSettingsData:
         "• Weather API: <code>{}</code>"
     )
 
-    BUTTONS = [
-        {"Show Bot Photo": "bsettings_show_bot_pic", "Images": "bsettings_images"},
-        {"Support Chat": "bsettings_support_chat", "Server URL": "bsettings_server_url"},
-        {"Sudo": "bsettings_sudo", "Shrinkme API": "bsettings_shrinkme_api"},
-        {"OMDB API": "bsettings_omdb_api", "Weather API": "bsettings_weather_api"},
-        {"> ⁅ Database ⁆": "bsettings_database", "Close": "misc_close"}
-    ]
+    BUTTONS = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("Show Bot Photo", callback_data="bsettings_show_bot_pic"),
+            InlineKeyboardButton("Images", callback_data="bsettings_images")
+        ],
+        [
+            InlineKeyboardButton("Support Chat", callback_data="bsettings_support_chat"),
+            InlineKeyboardButton("Server URL", callback_data="bsettings_server_url")
+        ],
+        [
+            InlineKeyboardButton("Sudo", callback_data="bsettings_sudo"),
+            InlineKeyboardButton("Shrinkme API", callback_data="bsettings_shrinkme_api")
+        ],
+        [
+            InlineKeyboardButton("OMDB API", callback_data="bsettings_omdb_api"),
+            InlineKeyboardButton("Weather API", callback_data="bsettings_weather_api")
+        ],
+        [
+            InlineKeyboardButton("> ⁅ Database ⁆", callback_data="bsettings_database"),
+            InlineKeyboardButton("Close", callback_data="misc_close")
+        ]
+    ])
 
 
 @pm_only
@@ -62,8 +76,6 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
         bot_data.get('omdb_api') or '-',
         bot_data.get('weather_api') or '-'
     )
-
-    btn = BuildKeyboard.cbutton(BotSettingsData.BUTTONS)
     
     show_bot_pic = MemoryDB.bot_data.get("show_bot_pic")
     images = MemoryDB.bot_data.get("images")
@@ -81,7 +93,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if photo or photo_file_id:
         try:
-            await message.reply_photo(photo or photo_file_id, text, reply_markup=btn, protect_content=True)
+            await message.reply_photo(photo or photo_file_id, text, reply_markup=BotSettingsData.BUTTONS)
             return
         except BadRequest:
             pass
@@ -89,4 +101,4 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.error(e)
     
     # if BadRequest or No Photo or Other error
-    await message.reply_text(text, reply_markup=btn, protect_content=True)
+    await message.reply_text(text, reply_markup=BotSettingsData.BUTTONS)

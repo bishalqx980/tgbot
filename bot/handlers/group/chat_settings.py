@@ -1,6 +1,6 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
-from bot.helpers import BuildKeyboard
+
 from bot.utils.database import DBConstants, MemoryDB, database_search
 from .auxiliary.chat_admins import ChatAdmins
 from .auxiliary.anonymous_admin import anonymousAdmin
@@ -25,14 +25,31 @@ class GroupChatSettingsData:
         "• Allowed Links: <code>{}</code>"
     )
 
-    BUTTONS = [
-        {"Language": "csettings_lang", "Auto translate": "csettings_auto_tr"},
-        {"Echo": "csettings_echo", "Antibot": "csettings_antibot"},
-        {"Welcome Members": "csettings_welcome_user", "Farewell Members": "csettings_farewell_user"},
-        {"Links Behave": "csettings_links_behave", "Allowed Links": "csettings_allowed_links"},
-        {"Join Request": "csettings_chat_join_req", "Service Messages": "csettings_service_messages"},
-        {"Close": "csettings_close"}
-    ]
+    BUTTONS = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("Language", callback_data="csettings_lang"),
+            InlineKeyboardButton("Auto translate", callback_data="csettings_auto_tr")
+        ],
+        [
+            InlineKeyboardButton("Echo", callback_data="csettings_echo"),
+            InlineKeyboardButton("Antibot", callback_data="csettings_antibot")
+        ],
+        [
+            InlineKeyboardButton("Welcome Members", callback_data="csettings_welcome_user"),
+            InlineKeyboardButton("Farewell Members", callback_data="csettings_farewell_user")
+        ],
+        [
+            InlineKeyboardButton("Links Behave", callback_data="csettings_links_behave"),
+            InlineKeyboardButton("Allowed Links", callback_data="csettings_allowed_links")
+        ],
+        [
+            InlineKeyboardButton("Join Request",callback_data="csettings_chat_join_req"),
+            InlineKeyboardButton("Service Messages", callback_data="csettings_service_messages")
+        ],
+        [
+            InlineKeyboardButton("Close", callback_data="csettings_close")
+        ]
+    ])
 
 
 async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -74,22 +91,21 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
     
     MemoryDB.insert(DBConstants.DATA_CENTER, chat.id, data)
-
-    text = GroupChatSettingsData.TEXT.format(
-        chat.title,
-        chat.id,
-        chat_data.get('lang') or '-',
-        'Enabled' if chat_data.get('auto_tr') else 'Disabled',
-        'Enabled' if chat_data.get('echo') else 'Disabled',
-        'Enabled' if chat_data.get('antibot') else 'Disabled',
-        'Enabled' if chat_data.get('welcome_user') else 'Disabled',
-        'Enabled' if chat_data.get('farewell_user') else 'Disabled',
-        chat_data.get('chat_join_req'),
-        'Enabled' if chat_data.get('service_messages') else 'Disabled',
-        chat_data.get('links_behave'), # this contains a value
-        ', '.join(chat_data.get('allowed_links') or [])
+    
+    await effective_message.reply_text(
+        GroupChatSettingsData.TEXT.format(
+            chat.title,
+            chat.id,
+            chat_data.get('lang') or '-',
+            'Enabled' if chat_data.get('auto_tr') else 'Disabled',
+            'Enabled' if chat_data.get('echo') else 'Disabled',
+            'Enabled' if chat_data.get('antibot') else 'Disabled',
+            'Enabled' if chat_data.get('welcome_user') else 'Disabled',
+            'Enabled' if chat_data.get('farewell_user') else 'Disabled',
+            chat_data.get('chat_join_req'),
+            'Enabled' if chat_data.get('service_messages') else 'Disabled',
+            chat_data.get('links_behave'), # this contains a value
+            ', '.join(chat_data.get('allowed_links') or [])
+        ),
+        reply_markup=GroupChatSettingsData.BUTTONS
     )
-
-    btn = BuildKeyboard.cbutton(GroupChatSettingsData.BUTTONS)
-
-    await effective_message.reply_text(text, reply_markup=btn)

@@ -1,7 +1,6 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
-from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, MemoryDB, MongoDB, database_search
 
 
@@ -52,9 +51,13 @@ async def query_misc(update: Update, context: ContextTypes.DEFAULT_TYPE):
             whispers.pop(whisper_key)
             # Diffrent from normal /whisper cmd
             MemoryDB.insert(DBConstants.DATA_CENTER, "whisper_data", {"whispers": whispers})
-
-            btn = BuildKeyboard.cbutton([{"Try Yourself!": "switch_to_inline"}])
-            await query.edit_message_text(f"<i>The whisper message is seen by {user.full_name}!</i>", reply_markup=btn)
+            
+            await query.edit_message_text(
+                f"<i>The whisper message is seen by {user.full_name}!</i>",
+                reply_markup=InlineKeyboardMarkup([[
+                    InlineKeyboardButton("Try Yourself!", switch_inline_query_current_chat="")
+                ]])
+            )
     
     elif query_data.startswith("whisper_"):
         chat_data = database_search(DBConstants.CHATS_DATA, "chat_id", chat.id)

@@ -1,6 +1,6 @@
 # [tgbot](https://bishalqx980.github.io/tgbot) 👻
 
-This Telegram bot is built using the `python-telegram-bot` library *`version 21.9`* and performs various tasks within **Telegram**.
+This Telegram bot is built using the **[python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)** library and performs various tasks within **Telegram**.
 
 > **This bot can be found as [Ciri](https://t.me/MissCiri_bot) on Telegram.**
 
@@ -111,7 +111,15 @@ This Telegram bot is built using the `python-telegram-bot` library *`version 21.
 
 ---
 
+<p align="center">
+  Made with ❤️ by <a href="https://github.com/bishalqx980">bishalqx980</a>
+</p>
+
+---
+
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://telegra.ph/Buy-me-a-Coffee-03-01)
+
+---
 
 ```
 𝓐 𝓹𝓻𝓸𝓳𝓮𝓬𝓽 𝓸𝓯

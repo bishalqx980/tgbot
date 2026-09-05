@@ -1,11 +1,11 @@
 import random
-from telegram import Update
+
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 from telegram.error import BadRequest
-from telegram.helpers import create_deep_linked_url
+
 from bot import logger
-from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB, database_add_user
 
 
@@ -19,11 +19,21 @@ class HelpMenuData:
         "• /support - Get Support or Report any bug related to bot"
     )
 
-    BUTTONS = [
-        {"Group Management": "help_menu_gm1", "AI/LLM": "help_menu_ai_knowledge"},
-        {"Misc": "help_menu_misc", "Owner/Sudo": "help_menu_owner"},
-        {"» bot.info()": "help_menu_botinfo",  "Close": "misc_close", "Try inline": "switch_to_inline"}
-    ]
+    BUTTONS = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("Group Management", callback_data="help_menu_gm1"),
+            InlineKeyboardButton("AI", callback_data="help_menu_ai_knowledge")
+        ],
+        [
+            InlineKeyboardButton("Misc", callback_data="help_menu_misc"),
+            InlineKeyboardButton("Owner/Sudo", callback_data="help_menu_owner")
+        ],
+        [
+            InlineKeyboardButton("» bot.info()", callback_data="help_menu_botinfo"),
+            InlineKeyboardButton("Close", callback_data="misc_close"),
+            InlineKeyboardButton("Try inline", switch_inline_query_current_chat="")
+        ]
+    ])
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -32,9 +42,12 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
 
     if chat.type not in [ChatType.PRIVATE]:
-        btn = BuildKeyboard.ubutton([{"Click here for help": create_deep_linked_url(context.bot.username, "help")}])
-        await effective_message.reply_text(f"Hey, {user.first_name}\nContact me in PM for help!", reply_markup=btn)
-        return
+        return await effective_message.reply_text(
+            f"Hey, {user.first_name}\nContact me in PM for help!",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("Click here for help", f"http://t.me/{context.bot.username}?start=help")
+            ]])
+        )
 
     show_bot_pic = MemoryDB.bot_data.get("show_bot_pic")
     images = MemoryDB.bot_data.get("images")
@@ -50,12 +63,13 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except:
             pass
     
-    btn = BuildKeyboard.cbutton(HelpMenuData.BUTTONS)
-    
     try:
         if photo or photo_file_id:
             try:
-                await effective_message.reply_photo(photo or photo_file_id, HelpMenuData.TEXT, reply_markup=btn)
+                await effective_message.reply_photo(
+                    photo or photo_file_id, HelpMenuData.TEXT,
+                    reply_markup=HelpMenuData.BUTTONS
+                )
                 return
             except BadRequest:
                 pass
@@ -63,7 +77,10 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.error(e)
         
         # if BadRequest or No Photo or Other error
-        await effective_message.reply_text(HelpMenuData.TEXT, reply_markup=btn)
+        await effective_message.reply_text(
+            HelpMenuData.TEXT,
+            reply_markup=HelpMenuData.BUTTONS
+        )
     except Exception as e:
         logger.error(e)
     

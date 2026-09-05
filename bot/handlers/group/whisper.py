@@ -1,10 +1,9 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
 from bot.utils.decorators.pm_error import pm_error
 from bot.utils.database import DBConstants, MemoryDB, MongoDB, database_search
 from bot.modules.utils import UTILITY
-from bot.helpers import BuildKeyboard
 
 
 @pm_error
@@ -82,5 +81,9 @@ async def func_whisper(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if re_msg and whisper_username is None:
         whisper_username = re_msg.from_user.mention_html()
     
-    btn = BuildKeyboard.cbutton([{"See the message 💭": f"misc_whisper_{whisper_key}"}])
-    await sent_message.edit_text(f"Hey, {whisper_username}. You got a whisper message from {user.name}.", reply_markup=btn)
+    await sent_message.edit_text(
+        f"Hey, {whisper_username}. You got a whisper message from {user.name}.",
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("See the message 💭", callback_data=f"misc_whisper_{whisper_key}")
+        ]])
+    )

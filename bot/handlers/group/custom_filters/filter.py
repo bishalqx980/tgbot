@@ -1,9 +1,8 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
 from bot.utils.decorators.pm_error import pm_error
 from bot.utils.database import DBConstants, MemoryDB, MongoDB, database_search
-from bot.helpers import BuildKeyboard
 from ..auxiliary.chat_admins import ChatAdmins
 from ..auxiliary.anonymous_admin import anonymousAdmin
 
@@ -59,14 +58,18 @@ async def func_filter(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "<code>{chatname}</code> chat title\n"
         )
 
-        btn = BuildKeyboard.cbutton([{"Close": "misc_close"}])
-        await effective_message.reply_text(text, reply_markup=btn)
-        return
+        return await effective_message.reply_text(
+            text,
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("Close", callback_data="misc_close")
+            ]])
+        )
 
     chat_data = database_search(DBConstants.CHATS_DATA, "chat_id", chat.id)
     if not chat_data:
-        await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
-        return
+        return await effective_message.reply_text(
+            "<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>"
+        )
     
     filters = chat_data.get("filters")
 

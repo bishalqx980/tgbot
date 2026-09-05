@@ -1,10 +1,9 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
-from telegram.helpers import create_deep_linked_url
 from telegram.error import BadRequest
+
 from bot import ORIGINAL_BOT_USERNAME, ORIGINAL_BOT_ID, logger
-from bot.helpers import BuildKeyboard
 from bot.utils.database import MemoryDB, database_add_user
 
 
@@ -14,9 +13,12 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     effective_message = update.effective_message
 
     if chat.type not in [ChatType.PRIVATE]:
-        btn = BuildKeyboard.ubutton([{"Start me in PM": create_deep_linked_url(context.bot.username, "start")}])
-        await effective_message.reply_text(f"Hey, {user.first_name}\nStart me in PM!", reply_markup=btn)
-        return
+        return await effective_message.reply_text(
+            f"Hey, {user.first_name}\nStart me in PM!",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("Start me in PM", f"http://t.me/{context.bot.username}?start=start")
+            ]])
+        )
     
     show_bot_pic = MemoryDB.bot_data.get("show_bot_pic") # Boolean
     support_chat = MemoryDB.bot_data.get("support_chat")
@@ -42,11 +44,16 @@ async def func_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if context.bot.id != ORIGINAL_BOT_ID:
         text += f"\n\n<blockquote>Cloned bot of @{ORIGINAL_BOT_USERNAME}</blockquote>"
 
-    btn_data = {"Add me to your chat": create_deep_linked_url(context.bot.username, "help", True)}
+    btn_data = [
+        [
+            InlineKeyboardButton("Add me to your chat", f"http://t.me/{context.bot.username}?startgroup=help")
+        ]
+    ]
+
     if support_chat:
-        btn_data.update({"Support Chat": support_chat})
+        btn_data.append([InlineKeyboardButton("Support Chat", support_chat)])
     
-    btn = BuildKeyboard.ubutton([btn_data])
+    btn = InlineKeyboardMarkup(btn_data)
 
     try:
         if photo_file_id:

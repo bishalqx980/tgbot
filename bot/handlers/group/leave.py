@@ -1,9 +1,8 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import ChatMemberStatus
 
 from bot.utils.decorators.pm_error import pm_error
-from bot.helpers import BuildKeyboard
 from .auxiliary.anonymous_admin import anonymousAdmin
 
 
@@ -28,5 +27,10 @@ async def func_leave(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await effective_message.reply_text("Huh, you aren't the owner of this chat!")
         return
     
-    btn = BuildKeyboard.cbutton([{"Leave": f"admin_leavechat_{user.id}", "Stay": "misc_close"}])
-    await effective_message.reply_text("Should I leave?", reply_markup=btn)
+    await effective_message.reply_text(
+        "Should I leave?",
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("Leave", callback_data=f"admin_leavechat_{user.id}"),
+            InlineKeyboardButton("Stay", callback_data="misc_close")
+        ]])
+    )

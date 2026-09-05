@@ -1,8 +1,6 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import MessageOriginType
-
-from bot.helpers import BuildKeyboard
 
 
 async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -42,7 +40,9 @@ async def func_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>• Is premium:</b> <code>{'Yes' if victim.is_premium else 'No'}</code>"
     )
 
-    btn = BuildKeyboard.ubutton([{"User Profile": f"tg://user?id={victim.id}"}]) if victim.username else None
+    btn = InlineKeyboardMarkup([[
+        InlineKeyboardButton("User Profile", f"tg://user?id={victim.id}")
+    ]]) if victim.username else None
 
     if victim_pfp:
         await effective_message.reply_photo(victim_pfp, text, reply_markup=btn)

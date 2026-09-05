@@ -1,6 +1,6 @@
-from telegram import Message, User
+from telegram import Message, User, InlineKeyboardMarkup, InlineKeyboardButton
+
 from bot import TL_LANG_CODES_URL
-from bot.helpers import BuildKeyboard
 from bot.modules.translator import translate
 
 
@@ -15,9 +15,12 @@ async def autoTranslate(message: Message, user: User, lang_code: str):
     response = translate(text, lang_code)
 
     if response is False:
-        btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
-        await message.reply_text("Invalid language code was given! Use /settings to set chat language.", reply_markup=btn)
-        return
+        return await message.reply_text(
+            "Invalid language code was given! Use /settings to set chat language.",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("Language code's", TL_LANG_CODES_URL)
+            ]])
+        )
     
     if not response:
         return

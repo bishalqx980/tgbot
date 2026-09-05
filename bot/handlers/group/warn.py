@@ -1,9 +1,9 @@
-from telegram import Update, ChatPermissions
+from telegram import Update, ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
 from bot.utils.decorators.pm_error import pm_error
 from bot.utils.database import DBConstants, MemoryDB, MongoDB, database_search
-from bot.helpers import BuildKeyboard
+
 from .auxiliary.chat_admins import ChatAdmins
 from .auxiliary.anonymous_admin import anonymousAdmin
 
@@ -86,9 +86,13 @@ async def func_warn(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"<b>You got warning's:</b> <code>{warn_count}/3</code>\n"
         f"<b>Reason (current warn):</b> <code>{reason if reason else 'Not Given'}</code>"
     )
-
-    btn = BuildKeyboard.cbutton([{"Remove Warn's (Admin only)": f"admin_remove_warn_{victim.id}"}])
-    await effective_message.reply_text(text, reply_markup=btn)
+    
+    await effective_message.reply_text(
+        text,
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("Remove Warn's (Admin only)", callback_data=f"admin_remove_warn_{victim.id}")
+        ]])
+    )
 
     if warn_count >= 3:
         try:

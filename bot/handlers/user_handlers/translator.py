@@ -1,9 +1,8 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.constants import ChatType
 
 from bot import TL_LANG_CODES_URL
-from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, database_search
 from bot.modules.translator import fetch_lang_codes, translate
 
@@ -17,9 +16,12 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context_args = " ".join(context.args)
 
     if not text and not context_args:
-        btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
-        await effective_message.reply_text("Use <code>/tr text</code> or <code>/tr lang code text</code> or reply the text with <code>/tr</code> or <code>/tr lang code</code>\n\nEnable auto translator mode for this chat from /settings", reply_markup=btn)
-        return
+        return await effective_message.reply_text(
+            "Use <code>/tr text</code> or <code>/tr lang code text</code> or reply the text with <code>/tr</code> or <code>/tr lang code</code>\n\nEnable auto translator mode for this chat from /settings",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("Language code's", TL_LANG_CODES_URL)
+            ]])
+        )
     
     to_translate = None
     lang_code = None
@@ -50,15 +52,19 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         database_data = database_search(collection_name, to_find, to_match)
         if not database_data:
-            await effective_message.reply_text("<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>")
-            return
+            return await effective_message.reply_text(
+                "<blockquote><b>Error:</b> Chat isn't registered! Remove/Block me from this chat then add me again!</blockquote>"
+            )
         
         lang_code = database_data.get("lang")
     
     if not lang_code:
-        btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
-        await effective_message.reply_text("Chat language code wasn't found! Use /tr to get more details or /settings to set chat language.", reply_markup=btn)
-        return
+        return await effective_message.reply_text(
+            "Chat language code wasn't found! Use /tr to get more details or /settings to set chat language.",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("Language code's", TL_LANG_CODES_URL)
+            ]])
+        )
     
     sent_message = await effective_message.reply_text("💭 Translating...")
 
@@ -67,7 +73,9 @@ async def func_tr(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if translated_text == False:
         text = "Invalid language code was given! Use /tr to get more details or /settings to set chat language."
-        btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
+        btn = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Language code's", TL_LANG_CODES_URL)
+        ]])
 
     elif not translated_text:
         text = "Oops! Something went wrong!"

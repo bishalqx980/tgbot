@@ -1,12 +1,10 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
-from bot.helpers import BuildKeyboard
 from bot.modules.freeimagehost import upload_image
 
 
 async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat = update.effective_chat
     effective_message = update.effective_message
     re_msg = effective_message.reply_to_message
 
@@ -38,14 +36,16 @@ async def func_imgtolink(update: Update, context: ContextTypes.DEFAULT_TYPE):
     img_size = image_data.get("size_formatted")
     img_mime = image_data["image"]["mime"]
 
-    text = (
-        "↓ <u><b>Image Details</b></u> ↓\n"
-        f"<b>- URL:</b> <a href='{img_url}'>◊ See Image ◊</a>\n"
-        f"<b>- Width:</b> <code>{img_width}px</code>\n"
-        f"<b>- Height:</b> <code>{img_height}px</code>\n"
-        f"<b>- Size:</b> <code>{img_size}</code>\n"
-        f"<b>- Mime:</b> <code>{img_mime}</code>"
+    await sent_message.edit_text(
+        (
+            "↓ <u><b>Image Details</b></u> ↓\n"
+            f"<b>- URL:</b> <a href='{img_url}'>◊ See Image ◊</a>\n"
+            f"<b>- Width:</b> <code>{img_width}px</code>\n"
+            f"<b>- Height:</b> <code>{img_height}px</code>\n"
+            f"<b>- Size:</b> <code>{img_size}</code>\n"
+            f"<b>- Mime:</b> <code>{img_mime}</code>"
+        ),
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("View 👀", img_url)
+        ]])
     )
-
-    btn = BuildKeyboard.ubutton([{"View 👀": img_url}])
-    await sent_message.edit_text(text, reply_markup=btn)

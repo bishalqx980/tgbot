@@ -2,13 +2,12 @@ import asyncio
 from time import time
 from io import BytesIO
 
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from telegram.error import BadRequest, Forbidden
 
 from bot.utils.database import DBConstants, MemoryDB, MongoDB
 from bot.modules.utils import UTILITY
-from bot.helpers import BuildKeyboard
 
 
 async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -104,7 +103,9 @@ async def query_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "[]"
         )
 
-        broadcastButton = BuildKeyboard.cbutton([{"Cancel": "broadcast_cancel"}])
+        broadcastButton = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Cancel", callback_data="broadcast_cancel")
+        ]])
         
         try:
             await query.edit_message_text(text, reply_markup=broadcastButton)

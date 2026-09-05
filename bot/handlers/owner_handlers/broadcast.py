@@ -1,7 +1,6 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
-from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, MemoryDB
 from bot.utils.decorators.sudo_users import require_sudo
 from bot.utils.decorators.pm_only import pm_only
@@ -33,10 +32,16 @@ async def func_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
     broadcastAudio_filename = re_msg.audio.file_name if re_msg.audio else None
 
     broadcastVoice = re_msg.voice.file_id if re_msg.voice else None
-
-    broadcastButton = BuildKeyboard.cbutton([
-        {"📩 Forward": "broadcast_value_forward", "📌 Pin": "broadcast_value_pin"},
-        {"✅ Send": "broadcast_send", "✖️ Close": "misc_close"}
+    
+    broadcastButton = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton("📩 Forward", callback_data="broadcast_value_forward"),
+            InlineKeyboardButton("📌 Pin", callback_data="broadcast_value_pin")
+        ],
+        [
+            InlineKeyboardButton("✅ Send", callback_data="broadcast_send"),
+            InlineKeyboardButton("✖️ Close", callback_data="misc_close")
+        ]
     ])
 
     broadcastData = {

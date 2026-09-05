@@ -1,8 +1,7 @@
-from telegram import Update, ChatMember
+from telegram import Update, ChatMember, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 
 from bot import TL_LANG_CODES_URL
-from bot.helpers import BuildKeyboard
 from bot.utils.database import DBConstants, database_search
 
 from .edit_database import edit_database
@@ -48,8 +47,12 @@ async def filter_public_chat(update: Update, context: ContextTypes.DEFAULT_TYPE)
     chat_lang = chat_data.get("lang")
 
     if auto_tr and not chat_lang:
-        btn = BuildKeyboard.ubutton([{"Language code's": TL_LANG_CODES_URL}])
-        await message.reply_text("Chat language code wasn't found! Use /settings to set chat language.", reply_markup=btn)
+        await message.reply_text(
+            "Chat language code wasn't found! Use /settings to set chat language.",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("Language code's", TL_LANG_CODES_URL)
+            ]])
+        )
     
     elif auto_tr and not filtered_text:
         await autoTranslate(message, user, chat_lang)
