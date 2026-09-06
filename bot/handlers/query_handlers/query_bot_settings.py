@@ -54,8 +54,14 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         ).format("Yes" if bot_data.get("show_bot_pic") else "No")
 
         btn_data = [
-            {"YES": "database_bool_true", "NO": "database_bool_false"},
-            {"Back": "bsettings_menu", "Close": "misc_close"}
+            [
+                InlineKeyboardButton("YES", callback_data="database_bool_true"),
+                InlineKeyboardButton("NO", callback_data="database_bool_false")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="bsettings_menu"),
+                InlineKeyboardButton("Close", callback_data="misc_close")
+            ]
         ]
     
     elif query_data == "images":
@@ -185,9 +191,16 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         )
 
         btn_data = [
-            {"Restore Database": "bsettings_restoredb", "Wipe Memory Cache": "bsettings_wipe_memory"},
-            {"Back": "bsettings_menu", "Close": "misc_close"}
+            [
+                InlineKeyboardButton("Restore Database", callback_data="bsettings_restoredb"),
+                InlineKeyboardButton("Wipe Memory Cache", callback_data="bsettings_wipe_memory")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="bsettings_menu"),
+                InlineKeyboardButton("Close", callback_data="misc_close")
+            ]
         ]
+
         is_refresh_btn = False
     
     elif query_data == "restoredb":
@@ -197,9 +210,15 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
         )
 
         btn_data = [
-            {"YES": "bsettings_restoredb_confirm", "NO": "bsettings_database"},
-            {"Back": "bsettings_database"}
+            [
+                InlineKeyboardButton("YES", callback_data="bsettings_restoredb_confirm"),
+                InlineKeyboardButton("NO", callback_data="bsettings_database")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="bsettings_database")
+            ]
         ]
+        
         is_refresh_btn = False
     
     elif query_data == "restoredb_confirm":

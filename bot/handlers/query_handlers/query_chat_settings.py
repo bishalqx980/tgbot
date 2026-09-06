@@ -152,10 +152,20 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format("Enabled" if memory_data.get("welcome_user") else 'Disabled')
 
         btn_data = [
-            {"Enable": "database_bool_true", "Disable": "database_bool_false"},
-            {"Welcome Photo": "csettings_welcome_photo"},
-            {"Custom Welcome Message": "csettings_custom_welcome_msg"},
-            {"Back": "csettings_menu", "Close": "csettings_close"}
+            [
+                InlineKeyboardButton("Enable", callback_data="database_bool_true"),
+                InlineKeyboardButton("Disable", callback_data="database_bool_false")
+            ],
+            [
+                InlineKeyboardButton("Welcome Photo", callback_data="csettings_welcome_photo")
+            ],
+            [
+                InlineKeyboardButton("Custom Welcome Message", callback_data="csettings_custom_welcome_msg")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="csettings_menu"),
+                InlineKeyboardButton("Close", callback_data="csettings_close")
+            ]
         ]
     
     elif query_data == "welcome_photo":
@@ -172,8 +182,14 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(memory_data.get("welcome_photo") or "-")
 
         btn_data = [
-            {"Edit Value": "database_edit_value", "Remove Value": "database_rm_value"},
-            {"Back": "csettings_welcome_user", "Close": "csettings_close"}
+            [
+                InlineKeyboardButton("Edit Value", callback_data="database_edit_value"),
+                InlineKeyboardButton("Remove Value", callback_data="database_rm_value")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="csettings_welcome_user"),
+                InlineKeyboardButton("Close", callback_data="csettings_close")
+            ]
         ]
     
     elif query_data == "custom_welcome_msg":
@@ -196,9 +212,17 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(custom_message)
 
         btn_data = [
-            {"Set Custom Message": "database_edit_value", "Remove Custom Message": "database_rm_value"},
-            {"Formattings": "csettings_formattings"},
-            {"Back": "csettings_welcome_user", "Close": "csettings_close"}
+            [
+                InlineKeyboardButton("Set Custom Message", callback_data="database_edit_value"),
+                InlineKeyboardButton("Remove Custom Message", callback_data="database_rm_value")
+            ],
+            [
+                InlineKeyboardButton("Formattings", callback_data="csettings_formattings")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="csettings_welcome_user"),
+                InlineKeyboardButton("Close", callback_data="csettings_close")
+            ]
         ]
     
     elif query_data == "formattings":
@@ -213,7 +237,13 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
             "• <code>{chatname}</code> - chat title"
         )
 
-        btn_data = [{"Back": "csettings_custom_welcome_msg", "Close": "csettings_close"}]
+        btn_data = [
+            [
+                InlineKeyboardButton("Back", callback_data="csettings_custom_welcome_msg"),
+                InlineKeyboardButton("Close", callback_data="csettings_close")
+            ]
+        ]
+
         is_refresh_btn = False
     
     elif query_data == "farewell_user":
@@ -245,8 +275,15 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(memory_data.get("chat_join_req"))
 
         btn_data = [
-            {"Approve": "database_value_approve", "Decline": "database_value_decline", "Do Nothing": "database_rm_value"},
-            {"Back": "csettings_menu", "Close": "csettings_close"}
+            [
+                InlineKeyboardButton("Approve", callback_data="database_value_approve"),
+                InlineKeyboardButton("Decline", callback_data="database_value_decline"),
+                InlineKeyboardButton("Do Nothing", callback_data="database_rm_value")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="csettings_menu"),
+                InlineKeyboardButton("Close", callback_data="csettings_close")
+            ]
         ]
     
     elif query_data == "service_messages":
@@ -279,8 +316,15 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
         ).format(memory_data.get("links_behave"))
 
         btn_data = [
-            {"Delete": "database_value_delete", "Convert to base64": "database_value_convert", "Do Nothing": "database_rm_value"},
-            {"Back": "csettings_menu", "Close": "csettings_close"}
+            [
+                InlineKeyboardButton("Delete", callback_data="database_value_delete"),
+                InlineKeyboardButton("Convert to base64", callback_data="database_value_convert"),
+                InlineKeyboardButton("Do Nothing", callback_data="database_rm_value")
+            ],
+            [
+                InlineKeyboardButton("Back", callback_data="csettings_menu"),
+                InlineKeyboardButton("Close", callback_data="csettings_close")
+            ]
         ]
     
     elif query_data == "allowed_links":
