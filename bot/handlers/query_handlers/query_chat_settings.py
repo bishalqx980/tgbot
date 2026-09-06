@@ -381,7 +381,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
     
     # `btn_data` pre-determined & added Refresh btn
     if is_refresh_btn:
-        btn_data.insert(0, InlineKeyboardButton("Refresh", callback_data=query.data))
+        btn_data.insert(0, [InlineKeyboardButton("Refresh", callback_data=query.data)])
     
     btn = InlineKeyboardMarkup(btn_data)
     # Global Reply

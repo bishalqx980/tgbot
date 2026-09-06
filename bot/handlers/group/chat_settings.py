@@ -25,7 +25,7 @@ class GroupChatSettingsData:
         "• Allowed Links: <code>{}</code>"
     )
 
-    BUTTONS = InlineKeyboardMarkup([
+    BUTTONS = [
         [
             InlineKeyboardButton("Language", callback_data="csettings_lang"),
             InlineKeyboardButton("Auto translate", callback_data="csettings_auto_tr")
@@ -49,7 +49,7 @@ class GroupChatSettingsData:
         [
             InlineKeyboardButton("Close", callback_data="csettings_close")
         ]
-    ])
+    ]
 
 
 async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -107,5 +107,5 @@ async def chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_data.get('links_behave'), # this contains a value
             ', '.join(chat_data.get('allowed_links') or [])
         ),
-        reply_markup=GroupChatSettingsData.BUTTONS
+        reply_markup=InlineKeyboardMarkup(GroupChatSettingsData.BUTTONS)
     )

@@ -18,7 +18,7 @@ class PvtChatSettingsData:
         "• Echo: <code>{}</code>"
     )
 
-    BUTTONS = InlineKeyboardMarkup([
+    BUTTONS = [
         [
             InlineKeyboardButton("Language", callback_data="csettings_lang"),
             InlineKeyboardButton("Auto translate", callback_data="csettings_auto_tr")
@@ -27,7 +27,7 @@ class PvtChatSettingsData:
             InlineKeyboardButton("Echo", callback_data="csettings_echo"),
             InlineKeyboardButton("Close", callback_data="misc_close")
         ]
-    ])
+    ]
 
 
 async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -62,5 +62,5 @@ async def func_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             'Enabled' if user_data.get('auto_tr') else 'Disabled',
             'Enabled' if user_data.get('echo') else 'Disabled'
         ),
-        reply_markup=PvtChatSettingsData.BUTTONS
+        reply_markup=InlineKeyboardMarkup(PvtChatSettingsData.BUTTONS)
     )

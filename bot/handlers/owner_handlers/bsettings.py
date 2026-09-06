@@ -23,7 +23,7 @@ class BotSettingsData:
         "• Weather API: <code>{}</code>"
     )
 
-    BUTTONS = InlineKeyboardMarkup([
+    BUTTONS = [
         [
             InlineKeyboardButton("Show Bot Photo", callback_data="bsettings_show_bot_pic"),
             InlineKeyboardButton("Images", callback_data="bsettings_images")
@@ -44,7 +44,7 @@ class BotSettingsData:
             InlineKeyboardButton("> ⁅ Database ⁆", callback_data="bsettings_database"),
             InlineKeyboardButton("Close", callback_data="misc_close")
         ]
-    ])
+    ]
 
 
 @pm_only
@@ -93,7 +93,7 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if photo or photo_file_id:
         try:
-            await message.reply_photo(photo or photo_file_id, text, reply_markup=BotSettingsData.BUTTONS)
+            await message.reply_photo(photo or photo_file_id, text, reply_markup=InlineKeyboardMarkup(BotSettingsData.BUTTONS))
             return
         except BadRequest:
             pass
@@ -101,4 +101,4 @@ async def func_bsettings(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.error(e)
     
     # if BadRequest or No Photo or Other error
-    await message.reply_text(text, reply_markup=BotSettingsData.BUTTONS)
+    await message.reply_text(text, reply_markup=InlineKeyboardMarkup(BotSettingsData.BUTTONS))

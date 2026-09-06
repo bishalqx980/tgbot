@@ -19,7 +19,7 @@ class HelpMenuData:
         "• /support - Get Support or Report any bug related to bot"
     )
 
-    BUTTONS = InlineKeyboardMarkup([
+    BUTTONS = [
         [
             InlineKeyboardButton("Group Management", callback_data="help_menu_gm1"),
             InlineKeyboardButton("AI", callback_data="help_menu_ai_knowledge")
@@ -33,7 +33,7 @@ class HelpMenuData:
             InlineKeyboardButton("Close", callback_data="misc_close"),
             InlineKeyboardButton("Try inline", switch_inline_query_current_chat="")
         ]
-    ])
+    ]
 
 
 async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -68,7 +68,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 await effective_message.reply_photo(
                     photo or photo_file_id, HelpMenuData.TEXT,
-                    reply_markup=HelpMenuData.BUTTONS
+                    reply_markup=InlineKeyboardMarkup(HelpMenuData.BUTTONS)
                 )
                 return
             except BadRequest:
@@ -79,7 +79,7 @@ async def func_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # if BadRequest or No Photo or Other error
         await effective_message.reply_text(
             HelpMenuData.TEXT,
-            reply_markup=HelpMenuData.BUTTONS
+            reply_markup=InlineKeyboardMarkup(HelpMenuData.BUTTONS)
         )
     except Exception as e:
         logger.error(e)
