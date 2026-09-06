@@ -56,7 +56,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
                 'Enabled' if memory_data.get('echo') else 'Disabled'
             )
 
-            btn_data = PvtChatSettingsData.BUTTONS
+            btn_data = InlineKeyboardMarkup(PvtChatSettingsData.BUTTONS)
             is_refresh_btn = False
         
         else:
@@ -75,7 +75,7 @@ async def query_chat_settings(update: Update, context: ContextTypes.DEFAULT_TYPE
                 ', '.join(memory_data.get('allowed_links') or [])
             )
 
-            btn_data = GroupChatSettingsData.BUTTONS
+            btn_data = InlineKeyboardMarkup(GroupChatSettingsData.BUTTONS)
             is_refresh_btn = False
     
     elif query_data == "lang":

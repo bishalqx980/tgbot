@@ -37,7 +37,7 @@ async def query_bot_settings(update: Update, context: ContextTypes.DEFAULT_TYPE)
             bot_data.get('weather_api') or '-'
         )
 
-        btn_data = BotSettingsData.BUTTONS
+        btn_data = InlineKeyboardMarkup(BotSettingsData.BUTTONS)
         is_refresh_btn = False
     
     elif query_data == "show_bot_pic":

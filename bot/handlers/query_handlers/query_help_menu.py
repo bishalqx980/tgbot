@@ -20,7 +20,7 @@ async def query_help_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if query_data == "menu":
         text = HelpMenuData.TEXT
-        btn = HelpMenuData.BUTTONS
+        btn = InlineKeyboardMarkup(HelpMenuData.BUTTONS)
     
     elif query_data == "gm1":
         text = (
