@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Admin Dashboard | SocketChat
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/admin.css') }}"
+    >
+
+</head>
+
+<body class="dashboard-body">
+
+
+<div class="dashboard">
+
+
+    <aside class="admin-sidebar">
+
+
+        <div class="admin-brand">
+
+            <div class="brand-icon">
+
+                ◉
+
+            </div>
+
+            <div>
+
+                <h2>SocketChat</h2>
+
+                <span>Administration</span>
+
+            </div>
+
+        </div>
+
+
+        <nav>
+
+            <a class="active">
+
+                Dashboard
+
+            </a>
+
+            <a href="/">
+
+                User Chat
+
+            </a>
+
+            <a
+                href="/admin/logout"
+                class="logout"
+            >
+
+                Logout
+
+            </a>
+
+        </nav>
+
+
+    </aside>
+
+
+    <main class="dashboard-main">
+
+
+        <header class="dashboard-header">
+
+
+            <div>
+
+                <h1>
+                    Live Dashboard
+                </h1>
+
+                <p>
+                    Monitor active chat rooms in real time
+                </p>
+
+            </div>
+
+
+            <div class="live-badge">
+
+                <span></span>
+
+                Live
+
+            </div>
+
+
+        </header>
+
+
+        <section class="stats">
+
+
+            <div class="stat-card">
+
+                <span>Total Users</span>
+
+                <strong id="totalUsers">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>Active Rooms</span>
+
+                <strong id="totalRooms">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>Default Room</span>
+
+                <strong id="defaultRoomCount">
+                    0
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+        <section class="rooms-section">
+
+
+            <div class="section-header">
+
+
+                <div>
+
+                    <h2>
+                        Active Rooms
+                    </h2>
+
+                    <p>
+                        Rooms disappear when empty
+                    </p>
+
+                </div>
+
+
+                <button id="refreshRooms">
+
+                    Refresh
+
+                </button>
+
+
+            </div>
+
+
+            <div
+                id="roomsContainer"
+                class="rooms-container"
+            >
+
+                <div class="empty-state">
+
+                    Loading rooms...
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+<div
+    id="roomModal"
+    class="modal hidden"
+>
+
+
+    <div class="modal-content">
+
+
+        <div class="modal-header">
+
+
+            <div>
+
+                <h2 id="modalRoomId"></h2>
+
+                <p id="modalMemberCount"></p>
+
+            </div>
+
+
+            <button id="closeModal">
+
+                ×
+
+            </button>
+
+
+        </div>
+
+
+        <div
+            id="modalMembers"
+            class="modal-members"
+        ></div>
+
+
+    </div>
+
+
+</div>
+
+
+<div
+    id="adminJoinModal"
+    class="modal hidden"
+>
+
+
+    <div class="modal-content admin-join-modal">
+
+
+        <div class="modal-header">
+
+
+            <div>
+
+                <h2>
+                    Join Room
+                </h2>
+
+                <p id="adminJoinRoomText"></p>
+
+            </div>
+
+
+            <button id="closeAdminJoin">
+
+                ×
+
+            </button>
+
+
+        </div>
+
+
+        <div class="admin-join-form">
+
+
+            <label>
+                Your display name
+            </label>
+
+
+            <input
+                type="text"
+                id="adminJoinName"
+                placeholder="Administrator"
+                maxlength="30"
+            >
+
+
+            <button id="confirmAdminJoin">
+
+                Join Room
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+<script
+    src="{{ url_for('static', filename='js/admin.js') }}"
+></script>
+
+</body>
+
+</html>

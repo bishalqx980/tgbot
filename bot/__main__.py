@@ -23,7 +23,7 @@ from telegram.error import BadRequest, Conflict, NetworkError, TimedOut
 from telegram.constants import ChatID, ParseMode
 
 from . import COMMANDS_FILE_PATH, DEFAULT_ERROR_CHANNEL_ID, RUN_SERVER, bot, logger, config
-from .utils.alive import alive
+from .utils.server import server
 from .utils.update_db import update_database
 from .modules import telegraph
 from .utils.database import MemoryDB
@@ -252,7 +252,7 @@ def main():
 
 async def app_init():
     if RUN_SERVER:
-        alive() # Server breathing
+        server() # Server breathing
     # maintain the sequence
     update_database()
     await post_init()

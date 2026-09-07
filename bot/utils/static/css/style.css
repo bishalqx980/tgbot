@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Inter, sans-serif;
+    background: #08090c;
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+.background {
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(75, 61, 255, 0.12), transparent 30%),
+        radial-gradient(circle at 80% 80%, rgba(0, 170, 255, 0.08), transparent 30%);
+    pointer-events: none;
+}
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+    position: relative;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 460px;
+    padding: 42px;
+    background: rgba(18, 20, 27, 0.9);
+    border: 1px solid #272a35;
+    border-radius: 24px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 30px 100px rgba(0, 0, 0, 0.45);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 38px;
+}
+
+.logo-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #635bff;
+    border-radius: 14px;
+    font-size: 24px;
+}
+
+.logo h1 {
+    font-size: 24px;
+}
+
+.logo p {
+    color: #858a99;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #c9ccd6;
+}
+
+.form-group label span {
+    color: #707687;
+    font-weight: 400;
+    margin-left: 5px;
+}
+
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.label-row button {
+    border: none;
+    background: transparent;
+    color: #7b73ff;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+input {
+    width: 100%;
+    padding: 15px 16px;
+    background: #11131a;
+    border: 1px solid #2b2e3a;
+    border-radius: 12px;
+    color: white;
+    outline: none;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+input:focus {
+    border-color: #635bff;
+    box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.12);
+}
+
+.password-input {
+    position: relative;
+}
+
+.password-input input {
+    padding-right: 65px;
+}
+
+.password-input button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: #8d93a3;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.join-button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: #635bff;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.join-button:hover {
+    background: #756eff;
+    transform: translateY(-1px);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 28px 0;
+    color: #6f7482;
+    font-size: 11px;
+}
+
+.divider span {
+    flex: 1;
+    height: 1px;
+    background: #292c36;
+}
+
+.default-room {
+    width: 100%;
+    padding: 14px;
+    background: #11131a;
+    border: 1px solid #2b2e3a;
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.default-room:hover {
+    border-color: #635bff;
+}
+
+.default-room small {
+    display: block;
+    color: #74798a;
+    margin-top: 4px;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: #39d98a;
+    border-radius: 50%;
+    margin-right: 7px;
+}
+
+.privacy-info {
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+    padding: 13px;
+    background: rgba(99, 91, 255, 0.06);
+    border: 1px solid rgba(99, 91, 255, 0.12);
+    border-radius: 10px;
+}
+
+.privacy-info div {
+    color: #8d86ff;
+}
+
+.privacy-info p {
+    font-size: 11px;
+    line-height: 1.5;
+    color: #868c9b;
+}
+
+.footer {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    color: #656a78;
+    font-size: 12px;
+}
+
+.footer a {
+    color: #7b73ff;
+    text-decoration: none;
+}
+
+@media (max-width: 500px) {
+    .login-card {
+        padding: 28px 22px;
+    }
+}

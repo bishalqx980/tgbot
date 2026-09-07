@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>SocketChat</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="background"></div>
+
+<main class="login-container">
+
+    <section class="login-card">
+
+        <div class="logo">
+
+            <div class="logo-icon">◉</div>
+
+            <div>
+
+                <h1>SocketChat</h1>
+
+                <p>Private real-time conversations</p>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Your Name</label>
+
+            <input
+                type="text"
+                id="name"
+                placeholder="Enter your name"
+                maxlength="30"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <div class="label-row">
+
+                <label>Room Number</label>
+
+                <button
+                    id="randomRoom"
+                    type="button"
+                >
+                    Create random room
+                </button>
+
+            </div>
+
+            <input
+                type="text"
+                id="room"
+                value="{{ default_room }}"
+                placeholder="Enter room number"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div class="form-group password-group">
+
+            <div class="label-row">
+
+                <label>
+                    Room Password
+                    <span>Optional</span>
+                </label>
+
+            </div>
+
+            <div class="password-input">
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Leave empty for public room"
+                    maxlength="100"
+                >
+
+                <button
+                    type="button"
+                    id="togglePassword"
+                >
+                    Show
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="join-button"
+            id="joinButton"
+        >
+            Join Room
+        </button>
+
+
+        <div class="divider">
+
+            <span></span>
+
+            <p>or join the public room</p>
+
+            <span></span>
+
+        </div>
+
+
+        <button
+            class="default-room"
+            id="defaultRoom"
+        >
+
+            <span class="status-dot"></span>
+
+            {{ default_room }}
+
+            <small>Default Public Room</small>
+
+        </button>
+
+
+        <div class="privacy-info">
+
+            <div>◈</div>
+
+            <p>
+                Messages are never permanently stored.
+                Files are deleted when a room becomes empty.
+            </p>
+
+        </div>
+
+
+        <div class="footer">
+
+            <a href="/admin/login">
+                Admin
+            </a>
+
+            <span>•</span>
+
+            <p>No message history</p>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script
+    src="{{ url_for('static', filename='js/index.js') }}"
+></script>
+
+</body>
+
+</html>

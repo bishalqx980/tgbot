@@ -1,0 +1,504 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Inter, sans-serif;
+    background: #090a0f;
+    color: white;
+}
+
+.admin-login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.admin-login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 38px;
+    background: #12141c;
+    border: 1px solid #252936;
+    border-radius: 20px;
+}
+
+.admin-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.admin-logo > div {
+    width: 50px;
+    height: 50px;
+    margin: auto auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #635bff;
+    border-radius: 14px;
+    font-size: 22px;
+}
+
+.admin-logo h1 {
+    font-size: 22px;
+}
+
+.admin-logo p {
+    color: #757b8a;
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 8px;
+    color: #b8bdc8;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 13px;
+    background: #0c0e14;
+    border: 1px solid #2b2f3b;
+    border-radius: 10px;
+    color: white;
+    outline: none;
+}
+
+.admin-login-card button {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: #635bff;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-login-card > a {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #7d83ff;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.error {
+    padding: 11px;
+    background: rgba(220, 70, 70, 0.1);
+    border: 1px solid rgba(220, 70, 70, 0.25);
+    color: #ff7c7c;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 18px;
+}
+
+.dashboard {
+    min-height: 100vh;
+    display: flex;
+}
+
+.admin-sidebar {
+    width: 240px;
+    padding: 24px;
+    background: #0d0f15;
+    border-right: 1px solid #20232d;
+}
+
+.admin-brand {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 45px;
+}
+
+.brand-icon {
+    width: 38px;
+    height: 38px;
+    background: #635bff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-brand h2 {
+    font-size: 15px;
+}
+
+.admin-brand span {
+    font-size: 10px;
+    color: #777d8d;
+}
+
+.admin-sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.admin-sidebar a {
+    padding: 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #9096a5;
+    font-size: 13px;
+}
+
+.admin-sidebar a.active {
+    background: #191c26;
+    color: white;
+}
+
+.admin-sidebar .logout {
+    margin-top: auto;
+}
+
+.dashboard-main {
+    flex: 1;
+    padding: 38px;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.dashboard-header h1 {
+    font-size: 24px;
+}
+
+.dashboard-header p {
+    color: #747a89;
+    font-size: 12px;
+    margin-top: 7px;
+}
+
+.live-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #65e4a5;
+    font-size: 12px;
+    background: rgba(57, 217, 138, 0.08);
+    padding: 8px 12px;
+    border-radius: 20px;
+}
+
+.live-badge span {
+    width: 7px;
+    height: 7px;
+    background: #39d98a;
+    border-radius: 50%;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    padding: 22px;
+    background: #12141c;
+    border: 1px solid #242833;
+    border-radius: 14px;
+}
+
+.stat-card span {
+    display: block;
+    color: #767c8b;
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+.stat-card strong {
+    font-size: 28px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.section-header h2 {
+    font-size: 17px;
+}
+
+.section-header p {
+    font-size: 11px;
+    color: #747a89;
+    margin-top: 5px;
+}
+
+.section-header button {
+    border: 1px solid #303440;
+    background: transparent;
+    color: #b5bac7;
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.rooms-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.room-card-admin {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    background: #12141c;
+    border: 1px solid #242833;
+    border-radius: 12px;
+}
+
+.room-info {
+    flex: 1;
+}
+
+.room-info span {
+    font-size: 9px;
+    color: #777d8d;
+    font-weight: 700;
+}
+
+.room-info h3 {
+    margin-top: 5px;
+    font-size: 16px;
+}
+
+.room-count {
+    text-align: center;
+    margin-right: 45px;
+}
+
+.room-count strong {
+    display: block;
+    font-size: 18px;
+}
+
+.room-count span {
+    font-size: 10px;
+    color: #777d8d;
+}
+
+.room-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.room-actions button {
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+}
+
+.view-room {
+    background: #20242f;
+    border: 1px solid #303541;
+}
+
+.join-room {
+    background: #635bff;
+    border: none;
+}
+
+.empty-state {
+    padding: 60px;
+    text-align: center;
+    background: #12141c;
+    border: 1px solid #242833;
+    border-radius: 12px;
+    color: #707687;
+    font-size: 13px;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.65);
+    padding: 20px;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 480px;
+    background: #12141c;
+    border: 1px solid #2b2f3a;
+    border-radius: 16px;
+    padding: 24px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 22px;
+}
+
+.modal-header h2 {
+    font-size: 18px;
+}
+
+.modal-header p {
+    font-size: 11px;
+    color: #747a89;
+    margin-top: 5px;
+}
+
+#closeModal {
+    background: transparent;
+    border: none;
+    color: #9ba1af;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.modal-members {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-member {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    background: #181b24;
+    border-radius: 10px;
+}
+
+.member-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.member-avatar {
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #292e3b;
+    border-radius: 50%;
+    font-size: 12px;
+}
+
+.member-info span {
+    font-size: 13px;
+}
+
+.kick-button {
+    padding: 7px 11px;
+    border: 1px solid rgba(255, 90, 90, 0.3);
+    background: rgba(255, 90, 90, 0.08);
+    color: #ff8585;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+@media (max-width: 700px) {
+
+    .admin-sidebar {
+        display: none;
+    }
+
+    .dashboard-main {
+        padding: 22px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .room-card-admin {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+}
+
+.room-info small {
+    display: block;
+    margin-top: 5px;
+    color: #767c8b;
+    font-size: 10px;
+}
+
+.room-storage {
+    text-align: center;
+    color: #b7bdc9;
+    font-size: 12px;
+    margin-right: 35px;
+}
+
+.room-storage span {
+    display: block;
+    color: #777d8d;
+    font-size: 10px;
+    margin-top: 4px;
+}
+
+.admin-join-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.admin-join-form label {
+    color: #aeb4c0;
+    font-size: 12px;
+}
+
+.admin-join-form input {
+    width: 100%;
+    padding: 13px;
+    background: #0d0f15;
+    border: 1px solid #2b303c;
+    color: white;
+    border-radius: 10px;
+    outline: none;
+}
+
+.admin-join-form button {
+    margin-top: 5px;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: #635bff;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}

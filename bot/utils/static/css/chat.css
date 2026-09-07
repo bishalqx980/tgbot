@@ -1,0 +1,653 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    height: 100vh;
+    font-family: Inter, sans-serif;
+    background: #090a0f;
+    color: #ffffff;
+}
+
+.app {
+    height: 100vh;
+    display: flex;
+}
+
+.sidebar {
+    width: 280px;
+    background: #0d0f15;
+    border-right: 1px solid #20232d;
+    display: flex;
+    flex-direction: column;
+    padding: 22px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 34px;
+}
+
+.brand-icon {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #635bff;
+    border-radius: 11px;
+}
+
+.brand h2 {
+    font-size: 16px;
+}
+
+.brand p {
+    color: #777d8d;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+.room-card {
+    padding: 16px;
+    background: #141720;
+    border: 1px solid #242833;
+    border-radius: 14px;
+    margin-bottom: 28px;
+}
+
+.room-card > span {
+    color: #73798a;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.room-id {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 9px;
+}
+
+.room-id strong {
+    font-size: 18px;
+    word-break: break-all;
+}
+
+.room-id button {
+    border: none;
+    background: #20242f;
+    color: white;
+    padding: 6px 9px;
+    border-radius: 7px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.members-header {
+    display: flex;
+    justify-content: space-between;
+    color: #777d8d;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.member-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.member {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 5px;
+}
+
+.member-avatar,
+.avatar {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #252a36;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.member span {
+    font-size: 13px;
+    color: #d8dae2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-bottom {
+    border-top: 1px solid #20232d;
+    padding-top: 16px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.user-info strong {
+    display: block;
+    font-size: 13px;
+}
+
+.user-info strong small {
+    color: #918aff;
+    font-size: 8px;
+    margin-left: 4px;
+}
+
+.user-info span {
+    font-size: 11px;
+    color: #39d98a;
+}
+
+#leaveRoom {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid #303440;
+    border-radius: 9px;
+    color: #a9aebb;
+    cursor: pointer;
+}
+
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.chat-header {
+    min-height: 76px;
+    border-bottom: 1px solid #20232d;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 32px;
+}
+
+.chat-header h2 {
+    font-size: 16px;
+}
+
+.chat-header p {
+    font-size: 11px;
+    color: #707687;
+    margin-top: 5px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #858b99;
+    font-size: 12px;
+}
+
+#connectionDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e05656;
+}
+
+#connectionDot.connected {
+    background: #39d98a;
+}
+
+#clearChat {
+    padding: 8px 12px;
+    border: 1px solid #2b2f3a;
+    border-radius: 8px;
+    background: transparent;
+    color: #a4a9b6;
+    cursor: pointer;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px max(32px, 10%);
+}
+
+.welcome {
+    text-align: center;
+    margin-top: 18vh;
+    color: #777d8d;
+}
+
+.welcome-icon {
+    font-size: 42px;
+    color: #635bff;
+    margin-bottom: 15px;
+}
+
+.welcome h2 {
+    color: #e4e6ec;
+    margin-bottom: 8px;
+}
+
+.message {
+    max-width: 680px;
+    margin-bottom: 20px;
+}
+
+.message strong {
+    display: block;
+    color: #aeb3c0;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
+.message p {
+    background: #171a23;
+    display: inline-block;
+    padding: 12px 15px;
+    border-radius: 12px;
+    line-height: 1.5;
+    font-size: 14px;
+    word-break: break-word;
+}
+
+.message.own {
+    margin-left: auto;
+    text-align: right;
+}
+
+.message.own p {
+    background: #635bff;
+}
+
+.file-content {
+    max-width: 500px;
+    background: #171a23;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.message.own .file-content {
+    margin-left: auto;
+}
+
+.file-content img {
+    display: block;
+    max-width: 100%;
+    max-height: 450px;
+    object-fit: contain;
+}
+
+.file-content video {
+    display: block;
+    width: 100%;
+    max-height: 450px;
+    background: black;
+}
+
+.attachment-name {
+    margin-top: 6px;
+    color: #818796;
+    font-size: 11px;
+}
+
+.generic-file {
+    padding: 15px;
+    min-width: 230px;
+}
+
+.generic-file a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.generic-file strong {
+    margin: 0;
+}
+
+.generic-file span {
+    color: #7c8291;
+    font-size: 11px;
+}
+
+.system-message {
+    text-align: center;
+    color: #626877;
+    font-size: 11px;
+    margin: 16px 0;
+}
+
+.typing-indicator {
+    min-height: 22px;
+    padding: 0 32px;
+    color: #777d8d;
+    font-size: 11px;
+}
+
+.upload-preview {
+    margin: 0 32px 10px;
+    padding: 10px 13px;
+    background: #151822;
+    border: 1px solid #282d39;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.upload-preview.hidden {
+    display: none;
+}
+
+#uploadInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 11px;
+}
+
+#uploadInfo span {
+    color: #7a8090;
+}
+
+#cancelUpload {
+    background: transparent;
+    border: none;
+    color: #9298a8;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.message-box {
+    display: flex;
+    gap: 10px;
+    padding: 12px 32px 8px;
+}
+
+.message-box input {
+    flex: 1;
+    background: #12151d;
+    border: 1px solid #272b36;
+    border-radius: 12px;
+    padding: 15px;
+    color: white;
+    outline: none;
+}
+
+.message-box input:focus {
+    border-color: #635bff;
+}
+
+.file-button {
+    width: 48px;
+    border: 1px solid #2c303c;
+    background: #171a23;
+    color: #b2b7c4;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 22px;
+}
+
+.message-box #sendButton {
+    border: none;
+    background: #635bff;
+    color: white;
+    padding: 0 22px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.message-box button span {
+    margin-left: 7px;
+    opacity: 0.6;
+}
+
+.upload-limit {
+    padding: 0 32px 18px;
+    font-size: 10px;
+    color: #626877;
+}
+
+.password-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+}
+
+.password-modal.hidden {
+    display: none;
+}
+
+.password-modal-content {
+    width: 100%;
+    max-width: 390px;
+    padding: 30px;
+    background: #141720;
+    border: 1px solid #2a2f3b;
+    border-radius: 18px;
+    text-align: center;
+}
+
+.modal-icon {
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+.password-modal-content h2 {
+    font-size: 18px;
+}
+
+.password-modal-content p {
+    color: #777d8d;
+    font-size: 12px;
+    margin: 10px 0 20px;
+}
+
+.password-modal-content input {
+    width: 100%;
+    padding: 13px;
+    background: #0d0f15;
+    border: 1px solid #2b303c;
+    color: white;
+    border-radius: 10px;
+    outline: none;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 12px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+#passwordCancel {
+    background: transparent;
+    border: 1px solid #303541;
+    color: #a7adbb;
+}
+
+#passwordJoin {
+    border: none;
+    background: #635bff;
+    color: white;
+}
+
+@media (max-width: 700px) {
+
+    .sidebar {
+        width: 210px;
+        padding: 14px;
+    }
+
+    .chat-header {
+        padding: 15px;
+    }
+
+    .messages {
+        padding: 20px;
+    }
+
+    .message-box {
+        padding: 12px 15px 8px;
+    }
+
+    .upload-preview {
+        margin: 0 15px 10px;
+    }
+
+    .typing-indicator {
+        padding: 0 15px;
+    }
+
+    .upload-limit {
+        padding: 0 15px 15px;
+    }
+
+}
+
+@media (max-width: 520px) {
+
+    .sidebar {
+        display: none;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .connection-status {
+        display: none;
+    }
+
+}
+
+.notification {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    width: min(380px, calc(100vw - 40px));
+    padding: 15px;
+    background: #171a23;
+    border: 1px solid #2b303c;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    z-index: 9999;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: 0.3s ease;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+}
+
+.notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification-icon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(99, 91, 255, 0.12);
+    border-radius: 10px;
+}
+
+.notification-icon span {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #8b84ff;
+}
+
+.notification-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.notification-content strong {
+    font-size: 13px;
+    color: #f0f1f5;
+}
+
+.notification-content p {
+    font-size: 11px;
+    color: #8b91a0;
+    line-height: 1.5;
+}
+
+.notification.success {
+    border-color: rgba(57, 217, 138, 0.3);
+}
+
+.notification.success .notification-icon span {
+    background: #39d98a;
+}
+
+.notification.warning {
+    border-color: rgba(255, 180, 70, 0.3);
+}
+
+.notification.warning .notification-icon span {
+    background: #ffb446;
+}
+
+.notification.error {
+    border-color: rgba(255, 85, 85, 0.3);
+}
+
+.notification.error .notification-icon span {
+    background: #ff5555;
+}
+
+@media (max-width: 520px) {
+    .notification {
+        top: 15px;
+        right: 20px;
+    }
+}

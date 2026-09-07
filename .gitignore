@@ -8,6 +8,7 @@
 venv
 config.env
 downloads
+uploads
 temp
 sys
 

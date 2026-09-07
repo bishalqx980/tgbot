@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Room {{ room }} | SocketChat
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/chat.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="app">
+
+
+    <aside class="sidebar">
+
+
+        <div class="brand">
+
+            <div class="brand-icon">◉</div>
+
+            <div>
+
+                <h2>SocketChat</h2>
+
+                <p>
+                    {% if is_admin %}
+                        Administrator
+                    {% else %}
+                        Private Room
+                    {% endif %}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="room-card">
+
+            <span>ROOM</span>
+
+            <div class="room-id">
+
+                <strong id="roomId">
+                    {{ room }}
+                </strong>
+
+                <button id="copyRoom">
+                    ⧉
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="members-header">
+
+            <span>MEMBERS</span>
+
+            <span id="memberCount">0</span>
+
+        </div>
+
+
+        <div
+            id="memberList"
+            class="member-list"
+        ></div>
+
+
+        <div class="sidebar-bottom">
+
+
+            <div class="user-info">
+
+                <div class="avatar">
+
+                    {{ name[0].upper() }}
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ name }}
+                        {% if is_admin %}
+                            <small>ADMIN</small>
+                        {% endif %}
+                    </strong>
+
+                    <span>Online</span>
+
+                </div>
+
+            </div>
+
+
+            <button id="leaveRoom">
+
+                Leave Room
+
+            </button>
+
+
+        </div>
+
+
+    </aside>
+
+
+    <main class="chat-area">
+
+
+        <header class="chat-header">
+
+
+            <div>
+
+                <h2>
+
+                    Room {{ room }}
+
+                </h2>
+
+                <p>
+
+                    No message history is stored
+
+                </p>
+
+            </div>
+
+
+            <div class="header-actions">
+
+
+                <span class="connection-status">
+
+                    <span id="connectionDot"></span>
+
+                    <span id="connectionText">
+
+                        Connecting
+
+                    </span>
+
+                </span>
+
+
+                <button id="clearChat">
+
+                    Clear Chat
+
+                </button>
+
+
+            </div>
+
+
+        </header>
+
+
+        <div
+            id="messages"
+            class="messages"
+        >
+
+
+            <div class="welcome">
+
+                <div class="welcome-icon">
+
+                    ◉
+
+                </div>
+
+                <h2>
+                    Welcome to the room
+                </h2>
+
+                <p>
+                    Messages are temporary and disappear when cleared.
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+        <div
+            id="typingIndicator"
+            class="typing-indicator"
+        ></div>
+
+
+        <div
+            id="uploadPreview"
+            class="upload-preview hidden"
+        >
+
+            <div id="uploadInfo"></div>
+
+            <button id="cancelUpload">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <div class="message-box">
+
+
+            <input
+                type="file"
+                id="fileInput"
+                hidden
+            >
+
+
+            <button
+                id="fileButton"
+                class="file-button"
+                type="button"
+                title="Send file"
+            >
+
+                +
+
+            </button>
+
+
+            <input
+                id="messageInput"
+                type="text"
+                placeholder="Write a message..."
+                autocomplete="off"
+                maxlength="2000"
+            >
+
+
+            <button id="sendButton">
+
+                Send
+
+                <span>↵</span>
+
+            </button>
+
+
+        </div>
+
+
+        <div class="upload-limit">
+
+            Maximum file size: 20 MB
+
+        </div>
+
+
+    </main>
+
+
+</div>
+
+
+<div
+    id="passwordModal"
+    class="password-modal hidden"
+>
+
+    <div class="password-modal-content">
+
+        <div class="modal-icon">
+
+            🔒
+
+        </div>
+
+        <h2>
+            Password Protected Room
+        </h2>
+
+        <p>
+            Enter the room password to continue.
+        </p>
+
+        <input
+            type="password"
+            id="roomPasswordInput"
+            placeholder="Room password"
+        >
+
+        <div class="modal-buttons">
+
+            <button id="passwordCancel">
+
+                Cancel
+
+            </button>
+
+            <button id="passwordJoin">
+
+                Join Room
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div
+    id="notification"
+    class="notification"
+>
+
+    <div class="notification-icon">
+
+        <span></span>
+
+    </div>
+
+    <div class="notification-content">
+
+        <strong id="notificationTitle"></strong>
+
+        <p id="notificationMessage"></p>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+
+<script>
+
+const USER_NAME = {{ name|tojson }};
+const ROOM_ID = {{ room|tojson }};
+const IS_ADMIN = {{ is_admin|tojson }};
+
+</script>
+
+
+<script
+    src="{{ url_for('static', filename='js/chat.js') }}"
+></script>
+
+</body>
+
+</html>
