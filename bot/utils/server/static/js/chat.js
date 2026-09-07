@@ -33,56 +33,88 @@ const notification = document.getElementById("notification");
 const notificationTitle = document.getElementById("notificationTitle");
 const notificationMessage = document.getElementById("notificationMessage");
 
-const mobileMenuButton = document.getElementById(
-    "mobileMenuButton"
-);
-
-const sidebarOverlay = document.getElementById(
-    "sidebarOverlay"
-);
-
-const sidebar = document.querySelector(
-    ".sidebar"
-);
+const mobileMenuButton = document.getElementById("mobileMenuButton");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+const sidebar = document.querySelector(".sidebar");
 
 let typingTimeout = null;
 let typingUsers = new Set();
 let selectedFile = null;
 let clearCooldown = false;
+let isSending = false;
 
-const initialParams = new URLSearchParams(
-    window.location.search
-);
+const initialParams = new URLSearchParams(window.location.search);
 
 let roomPassword = initialParams.get("password") || "";
 
+function updateViewportHeight() {
+    const viewport = window.visualViewport;
+
+    const height = viewport
+        ? viewport.height
+        : window.innerHeight;
+
+    document.documentElement.style.setProperty(
+        "--app-height",
+        `${Math.round(height)}px`
+    );
+}
+
+function setupViewportHandling() {
+    updateViewportHeight();
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener(
+            "resize",
+            () => {
+                updateViewportHeight();
+
+                requestAnimationFrame(() => {
+                    if (document.activeElement === messageInput) {
+                        scrollMessages();
+                    }
+                });
+            }
+        );
+
+        window.visualViewport.addEventListener(
+            "scroll",
+            () => {
+                updateViewportHeight();
+            }
+        );
+    }
+
+    window.addEventListener(
+        "resize",
+        updateViewportHeight
+    );
+
+    window.addEventListener(
+        "orientationchange",
+        () => {
+            setTimeout(updateViewportHeight, 100);
+            setTimeout(updateViewportHeight, 300);
+        }
+    );
+}
+
+setupViewportHandling();
 
 function openMobileSidebar() {
     sidebar.classList.add("mobile-open");
-
     sidebarOverlay.classList.add("active");
-
-    document.body.style.overflow = "hidden";
 }
-
 
 function closeMobileSidebar() {
     sidebar.classList.remove("mobile-open");
-
     sidebarOverlay.classList.remove("active");
-
-    document.body.style.overflow = "";
 }
-
 
 mobileMenuButton.addEventListener(
     "click",
     () => {
-        if (
-            sidebar.classList.contains(
-                "mobile-open"
-            )
-        ) {
+        if (sidebar.classList.contains("mobile-open")) {
             closeMobileSidebar();
         } else {
             openMobileSidebar();
@@ -90,12 +122,10 @@ mobileMenuButton.addEventListener(
     }
 );
 
-
 sidebarOverlay.addEventListener(
     "click",
     closeMobileSidebar
 );
-
 
 window.addEventListener(
     "resize",
@@ -106,27 +136,21 @@ window.addEventListener(
     }
 );
 
-
 socket.on("connect", () => {
     connectionDot.classList.add("connected");
-
     connectionText.textContent = "Connected";
 
     joinCurrentRoom();
 });
 
-
 socket.on("disconnect", () => {
     connectionDot.classList.remove("connected");
-
     connectionText.textContent = "Disconnected";
 });
-
 
 socket.on("connect_error", () => {
     connectionText.textContent = "Reconnecting";
 });
-
 
 function joinCurrentRoom() {
     socket.emit("join", {
@@ -138,7 +162,6 @@ function joinCurrentRoom() {
         admin: IS_ADMIN
     });
 }
-
 
 socket.on("join_error", data => {
     showNotification(
@@ -152,21 +175,15 @@ socket.on("join_error", data => {
     }, 1500);
 });
 
-
 socket.on("password_required", () => {
     passwordModal.classList.remove("hidden");
-
     roomPasswordInput.value = "";
-
     roomPasswordInput.focus();
 });
 
-
 socket.on("wrong_password", data => {
     passwordModal.classList.remove("hidden");
-
     roomPasswordInput.value = "";
-
     roomPasswordInput.focus();
 
     showNotification(
@@ -175,7 +192,6 @@ socket.on("wrong_password", data => {
         "error"
     );
 });
-
 
 socket.on("room_joined", data => {
     updateMembers(data.members);
@@ -187,7 +203,6 @@ socket.on("room_joined", data => {
     );
 });
 
-
 socket.on("user_joined", data => {
     updateMembers(data.members);
 
@@ -195,7 +210,6 @@ socket.on("user_joined", data => {
         `${data.name} joined the room`
     );
 });
-
 
 socket.on("user_left", data => {
     updateMembers(data.members);
@@ -205,16 +219,13 @@ socket.on("user_left", data => {
     );
 });
 
-
 socket.on("new_message", data => {
     addMessage(data);
 });
 
-
 socket.on("new_file", data => {
     addFileMessage(data);
 });
-
 
 socket.on("typing", data => {
     if (data.typing) {
@@ -225,7 +236,6 @@ socket.on("typing", data => {
 
     updateTypingIndicator();
 });
-
 
 socket.on("chat_cleared", data => {
     messages.innerHTML = "";
@@ -245,7 +255,6 @@ socket.on("chat_cleared", data => {
     );
 });
 
-
 socket.on("clear_cooldown", data => {
     clearCooldown = true;
 
@@ -255,7 +264,6 @@ socket.on("clear_cooldown", data => {
         "warning"
     );
 });
-
 
 socket.on("upload_error", data => {
     showNotification(
@@ -271,7 +279,6 @@ socket.on("upload_error", data => {
     fileInput.value = "";
 });
 
-
 socket.on("kicked", data => {
     showNotification(
         "Removed",
@@ -284,13 +291,13 @@ socket.on("kicked", data => {
     }, 1500);
 });
 
-
 function showNotification(
     title,
     message,
     type = "info"
 ) {
-    notification.className = `notification ${type}`;
+    notification.className =
+        `notification ${type}`;
 
     notificationTitle.textContent = title;
 
@@ -305,13 +312,26 @@ function showNotification(
     }, 4000);
 }
 
+function keepInputFocused() {
+    requestAnimationFrame(() => {
+        messageInput.focus({
+            preventScroll: true
+        });
+    });
+}
 
 function sendMessage() {
+    if (isSending) {
+        return;
+    }
+
     const message = messageInput.value.trim();
 
     if (!message) {
         return;
     }
+
+    isSending = true;
 
     socket.emit("send_message", {
         message: message
@@ -322,13 +342,29 @@ function sendMessage() {
     socket.emit("typing", {
         typing: false
     });
-}
 
+    clearTimeout(typingTimeout);
+
+    typingTimeout = null;
+
+    typingUsers.delete(USER_NAME);
+
+    updateTypingIndicator();
+
+    requestAnimationFrame(() => {
+        keepInputFocused();
+    });
+
+    setTimeout(() => {
+        isSending = false;
+    }, 100);
+}
 
 function addMessage(data) {
     removeWelcome();
 
-    const messageElement = document.createElement("div");
+    const messageElement =
+        document.createElement("div");
 
     messageElement.className = "message";
 
@@ -355,7 +391,6 @@ function addMessage(data) {
     text.textContent = data.message;
 
     messageElement.appendChild(name);
-
     messageElement.appendChild(text);
 
     messages.appendChild(messageElement);
@@ -363,13 +398,14 @@ function addMessage(data) {
     scrollMessages();
 }
 
-
 function addFileMessage(data) {
     removeWelcome();
 
-    const messageElement = document.createElement("div");
+    const messageElement =
+        document.createElement("div");
 
-    messageElement.className = "message file-message";
+    messageElement.className =
+        "message file-message";
 
     if (data.name === USER_NAME) {
         messageElement.classList.add("own");
@@ -420,13 +456,16 @@ function addFileMessage(data) {
         fileLink.target = "_blank";
         fileLink.download = data.filename;
 
-        const fileName = document.createElement("strong");
+        const fileName =
+            document.createElement("strong");
 
         fileName.textContent = data.filename;
 
-        const fileSize = document.createElement("span");
+        const fileSize =
+            document.createElement("span");
 
-        fileSize.textContent = formatFileSize(data.size);
+        fileSize.textContent =
+            formatFileSize(data.size);
 
         fileLink.appendChild(fileName);
         fileLink.appendChild(fileSize);
@@ -436,9 +475,11 @@ function addFileMessage(data) {
         content.appendChild(fileLink);
     }
 
-    const filename = document.createElement("div");
+    const filename =
+        document.createElement("div");
 
-    filename.className = "attachment-name";
+    filename.className =
+        "attachment-name";
 
     filename.textContent = data.filename;
 
@@ -457,9 +498,9 @@ function addFileMessage(data) {
     scrollMessages();
 }
 
-
 function addSystemMessage(text) {
-    const element = document.createElement("div");
+    const element =
+        document.createElement("div");
 
     element.className = "system-message";
 
@@ -470,32 +511,36 @@ function addSystemMessage(text) {
     scrollMessages();
 }
 
-
 function removeWelcome() {
-    const welcome = document.querySelector(".welcome");
+    const welcome =
+        document.querySelector(".welcome");
 
     if (welcome) {
         welcome.remove();
     }
 }
 
-
 function scrollMessages() {
-    messages.scrollTop = messages.scrollHeight;
+    requestAnimationFrame(() => {
+        messages.scrollTop =
+            messages.scrollHeight;
+    });
 }
-
 
 function updateMembers(members) {
     memberList.innerHTML = "";
 
-    memberCount.textContent = members.length;
+    memberCount.textContent =
+        members.length;
 
     members.forEach(member => {
-        const item = document.createElement("div");
+        const item =
+            document.createElement("div");
 
         item.className = "member";
 
-        const avatar = document.createElement("div");
+        const avatar =
+            document.createElement("div");
 
         avatar.className = "member-avatar";
 
@@ -503,7 +548,8 @@ function updateMembers(members) {
             .charAt(0)
             .toUpperCase();
 
-        const name = document.createElement("span");
+        const name =
+            document.createElement("span");
 
         let displayName = member.name;
 
@@ -524,15 +570,14 @@ function updateMembers(members) {
     });
 }
 
-
 function updateTypingIndicator() {
     if (typingUsers.size === 0) {
         typingIndicator.textContent = "";
-
         return;
     }
 
-    const users = Array.from(typingUsers);
+    const users =
+        Array.from(typingUsers);
 
     if (users.length === 1) {
         typingIndicator.textContent =
@@ -545,26 +590,31 @@ function updateTypingIndicator() {
         `${users.length} people are typing...`;
 }
 
-
 function formatFileSize(bytes) {
     if (bytes < 1024) {
         return `${bytes} B`;
     }
 
     if (bytes < 1024 * 1024) {
-        return `${(bytes / 1024).toFixed(1)} KB`;
+        return `${(
+            bytes / 1024
+        ).toFixed(1)} KB`;
     }
 
-    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    return `${(
+        bytes / 1024 / 1024
+    ).toFixed(1)} MB`;
 }
-
 
 function uploadSelectedFile() {
     if (!selectedFile) {
         return;
     }
 
-    if (selectedFile.size > 20 * 1024 * 1024) {
+    if (
+        selectedFile.size >
+        20 * 1024 * 1024
+    ) {
         showNotification(
             "File Too Large",
             "Maximum file size is 20 MB.",
@@ -579,36 +629,47 @@ function uploadSelectedFile() {
     reader.onload = event => {
         socket.emit("upload_file", {
             filename: selectedFile.name,
-            type: selectedFile.type || "application/octet-stream",
+            type: selectedFile.type
+                || "application/octet-stream",
             file: event.target.result
         });
 
         selectedFile = null;
 
-        uploadPreview.classList.add("hidden");
+        uploadPreview.classList.add(
+            "hidden"
+        );
 
         fileInput.value = "";
+
+        keepInputFocused();
     };
 
     reader.readAsArrayBuffer(selectedFile);
 }
 
-
 sendButton.addEventListener(
-    "click",
-    sendMessage
-);
+    "pointerdown",
+    event => {
+        event.preventDefault();
 
+        if (isSending) {
+            return;
+        }
+
+        sendMessage();
+    }
+);
 
 messageInput.addEventListener(
     "keydown",
     event => {
         if (event.key === "Enter") {
+            event.preventDefault();
             sendMessage();
         }
     }
 );
-
 
 messageInput.addEventListener(
     "input",
@@ -627,6 +688,15 @@ messageInput.addEventListener(
     }
 );
 
+messageInput.addEventListener(
+    "focus",
+    () => {
+        setTimeout(() => {
+            updateViewportHeight();
+            scrollMessages();
+        }, 50);
+    }
+);
 
 clearChat.addEventListener(
     "click",
@@ -634,7 +704,6 @@ clearChat.addEventListener(
         socket.emit("clear_chat");
     }
 );
-
 
 copyRoom.addEventListener(
     "click",
@@ -649,8 +718,9 @@ copyRoom.addEventListener(
                 "Room number copied to clipboard.",
                 "success"
             );
+        }
 
-        } catch {
+        catch {
             showNotification(
                 "Failed",
                 "Could not copy room number.",
@@ -659,7 +729,6 @@ copyRoom.addEventListener(
         }
     }
 );
-
 
 leaveRoom.addEventListener(
     "click",
@@ -670,14 +739,12 @@ leaveRoom.addEventListener(
     }
 );
 
-
 fileButton.addEventListener(
     "click",
     () => {
         fileInput.click();
     }
 );
-
 
 fileInput.addEventListener(
     "change",
@@ -688,7 +755,10 @@ fileInput.addEventListener(
             return;
         }
 
-        if (file.size > 20 * 1024 * 1024) {
+        if (
+            file.size >
+            20 * 1024 * 1024
+        ) {
             showNotification(
                 "File Too Large",
                 "Maximum file size is 20 MB.",
@@ -707,12 +777,13 @@ fileInput.addEventListener(
             <span>${formatFileSize(file.size)}</span>
         `;
 
-        uploadPreview.classList.remove("hidden");
+        uploadPreview.classList.remove(
+            "hidden"
+        );
 
         uploadSelectedFile();
     }
 );
-
 
 cancelUpload.addEventListener(
     "click",
@@ -721,10 +792,13 @@ cancelUpload.addEventListener(
 
         fileInput.value = "";
 
-        uploadPreview.classList.add("hidden");
+        uploadPreview.classList.add(
+            "hidden"
+        );
+
+        keepInputFocused();
     }
 );
-
 
 passwordCancel.addEventListener(
     "click",
@@ -733,11 +807,11 @@ passwordCancel.addEventListener(
     }
 );
 
-
 passwordJoin.addEventListener(
     "click",
     () => {
-        roomPassword = roomPasswordInput.value.trim();
+        roomPassword =
+            roomPasswordInput.value.trim();
 
         if (!roomPassword) {
             showNotification(
@@ -751,25 +825,27 @@ passwordJoin.addEventListener(
             return;
         }
 
-        passwordModal.classList.add("hidden");
+        passwordModal.classList.add(
+            "hidden"
+        );
 
         joinCurrentRoom();
     }
 );
 
-
 roomPasswordInput.addEventListener(
     "keydown",
     event => {
         if (event.key === "Enter") {
+            event.preventDefault();
             passwordJoin.click();
         }
     }
 );
 
-
 function escapeHtml(value) {
-    const div = document.createElement("div");
+    const div =
+        document.createElement("div");
 
     div.textContent = value;
 

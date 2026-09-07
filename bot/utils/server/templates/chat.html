@@ -7,7 +7,7 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover"
     >
 
     <title>
@@ -60,7 +60,10 @@
                     {{ room }}
                 </strong>
 
-                <button id="copyRoom">
+                <button
+                    id="copyRoom"
+                    type="button"
+                >
                     ⧉
                 </button>
 
@@ -111,7 +114,10 @@
             </div>
 
 
-            <button id="leaveRoom">
+            <button
+                id="leaveRoom"
+                type="button"
+            >
 
                 Leave Room
 
@@ -181,7 +187,10 @@
                 </span>
 
 
-                <button id="clearChat">
+                <button
+                    id="clearChat"
+                    type="button"
+                >
 
                     Clear Chat
 
@@ -235,7 +244,10 @@
 
             <div id="uploadInfo"></div>
 
-            <button id="cancelUpload">
+            <button
+                id="cancelUpload"
+                type="button"
+            >
 
                 ×
 
@@ -271,11 +283,17 @@
                 type="text"
                 placeholder="Write a message..."
                 autocomplete="off"
+                autocorrect="on"
+                autocapitalize="sentences"
+                spellcheck="true"
                 maxlength="2000"
             >
 
 
-            <button id="sendButton">
+            <button
+                id="sendButton"
+                type="button"
+            >
 
                 Send
 
@@ -335,13 +353,19 @@
 
         <div class="modal-buttons">
 
-            <button id="passwordCancel">
+            <button
+                id="passwordCancel"
+                type="button"
+            >
 
                 Cancel
 
             </button>
 
-            <button id="passwordJoin">
+            <button
+                id="passwordJoin"
+                type="button"
+            >
 
                 Join Room
 
