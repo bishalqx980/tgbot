@@ -33,6 +33,17 @@ const notification = document.getElementById("notification");
 const notificationTitle = document.getElementById("notificationTitle");
 const notificationMessage = document.getElementById("notificationMessage");
 
+const mobileMenuButton = document.getElementById(
+    "mobileMenuButton"
+);
+
+const sidebarOverlay = document.getElementById(
+    "sidebarOverlay"
+);
+
+const sidebar = document.querySelector(
+    ".sidebar"
+);
 
 let typingTimeout = null;
 let typingUsers = new Set();
@@ -46,8 +57,59 @@ const initialParams = new URLSearchParams(
 let roomPassword = initialParams.get("password") || "";
 
 
+function openMobileSidebar() {
+    sidebar.classList.add("mobile-open");
+
+    sidebarOverlay.classList.add("active");
+
+    document.body.style.overflow = "hidden";
+}
+
+
+function closeMobileSidebar() {
+    sidebar.classList.remove("mobile-open");
+
+    sidebarOverlay.classList.remove("active");
+
+    document.body.style.overflow = "";
+}
+
+
+mobileMenuButton.addEventListener(
+    "click",
+    () => {
+        if (
+            sidebar.classList.contains(
+                "mobile-open"
+            )
+        ) {
+            closeMobileSidebar();
+        } else {
+            openMobileSidebar();
+        }
+    }
+);
+
+
+sidebarOverlay.addEventListener(
+    "click",
+    closeMobileSidebar
+);
+
+
+window.addEventListener(
+    "resize",
+    () => {
+        if (window.innerWidth > 768) {
+            closeMobileSidebar();
+        }
+    }
+);
+
+
 socket.on("connect", () => {
     connectionDot.classList.add("connected");
+
     connectionText.textContent = "Connected";
 
     joinCurrentRoom();
@@ -56,6 +118,7 @@ socket.on("connect", () => {
 
 socket.on("disconnect", () => {
     connectionDot.classList.remove("connected");
+
     connectionText.textContent = "Disconnected";
 });
 
@@ -92,7 +155,9 @@ socket.on("join_error", data => {
 
 socket.on("password_required", () => {
     passwordModal.classList.remove("hidden");
+
     roomPasswordInput.value = "";
+
     roomPasswordInput.focus();
 });
 
@@ -101,6 +166,7 @@ socket.on("wrong_password", data => {
     passwordModal.classList.remove("hidden");
 
     roomPasswordInput.value = "";
+
     roomPasswordInput.focus();
 
     showNotification(
@@ -219,10 +285,15 @@ socket.on("kicked", data => {
 });
 
 
-function showNotification(title, message, type = "info") {
+function showNotification(
+    title,
+    message,
+    type = "info"
+) {
     notification.className = `notification ${type}`;
 
     notificationTitle.textContent = title;
+
     notificationMessage.textContent = message;
 
     notification.classList.add("show");
@@ -284,6 +355,7 @@ function addMessage(data) {
     text.textContent = data.message;
 
     messageElement.appendChild(name);
+
     messageElement.appendChild(text);
 
     messages.appendChild(messageElement);
@@ -456,6 +528,7 @@ function updateMembers(members) {
 function updateTypingIndicator() {
     if (typingUsers.size === 0) {
         typingIndicator.textContent = "";
+
         return;
     }
 
@@ -591,6 +664,8 @@ copyRoom.addEventListener(
 leaveRoom.addEventListener(
     "click",
     () => {
+        closeMobileSidebar();
+
         window.location.href = "/";
     }
 );

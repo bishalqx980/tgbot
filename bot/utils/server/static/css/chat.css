@@ -8,23 +8,36 @@
 
 body {
     height: 100vh;
+    overflow: hidden;
     font-family: Inter, sans-serif;
     background: #090a0f;
     color: #ffffff;
 }
 
+button,
+input {
+    font-family: inherit;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
 .app {
     height: 100vh;
     display: flex;
+    overflow: hidden;
 }
 
 .sidebar {
     width: 280px;
+    flex-shrink: 0;
     background: #0d0f15;
     border-right: 1px solid #20232d;
     display: flex;
     flex-direction: column;
     padding: 22px;
+    z-index: 200;
 }
 
 .brand {
@@ -103,6 +116,7 @@ body {
 .member-list {
     flex: 1;
     overflow-y: auto;
+    min-height: 0;
 }
 
 .member {
@@ -137,6 +151,7 @@ body {
 .sidebar-bottom {
     border-top: 1px solid #20232d;
     padding-top: 16px;
+    flex-shrink: 0;
 }
 
 .user-info {
@@ -177,6 +192,7 @@ body {
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
 }
 
 .chat-header {
@@ -186,6 +202,14 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 15px 32px;
+    gap: 15px;
+}
+
+.header-room-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
 }
 
 .chat-header h2 {
@@ -198,10 +222,48 @@ body {
     margin-top: 5px;
 }
 
+.mobile-menu-button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #2b2f3a;
+    background: #141720;
+    border-radius: 10px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.mobile-menu-button span {
+    width: 4px;
+    height: 4px;
+    background: #b5bac7;
+    border-radius: 50%;
+}
+
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.62);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    z-index: 150;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
 .header-actions {
     display: flex;
     align-items: center;
     gap: 18px;
+    flex-shrink: 0;
 }
 
 .connection-status {
@@ -230,12 +292,15 @@ body {
     background: transparent;
     color: #a4a9b6;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .messages {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     padding: 28px max(32px, 10%);
+    scroll-behavior: smooth;
 }
 
 .welcome {
@@ -373,6 +438,13 @@ body {
     flex-direction: column;
     gap: 4px;
     font-size: 11px;
+    overflow: hidden;
+}
+
+#uploadInfo strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 #uploadInfo span {
@@ -385,6 +457,7 @@ body {
     color: #9298a8;
     font-size: 18px;
     cursor: pointer;
+    margin-left: 10px;
 }
 
 .message-box {
@@ -395,6 +468,7 @@ body {
 
 .message-box input {
     flex: 1;
+    min-width: 0;
     background: #12151d;
     border: 1px solid #272b36;
     border-radius: 12px;
@@ -409,6 +483,7 @@ body {
 
 .file-button {
     width: 48px;
+    flex-shrink: 0;
     border: 1px solid #2c303c;
     background: #171a23;
     color: #b2b7c4;
@@ -425,6 +500,7 @@ body {
     border-radius: 12px;
     cursor: pointer;
     font-weight: 600;
+    flex-shrink: 0;
 }
 
 .message-box button span {
@@ -445,7 +521,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 100;
+    z-index: 500;
     padding: 20px;
 }
 
@@ -511,55 +587,6 @@ body {
     border: none;
     background: #635bff;
     color: white;
-}
-
-@media (max-width: 700px) {
-
-    .sidebar {
-        width: 210px;
-        padding: 14px;
-    }
-
-    .chat-header {
-        padding: 15px;
-    }
-
-    .messages {
-        padding: 20px;
-    }
-
-    .message-box {
-        padding: 12px 15px 8px;
-    }
-
-    .upload-preview {
-        margin: 0 15px 10px;
-    }
-
-    .typing-indicator {
-        padding: 0 15px;
-    }
-
-    .upload-limit {
-        padding: 0 15px 15px;
-    }
-
-}
-
-@media (max-width: 520px) {
-
-    .sidebar {
-        display: none;
-    }
-
-    .header-actions {
-        gap: 8px;
-    }
-
-    .connection-status {
-        display: none;
-    }
-
 }
 
 .notification {
@@ -645,9 +672,176 @@ body {
     background: #ff5555;
 }
 
-@media (max-width: 520px) {
-    .notification {
-        top: 15px;
-        right: 20px;
+@media (max-width: 700px) {
+
+    .sidebar {
+        width: 240px;
+        padding: 18px;
     }
+
+    .chat-header {
+        padding: 15px 20px;
+    }
+
+    .messages {
+        padding: 20px;
+    }
+
+    .message-box {
+        padding: 12px 20px 8px;
+    }
+
+    .upload-preview {
+        margin: 0 20px 10px;
+    }
+
+    .typing-indicator {
+        padding: 0 20px;
+    }
+
+    .upload-limit {
+        padding: 0 20px 15px;
+    }
+
+}
+
+@media (max-width: 520px) {
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: min(290px, 82vw);
+        padding: 18px;
+        transform: translateX(-105%);
+        transition: transform 0.28s ease;
+        box-shadow: 20px 0 60px rgba(0, 0, 0, 0.35);
+        z-index: 200;
+    }
+
+    .sidebar.mobile-open {
+        transform: translateX(0);
+    }
+
+    .mobile-menu-button {
+        display: flex;
+    }
+
+    .chat-header {
+        min-height: 70px;
+        padding: 12px 15px;
+    }
+
+    .chat-header h2 {
+        font-size: 15px;
+    }
+
+    .header-actions {
+        gap: 8px;
+    }
+
+    .connection-status {
+        display: none;
+    }
+
+    #clearChat {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .messages {
+        padding: 16px 15px;
+    }
+
+    .welcome {
+        margin-top: 15vh;
+    }
+
+    .message {
+        max-width: 90%;
+    }
+
+    .message p {
+        font-size: 13px;
+        padding: 11px 13px;
+    }
+
+    .file-content {
+        max-width: 100%;
+    }
+
+    .file-content img,
+    .file-content video {
+        max-height: 350px;
+    }
+
+    .typing-indicator {
+        padding: 0 15px;
+    }
+
+    .upload-preview {
+        margin: 0 15px 8px;
+    }
+
+    .message-box {
+        padding: 10px 15px 6px;
+        gap: 8px;
+    }
+
+    .message-box input {
+        padding: 13px 12px;
+        font-size: 13px;
+    }
+
+    .file-button {
+        width: 44px;
+        font-size: 20px;
+    }
+
+    .message-box #sendButton {
+        padding: 0 14px;
+        font-size: 12px;
+    }
+
+    .message-box button span {
+        display: none;
+    }
+
+    .upload-limit {
+        padding: 0 15px 13px;
+    }
+
+    .notification {
+        top: 12px;
+        right: 12px;
+        width: calc(100vw - 24px);
+    }
+
+}
+
+@media (max-width: 380px) {
+
+    .header-room-info {
+        gap: 8px;
+    }
+
+    .chat-header p {
+        display: none;
+    }
+
+    #clearChat {
+        padding: 8px;
+        font-size: 10px;
+    }
+
+    .message-box #sendButton {
+        width: 44px;
+        padding: 0;
+    }
+
+    .file-button {
+        width: 42px;
+    }
+
 }

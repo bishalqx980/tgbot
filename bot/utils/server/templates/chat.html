@@ -130,19 +130,37 @@
         <header class="chat-header">
 
 
-            <div>
+            <div class="header-room-info">
 
-                <h2>
+                <button
+                    id="mobileMenuButton"
+                    class="mobile-menu-button"
+                    type="button"
+                    aria-label="Open room menu"
+                >
 
-                    Room {{ room }}
+                    <span></span>
+                    <span></span>
+                    <span></span>
 
-                </h2>
+                </button>
 
-                <p>
 
-                    No message history is stored
+                <div>
 
-                </p>
+                    <h2>
+
+                        Room {{ room }}
+
+                    </h2>
+
+                    <p>
+
+                        No message history is stored
+
+                    </p>
+
+                </div>
 
             </div>
 
@@ -283,6 +301,12 @@
 
 
 <div
+    id="sidebarOverlay"
+    class="sidebar-overlay"
+></div>
+
+
+<div
     id="passwordModal"
     class="password-modal hidden"
 >
@@ -329,6 +353,7 @@
 
 </div>
 
+
 <div
     id="notification"
     class="notification"
@@ -349,6 +374,7 @@
     </div>
 
 </div>
+
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
