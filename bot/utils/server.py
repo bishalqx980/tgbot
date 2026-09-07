@@ -745,8 +745,9 @@ def run():
     socketio.run(
         app,
         host="0.0.0.0",
-        port=PORT
-        # debug=True
+        port=PORT,
+        # debug=True,
+        allow_unsafe_werkzeug=True
     )
 
 
