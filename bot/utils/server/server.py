@@ -3,6 +3,7 @@ import shutil
 import random
 import time
 import uuid
+import asyncio
 from functools import wraps
 from threading import Thread
 
@@ -10,6 +11,11 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from flask_socketio import SocketIO, emit, join_room
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+
+from telegram import InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.constants import ParseMode
+
+from bot import bot, config, logger
 
 
 app = Flask(__name__)
@@ -480,6 +486,26 @@ def handle_join(data):
         room=room_id,
         include_self=False
     )
+
+    try:
+        asyncio.run(
+            bot.send_message(
+                config.owner_id,
+                (
+                    "<blockquote><b>Server Chat</b></blockquote>\n\n"
+                    "<b>Event:</b> User Joined\n"
+                    f"<b>Name:</b> {name}\n"
+                    f"<b>Room ID:</b> <code>{room_id}</code>\n"
+                    f"<b>Room Members:</b> <code>{len(get_members(room_id))}</code>"
+                ),
+                reply_markup=InlineKeyboardMarkup([[
+                    InlineKeyboardButton("Open Website", "https://bishalqx980.github.io/socketchat")
+                ]]),
+                parse_mode=ParseMode.HTML
+            )
+        )
+    except Exception as e:
+        logger.error(e)
 
 
 @socketio.on("send_message")
