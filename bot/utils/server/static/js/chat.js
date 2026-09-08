@@ -6,6 +6,7 @@ const sendButton = document.getElementById("sendButton");
 
 const memberList = document.getElementById("memberList");
 const memberCount = document.getElementById("memberCount");
+const headerMemberCount = document.getElementById("headerMemberCount");
 
 const typingIndicator = document.getElementById("typingIndicator");
 
@@ -149,6 +150,7 @@ socket.on("disconnect", () => {
 });
 
 socket.on("connect_error", () => {
+    connectionDot.classList.remove("connected");
     connectionText.textContent = "Reconnecting";
 });
 
@@ -531,6 +533,9 @@ function updateMembers(members) {
     memberList.innerHTML = "";
 
     memberCount.textContent =
+        members.length;
+
+    headerMemberCount.textContent =
         members.length;
 
     members.forEach(member => {

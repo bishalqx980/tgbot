@@ -15,7 +15,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 PORT = int(os.environ.get("PORT", 8080))
 
-app.config["SECRET_KEY"] = "change-this-to-a-long-random-secret-key"
+app.config["SECRET_KEY"] = "619e2420-0d79-440b-8cc2-6a1c592abc1b"
 app.config["MAX_CONTENT_LENGTH"] = 20 * 1024 * 1024
 
 socketio = SocketIO(

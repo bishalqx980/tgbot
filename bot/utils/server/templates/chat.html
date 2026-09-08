@@ -25,9 +25,7 @@
 
 <div class="app">
 
-
     <aside class="sidebar">
-
 
         <div class="brand">
 
@@ -48,7 +46,6 @@
             </div>
 
         </div>
-
 
         <div class="room-card">
 
@@ -71,7 +68,6 @@
 
         </div>
 
-
         <div class="members-header">
 
             <span>MEMBERS</span>
@@ -80,15 +76,12 @@
 
         </div>
 
-
         <div
             id="memberList"
             class="member-list"
         ></div>
 
-
         <div class="sidebar-bottom">
-
 
             <div class="user-info">
 
@@ -113,7 +106,6 @@
 
             </div>
 
-
             <button
                 id="leaveRoom"
                 type="button"
@@ -123,20 +115,15 @@
 
             </button>
 
-
         </div>
-
 
     </aside>
 
-
     <main class="chat-area">
-
 
         <header class="chat-header">
 
-
-            <div class="header-room-info">
+            <div class="header-left">
 
                 <button
                     id="mobileMenuButton"
@@ -151,41 +138,55 @@
 
                 </button>
 
-
-                <div>
+                <div class="header-room-info">
 
                     <h2>
-
                         Room {{ room }}
-
                     </h2>
 
                     <p>
-
                         No message history is stored
-
                     </p>
 
                 </div>
 
             </div>
 
+            <div class="header-status-info">
 
-            <div class="header-actions">
+                <div class="header-user-status">
 
+                    <span class="header-user-dot"></span>
 
-                <span class="connection-status">
+                    <span class="header-user-name">
+                        {{ name }}
+                    </span>
+
+                    <span class="header-user-connected">
+                        Connected
+                    </span>
+
+                </div>
+
+                <div class="header-members">
+
+                    <span class="header-members-icon">●</span>
+
+                    <span id="headerMemberCount">
+                        0
+                    </span>
+
+                </div>
+
+                <div class="connection-status">
 
                     <span id="connectionDot"></span>
 
                     <span id="connectionText">
-
                         Connecting
-
                     </span>
 
-                </span>
-
+                </div>
 
                 <button
                     id="clearChat"
@@ -196,18 +197,14 @@
 
                 </button>
 
-
             </div>
 
-
         </header>
-
 
         <div
             id="messages"
             class="messages"
         >
-
 
             <div class="welcome">
 
@@ -227,15 +224,12 @@
 
             </div>
 
-
         </div>
-
 
         <div
             id="typingIndicator"
             class="typing-indicator"
         ></div>
-
 
         <div
             id="uploadPreview"
@@ -255,16 +249,13 @@
 
         </div>
 
-
         <div class="message-box">
-
 
             <input
                 type="file"
                 id="fileInput"
                 hidden
             >
-
 
             <button
                 id="fileButton"
@@ -277,7 +268,6 @@
 
             </button>
 
-
             <input
                 id="messageInput"
                 type="text"
@@ -288,7 +278,6 @@
                 spellcheck="true"
                 maxlength="2000"
             >
-
 
             <button
                 id="sendButton"
@@ -301,9 +290,7 @@
 
             </button>
 
-
         </div>
-
 
         <div class="upload-limit">
 
@@ -311,18 +298,14 @@
 
         </div>
 
-
     </main>
 
-
 </div>
-
 
 <div
     id="sidebarOverlay"
     class="sidebar-overlay"
 ></div>
-
 
 <div
     id="passwordModal"
@@ -377,7 +360,6 @@
 
 </div>
 
-
 <div
     id="notification"
     class="notification"
@@ -399,9 +381,7 @@
 
 </div>
 
-
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-
 
 <script>
 
@@ -410,7 +390,6 @@ const ROOM_ID = {{ room|tojson }};
 const IS_ADMIN = {{ is_admin|tojson }};
 
 </script>
-
 
 <script
     src="{{ url_for('static', filename='js/chat.js') }}"

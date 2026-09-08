@@ -250,12 +250,12 @@ button {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px 32px;
-    gap: 15px;
+    padding: 12px 28px;
+    gap: 18px;
     z-index: 100;
 }
 
-.header-room-info {
+.header-left {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -263,7 +263,7 @@ button {
     flex: 1;
 }
 
-.header-room-info > div:last-child {
+.header-room-info {
     min-width: 0;
     overflow: hidden;
 }
@@ -325,11 +325,59 @@ button {
     visibility: visible;
 }
 
-.header-actions {
+.header-status-info {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 14px;
     flex-shrink: 0;
+    min-width: 0;
+}
+
+.header-user-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding-right: 14px;
+    border-right: 1px solid #242833;
+}
+
+.header-user-dot {
+    width: 7px;
+    height: 7px;
+    min-width: 7px;
+    border-radius: 50%;
+    background: #39d98a;
+}
+
+.header-user-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #d8dae2;
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.header-user-connected {
+    font-size: 10px;
+    color: #39d98a;
+}
+
+.header-members {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #aeb3c0;
+    font-size: 12px;
+    padding-right: 14px;
+    border-right: 1px solid #242833;
+}
+
+.header-members-icon {
+    font-size: 8px;
+    color: #635bff;
 }
 
 .connection-status {
@@ -339,6 +387,8 @@ button {
     color: #858b99;
     font-size: 12px;
     white-space: nowrap;
+    padding-right: 14px;
+    border-right: 1px solid #242833;
 }
 
 #connectionDot {
@@ -787,6 +837,23 @@ button {
     background: #ff5555;
 }
 
+@media (max-width: 1100px) {
+
+    .header-user-name {
+        max-width: 90px;
+    }
+
+    .chat-header {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .header-status-info {
+        gap: 10px;
+    }
+
+}
+
 @media (max-width: 900px) {
 
     .sidebar {
@@ -796,7 +863,11 @@ button {
     }
 
     .chat-header {
-        padding: 15px 24px;
+        padding: 12px 16px;
+    }
+
+    .header-user-connected {
+        display: none;
     }
 
     .messages {
@@ -833,12 +904,25 @@ button {
         min-width: 230px;
     }
 
-    .header-actions {
-        gap: 10px;
+    .header-user-status {
+        padding-right: 10px;
+    }
+
+    .header-members {
+        padding-right: 10px;
     }
 
     .connection-status {
-        display: none;
+        padding-right: 10px;
+    }
+
+    .header-user-name {
+        max-width: 70px;
+    }
+
+    #clearChat {
+        padding: 8px 9px;
+        font-size: 10px;
     }
 
 }
@@ -874,26 +958,69 @@ button {
     }
 
     .chat-header {
-        min-height: 68px;
-        padding: 10px 14px;
+        min-height: 74px;
+        padding: 8px 10px;
         gap: 8px;
     }
 
+    .header-left {
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .header-room-info {
+        min-width: 0;
+    }
+
     .chat-header h2 {
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .chat-header p {
+        display: none;
+    }
+
+    .header-status-info {
+        gap: 7px;
+    }
+
+    .header-user-status {
+        padding: 0;
+        border: none;
+        gap: 4px;
+    }
+
+    .header-user-name {
+        max-width: 52px;
         font-size: 10px;
     }
 
-    .header-actions {
-        gap: 6px;
+    .header-user-connected {
+        display: none;
+    }
+
+    .header-members {
+        padding: 0;
+        border: none;
+        gap: 4px;
+        font-size: 11px;
+    }
+
+    .connection-status {
+        padding: 0;
+        border: none;
+        gap: 5px;
+        font-size: 10px;
+    }
+
+    #connectionText {
+        display: inline;
     }
 
     #clearChat {
-        padding: 8px 9px;
-        font-size: 10px;
+        padding: 7px 8px;
+        font-size: 9px;
     }
 
     .messages {
@@ -963,19 +1090,13 @@ button {
 
 }
 
-@media (max-width: 380px) {
+@media (max-width: 480px) {
 
     .chat-header {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .header-room-info {
-        gap: 7px;
-    }
-
-    .chat-header p {
-        display: none;
+        min-height: 70px;
+        padding-left: 7px;
+        padding-right: 7px;
+        gap: 5px;
     }
 
     .mobile-menu-button {
@@ -984,9 +1105,70 @@ button {
         min-width: 38px;
     }
 
-    #clearChat {
-        padding: 7px;
+    .header-left {
+        gap: 6px;
+    }
+
+    .chat-header h2 {
+        font-size: 12px;
+    }
+
+    .header-user-name {
+        display: none;
+    }
+
+    .header-user-dot {
+        width: 6px;
+        height: 6px;
+        min-width: 6px;
+    }
+
+    .header-status-info {
+        gap: 6px;
+    }
+
+    .connection-status {
         font-size: 9px;
+    }
+
+    #connectionDot {
+        width: 6px;
+        height: 6px;
+        min-width: 6px;
+    }
+
+    #clearChat {
+        padding: 7px 6px;
+        font-size: 8px;
+    }
+
+}
+
+@media (max-width: 380px) {
+
+    .chat-header {
+        min-height: 66px;
+    }
+
+    .header-room-info {
+        max-width: 80px;
+    }
+
+    .chat-header h2 {
+        font-size: 11px;
+    }
+
+    .header-members-icon {
+        display: none;
+    }
+
+    .connection-status {
+        font-size: 8px;
+    }
+
+    #clearChat {
+        padding: 6px 5px;
+        font-size: 7px;
     }
 
     .messages {
@@ -1029,6 +1211,14 @@ button {
 }
 
 @media (max-width: 320px) {
+
+    .header-room-info {
+        max-width: 60px;
+    }
+
+    .connection-status {
+        display: none;
+    }
 
     .message-box #sendButton {
         min-width: 42px;
