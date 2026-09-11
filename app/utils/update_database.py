@@ -12,7 +12,7 @@ def update_database(force_update: bool = False):
             logger.info(message)
             return message
 
-    config_data = config.vardict()
+    config_data = vars(config)
 
     update = MongoDB.insert(
         MongoDB.SETTINGS,

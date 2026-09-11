@@ -11,10 +11,10 @@ from app.utils.server_ping import keep_server_alive
 
 
 async def app_init():
-    # Run Server
-    await keep_server_alive()
     # Update Database info/config
     update_database_res = update_database()
+    # Run Server
+    await keep_server_alive()
     # Initialize Telegraph
     telegraph_res = await telegraph.initialize()
 
