@@ -32,21 +32,33 @@ async def func_(_, message: Message):
         user_registered = MongoDB.search(MongoDB.USERS, "user_id", user.id)
 
         if user_registered:
+            active_status = user_registered.get("active_status")
+
+            if not active_status:
+                MongoDB.update(
+                    MongoDB.USERS,
+                    "user_id",
+                    user.id,
+                    { "active_status": True }
+                )
+            
             return await sent_message.edit_text(
                 "Chat is already registered!"
             )
-        
-        user_info = {
-            "user_id": user.id,
-            "dc_id": user.dc_id,
-            "name": user.full_name,
-            "username": user.username,
-            "usernames": user.usernames,
-            "lang": user.language_code,
-            "active_status": True
-        }
 
-        is_ok = MongoDB.insert(MongoDB.USERS, user.id, user_info)
+        is_ok = MongoDB.insert(
+            MongoDB.USERS,
+            user.id,
+            {
+                "user_id": user.id,
+                "dc_id": user.dc_id,
+                "name": user.full_name,
+                "username": user.username,
+                "usernames": user.usernames,
+                "lang": user.language_code,
+                "active_status": True
+            }
+        )
         
         if not is_ok:
             return await sent_message.edit_text(

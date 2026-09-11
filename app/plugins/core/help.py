@@ -184,18 +184,32 @@ async def func_(_, message: Message):
     finally:
         # database entry checking if user is registered.
         user_registered = MongoDB.search(MongoDB.USERS, "user_id", user.id)
-        if not user_registered:
-            user_info = {
-                "user_id": user.id,
-                "dc_id": user.dc_id,
-                "name": user.full_name,
-                "username": user.username,
-                "usernames": user.usernames,
-                "lang": user.language_code,
-                "active_status": True
-            }
 
-            MongoDB.insert(MongoDB.USERS, user.id, user_info)
+        if user_registered:
+            active_status = user_registered.get("active_status")
+            
+            if not active_status:
+                MongoDB.update(
+                    MongoDB.USERS,
+                    "user_id",
+                    user.id,
+                    { "active_status": True }
+                )
+
+        else:
+            MongoDB.insert(
+                MongoDB.USERS,
+                user.id,
+                {
+                    "user_id": user.id,
+                    "dc_id": user.dc_id,
+                    "name": user.full_name,
+                    "username": user.username,
+                    "usernames": user.usernames,
+                    "lang": user.language_code,
+                    "active_status": True
+                }
+            )
 
 
 # Callback for Help Menu Navigation
