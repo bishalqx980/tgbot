@@ -1,12 +1,16 @@
-# [tgbot](https://bishalqx980.github.io/tgbot) 👻
+# [tgbot 2.0 (beta)](https://bishalqx980.github.io/tgbot) 👻
 
-This Telegram bot is built using the **[python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot)** library and performs various tasks within **Telegram**.
+This Telegram bot is built using the **[kurigram](https://github.com/kurigram-org/kurigram)** library and performs various tasks within **Telegram**.
+
+**Checkout [tgbot v1](https://bishalqx980.github.io/tgbot/tree/main)**
 
 > **This bot can be found as [Ciri](https://t.me/MissCiri_bot) on Telegram.**
 
 ***If you liked this project then please give it a ⭐ | Thank You!***
 
-## Features 🐳
+# ⌛ To be continued...
+
+<!-- ## Features 🐳
 
 > **📝 Note (14/12/2024):** _Certain features have been temporarily removed due to limitations. They may be reintroduced in future updates. Additionally, not all features are listed here. We encourage you to start the bot and explore its full functionality. I appreciate your understanding._
 
@@ -107,9 +111,9 @@ This Telegram bot is built using the **[python-telegram-bot](https://github.com/
 
     > **Important (Render Hosting):** _After deployment complete go to [Render Dashboard](https://dashboard.render.com/) and open your service then you can see service url on top left corner [https://example.onrender.com]() copy that and go to bot `/bsettings` server url and edit with your service url. (**So that bot won't go to sleep**)_
 
-**_After deployment complete, don't forget to visit `/bsettings`_**
+**_After deployment complete, don't forget to visit `/bsettings`_** 
 
----
+--- -->
 
 <p align="center">
   Made with ❤️ by <a href="https://github.com/bishalqx980">bishalqx980</a>

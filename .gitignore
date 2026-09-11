@@ -5,16 +5,15 @@
 *.png
 *.txt
 *.json
+*.session*
 venv
-config.env
+config.py
 downloads
 uploads
-temp
 sys
 
 # Exception 
 !requirements.txt
 !.vscode/*
 !version.json
-!commands.json
-!coffee.json
+!dev/note.txt

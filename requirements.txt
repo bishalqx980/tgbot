@@ -1,16 +1,13 @@
-python-telegram-bot==22.6
-python-dotenv==1.2.2
+kurigram==2.2.24
+pymongo==4.16.0
 deep-translator==1.11.4
-pymongo==4.13.0
-pytz==2025.2
-flask
-flask-socketio
-werkzeug
-psutil==7.0.0
-telegraph[aio]==2.2.0
 gtts==2.5.4
-# yt-dlp==2025.6.9
+telegraph[aio]==2.2.0
 qrcode[pil]==8.2
 pyzbar==0.1.9
 pyzipper==0.4.0
-aiohttp[speedups]
+psutil==7.2.2
+aiohttp
+flask
+flask-socketio
+werkzeug

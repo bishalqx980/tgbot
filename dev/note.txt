@@ -1,0 +1,11 @@
+Settings
+Bot Settings
+Support
+Broadcast
+
+
+filters
+Auto Translator
+Link Blocker
+Auto Trigger
+Edit Database
