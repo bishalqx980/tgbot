@@ -13,8 +13,6 @@ from app.utils.server_ping import keep_server_alive
 async def app_init():
     # Update Database info/config
     update_database_res = update_database()
-    # Run Server
-    await keep_server_alive()
     # Initialize Telegraph
     telegraph_res = await telegraph.initialize()
 
@@ -52,7 +50,10 @@ async def app_init():
         logger.error(e)
     
     logger.info("App Started...!")
-    await idle()
+
+    # Run Server - This need to run at the end otherwise it will stuck the bot process
+    await keep_server_alive()
+    # await idle()
 
 
 async def main():
