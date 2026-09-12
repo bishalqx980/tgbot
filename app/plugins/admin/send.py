@@ -4,7 +4,7 @@ from pyrogram.enums import ChatType
 from pyrogram.errors import Forbidden
 
 from app import bot, COMMAND_PREFIXES
-from app.decorators import privatechat_only, admin_require
+from app.decorators import privatechat_only, sudo_required
 from app.helpers import CommandArgs
 
 
@@ -24,7 +24,7 @@ __module__ = {
 
 @bot.on_message(filters.command(__module__["commands"], COMMAND_PREFIXES))
 @privatechat_only
-@admin_require
+@sudo_required
 async def func_(_, message: Message):
     user = message.from_user or message.sender_chat
     re_msg = message.reply_to_message

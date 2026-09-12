@@ -6,7 +6,7 @@ from app import config
 from app.database import MongoDB
 
 
-def admin_require(func):
+def sudo_required(func):
     @wraps(func)
     async def wraper(_, message: Message):
         user = message.from_user or message.sender_chat

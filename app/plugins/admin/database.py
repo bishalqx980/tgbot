@@ -6,7 +6,7 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from app import bot, COMMAND_PREFIXES
 from app.database import MongoDB
-from app.decorators import admin_require, privatechat_only
+from app.decorators import sudo_required, privatechat_only
 from app.helpers import CommandArgs
 
 
@@ -26,7 +26,7 @@ __module__ = {
 
 @bot.on_message(filters.command(__module__["commands"], COMMAND_PREFIXES))
 @privatechat_only
-@admin_require
+@sudo_required
 async def func_(_, message: Message):
     # CHAT ID or USER ID // Not username
     victim_id = CommandArgs(message.text, message.command)

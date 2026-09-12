@@ -3,7 +3,7 @@ from pyrogram.types import Message
 from pyrogram.enums import ChatMembersFilter, ChatMemberStatus
 
 from app import bot, COMMAND_PREFIXES
-from app.decorators import admin_require, privatechat_only
+from app.decorators import sudo_required, privatechat_only
 from app.helpers import CommandArgs
 
 
@@ -23,7 +23,7 @@ __module__ = {
 
 @bot.on_message(filters.command(__module__["commands"], COMMAND_PREFIXES))
 @privatechat_only
-@admin_require
+@sudo_required
 async def func_(_, message: Message):
     chat_id = CommandArgs(message.text, message.command) # CHAT_ID or USERNAME
 

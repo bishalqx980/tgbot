@@ -12,11 +12,13 @@ from telegram.utils.helpers import escape_markdown
 # match ` (code)
 # match []() (markdown link)
 # else, escape *, _, `, and [
-MATCH_MD = re.compile(r'\*(.*?)\*|'
-                      r'_(.*?)_|'
-                      r'`(.*?)`|'
-                      r'(?<!\\)(\[.*?\])(\(.*?\))|'
-                      r'(?P<esc>[*_`\[])')
+MATCH_MD = re.compile(
+    r'\*(.*?)\*|'
+    r'_(.*?)_|'
+    r'`(.*?)`|'
+    r'(?<!\\)(\[.*?\])(\(.*?\))|'
+    r'(?P<esc>[*_`\[])'
+)
 
 # regex to find []() links -> hyperlinks/buttons
 LINK_REGEX = re.compile(r'(?<!\\)\[.+?\]\((.*?)\)')

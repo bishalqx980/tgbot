@@ -1,6 +1,6 @@
 from .privatechat_only import privatechat_only
 from .groupchat_only import groupchat_only
-from .admin_require import admin_require
+from .sudo_required import sudo_required
 from .chat_status import (
     bot_admin,
     bot_can_restrict,
@@ -23,7 +23,7 @@ from .chat_status import (
 __all__ = [
     "privatechat_only",
     "groupchat_only",
-    "admin_require",
+    "sudo_required",
 
     "bot_admin",
     "bot_can_restrict",

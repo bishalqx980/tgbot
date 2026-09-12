@@ -4,7 +4,7 @@ from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 from app import bot, COMMAND_PREFIXES
-from app.decorators import privatechat_only, admin_require
+from app.decorators import privatechat_only, sudo_required
 from app.helpers import CommandArgs
 
 
@@ -24,7 +24,7 @@ __module__ = {
 
 @bot.on_message(filters.command(__module__["commands"], COMMAND_PREFIXES))
 @privatechat_only
-@admin_require
+@sudo_required
 async def func_(_, message: Message):
     # this is the CHATID
     chat_id = CommandArgs(message.text, message.command)
