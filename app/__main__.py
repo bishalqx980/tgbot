@@ -1,9 +1,10 @@
 import asyncio
+import requests
 
 from pyrogram import idle
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, BotCommand, BotCommandScopeAllPrivateChats
 
-from app import bot, logger, config, __version__, __versionStatus__, MODULES, FAILED_TO_LOAD_MODULES
+from app import bot, logger, config, __version__, __versionStatus__, __githubVersionURL__, MODULES, FAILED_TO_LOAD_MODULES
 from app.modules import telegraph
 from app.utils.loader import load_plugins
 from app.utils.update_database import update_database
@@ -28,6 +29,25 @@ async def app_init():
         botcmdres = None
 
     try:
+
+        try:
+
+            is_latest = "???"
+
+            res = requests.get(__githubVersionURL__)
+            if res.ok:
+                data = res.json()
+                __githubVersion__ = data.get("__version__")
+
+            if __version__ == __githubVersion__:
+                is_latest = "latest"
+
+            else:
+                is_latest = "outdated"
+
+        except Exception as e:
+            logger.error(e)
+        
         await bot.send_message(
             config.owner_id,
             (
@@ -39,7 +59,7 @@ async def app_init():
                 f"**$telegraph : <i>{telegraph_res}</i>**\n"
                 f"**$botcommand : <i>{'Updated!' if botcmdres else 'Failed to update!'}</i>**\n\n"
 
-                f"> **Version (<i>{__versionStatus__}</i>)** : **{__version__}**"
+                f"> **Version (<i>{__versionStatus__}</i>)** : **{__version__}** ({is_latest})"
             ),
             reply_markup=InlineKeyboardMarkup([[
                 InlineKeyboardButton("Start", url=f"https://{bot.me.username}.t.me?start=start"),

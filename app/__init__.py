@@ -15,6 +15,7 @@ from config import CONFIG
 version_tracker = json.load(open("version.json", "rb"))
 __version__ = version_tracker["__version__"] # major.minor.patch.commits
 __versionStatus__ = version_tracker["__status__"] # Stable / Beta
+__githubVersionURL__ = "https://raw.githubusercontent.com/bishalqx980/tgbot/refs/heads/v2/version.json"
 
 # constants
 MODULES = {}
