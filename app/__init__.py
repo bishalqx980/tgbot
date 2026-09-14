@@ -20,8 +20,8 @@ __githubVersionURL__ = "https://raw.githubusercontent.com/bishalqx980/tgbot/refs
 # constants
 MODULES = {}
 FAILED_TO_LOAD_MODULES = [] # contains error message str
-HELP_MENU_CATEGORIES = ["user", "group", "ai", "admin"]
-ADMIN_CATEGORIES = ["admin"]
+HELP_MENU_CATEGORIES = ["user", "group", "sudo"]
+ADMIN_CATEGORIES = ["sudo"]
 PLUGINS_PATH = Path("app/plugins") # Path("path")
 
 BOT_UPTIME = time()

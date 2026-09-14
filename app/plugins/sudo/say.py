@@ -12,7 +12,7 @@ __module__ = {
     "commands": ["say"], # list of commands including aliases
 
     "description": "Send a message for the bot to repeat! E.g. `/say What's Up!`",
-    "category": "admin", # check app/__init__.py for HELP_MENU_CATEGORIES
+    "category": "sudo", # check app/__init__.py for HELP_MENU_CATEGORIES
     "button_name": "Say", # Help menu button name (Note: Leaving blank or None will result in no button on help menu)
 
     "version": "1.0.0", # major.minor.patch

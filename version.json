@@ -1,5 +1,11 @@
 {
     "_comment": "major.minor.patch.commits",
     "__status__": "Beta",
-    "__version__": "2.1.1.598"
+    "__version__": "2.1.3.599",
+    "update_note": [
+        "- Updated / bug fixed (info cmd)",
+        "- Removed AI func's (unstable)",
+        "- Change category name from 'admin' to 'sudo'",
+        "- Updated version compare func"
+    ]
 }

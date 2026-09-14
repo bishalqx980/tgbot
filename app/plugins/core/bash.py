@@ -16,7 +16,7 @@ __module__ = {
     "commands": ["bash", "shell", "cmd"], # list of commands including aliases
 
     "description": "Run any command on CMD! E.g. `/bash whoami`",
-    "category": "admin", # check app/__init__.py for HELP_MENU_CATEGORIES
+    "category": "sudo", # check app/__init__.py for HELP_MENU_CATEGORIES
     "button_name": "Bash/Shell/CMD", # Help menu button name (Note: Leaving blank or None will result in no button on help menu)
 
     "version": "1.0.0", # major.minor.patch

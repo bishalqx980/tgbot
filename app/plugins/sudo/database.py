@@ -16,7 +16,7 @@ __module__ = {
     "commands": ["database", "db"], # list of commands including aliases
 
     "description": "Get database info or specific chat info stored on database! E.g. `/database CHAT_ID`",
-    "category": "admin", # check app/__init__.py for HELP_MENU_CATEGORIES
+    "category": "sudo", # check app/__init__.py for HELP_MENU_CATEGORIES
     "button_name": "Database", # Help menu button name (Note: Leaving blank or None will result in no button on help menu)
 
     "version": "1.0.0", # major.minor.patch

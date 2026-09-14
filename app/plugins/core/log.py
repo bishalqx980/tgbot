@@ -14,7 +14,7 @@ __module__ = {
     "commands": ["log"], # list of commands including aliases
 
     "description": "Get app.log file (to debug app)!",
-    "category": "admin", # check app/__init__.py for HELP_MENU_CATEGORIES
+    "category": "sudo", # check app/__init__.py for HELP_MENU_CATEGORIES
     "button_name": "Log", # Help menu button name (Note: Leaving blank or None will result in no button on help menu)
 
     "version": "1.0.0", # major.minor.patch
@@ -28,8 +28,9 @@ __module__ = {
 async def func_(_, message: Message):
     filename = f"log-{uuid4().hex}.log"
 
-    await message.reply_document(
-        document=open(LOG_PATH, "rb"),
-        caption=filename,
-        file_name=filename
-    )
+    with open(LOG_PATH, "rb") as f:
+        await message.reply_document(
+            document=f,
+            caption=filename,
+            file_name=filename
+        )

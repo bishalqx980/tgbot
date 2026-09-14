@@ -11,7 +11,7 @@ __module__ = {
     "name": "information",
     "commands": ["info"], # list of commands including aliases
 
-    "description": "Get user info! Reply any user with the command,. OR `/info @username`",
+    "description": "Get user info! Reply any user with the command,. OR `/info @username or ID`",
     "category": "user", # check app/__init__.py for HELP_MENU_CATEGORIES
     "button_name": "Info", # Help menu button name (Note: Leaving blank or None will result in no button on help menu)
 
@@ -23,18 +23,28 @@ __module__ = {
 @bot.on_message(filters.command(__module__["commands"], COMMAND_PREFIXES))
 async def func_(_, message: Message):
     user = message.from_user or message.sender_chat
-    # priority: @username > replied user > myself (user)
-    username = CommandArgs(message.text, message.command)
+    # priority: @username or ID > replied user > myself (user)
+    args = CommandArgs(message.text, message.command)
     re_msg = message.reply_to_message
     victim = None # it will be assigned as myself (user) if no @username or replied user
     victim_photo = None
 
-    # case1: @username
-    if username:
+    # case1: @username or ID
+    if args:
         try:
+            
+            # mention user,. who doesn't have a username (group chat only)
             if message.entities[-1].user:
-                username = message.entities[-1].user.id # for mention without @username
-            victim = await bot.get_users(username)
+                victim = await bot.get_users(
+                    message.entities[-1].user.id
+                )
+            # @username
+            elif "@" in args:
+                victim = await bot.get_users(args)
+            # user_id
+            else:
+                victim = await bot.get_users(int(args))
+
         except Exception as e:
             return await message.reply(f"Error: {e}")
 

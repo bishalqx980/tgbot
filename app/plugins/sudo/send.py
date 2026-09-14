@@ -14,7 +14,7 @@ __module__ = {
     "commands": ["send"], # list of commands including aliases
 
     "description": "Send message to specified user! E.g. reply a message with `/send [username / userid]` or `/send f [username / userid]` to forward.",
-    "category": "admin", # check app/__init__.py for HELP_MENU_CATEGORIES
+    "category": "sudo", # check app/__init__.py for HELP_MENU_CATEGORIES
     "button_name": "Send", # Help menu button name (Note: Leaving blank or None will result in no button on help menu)
 
     "version": "1.0.0", # major.minor.patch

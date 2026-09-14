@@ -11,6 +11,10 @@ from app.utils.update_database import update_database
 from app.utils.server_ping import keep_server_alive
 
 
+def _version_compare(current, latest):
+    return tuple(map(int, current.split("."))) >= tuple(map(int, latest.split(".")))
+
+
 async def app_init():
     # Update Database info/config
     update_database_res = update_database()
@@ -39,9 +43,9 @@ async def app_init():
                 data = res.json()
                 __githubVersion__ = data.get("__version__")
 
-            if __version__ == __githubVersion__:
+            if _version_compare(__version__, __githubVersion__):
                 is_latest = "latest"
-
+                
             else:
                 is_latest = "outdated"
 
