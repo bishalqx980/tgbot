@@ -12,7 +12,10 @@ class CONFIG:
 
         self.shrinkme_api: Optional[str] = None   # STR Get from > https://shrinkme.io/
         self.omdb_api: Optional[str] = None       # STR Get from > https://www.omdbapi.com/
-        self.forecast_api: Optional[str] = None    # STR Get from > https://www.weatherapi.com/
+        self.forecast_api: Optional[str] = None   # STR Get from > https://www.weatherapi.com/
+
+        self.log_channel: Optional[int] = None    # INT Telegram Log Channel ID // use /id in channel after adding bot
+        self.dump_channel: Optional[int] = None   # INT Telegram Dump Channel ID // use /id in channel after adding bot
     
     
     def validate(self) -> bool:

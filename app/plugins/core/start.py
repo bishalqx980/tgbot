@@ -22,7 +22,7 @@ __module__ = {
 }
 
 
-@bot.on_message(filters.command(__module__["commands"], COMMAND_PREFIXES) & ~filters.regex("help"))
+@bot.on_message(filters.command(__module__["commands"], COMMAND_PREFIXES) & filters.regex(r"^/start(?:@\w+)?(?:\s+start)?$"))
 async def func_(_, message: Message):
     user = message.from_user or message.sender_chat
     chat = message.chat

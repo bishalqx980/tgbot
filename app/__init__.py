@@ -39,7 +39,6 @@ BOT_SETTINGS_EXTRA_CONFIG = [
 ]
 ORIGINAL_BOT_USERNAME = "MissCiri_bot" # without @
 ORIGINAL_BOT_ID = 6845693976
-SERVER_LOG_CHANNEL_ID = -1002675104487
 COMMAND_PREFIXES = ["/", "-", "!", "."]
 REQUIRED_DIRS = ["downloads", "sys"]
 WORK_DIR = Path("sys")

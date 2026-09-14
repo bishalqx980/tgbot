@@ -1,11 +1,9 @@
 {
     "_comment": "major.minor.patch.commits",
     "__status__": "Beta",
-    "__version__": "2.1.3.599",
+    "__version__": "2.2.0.600",
     "update_note": [
-        "- Updated / bug fixed (info cmd)",
-        "- Removed AI func's (unstable)",
-        "- Change category name from 'admin' to 'sudo'",
-        "- Updated version compare func"
+        "- Added log & dump channel id in config.py",
+        "- Added dump func"
     ]
 }

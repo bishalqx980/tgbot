@@ -14,7 +14,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-from app import bot, logger, SERVER_LOG_CHANNEL_ID
+from app import bot, logger, config
 
 
 app = Flask(__name__)
@@ -490,7 +490,7 @@ def handle_join(data):
         
         asyncio.run(
             bot.send_message(
-                SERVER_LOG_CHANNEL_ID,
+                config.log_channel,
                 (
                     "> **Server Chat**\n\n"
                     "**Event:** User Joined\n"
