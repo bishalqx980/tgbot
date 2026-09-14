@@ -2,56 +2,42 @@
 
 This Telegram bot is built using the **[kurigram](https://github.com/kurigram-org/kurigram)** library and performs various tasks within **Telegram**.
 
-**Checkout [tgbot v1](https://bishalqx980.github.io/tgbot/tree/main)**
+**Checkout [tgbot v1](https://github.com/bishalqx980/tgbot/tree/v1)**
 
 > **This bot can be found as [Ciri](https://t.me/MissCiri_bot) on Telegram.**
 
 ***If you liked this project then please give it a ⭐ | Thank You!***
 
-# ⌛ To be continued...
+## Features 🐳
 
-<!-- ## Features 🐳
-
-> **📝 Note (14/12/2024):** _Certain features have been temporarily removed due to limitations. They may be reintroduced in future updates. Additionally, not all features are listed here. We encourage you to start the bot and explore its full functionality. I appreciate your understanding._
+> Note: tgbot v2 is underdevelopment, so many features are disabled or won't work properly. Thank you for your understanding...
 
 - **Group Management ⚡**
     - It has just everything... 😉
-    - Whisper Message (secretly message a user in Group) 🤫
-- **AI 🤖**
-    - ChatGPT
-    - AI Imagine
+    - Whisper Message (secretly message someone in a Group) 🤫
+
 - **Misc ✨**
-    - Get Movie Information
+    - Dumper (store documents and get unique URL)
     - Built-in Language Translator
     - Decode, Encode (base64)
-    - Short URL / Ping URL
+    - Short or Ping URL
     - Generate QR Code (Image)
-    - Host Image Publicly (Link)
+    - Upload Image (Get a link for that image)
     - Pastebin (telegraph)
+    - Unziper `.zip` files
     - Convert text into speech (voice)
+    - Movie Information
     - Built-in [PSNDL](https://bishalqx980.github.io/psndl/) Support
     - Get Any Location Weather Information
     - Calculate basic math
-    - ~~Take webshot (website screenshot)~~ `Removed due to limitations`
-    - ~~Download YouTube video~~ `Removed due to limitations`
-        - Added YouTube audio/song download (14/01/2025)
-    - ~~Search YouTube video~~ `Removed due to limitations`
     - Much more...🤩 [Start Now](https://t.me/MissCiri_bot) to explore 🌴
 
 
 ## How to add new command?
 
-- Only for `CommandHandler`
-- Create your handler file/func inside `bot/handlers`
-- Add your handler details in `bot/handler/commands.json`
-
-```
-{
-    "command": str or [str, str],   # str or list of str example: "start" or ["start", "demo"]
-    "function": "",                 # func name example: func_start
-    "module": ""                    # str example: .handlers.core.start
-}
-```
+- Check [_\_demo\_\_.py](./app/plugins/__demo__.py)
+- Edit the metadata and make your own plugin 👀
+- Don't forget to open a [pull request](https://github.com/bishalqx980/tgbot/pulls)
 
 ## Deploy your own bot 👩‍🚀
 
@@ -62,17 +48,10 @@ This Telegram bot is built using the **[kurigram](https://github.com/kurigram-or
 
 **Preparation 📦**
 ---
-- Recommended python version 3.11
-- Download & Rename `sample_config.env` to `config.env` then fillup `config.env` file value's
+- Recommended python version **3.14**
+- Download & Rename `sample_config.py` to `config.py` then fillup `config.py` file value's
 
-    **⚠️ Note:** _Don't share or upload the `config.env` any public place or repository_
-
-**`config.env` Values**
-
-- `BOT_TOKEN` Get from [https://t.me/BotFather](https://t.me/BotFather) E.g. `123456:abcdefGHIJK...`
-- `OWNER_ID` Get from bot by /id command E.g. `2134776547`
-- `MONGODB_URI` Get from [https://www.mongodb.com/](https://www.mongodb.com/) (Check Below for instruction)
-- `DB_NAME` anything E.g. `MissCiri_db`
+    **⚠️ Note:** _Don't share or upload the `config.py` any public place or repository_
 
 **[Creating MongoDB URI](https://www.mongodb.com/docs/languages/python/pymongo-driver/current/get-started/#create-a-connection-string)**
 
@@ -83,10 +62,10 @@ This Telegram bot is built using the **[kurigram](https://github.com/kurigram-or
 **Local Hosting 💻**
 
 - Windows/Linux
-    - Required `python 3.11` (also tested on `3.13`)
+    - Required `python 3.14` (also tested on `3.13`)
     - Open `tgbot` directory on cmd/shell
     - Run on cmd/shell `pip install -r requirements.txt`
-    - Finally `python -m bot`
+    - Finally `python -m app`
 
 **Render Deploy ⚡**
 
@@ -96,24 +75,22 @@ This Telegram bot is built using the **[kurigram](https://github.com/kurigram-or
 - Then 👇
     ```
     > Language: Docker
-    > Branch: main
+    > Branch: v2
     > Instance Type: Free [or paid]
     ```
 - Advanced option 👇
     ```
     Secret Files
 
-    > Filename: 'config.env'
-    > File Contents: Paste all content from 'sample_config.env' (make sure you filled up everything)
+    > Filename: 'config.py'
+    > File Contents: Paste all content from 'sample_config.py' (make sure you filled up everything)
     ```
 
-    > **Note (Render Hosting):** _If you face anyproblem accessing `Advanced option` then just click on `Create Web Service` then from `Environment` > `Secret Files` and add the `config.env` values. Then restart/redeploy the web service._
+    > **Note (Render Hosting):** _If you face anyproblem accessing `Advanced option` then just click on `Create Web Service` then from `Environment` > `Secret Files` and add the `config.py` values. Then restart/redeploy the web service._
 
-    > **Important (Render Hosting):** _After deployment complete go to [Render Dashboard](https://dashboard.render.com/) and open your service then you can see service url on top left corner [https://example.onrender.com]() copy that and go to bot `/bsettings` server url and edit with your service url. (**So that bot won't go to sleep**)_
+    > **Important (Render Hosting):** _After deployment complete go to [Render Dashboard](https://dashboard.render.com/) and open your service then you can see service url on top left corner [https://example.onrender.com]() copy that and go to Environments and edit config.py `server_url` with your service url. (**So that bot won't fall asleep**)_
 
-**_After deployment complete, don't forget to visit `/bsettings`_** 
-
---- -->
+---
 
 <p align="center">
   Made with ❤️ by <a href="https://github.com/bishalqx980">bishalqx980</a>

@@ -16,6 +16,8 @@ class CONFIG:
 
         self.log_channel: Optional[int] = None    # INT Telegram Log Channel ID // use /id in channel after adding bot
         self.dump_channel: Optional[int] = None   # INT Telegram Dump Channel ID // use /id in channel after adding bot
+
+        self.server_url: Optional[str] = None     # STR Optional but recommended if you are hosting on Render. Fill this with render server url E.g. https://example.onrender.com
     
     
     def validate(self) -> bool:

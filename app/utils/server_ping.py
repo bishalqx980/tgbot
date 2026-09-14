@@ -1,7 +1,7 @@
 import asyncio
 import aiohttp
 
-from app import logger, RUN_SERVER
+from app import logger, config, RUN_SERVER
 from app.database import MongoDB
 from app.utils.server.server import RunServer
 
@@ -11,9 +11,8 @@ async def keep_server_alive():
         return
 
     RunServer()
-    
-    bot_data = MongoDB.get_bot_data()
-    server_url = bot_data.get("server_url")
+
+    server_url = config.server_url
     sleeptime = 180 # 3 min
 
     if not server_url:
@@ -25,12 +24,12 @@ async def keep_server_alive():
     while True:
 
         # Everytime check if there is new server_url
-        bot_data = MongoDB.get_bot_data()
-        server_url = bot_data.get("server_url")
+        # bot_data = MongoDB.get_bot_data()
+        # server_url = bot_data.get("server_url")
 
-        if not server_url:
-            await asyncio.sleep(sleeptime)
-            return
+        # if not server_url:
+        #     await asyncio.sleep(sleeptime)
+        #     return
         
         if not server_url.startswith("http"):
             server_url = f"http://{server_url}"

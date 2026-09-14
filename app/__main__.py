@@ -77,7 +77,7 @@ async def app_init():
 
     # Run Server - This need to run at the end otherwise it will stuck the bot process
     await keep_server_alive()
-    # await idle()
+    await idle()
 
 
 async def main():

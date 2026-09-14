@@ -4,9 +4,8 @@ from time import time
 from pyrogram import filters
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
-from app import bot, logger, COMMAND_PREFIXES
+from app import bot, logger, config, COMMAND_PREFIXES
 from app.decorators import privatechat_only
-from app.database import MongoDB
 from app.helpers import system_uptime
 from app.modules.utils import UTILITY
 
@@ -64,10 +63,9 @@ async def func_(_, message: Message):
     cache_time = SysMenuData.DATA.get("cache_time", 0)
     if (time() - cache_time) >= 3 * 60:
         # pinging server
-        bot_data = MongoDB.get_bot_data()
-        server_url = bot_data.get("server_url")
-        
+        server_url = config.server_url
         server_ping = "~ infinite ~" # pre-determined
+
         if server_url:
             server_url = server_url if server_url.startswith("http") else f"http://{server_url}"
             server_ping = await UTILITY.pingServer(server_url)
