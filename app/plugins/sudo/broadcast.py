@@ -4,7 +4,7 @@ from io import BytesIO
 
 from pyrogram import filters
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from pyrogram.errors import Forbidden
+from pyrogram.errors import BadRequest, Forbidden
 
 from app import bot, logger, COMMAND_PREFIXES
 from app.decorators import sudo_required, privatechat_only
@@ -159,7 +159,8 @@ async def start_broadcast(message: Message):
 
             succeed.append(uid)
 
-        except Forbidden:
+        except BadRequest:
+            # It would be forbidden but lib says as 400 USER_IS_BLOCKED under BadRequest
             failed.append(f"Forbidden: {uid}")
             # updating MongoDB
             MongoDB.update(

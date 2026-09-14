@@ -52,16 +52,28 @@ async def func_(_, message: Message):
             "Error: Ohh my head is spinning, I don't know what's going on."
         )
 
-    await sent_message.delete()
-    await message.reply_audio(
-        response,
-        (
-            f"**Filename : ** `{response.name}`\n"
-            f"**Message ID : ** `{re_msg.id}`\n"
-            f"**Lang Code : ** `{lang_code}`"
-        ),
-        title=response.name,
-        reply_parameters=ReplyParameters(
-            message_id=re_msg.id
-        )
+    await sent_message.edit_text(
+        "📤 Uploading..."
     )
+
+    try:
+    
+        await message.reply_audio(
+            response,
+            (
+                f"**Filename : ** `{response.name}`\n"
+                f"**Message ID : ** `{re_msg.id}`\n"
+                f"**Lang Code : ** `{lang_code}`"
+            ),
+            title=response.name,
+            reply_parameters=ReplyParameters(
+                message_id=re_msg.id
+            )
+        )
+
+        await sent_message.delete()
+
+    except Exception as e:
+        return await sent_message.edit_text(
+            f"Error: {e}"
+        )
