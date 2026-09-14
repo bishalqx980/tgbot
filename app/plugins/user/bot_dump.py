@@ -1,7 +1,14 @@
 from uuid import uuid4
 
 from pyrogram import filters
-from pyrogram.types import Message, User, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.types import (
+    Message,
+    User,
+    ReplyParameters,
+    CallbackQuery,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton
+)
 from pyrogram.enums import ButtonStyle
 
 from app import bot, logger, config, COMMAND_PREFIXES
@@ -47,10 +54,7 @@ async def func_(_, message: Message):
             f"**Version :** `{__module__['version']}`\n"
             f"**Author :** `{__module__['author']}`\n\n"
 
-            f"#{__module__['_id']}",
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("Click", "demo:hello")
-            ]])
+            f"#{__module__['_id']}"
         )
     
     try:
@@ -76,40 +80,31 @@ async def func_(_, message: Message):
         )
 
         bot_url = f"http://t.me/{bot.me.username}/?start=dump_{key}"
+        btn = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Copy Link", copy_text=bot_url),
+            InlineKeyboardButton(
+                "Delete file",
+                f"dump:delete:{key}",
+                style=ButtonStyle.DANGER
+            )
+        ]])
 
         await message.reply(
             "Document has been saved successfully.\n"
             f"• [Get the file]({bot_url})",
-            reply_markup=InlineKeyboardMarkup([
-                [
-                    InlineKeyboardButton("Open Link", url=bot_url),
-                    InlineKeyboardButton("Copy Link", copy_text=bot_url)
-                ],
-                [
-                    InlineKeyboardButton(
-                        "Delete file",
-                        f"dump:delete:{key}",
-                        style=ButtonStyle.DANGER
-                    )
-                ]
-            ])
+            reply_markup=btn
         )
 
         # Save info on dump channel too
         await bot.send_message(
             config.dump_channel,
             "> Dump Information\n\n"
-            f"Sender ID : `{user.id}`\n"
-            f"Message ID : `{forwarded_message.id}`\n"
-            f"Key : `{key}`\n",
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("Open Link", url=bot_url),
-                InlineKeyboardButton(
-                    "Delete file",
-                    f"dump:delete:{key}",
-                    style=ButtonStyle.DANGER
-                )
-            ]])
+            f"• Sender ID : `{user.id}`\n"
+            f"• Message ID : `{forwarded_message.id}`\n"
+            f"• Key : `{key}`\n"
+            f"• [Get the file]({bot_url})",
+            reply_parameters=ReplyParameters(message_id=forwarded_message.id),
+            reply_markup=btn
         )
 
     except Exception as e:

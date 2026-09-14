@@ -1,9 +1,8 @@
 {
     "_comment": "major.minor.patch.commits",
     "__status__": "Beta",
-    "__version__": "2.2.0.600",
+    "__version__": "2.2.1.601",
     "update_note": [
-        "- Added log & dump channel id in config.py",
-        "- Added dump func"
+        "- Minor fixes"
     ]
 }
