@@ -21,7 +21,7 @@ __module__ = {
     "commands": ["save", "dump"], # list of commands including aliases
 
     "description": (
-        "Store files/documents and generate a unique URL for later retrieval.\n\n"
+        "Store files/documents and generate a unique URL for later retrieval.\n"
         "E.g. Reply any document with this command to generate a unique URL."
     ),
     "category": "user", # check app/__init__.py for HELP_MENU_CATEGORIES
@@ -80,18 +80,22 @@ async def func_(_, message: Message):
         )
 
         bot_url = f"http://t.me/{bot.me.username}/?start=dump_{key}"
-        btn = InlineKeyboardMarkup([[
-            InlineKeyboardButton("Copy Link", copy_text=bot_url),
-            InlineKeyboardButton(
-                "Delete file",
-                f"dump:delete:{key}",
-                style=ButtonStyle.DANGER
-            )
-        ]])
+        btn = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton("Get the document", url=bot_url)
+            ],
+            [
+                InlineKeyboardButton("Copy link", copy_text=bot_url),
+                InlineKeyboardButton(
+                    "Delete document",
+                    f"dump:delete:{key}",
+                    style=ButtonStyle.DANGER
+                )
+            ]
+        ])
 
         await message.reply(
-            "Document has been saved successfully.\n"
-            f"• [Get the file]({bot_url})",
+            "Document has been saved successfully.",
             reply_markup=btn
         )
 
@@ -99,10 +103,9 @@ async def func_(_, message: Message):
         await bot.send_message(
             config.dump_channel,
             "> Dump Information\n\n"
-            f"• Sender ID : `{user.id}`\n"
-            f"• Message ID : `{forwarded_message.id}`\n"
-            f"• Key : `{key}`\n"
-            f"• [Get the file]({bot_url})",
+            f"• Dumper ID : `{user.id}`\n"
+            f"• Message Link : [{forwarded_message.id}]({forwarded_message.link})\n"
+            f"• Key : `{key}`",
             reply_parameters=ReplyParameters(message_id=forwarded_message.id),
             reply_markup=btn
         )
@@ -121,15 +124,84 @@ async def query_(_, query: CallbackQuery):
     if query_data.startswith("delete:"):
         key = query_data.removeprefix("delete:")
 
-        MongoDB.delete(
+        # Get the database info before deleting
+        data = MongoDB.search(
             DUMP_COLLECTION_NAME,
             "key",
             key
         )
 
-        await query.edit_message_text(
-            "File has been deleted successfully."
+        if not data:
+            return await query.answer(
+                "Error: Unable to fetch data from database!\nPossibly invalid key!"
+            )
+
+        # (Note: Need to add sudo_users access)
+        sudo_users = [config.owner_id]
+
+        if query.from_user.id != data["user_id"] and query.from_user.id not in sudo_users:
+            return await query.answer(
+                "Access denied!"
+            )
+        
+        is_deleted = MongoDB.delete(
+            DUMP_COLLECTION_NAME,
+            "key",
+            key
         )
+
+        if is_deleted:
+            try:
+
+                # +1 of the original message ID
+                bot_message_id = data["message_id"] + 1
+
+                await bot.edit_message_text(
+                    chat_id=config.dump_channel,
+                    message_id=bot_message_id,
+                    text=(
+                        "> Dump Information\n\n"
+                        f"• Dumper ID : `{data['user_id']}`\n"
+                        f"• Message ID : `{data['message_id']}`\n\n"
+                        "<i>Document has been deleted by dumper.</i>"
+                    )
+                )
+
+            except Exception as e:
+                logger.error(e)
+
+            # responding dumper
+            if query.from_user.id == data["user_id"]:
+                await query.edit_message_text(
+                    "Document has been deleted successfully."
+                )
+
+        else:
+            return await query.answer(
+                "Error: failed to delete the document."
+            )
+
+        # Send a alert message to the dumper if the document get deleted by sudo_users
+        if query.from_user.id in sudo_users:
+            try:
+
+                # giving the document back to the dumper
+                await bot.forward_messages(
+                    chat_id=data["user_id"],
+                    from_chat_id=config.dump_channel,
+                    message_ids=data["message_id"],
+                    hide_sender_name=True,
+                    hide_captions=False
+                )
+
+                await bot.send_message(
+                    data["user_id"],
+                    f"Your dumped document has been deleted by {query.from_user.mention}!\n\n"
+                    f"<i>Note: you can dump the document again using /{__module__['commands'][0]} command!</i>"
+                )
+
+            except Exception as e:
+                logger.error(e)
 
 
 @bot.on_message(filters.regex(r"^/start dump_(?P<key>[A-Za-z0-9_-]+)$"))

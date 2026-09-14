@@ -1,8 +1,8 @@
 {
     "_comment": "major.minor.patch.commits",
     "__status__": "Beta",
-    "__version__": "2.2.2.602",
+    "__version__": "2.2.3.603",
     "update_note": [
-        "- Minor fixes"
+        "- Updated dumper (bot_dump.py)"
     ]
 }
