@@ -1,7 +1,7 @@
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.enums import ChatType
-from pyrogram.errors import Forbidden
+from pyrogram.errors import BadRequest, Forbidden
 
 from app import bot, COMMAND_PREFIXES
 from app.decorators import privatechat_only, sudo_required
@@ -13,7 +13,7 @@ __module__ = {
     "name": "send",
     "commands": ["send"], # list of commands including aliases
 
-    "description": "Send message to specified user! E.g. reply a message with `/send [username / userid]` or `/send f [username / userid]` to forward.",
+    "description": "Send message to specified user! E.g. reply a message with `/send ( username / userid )`",
     "category": "sudo", # check app/__init__.py for HELP_MENU_CATEGORIES
     "button_name": "Send", # Help menu button name (Note: Leaving blank or None will result in no button on help menu)
 
@@ -28,10 +28,9 @@ __module__ = {
 async def func_(_, message: Message):
     user = message.from_user or message.sender_chat
     re_msg = message.reply_to_message
-    # contains str if forward is true and chat_id >> /send f chat_id
-    args = CommandArgs(message.text, message.command)
+    victim_username_or_id = CommandArgs(message.text, message.command)
 
-    if not args or not re_msg:
+    if not victim_username_or_id or not re_msg:
         return await message.reply(
             f"**Name :** `{__module__['name']}`\n"
             f"**Command/s :** {' ༝ '.join(f'/{cmd}' for cmd in __module__['commands'])}\n"
@@ -44,121 +43,137 @@ async def func_(_, message: Message):
         )
 
     sent_message = await message.reply("Sending...")
-    
-    forward_confirm = None
-    victim_id = args # CHAT_ID or USERNAME
 
-    splited_text = args.split()
-    if len(splited_text) == 2:
-        forward_confirm, victim_id = splited_text
-    
+    victim_username, victim_id = None, None
+
     try:
-        # int convert to fix contacts.ResolvePhone error
-        try:
-            victim_id = int(victim_id)
-        except (ValueError, TypeError):
-            pass
 
-        if forward_confirm:
-            await bot.forward_messages(victim_id, user.id, re_msg.id)
+        if victim_username_or_id.startswith("@"):
+            victim_username = victim_username_or_id
         
         else:
+
             try:
-                victim_chat_info = await bot.get_chat(victim_id)
-            except Exception as e:
-                return await sent_message.edit(f"Error: {e}")
-            
-            if victim_chat_info.type == ChatType.PRIVATE:
-                text = (
-                    f"Message: {re_msg.text.html if re_msg.text else None}\n\n"
-                    "<i>Reply to this message to continue conversation!</i>\n"
-                    f"||#UID{hex(user.id).upper()}||"
-                )
-                caption = (
-                    f"Message: {re_msg.caption.html if re_msg.caption else None}\n\n"
-                    "<i>Reply to this message to continue conversation!</i>\n"
-                    f"||#UID{hex(user.id).upper()}||"
-                )
-            else:
-                text = re_msg.text.html if re_msg.text else None
-                caption = re_msg.caption.html if re_msg.caption else None
-            
-            photo = re_msg.photo
-            audio = re_msg.audio
-            video = re_msg.video
-            document = re_msg.document
-            voice = re_msg.voice
-            video_note = re_msg.video_note
-            reply_markup = re_msg.reply_markup
+                victim_id = int(victim_username_or_id)
+            except (ValueError, TypeError):
+                pass
 
-            if text:
-                await bot.send_message(
-                    victim_id,
-                    text,
-                    reply_markup=reply_markup
-                )
-
-            elif photo:
-                await bot.send_photo(
-                    victim_id,
-                    photo.file_id,
-                    caption,
-                    reply_markup=reply_markup
-                )
-
-            elif audio:
-                await bot.send_audio(
-                    victim_id,
-                    audio.file_id,
-                    title=audio.file_name,
-                    caption=caption,
-                    reply_markup=reply_markup,
-                    filename=audio.file_name
-                )
-
-            elif video:
-                await bot.send_video(
-                    victim_id,
-                    video.file_id,
-                    caption=caption,
-                    reply_markup=reply_markup
-                )
-
-            elif document:
-                await bot.send_document(
-                    victim_id,
-                    document.file_id,
-                    caption,
-                    reply_markup=reply_markup,
-                    filename=document.file_name
-                )
+    except Exception as e:
+        return await sent_message.edit(
+            f"Error: {e}"
+        )
+    
+    try:
+        try:
+            victim = await bot.get_chat(victim_username or victim_id)
+        except Exception as e:
+            return await sent_message.edit(
+                f"Error: {e}"
+            )
             
-            elif voice:
-                await bot.send_voice(
-                    victim_id,
-                    voice.file_id,
-                    caption=caption,
-                    reply_markup=reply_markup
-                )
-            
-            elif video_note:
-                await bot.send_video_note(
-                    victim_id,
-                    video_note.file_id,
-                    reply_markup=reply_markup
-                )
-            
-            else:
-                return await sent_message.edit(
-                    "Error: Replied content isn't added yet. Stay tuned for future update."
-                )
+        if victim.type in [ChatType.GROUP, ChatType.SUPERGROUP]:
+            text = re_msg.html_text
+            caption = re_msg.caption.html if re_msg.caption else None
+
+        else:
+            text = (
+                f"Message: {re_msg.html_text}\n\n"
+                "<i>Reply to this message to continue conversation!</i>\n"
+                f"|| #uid{hex(user.id)} ||"
+            )
+
+            caption = (
+                f"Message: {re_msg.caption.html if re_msg.caption else None}\n\n"
+                "<i>Reply to this message to continue conversation!</i>\n"
+                f"|| #uid{hex(user.id)} ||"
+            )
+        
+        photo = re_msg.photo
+        audio = re_msg.audio
+        video = re_msg.video
+        document = re_msg.document
+        voice = re_msg.voice
+        video_note = re_msg.video_note
+        sticker = re_msg.sticker
+        reply_markup = re_msg.reply_markup
+
+        if photo:
+            await bot.send_photo(
+                chat_id=victim.id,
+                photo=photo.file_id,
+                caption=caption,
+                reply_markup=reply_markup
+            )
+
+        elif audio:
+            await bot.send_audio(
+                chat_id=victim.id,
+                audio=audio.file_id,
+                title=audio.file_name,
+                caption=caption,
+                reply_markup=reply_markup,
+                file_name=audio.file_name
+            )
+
+        elif video:
+            await bot.send_video(
+                chat_id=victim.id,
+                video=video.file_id,
+                caption=caption,
+                reply_markup=reply_markup
+            )
+
+        elif document:
+            await bot.send_document(
+                chat_id=victim.id,
+                document=document.file_id,
+                caption=caption,
+                reply_markup=reply_markup,
+                file_name=document.file_name
+            )
+        
+        elif voice:
+            await bot.send_voice(
+                chat_id=victim.id,
+                voice=voice.file_id,
+                caption=caption,
+                reply_markup=reply_markup
+            )
+        
+        elif video_note:
+            await bot.send_video_note(
+                chat_id=victim.id,
+                video_note=video_note.file_id,
+                reply_markup=reply_markup
+            )
+
+        elif sticker:
+            await bot.send_sticker(
+                chat_id=victim_id,
+                sticker=sticker.file_id,
+                caption=caption,
+                reply_markup=reply_markup
+            )
+
+        # this condition need to set at bottom to check others first
+        elif text:
+            await bot.send_message(
+                chat_id=victim.id,
+                text=text,
+                reply_markup=reply_markup
+            )
+        
+        else:
+            return await sent_message.edit(
+                "Error: Unknown type!"
+            )
         
         reaction = "👍"
         await sent_message.edit(
-            "Message sent!"
+            "Message has been sent!"
         )
 
-    except Forbidden as e:
+    except BadRequest as e:
         reaction = "👎"
         await sent_message.edit(f"Error: {e}")
 

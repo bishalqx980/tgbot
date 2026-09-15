@@ -13,6 +13,7 @@ from pyrogram.enums import ButtonStyle
 
 from app import bot, logger, config, COMMAND_PREFIXES
 from app.database import MongoDB
+from app.helpers import CommandArgs
 
 
 __module__ = {
@@ -22,7 +23,7 @@ __module__ = {
 
     "description": (
         "Store files/documents and generate a unique URL for later retrieval.\n"
-        "E.g. Reply any document with this command to generate a unique URL."
+        "E.g. Reply any document with this command to generate a unique URL. OR `/dump title`"
     ),
     "category": "user", # check app/__init__.py for HELP_MENU_CATEGORIES
     "button_name": "Dump", # Help menu button name (Note: Leaving blank or None will result in no button on help menu)
@@ -39,6 +40,7 @@ DUMP_COLLECTION_NAME = "dumps"
 async def func_(_, message: Message):
     user = message.from_user or message.sender_chat
     re_msg = message.reply_to_message
+    title = CommandArgs(message.text, message.command)
 
     if not isinstance(user, User):
         return await message.reply(
@@ -74,6 +76,7 @@ async def func_(_, message: Message):
             key,
             {
                 "key": key,
+                "title": title,
                 "user_id": user.id, # file saver user id
                 "message_id": forwarded_message.id
             }
@@ -219,10 +222,25 @@ async def func_(_, message: Message):
             "Error: Invalid key!"
         )
     
-    await bot.forward_messages(
+    sent_message = await bot.forward_messages(
         chat_id=message.chat.id,
         from_chat_id=config.dump_channel,
         message_ids=data["message_id"],
         hide_sender_name=True,
         hide_captions=False
     )
+
+    if data["user_id"] == message.from_user.id:
+        bot_url = f"http://t.me/{bot.me.username}/?start=dump_{key}"
+
+        await sent_message.reply(
+            "Available option's.",
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("Copy link", copy_text=bot_url),
+                InlineKeyboardButton(
+                    "Delete document",
+                    f"dump:delete:{key}",
+                    style=ButtonStyle.DANGER
+                )
+            ]])
+        )

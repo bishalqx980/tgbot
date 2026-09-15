@@ -1,8 +1,11 @@
 {
     "_comment": "major.minor.patch.commits",
     "__status__": "Beta",
-    "__version__": "2.2.4.604",
+    "__version__": "2.2.8.605",
     "update_note": [
-        "- Updated README.md & server_url config"
+        "- Added dumps command",
+        "- send.py bug fixed",
+        "- Updated translator",
+        "- Updated dump.py"
     ]
 }

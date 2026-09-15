@@ -5,7 +5,7 @@ from pyrogram.enums import ChatType
 from app import bot, COMMAND_PREFIXES, TL_LANG_CODES_URL
 from app.database import MongoDB
 from app.helpers import CommandArgs
-from app.modules.gtranslator import fetch_langcode, Translate
+from app.modules import translator
 
 
 __module__ = {
@@ -52,7 +52,7 @@ async def func_(_, message: Message):
     
     to_translate = None
     lang_code = None
-    LANG_CODE_LIST = fetch_langcode()
+    LANG_CODE_LIST = translator.lang_codes()
     
     if args:
         words = args.split()
@@ -95,16 +95,15 @@ async def func_(_, message: Message):
     
     sent_message = await message.reply("💭 Translating...")
 
-    text = Translate(to_translate, lang_code)
+    text = translator.translate(to_translate, lang_code)
     btn = None
 
-    if text is False:
-        text = f"Invalid language code was given! Use /{message.command[0]} to get more details or /settings to set chat language."
+    if text:
         btn = InlineKeyboardMarkup([[
             InlineKeyboardButton("Language code's", url=TL_LANG_CODES_URL)
         ]])
 
-    elif not text:
+    else:
         text = "Error: Hmm,. Something went wrong!!"
     
     await sent_message.edit_text(text, reply_markup=btn)
