@@ -1,3 +1,6 @@
+from uuid import uuid4
+from io import BytesIO
+
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -83,9 +86,27 @@ async def func_(_, message: Message):
             rows.append(row)
 
         buttons = InlineKeyboardMarkup(rows)
-    
-    await sent_message.edit(
+
+    text = (
         "> My Dump's\n\n"
-        f"{text}",
-        reply_markup=buttons
+        f"{text}"
     )
+
+    try:
+        await sent_message.edit(
+            text,
+            reply_markup=buttons
+        )
+    except:
+        buffer = BytesIO(text.encode())
+        buffer.name = f"dumps_{uuid4().hex}.md"
+
+        await sent_message.delete()
+
+        await message.reply_document(
+            document=buffer,
+            caption=(
+                f"<i>{buffer.name}</i>"
+            ),
+            file_name=buffer.name
+        )
