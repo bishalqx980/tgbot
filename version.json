@@ -1,7 +1,7 @@
 {
     "_comment": "major.minor.patch.commits",
     "__status__": "Beta",
-    "__version__": "2.2.11.608",
+    "__version__": "2.2.12.609",
     "update_note": [
         "- minor update"
     ]

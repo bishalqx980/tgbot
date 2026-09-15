@@ -187,7 +187,7 @@ async def query_(_, query: CallbackQuery):
             )
 
         # Send a alert message to the dumper if the document get deleted by sudo_users
-        if query.from_user.id in sudo_users:
+        if query.from_user.id in sudo_users and query.from_user.id != data["user_id"]:
             try:
 
                 # giving the document back to the dumper
