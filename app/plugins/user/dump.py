@@ -107,6 +107,7 @@ async def func_(_, message: Message):
             config.dump_channel,
             "> Dump Information\n\n"
             f"• Dumper ID : `{user.id}`\n"
+            f"• Title : {title}\n",
             f"• Message Link : [{forwarded_message.id}]({forwarded_message.link})\n"
             f"• Key : `{key}`",
             reply_parameters=ReplyParameters(message_id=forwarded_message.id),
@@ -165,6 +166,7 @@ async def query_(_, query: CallbackQuery):
                     text=(
                         "> Dump Information\n\n"
                         f"• Dumper ID : `{data['user_id']}`\n"
+                        f"• Title : `{data['title']}`\n"
                         f"• Message ID : `{data['message_id']}`\n\n"
                         "<i>Document has been deleted by dumper.</i>"
                     )
