@@ -69,8 +69,8 @@ def GenerateHelpMenu(category = None, page = 1):
 
     # Navigation buttons
     nav = []
-    back_btn = InlineKeyboardButton(f"◀ Back ({page - 1})", f"help_nav:{category}:{page - 1}")
-    next_btn = InlineKeyboardButton(f"▶ Next ({page + 1})", f"help_nav:{category}:{page + 1}")
+    back_btn = InlineKeyboardButton(f"« Back", f"help_nav:{category}:{page - 1}")
+    next_btn = InlineKeyboardButton(f"Next »", f"help_nav:{category}:{page + 1}")
 
     if page > 1:
         nav.append(back_btn)
@@ -85,6 +85,8 @@ def GenerateHelpMenu(category = None, page = 1):
         InlineKeyboardButton("☰ Menu", "help:menu"),
         InlineKeyboardButton("✘ Close", "help:close")
     ])
+
+    message += f"\n<i>Page : {page}/{total_pages}</i>"
 
     return {
         "message": message,
@@ -316,7 +318,7 @@ async def query_(_, query: CallbackQuery):
         )
         
         btn = InlineKeyboardMarkup([[
-            InlineKeyboardButton("◀ Back", f"help:{category}:"),
+            InlineKeyboardButton("« Back", f"help:{category}:"),
             InlineKeyboardButton("✘ Close", "help:close"),
             InlineKeyboardButton("☰ Menu", "help:menu")
         ]])
@@ -324,7 +326,7 @@ async def query_(_, query: CallbackQuery):
     else:
         return await query.answer("World of madness!!", True)
     
-    # global reply
+    # final reply
     try:
         await query.edit_message_caption(text, reply_markup=btn)
     except BadRequest:

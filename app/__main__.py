@@ -6,13 +6,10 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, BotComman
 
 from app import bot, logger, config, __version__, __versionStatus__, __githubVersionURL__, MODULES, FAILED_TO_LOAD_MODULES
 from app.modules import telegraph
+from app.helpers import _version_compare
 from app.utils.loader import load_plugins
 from app.utils.update_database import update_database
 from app.utils.server_ping import keep_server_alive
-
-
-def _version_compare(current, latest):
-    return tuple(map(int, current.split("."))) >= tuple(map(int, latest.split(".")))
 
 
 async def app_init():

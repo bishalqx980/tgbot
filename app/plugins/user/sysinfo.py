@@ -193,7 +193,7 @@ async def query_(_, query: CallbackQuery):
             except: pass
         return
     
-    # global reply
+    # final reply
     try:
         await query.edit_message_text(text, reply_markup=btn)
     except Exception as e:

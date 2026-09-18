@@ -1,6 +1,10 @@
 from app import logger, COMMAND_PREFIXES
 
 
+def _version_compare(current, latest):
+    return tuple(map(int, current.split("."))) >= tuple(map(int, latest.split(".")))
+
+
 def CommandArgs(text: str, commands: list, prefixes: list = COMMAND_PREFIXES):
     """
     Extracts args from given text by removing command & prefixes.

@@ -1,11 +1,13 @@
+import requests
+
 from pyrogram import filters
 from pyrogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ChatType
 from pyrogram.errors import BadRequest
 
-from app import bot, logger, __version__, __versionStatus__, COMMAND_PREFIXES, ORIGINAL_BOT_ID, ORIGINAL_BOT_USERNAME
+from app import bot, logger, __version__, __versionStatus__, __githubVersionURL__, COMMAND_PREFIXES, ORIGINAL_BOT_ID, ORIGINAL_BOT_USERNAME
 from app.database import MongoDB, SessionData
-from app.helpers import system_uptime
+from app.helpers import system_uptime, _version_compare
 
 
 __module__ = {
@@ -185,7 +187,8 @@ async def query_(_, query: CallbackQuery):
 
             f"**• System uptime :** `{uptime['system_uptime']}`\n"
             f"**• Bot uptime :** `{uptime['bot_uptime']}`\n"
-            f"**• Version ({__versionStatus__}) :** `{__version__}`\n\n"
+            f"**• Version (<i>{__versionStatus__}</i>) :** `{__version__}` "
+            "`({is_latest})`\n\n"
 
             "**<i>• /sysinfo : To get system info...</i>**"
         )
@@ -195,7 +198,8 @@ async def query_(_, query: CallbackQuery):
             t_users_count = "loading...",
             active_users = "loading...",
             inactive_users = "loading...",
-            t_chats_count = "loading..."
+            t_chats_count = "loading...",
+            is_latest = "???"
         )
 
         btn = InlineKeyboardMarkup([
@@ -208,7 +212,7 @@ async def query_(_, query: CallbackQuery):
                 InlineKeyboardButton("Buy me a Coffee", url = "https://telegra.ph/Buy-me-a-Coffee-03-01")
             ],
             [
-                InlineKeyboardButton("◀ Back", "start:menu"),
+                InlineKeyboardButton("« Back", "start:menu"),
                 InlineKeyboardButton("✘ Close", "start:close")
             ]
         ])
@@ -234,15 +238,35 @@ async def query_(_, query: CallbackQuery):
         active_users = active_status.count(True)
         inactive_users = active_status.count(False)
 
+        # get version info
+        try:
+                
+            is_latest = "???"
+
+            res = requests.get(__githubVersionURL__)
+            if res.ok:
+                data = res.json()
+                __githubVersion__ = data.get("__version__")
+
+            if _version_compare(__version__, __githubVersion__):
+                is_latest = "latest"
+                
+            else:
+                is_latest = "outdated"
+
+        except Exception as e:
+            logger.error(e)
+
         # final formatting with db info
         text = text.format(
             t_users_count = t_users_count,
             active_users = active_users,
             inactive_users = inactive_users,
-            t_chats_count = t_chats_count
+            t_chats_count = t_chats_count,
+            is_latest = is_latest
         )
     
-    # global reply
+    # final reply
     try:
         await query.edit_message_caption(text, reply_markup=btn)
     except BadRequest:
