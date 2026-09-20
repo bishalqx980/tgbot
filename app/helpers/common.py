@@ -1,4 +1,4 @@
-from app import logger, COMMAND_PREFIXES
+from app import bot, logger, COMMAND_PREFIXES
 
 
 def _version_compare(current, latest):
@@ -24,7 +24,13 @@ def CommandArgs(text: str, commands: list, prefixes: list = COMMAND_PREFIXES):
             if text.startswith(c):
                 text = text[len(c):]
                 break
-        
+
+        # remove /command@bot_username
+        username = f"@{bot.me.username}"
+
+        if text.startswith(username):
+            text = text[len(username):]
+
         return text.strip()
     except Exception as e:
         logger.error(e)
