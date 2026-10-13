@@ -61,15 +61,31 @@ async def func_(_, message: Message):
     
     try:
 
+        try:
+
+            dump_files = await re_msg.get_media_group()
+            message_ids = [msg.id for msg in dump_files]
+
+        except ValueError:
+
+            message_ids = [re_msg.id]
+        
         key = uuid4().hex
 
         forwarded_message = await bot.forward_messages(
             chat_id=config.dump_channel,
             from_chat_id=message.chat.id,
-            message_ids=re_msg.id,
+            message_ids=message_ids,
             hide_sender_name=True,
             hide_captions=False
         )
+
+        forwarded_message_id = forwarded_message[0].id
+        forwarded_message_link = forwarded_message[0].link
+        forwarded_message_ids = [msg.id for msg in forwarded_message]
+
+        if not title:
+            title = re_msg.caption or key[:8]
 
         MongoDB.insert(
             DUMP_COLLECTION_NAME,
@@ -78,7 +94,7 @@ async def func_(_, message: Message):
                 "key": key,
                 "title": title,
                 "user_id": user.id, # file saver user id
-                "message_id": forwarded_message.id
+                "message_ids": forwarded_message_ids
             }
         )
 
@@ -108,9 +124,9 @@ async def func_(_, message: Message):
             "> Dump Information\n\n"
             f"• Dumper ID : `{user.id}`\n"
             f"• Title : {title}\n"
-            f"• Message Link : [{forwarded_message.id}]({forwarded_message.link})\n"
+            f"• Message Link : [{key[:8]}]({forwarded_message_link})\n"
             f"• Key : `{key}`",
-            reply_parameters=ReplyParameters(message_id=forwarded_message.id),
+            reply_parameters=ReplyParameters(message_id=forwarded_message_id),
             reply_markup=btn
         )
 
@@ -158,7 +174,7 @@ async def query_(_, query: CallbackQuery):
             try:
 
                 # +1 of the original message ID
-                bot_message_id = data["message_id"] + 1
+                bot_message_id = data["message_ids"][-1] + 1
 
                 await bot.edit_message_text(
                     chat_id=config.dump_channel,
@@ -167,7 +183,7 @@ async def query_(_, query: CallbackQuery):
                         "> Dump Information\n\n"
                         f"• Dumper ID : `{data['user_id']}`\n"
                         f"• Title : `{data['title']}`\n"
-                        f"• Message ID : `{data['message_id']}`\n\n"
+                        f"• Message ID : `{', '.join(map(str, data['message_ids']))}`\n\n"
                         "<i>Document has been deleted by dumper.</i>"
                     )
                 )
@@ -194,7 +210,7 @@ async def query_(_, query: CallbackQuery):
                 await bot.forward_messages(
                     chat_id=data["user_id"],
                     from_chat_id=config.dump_channel,
-                    message_ids=data["message_id"],
+                    message_ids=data["message_ids"],
                     hide_sender_name=True,
                     hide_captions=False
                 )
@@ -227,10 +243,12 @@ async def func_(_, message: Message):
     sent_message = await bot.forward_messages(
         chat_id=message.chat.id,
         from_chat_id=config.dump_channel,
-        message_ids=data["message_id"],
+        message_ids=data["message_ids"],
         hide_sender_name=True,
         hide_captions=False
     )
+
+    sent_message = sent_message[0]
 
     if data["user_id"] == message.from_user.id:
         bot_url = f"http://t.me/{bot.me.username}/?start=dump_{key}"

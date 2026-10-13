@@ -59,8 +59,7 @@ async def func_(_, message: Message):
         if data["user_id"] != user.id:
             continue
 
-        title = data.get("title")
-        message_id = data.get("message_id")
+        title = data.get("title") or key[:8]
 
         bot_url = f"http://t.me/{bot.me.username}/?start=dump_{key}"
 
@@ -69,7 +68,7 @@ async def func_(_, message: Message):
         )
 
         buttons.append(
-            InlineKeyboardButton(title or message_id, url=bot_url)
+            InlineKeyboardButton(title, url=bot_url)
         )
 
     if lines:
