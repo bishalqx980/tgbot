@@ -4,7 +4,8 @@ from io import BytesIO
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
-from app import bot, COMMAND_PREFIXES
+from app import bot, config, COMMAND_PREFIXES
+from app.helpers import CommandArgs
 from app.database import MongoDB
 from app.decorators import privatechat_only
 
@@ -12,7 +13,7 @@ from app.decorators import privatechat_only
 __module__ = {
     "_id": "", # leave it! Auto filled!
     "name": "mydumps",
-    "commands": ["mydumps", "dumps"], # list of commands including aliases
+    "commands": ["mydumps", "dumps", "saves"], # list of commands including aliases
 
     "description": "Get your dump list so far through the bot.",
     "category": "user", # check app/__init__.py for HELP_MENU_CATEGORIES
@@ -30,10 +31,20 @@ DUMP_COLLECTION_NAME = "dumps"
 @privatechat_only
 async def func_(_, message: Message):
     user = message.from_user or message.sender_chat
+    user_id = CommandArgs(message.text, message.command)
 
     sent_message = await message.reply(
         "Please wait..."
     )
+
+    # if the user is owner & send a userid as param, then he will get the specified user dumps list
+    if user_id and user.id == config.owner_id:
+        try:
+            search_user_id = int(user_id)
+        except (ValueError, TypeError):
+            search_user_id = user.id
+    else:
+        search_user_id = user.id
 
     keys = MongoDB.get_field_values(
         DUMP_COLLECTION_NAME,
@@ -51,12 +62,12 @@ async def func_(_, message: Message):
             key
         )
 
-        # This will never gonna happen but im using the condition
+        # This will never gonna happen but still using the condition
         if not data:
             continue
 
         # skiping other users data
-        if data["user_id"] != user.id:
+        if data["user_id"] != search_user_id:
             continue
 
         title = data.get("title") or key[:8]
@@ -64,7 +75,7 @@ async def func_(_, message: Message):
         bot_url = f"http://t.me/{bot.me.username}/?start=dump_{key}"
 
         lines.append(
-            f"• {title or '???'} : [Get the file]({bot_url})"
+            f"• {title} : [Get the file]({bot_url})"
         )
 
         buttons.append(
