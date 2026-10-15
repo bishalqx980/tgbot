@@ -9,6 +9,8 @@ from app.helpers import CommandArgs
 from app.database import MongoDB
 from app.decorators import privatechat_only
 
+from app.plugins.user.dump import DUMP_DATA
+
 
 __module__ = {
     "_id": "", # leave it! Auto filled!
@@ -22,9 +24,6 @@ __module__ = {
     "version": "1.0.0", # major.minor.patch
     "author": "http://github.com/bishalqx980"
 }
-
-# collection name for database
-DUMP_COLLECTION_NAME = "dumps"
 
 
 @bot.on_message(filters.command(__module__["commands"], COMMAND_PREFIXES))
@@ -47,7 +46,7 @@ async def func_(_, message: Message):
         search_user_id = user.id
 
     keys = MongoDB.get_field_values(
-        DUMP_COLLECTION_NAME,
+        DUMP_DATA.DUMP_COLLECTION_NAME,
         "key"
     )
 
@@ -57,7 +56,7 @@ async def func_(_, message: Message):
 
     for key in keys:
         data = MongoDB.search(
-            DUMP_COLLECTION_NAME,
+            DUMP_DATA.DUMP_COLLECTION_NAME,
             "key",
             key
         )

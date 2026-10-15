@@ -1,3 +1,4 @@
+import asyncio
 from uuid import uuid4
 
 from pyrogram import filters
@@ -32,8 +33,17 @@ __module__ = {
     "author": "http://github.com/bishalqx980"
 }
 
-# collection name for database
-DUMP_COLLECTION_NAME = "dumps"
+
+class DUMP_DATA:
+    # collection name for database
+    DUMP_COLLECTION_NAME = "dumps"
+    DUMP_MESSAGE_1 = (
+        "> Dump Information\n\n"
+        "• Dumper ID : `{dumper_id}`\n"
+        "• Title : {title}\n"
+        "• Key : `{key}`\n"
+        "• Self-destruct : {self_destruct}"
+    )
 
 
 @bot.on_message(filters.command(__module__["commands"], COMMAND_PREFIXES))
@@ -88,7 +98,7 @@ async def func_(_, message: Message):
             title = re_msg.caption or key[:8]
 
         MongoDB.insert(
-            DUMP_COLLECTION_NAME,
+            DUMP_DATA.DUMP_COLLECTION_NAME,
             key,
             {
                 "key": key,
@@ -104,6 +114,10 @@ async def func_(_, message: Message):
                 InlineKeyboardButton("Get the document", url=bot_url)
             ],
             [
+                InlineKeyboardButton("Enable Self-destruct", f"dump:e_sd:{key}"),
+                InlineKeyboardButton("Disable Self-destruct", f"dump:d_sd:{key}")
+            ],
+            [
                 InlineKeyboardButton("Copy link", copy_text=bot_url),
                 InlineKeyboardButton(
                     "Delete document",
@@ -114,7 +128,15 @@ async def func_(_, message: Message):
         ])
 
         await message.reply(
-            "Document has been saved successfully.",
+            (
+                "Document has been saved successfully.\n\n" +
+                DUMP_DATA.DUMP_MESSAGE_1.format(
+                    dumper_id=user.id,
+                    title=title,
+                    key=key,
+                    self_destruct="off"
+                )
+            ),
             reply_markup=btn
         )
 
@@ -141,12 +163,133 @@ async def func_(_, message: Message):
 async def query_(_, query: CallbackQuery):
     query_data = query.data.removeprefix("dump:")
 
-    if query_data.startswith("delete:"):
+    # Enable Self-destruct : e_sd
+    if query_data.startswith("e_sd:"):
+        key = query_data.removeprefix("e_sd:")
+
+        data = MongoDB.search(
+            DUMP_DATA.DUMP_COLLECTION_NAME,
+            "key",
+            key
+        )
+    
+        if not data:
+            return await query.answer(
+                "Error: Invalid key!",
+                True
+            )
+
+        response = MongoDB.update(
+            DUMP_DATA.DUMP_COLLECTION_NAME,
+            "key",
+            key,
+            { "self_destruct": 30 }
+        )
+
+        if response:
+            await query.answer(
+                "✅ Enabled Self-destruct timer!",
+                True
+            )
+        
+        else:
+            return await query.answer(
+                "❌ Failed to enable Self-destruct timer!",
+                True
+            )
+
+        try:
+
+            data = MongoDB.search(
+                DUMP_DATA.DUMP_COLLECTION_NAME,
+                "key",
+                key
+            )
+
+            dumper_id = data["user_id"]
+            title = data["title"]
+            self_destruct = data.get("self_destruct")
+
+            await query.edit_message_text(
+                DUMP_DATA.DUMP_MESSAGE_1.format(
+                    dumper_id=dumper_id,
+                    title=title,
+                    key=key,
+                    self_destruct=self_destruct or "off"
+                ),
+                reply_markup=query.message.reply_markup
+            )
+
+        except:
+            pass
+    
+    # Disable Self-destruct : d_sd
+    elif query_data.startswith("d_sd:"):
+        key = query_data.removeprefix("d_sd:")
+
+        data = MongoDB.search(
+            DUMP_DATA.DUMP_COLLECTION_NAME,
+            "key",
+            key
+        )
+    
+        if not data:
+            return await query.answer(
+                "Error: Invalid key!",
+                True
+            )
+
+        response = MongoDB.update(
+            DUMP_DATA.DUMP_COLLECTION_NAME,
+            "key",
+            key,
+            { "self_destruct": None }
+        )
+
+        if response:
+            await query.answer(
+                "✅ Disabled Self-destruct timer!",
+                True
+            )
+        
+        else:
+            return await query.answer(
+                "❌ Failed to disable Self-destruct timer!",
+                True
+            )
+
+        try:
+
+            data = MongoDB.search(
+                DUMP_DATA.DUMP_COLLECTION_NAME,
+                "key",
+                key
+            )
+        
+            dumper_id = data["user_id"]
+            title = data["title"]
+            self_destruct = data.get("self_destruct")
+
+            await query.edit_message_text(
+                DUMP_DATA.DUMP_MESSAGE_1.format(
+                    dumper_id=dumper_id,
+                    title=title,
+                    key=key,
+                    self_destruct=self_destruct or "off"
+                ),
+                reply_markup=query.message.reply_markup
+            )
+
+        except:
+            pass
+
+    # delete key from database
+    elif query_data.startswith("delete:"):
         key = query_data.removeprefix("delete:")
 
         # Get the database info before deleting
         data = MongoDB.search(
-            DUMP_COLLECTION_NAME,
+            DUMP_DATA.DUMP_COLLECTION_NAME,
             "key",
             key
         )
@@ -165,7 +308,7 @@ async def query_(_, query: CallbackQuery):
             )
         
         is_deleted = MongoDB.delete(
-            DUMP_COLLECTION_NAME,
+            DUMP_DATA.DUMP_COLLECTION_NAME,
             "key",
             key
         )
@@ -230,7 +373,7 @@ async def func_(_, message: Message):
     key = message.matches[0]["key"]
 
     data = MongoDB.search(
-        DUMP_COLLECTION_NAME,
+        DUMP_DATA.DUMP_COLLECTION_NAME,
         "key",
         key
     )
@@ -240,27 +383,54 @@ async def func_(_, message: Message):
             "Error: Invalid key!"
         )
     
+    dumper_id = data["user_id"]
+    title = data["title"]
+    message_ids = data["message_ids"]
+    self_destruct = data.get("self_destruct")
+    
     sent_message = await bot.forward_messages(
         chat_id=message.chat.id,
         from_chat_id=config.dump_channel,
-        message_ids=data["message_ids"],
+        message_ids=message_ids,
         hide_sender_name=True,
         hide_captions=False
     )
 
     sent_message = sent_message[0]
 
-    if data["user_id"] == message.from_user.id:
+    if dumper_id == message.from_user.id:
         bot_url = f"http://t.me/{bot.me.username}/?start=dump_{key}"
 
         await sent_message.reply(
-            "Available option's.",
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("Copy link", copy_text=bot_url),
-                InlineKeyboardButton(
-                    "Delete document",
-                    f"dump:delete:{key}",
-                    style=ButtonStyle.DANGER
-                )
-            ]])
+            DUMP_DATA.DUMP_MESSAGE_1.format(
+                dumper_id=dumper_id,
+                title=title,
+                key=key,
+                self_destruct=self_destruct or "off"
+            ),
+            reply_markup=InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton("Get the document", url=bot_url)
+                ],
+                [
+                    InlineKeyboardButton("Enable Self-destruct", f"dump:e_sd:{key}"),
+                    InlineKeyboardButton("Disable Self-destruct", f"dump:d_sd:{key}")
+                ],
+                [
+                    InlineKeyboardButton("Copy link", copy_text=bot_url),
+                    InlineKeyboardButton(
+                        "Delete document",
+                        f"dump:delete:{key}",
+                        style=ButtonStyle.DANGER
+                    )
+                ]
+            ])
         )
+
+    # self-destruct auto delete timer set
+    if self_destruct:
+        try:
+            await asyncio.sleep(self_destruct)
+            await sent_message.delete()
+        except Exception as e:
+            logger.error(e)
